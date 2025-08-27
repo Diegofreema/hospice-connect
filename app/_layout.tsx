@@ -1,13 +1,15 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { ThemeProvider } from '@shopify/restyle';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import React from 'react';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+import theme from '@/theme';
+import 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
@@ -18,11 +20,15 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
+    <ThemeProvider theme={theme}>
+      <SafeAreaView style={{ flex: 1 }} edges={['top', 'right', 'left']}>
+        <KeyboardProvider>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+        </KeyboardProvider>
+      </SafeAreaView>
       <StatusBar style="auto" />
     </ThemeProvider>
   );
