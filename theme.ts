@@ -1,6 +1,6 @@
 import { createTheme } from '@shopify/restyle';
 
-const palette = {
+export const palette = {
   purpleLight: '#8C6FF7',
   purpleDark: '#9747FF',
 
