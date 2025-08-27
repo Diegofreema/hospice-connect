@@ -1,4 +1,5 @@
 import { createTheme } from '@shopify/restyle';
+import { getFontSize } from './features/shared/utils';
 
 export const palette = {
   purpleLight: '#8C6FF7',
@@ -26,6 +27,8 @@ const theme = createTheme({
     mainBackground: palette.white,
     cardBackground: palette.greyLight,
     buttonBackground: palette.blue,
+    backgroundRed: palette.redDark,
+    black: palette.black,
   },
   spacing: {
     s: 8,
@@ -44,13 +47,32 @@ const theme = createTheme({
   },
   textVariants: {
     header: {
+      fontFamily: 'PublicSansBold',
       fontWeight: 'bold',
-      fontSize: 34,
+      fontSize: getFontSize(34),
+      lineHeight: 42.5,
+      color: 'black',
+    },
+    subheader: {
+      fontFamily: 'PublicSansSemibold',
+      fontWeight: '600',
+      fontSize: getFontSize(28),
+      lineHeight: 36,
+      color: 'black',
     },
     body: {
-      fontSize: 16,
+      fontFamily: 'PublicSansRegular',
+      fontSize: getFontSize(16),
       lineHeight: 24,
+      color: 'black',
     },
+    small: {
+      fontFamily: 'PublicSansLight',
+      fontSize: getFontSize(13),
+      lineHeight: 24,
+      color: 'black',
+    },
+
     defaults: {
       // We can define a default text variant here.
     },

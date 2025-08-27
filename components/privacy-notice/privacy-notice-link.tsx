@@ -34,5 +34,8 @@ const styles = StyleSheet.create({
   text: {
     color: '#007AFF',
     fontSize: 14,
+    marginBottom: -3,
+    fontFamily: 'PublicSansSemiBold',
+    textDecorationLine: 'underline',
   },
 });

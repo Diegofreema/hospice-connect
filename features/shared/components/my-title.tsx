@@ -1,16 +1,17 @@
 import { Title } from '@/components/title/Title';
 import { palette } from '@/theme';
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleProp, StyleSheet, TextStyle } from 'react-native';
 import { getFontSize } from '../utils';
 
 type Props = {
   title: string;
+  style?: StyleProp<TextStyle>;
 };
 
-export const MyTitle = ({ title }: Props) => {
+export const MyTitle = ({ title, style }: Props) => {
   return (
-    <Title style={styles.title} size={getFontSize(22)}>
+    <Title style={[styles.title, style]} size={getFontSize(22)}>
       {title}
     </Title>
   );
