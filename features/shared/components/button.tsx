@@ -40,6 +40,9 @@ type Props = RestyleProps & {
     | 'white'
     | 'textGrey'
     | 'transparent';
+  disabled?: boolean;
+  loading?: boolean;
+  loadingText?: string;
 };
 
 export const Button = ({
@@ -47,12 +50,15 @@ export const Button = ({
   label,
   rightIcon,
   color = 'white',
+  disabled = false,
+  loading,
+  loadingText,
   ...rest
 }: Props) => {
   const props = useRestyle(restyleFunctions, rest);
 
   return (
-    <TouchableOpacity onPress={onPress}>
+    <TouchableOpacity onPress={onPress} disabled={disabled}>
       <View
         alignItems={'center'}
         justifyContent={'center'}
@@ -65,7 +71,7 @@ export const Button = ({
       >
         {rightIcon}
         <Text variant="body" color={color}>
-          {label}
+          {loading ? loadingText : label}
         </Text>
       </View>
     </TouchableOpacity>

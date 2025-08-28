@@ -1,4 +1,3 @@
-import { PrivacyNoticeLink } from '@/components/privacy-notice/privacy-notice-link';
 import { Button } from '@/features/shared/components/button';
 import { Spacer } from '@/features/shared/components/spacer';
 import View from '@/features/shared/components/view';
@@ -15,7 +14,7 @@ import { useForm } from 'react-hook-form';
 import { TouchableOpacity } from 'react-native';
 import { loginSchema, LoginSchema } from '../../validators';
 import { ControlInput } from './control-input';
-export const LoginForm = () => {
+export const RegisterForm = () => {
   const [secured, setSecured] = useState(true);
   const {
     control,
@@ -69,16 +68,14 @@ export const LoginForm = () => {
         }
         secureTextEntry={secured}
       />
-      <PrivacyNoticeLink style={{ alignSelf: 'flex-end' }}>
-        Forgot Password?
-      </PrivacyNoticeLink>
+
       <Spacer />
       <Button
-        label="Login"
+        label="Create"
         disabled={isSubmitting}
         onPress={handleSubmit(onSubmit)}
         loading={isSubmitting}
-        loadingText="Logging in..."
+        loadingText="Creating..."
       />
     </View>
   );

@@ -37,6 +37,7 @@ const theme = createTheme({
     white: palette.white,
     textGrey: palette.textGrey,
     transparent: 'transparent',
+    error: palette.redDark,
   },
   spacing: {
     s: 8,

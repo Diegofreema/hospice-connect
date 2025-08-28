@@ -1,7 +1,7 @@
 import { PrivacyNoticeLink } from '@/components/privacy-notice/privacy-notice-link';
 import { Subtitle } from '@/components/subtitle/Subtitle';
 import { DividerWithText } from '@/features/authentication/components/divider-with-text';
-import { LoginForm } from '@/features/authentication/components/form/login-form';
+import { RegisterForm } from '@/features/authentication/components/form/register-form';
 import { PrivacyTermsLink } from '@/features/authentication/components/privacy-term';
 import { Button } from '@/features/shared/components/button';
 import { MyTitle } from '@/features/shared/components/my-title';
@@ -13,23 +13,23 @@ import { router } from 'expo-router';
 import React from 'react';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 
-const LoginScreen = () => {
+const CreateAccountScreen = () => {
   return (
     <Wrapper>
       <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <Spacer height={50} />
-        <MyTitle title="Sign in" />
+        <MyTitle title="Create an account" />
         <Subtitle style={{ color: palette.black }}>
-          Don&apos;t have an account?{' '}
+          Already have an account?{' '}
           <PrivacyNoticeLink
             tint={palette.blue}
-            onPress={() => router.push('/create')}
+            onPress={() => router.push('/')}
           >
-            Create Account
+            Log in
           </PrivacyNoticeLink>
         </Subtitle>
         <Spacer height={30} />
-        <LoginForm />
+        <RegisterForm />
         <DividerWithText />
 
         <Button
@@ -54,4 +54,4 @@ const LoginScreen = () => {
   );
 };
 
-export default LoginScreen;
+export default CreateAccountScreen;
