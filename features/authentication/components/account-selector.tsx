@@ -1,10 +1,10 @@
-import { Card } from '@/features/shared/components/card';
 import Text from '@/features/shared/components/text';
 import View from '@/features/shared/components/view';
 import { getFontSize } from '@/features/shared/utils';
+import { palette } from '@/theme';
 import Checkbox from 'expo-checkbox';
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 
 const accountTypes = [
   { type: 'nurse', text: 'Nurse' },
@@ -18,22 +18,20 @@ export const AccountSelector = ({ selected, setSelected }: Props) => {
   return (
     <View marginTop={'l'} gap="m">
       {accountTypes.map((accountType) => (
-        <Card
-          flexDirection={'row'}
-          gap={'s'}
-          alignItems={'center'}
+        <TouchableOpacity
           key={accountType.type}
-          variant={'transparent'}
+          style={styles.press}
+          onPress={() => setSelected(accountType.type)}
         >
           <Checkbox
             value={accountType.type === selected}
-            onValueChange={() => setSelected(accountType.type)}
             style={styles.checkBox}
           />
+
           <Text variant={'subheader'} fontSize={getFontSize(20)}>
             {accountType.text}
           </Text>
-        </Card>
+        </TouchableOpacity>
       ))}
     </View>
   );
@@ -42,5 +40,15 @@ export const AccountSelector = ({ selected, setSelected }: Props) => {
 const styles = StyleSheet.create({
   checkBox: {
     borderRadius: 100,
+  },
+  press: {
+    borderWidth: 1,
+    borderColor: palette.grey,
+    paddingHorizontal: 10,
+    paddingVertical: 15,
+    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
   },
 });

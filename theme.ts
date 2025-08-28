@@ -21,6 +21,8 @@ export const palette = {
 
   greyLight: '#F8F8F8',
   grey: '#ccc',
+  iconGrey: '#666666',
+  textGrey: '#8D8D8D',
 };
 
 const theme = createTheme({
@@ -33,6 +35,8 @@ const theme = createTheme({
     borderColor: palette.grey,
     blue: palette.blue,
     white: palette.white,
+    textGrey: palette.textGrey,
+    transparent: 'transparent',
   },
   spacing: {
     s: 8,

@@ -9,6 +9,7 @@ import {
   SpacingProps,
   useRestyle,
 } from '@shopify/restyle';
+import { ReactNode } from 'react';
 import { TouchableOpacity } from 'react-native';
 import Text from './text';
 import View from './view';
@@ -27,9 +28,27 @@ const restyleFunctions = composeRestyleFunctions<Theme, RestyleProps>([
 type Props = RestyleProps & {
   onPress: () => void;
   label: string;
+  rightIcon?: ReactNode;
+  color?:
+    | 'mainBackground'
+    | 'cardBackground'
+    | 'buttonBackground'
+    | 'backgroundRed'
+    | 'black'
+    | 'borderColor'
+    | 'blue'
+    | 'white'
+    | 'textGrey'
+    | 'transparent';
 };
 
-export const Button = ({ onPress, label, ...rest }: Props) => {
+export const Button = ({
+  onPress,
+  label,
+  rightIcon,
+  color = 'white',
+  ...rest
+}: Props) => {
   const props = useRestyle(restyleFunctions, rest);
 
   return (
@@ -40,9 +59,12 @@ export const Button = ({ onPress, label, ...rest }: Props) => {
         p={'m'}
         bg={'blue'}
         borderRadius={5}
+        flexDirection={'row'}
+        g={'s'}
         {...props}
       >
-        <Text variant="body" color={'white'}>
+        {rightIcon}
+        <Text variant="body" color={color}>
           {label}
         </Text>
       </View>

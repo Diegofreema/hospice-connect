@@ -1,8 +1,9 @@
+import { palette } from '@/theme';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import type { IPrivacyNoticeLinkProps } from './privacy-notice-link.types';
 
-const DEFAULT_TINT = '#007AFF';
+const DEFAULT_TINT = palette.blue;
 const DEFAULT_SIZE = 14;
 
 export const PrivacyNoticeLink: React.FC<IPrivacyNoticeLinkProps> &
