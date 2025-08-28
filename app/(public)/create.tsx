@@ -4,6 +4,7 @@ import { DividerWithText } from '@/features/authentication/components/divider-wi
 import { RegisterForm } from '@/features/authentication/components/form/register-form';
 import { GoogleButton } from '@/features/authentication/components/google-button';
 import { PrivacyTermsLink } from '@/features/authentication/components/privacy-term';
+import { BackButton } from '@/features/shared/components/back-button';
 import { MyTitle } from '@/features/shared/components/my-title';
 import { Spacer } from '@/features/shared/components/spacer';
 import { Wrapper } from '@/features/shared/components/wrapper';
@@ -15,8 +16,9 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 const CreateAccountScreen = () => {
   return (
     <Wrapper>
+      <BackButton />
       <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <Spacer height={50} />
+        <Spacer height={20} />
         <MyTitle title="Create an account" />
         <Subtitle style={{ color: palette.black }}>
           Already have an account?{' '}

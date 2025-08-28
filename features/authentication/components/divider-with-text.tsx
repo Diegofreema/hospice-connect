@@ -11,7 +11,8 @@ export const DividerWithText = () => {
       gap={'s'}
       marginVertical={'xl'}
     >
-      <HorizontalDivider /> <Text color={'textGrey'}>Or Continue with</Text>
+      <HorizontalDivider />
+      <Text color={'textGrey'}>Or Continue with</Text>
       <HorizontalDivider />
     </View>
   );

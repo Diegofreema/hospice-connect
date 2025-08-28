@@ -1,5 +1,5 @@
-import { StyleSheet } from "react-native";
-import { WIDTH } from "./const";
+import { StyleSheet } from 'react-native';
+import { WIDTH } from './const';
 
 export const otpInputStyles = StyleSheet.create({
   container: {
@@ -7,47 +7,48 @@ export const otpInputStyles = StyleSheet.create({
     height: 120,
   },
   row: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    // justifyContent: "center",
   },
   inputSize: {
-    marginHorizontal: 6,
+    // marginHorizontal: 6,
   },
   input: {
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   inputFocused: {
-    borderColor: "#f8fafc",
-    backgroundColor: "#0f0f23",
+    borderColor: '#f8fafc',
+    backgroundColor: '#0f0f23',
   },
   inputError: {
-    borderColor: "#ef4444",
-    backgroundColor: "#1c0a0a",
+    borderColor: '#ef4444',
+    backgroundColor: '#1c0a0a',
   },
   text: {
-    fontWeight: "600",
+    fontWeight: '600',
     fontSize: 18,
-    color: "#f8fafc",
+    color: '#f8fafc',
   },
   textError: {
-    color: "#fecaca",
+    color: '#fecaca',
   },
   blurContainer: {
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     width: 48,
     height: 56,
   },
   overlay: {
-    position: "absolute",
+    position: 'absolute',
   },
   errorMessage: {
-    color: "#ef4444",
+    color: '#ef4444',
     fontSize: 14,
-    fontWeight: "500",
-    textAlign: "center",
+    fontWeight: '500',
+    textAlign: 'center',
     marginTop: 20,
     paddingHorizontal: 16,
   },

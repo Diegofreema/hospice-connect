@@ -13,7 +13,7 @@ export const PrivacyNoticeLink: React.FC<IPrivacyNoticeLinkProps> &
 }: IPrivacyNoticeLinkProps): React.ReactNode => {
   return (
     <View style={[styles.container, props.style]}>
-      <TouchableOpacity onPress={props.onPress}>
+      <TouchableOpacity onPress={props.onPress} disabled={props.disabled}>
         <Text
           style={[
             styles.text,

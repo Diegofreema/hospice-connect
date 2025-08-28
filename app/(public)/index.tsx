@@ -30,9 +30,7 @@ const LoginScreen = () => {
         <Spacer height={30} />
         <LoginForm />
         <DividerWithText />
-
         <GoogleButton />
-
         <PrivacyTermsLink />
       </KeyboardAwareScrollView>
     </Wrapper>

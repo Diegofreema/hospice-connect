@@ -1,25 +1,25 @@
-import { OtpItem } from "./children/OTPItem";
-import { OtpContext } from "./context";
-import React, { useEffect, useRef, useState } from "react";
-import { TextInput, Text } from "react-native";
+import { palette } from '@/theme';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { TextInput } from 'react-native';
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  withSequence,
-  withRepeat,
   FadeInDown,
   FadeOutDown,
-} from "react-native-reanimated";
-import type { IOtpInput, OtpContextProps } from "./types";
-import { otpInputStyles as styles } from "./styles";
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
+import { OtpItem } from './children/OTPItem';
+import { OtpContext } from './context';
+import { otpInputStyles as styles } from './styles';
+import type { IOtpInput, OtpContextProps } from './types';
 
 export const OtpInput = ({
   otpCount = 6,
   containerStyle = {},
   otpInputStyle = {},
   textStyle = {},
-  focusedColor = "#f8fafc",
+  focusedColor = palette.blue,
 
   editable = true,
   enteringAnimated = FadeInDown,
@@ -27,16 +27,16 @@ export const OtpInput = ({
   onInputFinished,
   onInputChange,
   error = false,
-  errorMessage = "Invalid OTP. Please try again.",
+  errorMessage = 'Invalid OTP. Please try again.',
   inputBorderRadius = 20,
   inputWidth = 60,
   inputHeight = 60,
   ...rest
 }: IOtpInput) => {
   const inputRef = useRef<any[]>([]);
-  const data: string[] = new Array(otpCount).fill("");
+  const data: string[] = new Array(otpCount).fill('');
   inputRef.current = data.map(
-    (_, index) => (inputRef.current[index] = React.createRef<TextInput>()),
+    (_, index) => (inputRef.current[index] = React.createRef<TextInput>())
   );
   const [focus, setFocus] = useState<number>(0);
   const [otpValue, setOtpValue] = useState<string[]>(data);
@@ -47,7 +47,7 @@ export const OtpInput = ({
   const onPress = () => {
     if (focus === -1) {
       setFocus(otpCount - 1);
-      otpValue[data.length - 1] = "";
+      otpValue[data.length - 1] = '';
       setOtpValue([...otpValue]);
       inputRef.current[data.length - 1].current.focus();
     } else {
@@ -69,18 +69,18 @@ export const OtpInput = ({
   };
 
   const onFocusPrevious = (key: string, index: number) => {
-    if (key === "Backspace" && index !== 0) {
+    if (key === 'Backspace' && index !== 0) {
       inputRef.current[index - 1].current.focus();
       setFocus(index - 1);
-      otpValue[index - 1] = "";
+      otpValue[index - 1] = '';
       setOtpValue([...otpValue]);
-    } else if (key === "Backspace" && index === 0) {
-      otpValue[0] = "";
+    } else if (key === 'Backspace' && index === 0) {
+      otpValue[0] = '';
     }
   };
 
   if (otpCount < 4 && otpCount > 6) {
-    throw "OTP Count min is 4 and max is 6";
+    throw 'OTP Count min is 4 and max is 6';
   }
 
   const animatedContainerStyle = useAnimatedStyle(() => {
@@ -90,12 +90,12 @@ export const OtpInput = ({
     };
   });
 
-  const triggerCompleteAnimation = () => {
+  const triggerCompleteAnimation = useCallback(() => {
     opacity.value = withTiming(0.6, { duration: 100 });
     opacity.value = withTiming(1, { duration: 100 });
-  };
+  }, [opacity]);
 
-  const triggerShakeAnimation = () => {
+  const triggerShakeAnimation = useCallback(() => {
     translateX.value = withSequence(
       withTiming(-4, { duration: 80 }),
       withTiming(4, { duration: 80 }),
@@ -103,9 +103,9 @@ export const OtpInput = ({
       withTiming(3, { duration: 80 }),
       withTiming(-2, { duration: 80 }),
       withTiming(2, { duration: 80 }),
-      withTiming(0, { duration: 80 }),
+      withTiming(0, { duration: 80 })
     );
-  };
+  }, [translateX]);
 
   const inputProps = {
     inputRef,
@@ -133,24 +133,31 @@ export const OtpInput = ({
   };
 
   useEffect(() => {
-    onInputChange && onInputChange(otpValue?.join(""));
+    onInputChange && onInputChange(otpValue?.join(''));
     if (
       otpValue &&
-      Number(otpValue.join("").length === otpCount) &&
+      Number(otpValue.join('').length === otpCount) &&
       onInputFinished
     ) {
       if (!error) {
         triggerCompleteAnimation();
       }
-      onInputFinished(otpValue.join(""));
+      onInputFinished(otpValue.join(''));
     }
-  }, [otpValue]);
+  }, [
+    otpValue,
+    error,
+    onInputChange,
+    triggerCompleteAnimation,
+    otpCount,
+    onInputFinished,
+  ]);
 
   useEffect(() => {
     if (error) {
       triggerShakeAnimation();
     }
-  }, [error]);
+  }, [error, triggerShakeAnimation]);
 
   return (
     <OtpContext.Provider value={inputProps as OtpContextProps}>

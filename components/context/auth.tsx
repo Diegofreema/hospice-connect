@@ -15,7 +15,6 @@ const AuthContext = React.createContext({
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const user = useQuery(api.users.getUser, {});
-  console.log({ image: user?.image });
 
   const isAuthenticated = !!user;
   const isLoading = user === undefined;

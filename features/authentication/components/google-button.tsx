@@ -9,10 +9,10 @@ import { Platform } from 'react-native';
 const redirectTo = makeRedirectUri();
 
 export const GoogleButton = () => {
-  const action = useAuthActions();
+  const { signIn } = useAuthActions();
 
   const handleSignIn = async () => {
-    const { redirect } = await action.signIn('google', { redirectTo });
+    const { redirect } = await signIn('google', { redirectTo });
     if (Platform.OS === 'web') {
       return;
     }
@@ -20,7 +20,7 @@ export const GoogleButton = () => {
     if (result.type === 'success') {
       const { url } = result;
       const code = new URL(url).searchParams.get('code')!;
-      await action.signIn('google', { code });
+      await signIn('google', { code });
     }
   };
   return (

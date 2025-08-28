@@ -8,4 +8,5 @@ export interface IPrivacyNoticeLinkProps {
   onPress?: () => void;
   size?: number | 14;
   tint?: string;
+  disabled?: boolean;
 }
