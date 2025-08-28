@@ -7,6 +7,7 @@ import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 import { useAuth } from '@/components/context/auth';
 import Provider from '@/components/provider';
+import { ToastProviderWithViewport } from '@/components/toast';
 import theme, { palette } from '@/theme';
 import { StyleSheet, View } from 'react-native';
 import 'react-native-reanimated';
@@ -49,14 +50,16 @@ export default function RootLayout() {
 const InitialRoute = () => {
   const { isAuthenticated } = useAuth();
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Protected guard={isAuthenticated}>
-        <Stack.Screen name="(protected)" />
-      </Stack.Protected>
-      <Stack.Protected guard={!isAuthenticated}>
-        <Stack.Screen name="(public)" />
-      </Stack.Protected>
-    </Stack>
+    <ToastProviderWithViewport>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Protected guard={isAuthenticated}>
+          <Stack.Screen name="(protected)" />
+        </Stack.Protected>
+        <Stack.Protected guard={!isAuthenticated}>
+          <Stack.Screen name="(public)" />
+        </Stack.Protected>
+      </Stack>
+    </ToastProviderWithViewport>
   );
 };
 const styles = StyleSheet.create({

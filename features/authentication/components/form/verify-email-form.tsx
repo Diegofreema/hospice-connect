@@ -1,6 +1,11 @@
 import { OtpInput } from '@/components/otp-input';
 import { PrivacyNoticeLink } from '@/components/privacy-notice/privacy-notice-link';
+import { Toast } from '@/components/toast';
 import { Button } from '@/features/shared/components/button';
+import {
+  ErrorToast,
+  SuccessToast,
+} from '@/features/shared/components/error-toast';
 import { Spacer } from '@/features/shared/components/spacer';
 import Text from '@/features/shared/components/text';
 import View from '@/features/shared/components/view';
@@ -18,6 +23,7 @@ type Props = {
 export const VerifyEmailForm = ({ email, password }: Props) => {
   const { signIn } = useAuthActions();
   const [otpValue, setOtpValue] = useState<string>('');
+  const [loading, setLoading] = useState(false);
   const { startTimer, timeLeft } = useTimer();
   const { width } = useWindowDimensions();
   const otpInputWidth = (width - 50) / 6;
@@ -31,12 +37,41 @@ export const VerifyEmailForm = ({ email, password }: Props) => {
   };
 
   const handleResendCode = () => {
-    void signIn('password-custom', { email, password, flow: 'signUp' }).then(
-      () => {
+    setLoading(true);
+    void signIn('password-custom', { email, password, flow: 'signUp' })
+      .then(() => {
         clearOtp();
         startTimer();
-      }
-    );
+      })
+      .then(() => {
+        Toast.show(
+          <SuccessToast
+            title="Success"
+            description={'Your email has been verified.'}
+          />,
+          {
+            type: 'success',
+            action: undefined,
+            position: 'top',
+          }
+        );
+      })
+      .catch(() => {
+        Toast.show(
+          <ErrorToast
+            title="An error occurred"
+            description={'Failed to verify email. Please try again.'}
+          />,
+          {
+            type: 'error',
+            action: undefined,
+            position: 'top',
+          }
+        );
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   const onSubmit = () => {
@@ -70,7 +105,13 @@ export const VerifyEmailForm = ({ email, password }: Props) => {
       </PrivacyNoticeLink>
       <Spacer />
       <View width={'100%'}>
-        <Button label="Verify" onPress={onSubmit} />
+        <Button
+          label="Verify"
+          onPress={onSubmit}
+          disabled={loading}
+          loading={loading}
+          loadingText="Verifying..."
+        />
       </View>
     </View>
   );

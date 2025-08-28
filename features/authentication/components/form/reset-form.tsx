@@ -1,3 +1,4 @@
+import { OtpInput } from '@/components/otp-input';
 import { Toast } from '@/components/toast';
 import { Button } from '@/features/shared/components/button';
 import {
@@ -15,48 +16,51 @@ import {
   IconEye,
   IconEyeOff,
   IconLock,
-  IconMail,
   IconX,
 } from '@tabler/icons-react-native';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { TouchableOpacity } from 'react-native';
-import { loginSchema, LoginSchema } from '../../validators';
+import { Controller, useForm } from 'react-hook-form';
+import {
+  StyleSheet,
+  TouchableOpacity,
+  useWindowDimensions,
+} from 'react-native';
+import { resetPasswordSchema, ResetPasswordSchema } from '../../validators';
 import { ControlInput } from './control-input';
-export const RegisterForm = () => {
+export const ResetForm = ({ email }: { email: string }) => {
   const [secured, setSecured] = useState(true);
   const { signIn } = useAuthActions();
-
+  const { width } = useWindowDimensions();
+  const otpInputWidth = (width - 50) / 6;
   const {
     control,
     formState: { errors, isSubmitting },
     handleSubmit,
     reset,
     watch,
-  } = useForm<LoginSchema>({
+  } = useForm<ResetPasswordSchema>({
     defaultValues: {
-      email: '',
+      code: '',
       password: '',
     },
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(resetPasswordSchema),
   });
   const { password } = watch();
-  const onSubmit = async (data: LoginSchema) => {
+  const onSubmit = async (data: ResetPasswordSchema) => {
     void signIn('password-custom', {
-      email: data.email,
-      password: data.password,
-      flow: 'signUp',
+      code: data.code,
+      newPassword: data.password,
+      flow: 'reset-verification',
+      email,
     })
       .then(() => {
-        router.push(`/verify?email=${data.email}&password=${data.password}`);
+        router.push(`/`);
         reset();
         Toast.show(
           <SuccessToast
             title="Success"
-            description={
-              'Account created successfully. Please verify your email.'
-            }
+            description={'Password reset successfully. Please sign in.'}
           />,
           {
             type: 'success',
@@ -71,7 +75,7 @@ export const RegisterForm = () => {
         if (e.message.includes('already exists')) {
           errorMessage = 'Email already exists, please try a different email';
         } else {
-          errorMessage = 'Failed to create account. Please try again.';
+          errorMessage = 'Failed to reset password. Please try again.';
         }
         Toast.show(
           <ErrorToast title="An error occurred" description={errorMessage} />,
@@ -119,15 +123,33 @@ export const RegisterForm = () => {
   const hasNumber = /[0-9]/.test(password || '');
   return (
     <View gap={'m'}>
-      <ControlInput
-        control={control}
-        errors={errors}
-        name="email"
-        label="Email Address"
-        placeholder="Johndoe@gmail.com"
-        leftIcon={<IconMail color={palette.iconGrey} />}
-        autoCapitalize="none"
-      />
+      <View gap={'m'}>
+        <Controller
+          render={({ field: { onChange } }) => (
+            <OtpInput
+              otpCount={5}
+              containerStyle={styles.otpInputContainer}
+              otpInputStyle={[styles.otpInputStyle]}
+              textStyle={styles.otpTextStyle}
+              inputWidth={otpInputWidth}
+              inputHeight={72}
+              inputBorderRadius={12}
+              enableAutoFocus={true}
+              onInputChange={onChange}
+              focusedColor={palette.greenLight}
+            />
+          )}
+          control={control}
+          name="code"
+        />
+        {errors['code']?.message && (
+          <Text variant={'small'} color={'error'}>
+            {typeof errors['code']?.message === 'string'
+              ? errors['code']?.message
+              : 'Invalid input'}
+          </Text>
+        )}
+      </View>
       <ControlInput
         control={control}
         errors={errors}
@@ -147,6 +169,7 @@ export const RegisterForm = () => {
         }
         secureTextEntry={secured}
       />
+
       <View>
         <View flexDirection={'row'} gap="s" alignItems={'center'}>
           <ValidIcon isValid={isStrong} />
@@ -189,3 +212,33 @@ const ValidIcon = ({ isValid }: { isValid: boolean }) => {
     <IconX color={palette.redDark} size={25} />
   );
 };
+
+const styles = StyleSheet.create({
+  otpContainer: {
+    marginBottom: 24,
+    marginTop: 24,
+  },
+  otpInputContainer: {
+    gap: 12,
+  },
+  otpInputStyle: {
+    backgroundColor: palette.greenLight,
+    color: palette.black,
+    fontSize: 24,
+    fontWeight: '600',
+    textAlign: 'center',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+
+  otpTextStyle: {
+    color: palette.black,
+    fontSize: 24,
+    fontWeight: '600',
+  },
+});

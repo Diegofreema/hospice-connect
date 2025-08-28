@@ -10,6 +10,7 @@ import {
   IconLock,
   IconMail,
 } from '@tabler/icons-react-native';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { TouchableOpacity } from 'react-native';
@@ -69,7 +70,10 @@ export const LoginForm = () => {
         }
         secureTextEntry={secured}
       />
-      <PrivacyNoticeLink style={{ alignSelf: 'flex-end' }}>
+      <PrivacyNoticeLink
+        style={{ alignSelf: 'flex-end' }}
+        onPress={() => router.push('/forgot-password')}
+      >
         Forgot Password?
       </PrivacyNoticeLink>
       <Spacer />

@@ -14,13 +14,13 @@ export const ResendOTPPasswordReset = Resend({
     };
 
     const alphabet = '0123456789';
-    const length = 8;
+    const length = 5;
     return generateRandomString(random, alphabet, length);
   },
   async sendVerificationRequest({ identifier: email, provider, token }) {
     const resend = new ResendAPI(provider.apiKey);
     const { error } = await resend.emails.send({
-      from: 'HospiceConnect <onboarding@resend.dev>',
+      from: 'HospiceConnect <info@hospice-connect.net>',
       to: [email],
       subject: `Reset your password`,
       react: ResetPasswordTemplate({
