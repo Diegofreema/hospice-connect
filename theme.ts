@@ -20,6 +20,7 @@ export const palette = {
   yellowDark: '#FFBF00',
 
   greyLight: '#F8F8F8',
+  grey: '#ccc',
 };
 
 const theme = createTheme({
@@ -29,6 +30,9 @@ const theme = createTheme({
     buttonBackground: palette.blue,
     backgroundRed: palette.redDark,
     black: palette.black,
+    borderColor: palette.grey,
+    blue: palette.blue,
+    white: palette.white,
   },
   spacing: {
     s: 8,
@@ -36,6 +40,7 @@ const theme = createTheme({
     l: 24,
     xl: 40,
   },
+
   breakpoints: {
     phone: 0,
     longPhone: {
@@ -77,6 +82,40 @@ const theme = createTheme({
       // We can define a default text variant here.
     },
   },
+  cardVariants: {
+    defaults: {
+      // We can define defaults for the variant here.
+      // This will be applied after the defaults passed to createVariant and before the variant defined below.
+    },
+    regular: {
+      // We can refer to other values in the theme here, and use responsive props
+      padding: {
+        phone: 'm',
+        tablet: 'l',
+      },
+    },
+    elevated: {
+      padding: {
+        phone: 's',
+        tablet: 'm',
+      },
+      shadowColor: 'black',
+      shadowOpacity: 0.2,
+      shadowOffset: { width: 0, height: 5 },
+      shadowRadius: 15,
+      elevation: 5,
+    },
+    transparent: {
+      padding: {
+        phone: 'm',
+        tablet: 'l',
+      },
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: 'borderColor',
+    },
+  },
+  buttonVariant: {},
 });
 
 export type Theme = typeof theme;

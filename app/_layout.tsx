@@ -44,7 +44,7 @@ export default function RootLayout() {
           </KeyboardProvider>
         </View>
       </SafeAreaView>
-      <StatusBar style="auto" />
+      <StatusBar style="light" />
     </ThemeProvider>
   );
 }

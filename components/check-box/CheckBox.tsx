@@ -1,26 +1,25 @@
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
 import {
-  StyleSheet,
-  TouchableOpacity,
-  ViewStyle,
   StyleProp,
-  View,
+  StyleSheet,
   Text,
   TextStyle,
-} from "react-native";
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  interpolateColor,
   Easing,
+  Extrapolation,
+  interpolate,
+  interpolateColor,
+  useAnimatedStyle,
+  useSharedValue,
   withSequence,
   withSpring,
-  interpolate,
-  Extrapolate,
-  Extrapolation,
-} from "react-native-reanimated";
-import { Path, Svg } from "react-native-svg";
+  withTiming,
+} from 'react-native-reanimated';
+import { Path, Svg } from 'react-native-svg';
 
 interface AnimatedCheckboxProps {
   /** Whether the checkbox is checked */
@@ -46,7 +45,7 @@ interface AnimatedCheckboxProps {
   /** Label to display next to checkbox */
   label?: string;
   /** Position of the label relative to checkbox */
-  labelPosition?: "left" | "right";
+  labelPosition?: 'left' | 'right';
   /** Additional styling for the container */
   containerStyle?: StyleProp<ViewStyle>;
   /** Additional styling for the checkbox */
@@ -66,14 +65,14 @@ export const AnimatedCheckbox: React.FC<AnimatedCheckboxProps> = ({
   onPress,
   size = 24,
   borderRadius,
-  activeColor = "#2196F3",
-  inactiveColor = "transparent",
-  borderColor = "#757575",
+  activeColor = '#2196F3',
+  inactiveColor = 'transparent',
+  borderColor = '#757575',
   borderWidth = 2,
-  checkMarkColor = "white",
+  checkMarkColor = 'white',
   animationDuration = 300,
   label,
-  labelPosition = "right",
+  labelPosition = 'right',
   containerStyle,
   checkboxStyle,
   labelStyle,
@@ -99,7 +98,7 @@ export const AnimatedCheckbox: React.FC<AnimatedCheckboxProps> = ({
           mass: 1,
           stiffness: 500,
           damping: 15,
-        }),
+        })
       );
     }
   }, [checked, animationDuration, progress, scale, bounceEffect]);
@@ -112,12 +111,12 @@ export const AnimatedCheckbox: React.FC<AnimatedCheckboxProps> = ({
     if (rippleEffect) {
       rippleOpacity.value = withSequence(
         withTiming(0.3, { duration: 100 }),
-        withTiming(0, { duration: 300 }),
+        withTiming(0, { duration: 300 })
       );
 
       rippleScale.value = withSequence(
         withTiming(0, { duration: 0 }),
-        withTiming(1, { duration: 400 }),
+        withTiming(1, { duration: 400 })
       );
     }
   };
@@ -127,12 +126,12 @@ export const AnimatedCheckbox: React.FC<AnimatedCheckboxProps> = ({
       backgroundColor: interpolateColor(
         progress.value,
         [0, 1],
-        [inactiveColor, activeColor],
+        [inactiveColor, activeColor]
       ),
       borderColor: interpolateColor(
         progress.value,
         [0, 1],
-        [borderColor, activeColor],
+        [borderColor, activeColor]
       ),
       transform: [{ scale: scale.value }],
     };
@@ -147,7 +146,7 @@ export const AnimatedCheckbox: React.FC<AnimatedCheckboxProps> = ({
             progress.value,
             [0, 0.5, 1],
             [0, 1.2, 1],
-            Extrapolation.CLAMP,
+            Extrapolation.CLAMP
           ),
         },
       ],
@@ -171,12 +170,12 @@ export const AnimatedCheckbox: React.FC<AnimatedCheckboxProps> = ({
       disabled={disabled}
       style={[
         styles.container,
-        labelPosition === "left" ? styles.rowReverse : styles.row,
+        labelPosition === 'left' ? styles.rowReverse : styles.row,
         { opacity: disabled ? 0.6 : 1 },
         containerStyle,
       ]}
     >
-      <View style={{ position: "relative" }}>
+      <View style={{ position: 'relative' }}>
         <Animated.View
           style={[
             styles.checkbox,
@@ -235,8 +234,8 @@ export const AnimatedCheckbox: React.FC<AnimatedCheckboxProps> = ({
           style={[
             styles.label,
             {
-              marginLeft: labelPosition === "right" ? 10 : 0,
-              marginRight: labelPosition === "left" ? 10 : 0,
+              marginLeft: labelPosition === 'right' ? 10 : 0,
+              marginRight: labelPosition === 'left' ? 10 : 0,
             },
             labelStyle,
           ]}
@@ -250,30 +249,30 @@ export const AnimatedCheckbox: React.FC<AnimatedCheckboxProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-start",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
   },
   row: {
-    flexDirection: "row",
+    flexDirection: 'row',
   },
   rowReverse: {
-    flexDirection: "row-reverse",
+    flexDirection: 'row-reverse',
   },
   checkbox: {
-    justifyContent: "center",
-    alignItems: "center",
-    borderStyle: "solid",
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderStyle: 'solid',
   },
   ripple: {
-    position: "absolute",
-    backgroundColor: "#000",
+    position: 'absolute',
+    backgroundColor: '#000',
     zIndex: -1,
   },
   checkMarkContainer: {
-    position: "absolute",
-    justifyContent: "center",
-    alignItems: "center",
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   label: {
     fontSize: 16,

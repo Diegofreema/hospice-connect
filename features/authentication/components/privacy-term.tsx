@@ -5,8 +5,10 @@ import { palette } from '@/theme';
 import { router } from 'expo-router';
 import React from 'react';
 import { View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const PrivacyTermsLink = () => {
+  const { bottom } = useSafeAreaInsets();
   const onGoToTermsPage = () => {
     router.push('/terms');
   };
@@ -14,7 +16,7 @@ export const PrivacyTermsLink = () => {
     router.push('/privacy');
   };
   return (
-    <View style={{ marginTop: 'auto', marginBottom: 30 }}>
+    <View style={{ marginTop: 'auto', marginBottom: bottom + 40 }}>
       <Text variant={'small'} textAlign={'center'}>
         By signing up, you agree to our{' '}
         <PrivacyNoticeLink
