@@ -2,13 +2,12 @@ import { PrivacyNoticeLink } from '@/components/privacy-notice/privacy-notice-li
 import { Subtitle } from '@/components/subtitle/Subtitle';
 import { DividerWithText } from '@/features/authentication/components/divider-with-text';
 import { LoginForm } from '@/features/authentication/components/form/login-form';
+import { GoogleButton } from '@/features/authentication/components/google-button';
 import { PrivacyTermsLink } from '@/features/authentication/components/privacy-term';
-import { Button } from '@/features/shared/components/button';
 import { MyTitle } from '@/features/shared/components/my-title';
 import { Spacer } from '@/features/shared/components/spacer';
 import { Wrapper } from '@/features/shared/components/wrapper';
 import { palette } from '@/theme';
-import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import React from 'react';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
@@ -32,21 +31,7 @@ const LoginScreen = () => {
         <LoginForm />
         <DividerWithText />
 
-        <Button
-          backgroundColor={'transparent'}
-          borderColor={'borderColor'}
-          borderWidth={1}
-          label="Google"
-          rightIcon={
-            <Image
-              source={require('@/assets/images/google.png')}
-              style={{ width: 25, height: 25 }}
-              contentFit="contain"
-            />
-          }
-          onPress={() => {}}
-          color="black"
-        />
+        <GoogleButton />
 
         <PrivacyTermsLink />
       </KeyboardAwareScrollView>

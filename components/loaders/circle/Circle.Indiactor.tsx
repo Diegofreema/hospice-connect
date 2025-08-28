@@ -1,14 +1,14 @@
 // components/LoadingIndicator.tsx
-import React, { useEffect } from "react";
-import { View, StyleSheet, ViewStyle } from "react-native";
-import Svg, { Circle } from "react-native-svg";
+import React, { useEffect } from 'react';
+import { StyleSheet, View, ViewStyle } from 'react-native';
 import Animated, {
-  useSharedValue,
+  Easing,
   useAnimatedProps,
+  useSharedValue,
   withRepeat,
   withTiming,
-  Easing,
-} from "react-native-reanimated";
+} from 'react-native-reanimated';
+import Svg, { Circle } from 'react-native-svg';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -21,7 +21,7 @@ export interface CircleLoadingIndicatorProps {
 }
 
 export const CircleLoadingIndicator: React.FC<CircleLoadingIndicatorProps> = ({
-  dotColor = "#007AFF",
+  dotColor = '#007AFF',
   dotRadius = 6,
   dotSpacing = 20,
   duration = 450,
@@ -38,7 +38,7 @@ export const CircleLoadingIndicator: React.FC<CircleLoadingIndicatorProps> = ({
         easing: Easing.inOut(Easing.ease),
       }),
       -1,
-      true,
+      true
     );
 
     setTimeout(() => {
@@ -48,7 +48,7 @@ export const CircleLoadingIndicator: React.FC<CircleLoadingIndicatorProps> = ({
           easing: Easing.inOut(Easing.ease),
         }),
         -1,
-        true,
+        true
       );
     }, duration / 3);
 
@@ -60,12 +60,12 @@ export const CircleLoadingIndicator: React.FC<CircleLoadingIndicatorProps> = ({
             easing: Easing.inOut(Easing.ease),
           }),
           -1,
-          true,
+          true
         );
       },
-      (2 * duration) / 3,
+      (2 * duration) / 3
     );
-  }, [duration]);
+  }, [duration, progress1, progress2, progress3]);
 
   const jumpHeight = dotRadius * 0.85;
 
@@ -111,7 +111,7 @@ export const CircleLoadingIndicator: React.FC<CircleLoadingIndicatorProps> = ({
 const styles = StyleSheet.create({
   container: {
     height: 40,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

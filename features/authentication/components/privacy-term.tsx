@@ -18,7 +18,7 @@ export const PrivacyTermsLink = () => {
   return (
     <View style={{ marginTop: 'auto', marginBottom: bottom + 40 }}>
       <Text variant={'small'} textAlign={'center'}>
-        By signing up, you agree to our
+        By signing up, you agree to our{' '}
         <PrivacyNoticeLink
           tint={palette.blue}
           size={getFontSize(13)}
@@ -31,7 +31,7 @@ export const PrivacyTermsLink = () => {
         >
           Terms & Conditions
         </PrivacyNoticeLink>
-        , acknowledging our
+        , acknowledging our{' '}
         <PrivacyNoticeLink
           onPress={onGoToPrivacyPage}
           tint={palette.blue}
