@@ -32,9 +32,7 @@ const CreateAccountScreen = () => {
         <Spacer height={30} />
         <RegisterForm />
         <DividerWithText />
-
         <GoogleButton />
-
         <PrivacyTermsLink />
       </KeyboardAwareScrollView>
     </Wrapper>

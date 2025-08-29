@@ -2,7 +2,9 @@ import { PrivacyNoticeLink } from '@/components/privacy-notice/privacy-notice-li
 import { Button } from '@/features/shared/components/button';
 import { Spacer } from '@/features/shared/components/spacer';
 import View from '@/features/shared/components/view';
+import { useToast } from '@/hooks/use-toast';
 import { palette } from '@/theme';
+import { useAuthActions } from '@convex-dev/auth/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   IconEye,
@@ -18,6 +20,8 @@ import { loginSchema, LoginSchema } from '../../validators';
 import { ControlInput } from './control-input';
 export const LoginForm = () => {
   const [secured, setSecured] = useState(true);
+  const { signIn } = useAuthActions();
+  const { showToast } = useToast();
   const {
     control,
     formState: { errors, isSubmitting },
@@ -31,11 +35,27 @@ export const LoginForm = () => {
     resolver: zodResolver(loginSchema),
   });
   const onSubmit = async (data: LoginSchema) => {
-    try {
-      reset();
-    } catch (error) {
-      console.log(error);
-    }
+    void signIn('password-custom', {
+      password: data.password,
+      flow: 'signIn',
+      email: data.email,
+    })
+      .then(() => {
+        reset();
+      })
+      .catch((error) => {
+        let errorMessage = 'Failed to login';
+        if (error.message.includes('InvalidAccountId')) {
+          errorMessage = 'Invalid email or password, please try again.';
+        }
+        showToast({
+          title: 'Login Failed',
+          description: errorMessage,
+          type: 'error',
+        });
+        console.error('Login error:', error.message);
+        // Optionally, display an error message to the user here
+      });
   };
   const toggleSecure = () => {
     setSecured(!secured);

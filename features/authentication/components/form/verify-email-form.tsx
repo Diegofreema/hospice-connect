@@ -1,15 +1,11 @@
 import { OtpInput } from '@/components/otp-input';
 import { PrivacyNoticeLink } from '@/components/privacy-notice/privacy-notice-link';
-import { Toast } from '@/components/toast';
 import { Button } from '@/features/shared/components/button';
-import {
-  ErrorToast,
-  SuccessToast,
-} from '@/features/shared/components/error-toast';
 import { Spacer } from '@/features/shared/components/spacer';
 import Text from '@/features/shared/components/text';
 import View from '@/features/shared/components/view';
 import { useTimer } from '@/hooks/use-timer';
+import { useToast } from '@/hooks/use-toast';
 import { palette } from '@/theme';
 import { useAuthActions } from '@convex-dev/auth/react';
 import React, { useState } from 'react';
@@ -26,6 +22,7 @@ export const VerifyEmailForm = ({ email, password }: Props) => {
   const [loading, setLoading] = useState(false);
   const { startTimer, timeLeft } = useTimer();
   const { width } = useWindowDimensions();
+  const { showToast } = useToast();
   const otpInputWidth = (width - 50) / 6;
   const clearOtp = (): void => {
     setOtpValue('');
@@ -44,30 +41,19 @@ export const VerifyEmailForm = ({ email, password }: Props) => {
         startTimer();
       })
       .then(() => {
-        Toast.show(
-          <SuccessToast
-            title="Success"
-            description={'Your email has been verified.'}
-          />,
-          {
-            type: 'success',
-            action: undefined,
-            position: 'top',
-          }
-        );
+        showToast({
+          title: 'Success',
+          description: 'Verification code sent successfully.',
+          type: 'success',
+        });
       })
       .catch(() => {
-        Toast.show(
-          <ErrorToast
-            title="An error occurred"
-            description={'Failed to verify email. Please try again.'}
-          />,
-          {
-            type: 'error',
-            action: undefined,
-            position: 'top',
-          }
-        );
+        showToast({
+          title: 'Error',
+          description:
+            'Failed to verify email. Check if your email or verification code is correct.',
+          type: 'error',
+        });
       })
       .finally(() => {
         setLoading(false);
@@ -79,9 +65,24 @@ export const VerifyEmailForm = ({ email, password }: Props) => {
       email,
       code: otpValue,
       flow: 'email-verification',
-    }).then(() => {
-      clearOtp();
-    });
+    })
+      .then(() => {
+        clearOtp();
+        showToast({
+          title: 'Success',
+          description:
+            'Your email has been verified. welcome to HospiceConnect',
+          type: 'success',
+        });
+      })
+      .catch((e) => {
+        showToast({
+          title: 'Error',
+          description:
+            'Failed to verify email. Check if your email or verification code is correct.',
+          type: 'error',
+        });
+      });
   };
 
   return (

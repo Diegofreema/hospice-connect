@@ -1,7 +1,6 @@
 import Resend from '@auth/core/providers/resend';
 import { RandomReader, generateRandomString } from '@oslojs/crypto/random';
 import { Resend as ResendAPI } from 'resend';
-import VerifyEmail from './VerifyEmail';
 
 export const ResendOTP = Resend({
   id: 'resend-otp',
@@ -20,14 +19,10 @@ export const ResendOTP = Resend({
   async sendVerificationRequest({ identifier: email, provider, token }) {
     const resend = new ResendAPI(provider.apiKey);
     const { error } = await resend.emails.send({
-      from: 'HospiceConnect <info@hospice-connect.net>',
+      from: 'HospiceConnect <innovate@learnfactory.com.ng>',
       to: [email],
       subject: `Verify your email`,
-      react: VerifyEmail({
-        code: token,
-
-        expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
-      }),
+      text: `Your verification code is ${token}`,
     });
     console.log({ error });
 

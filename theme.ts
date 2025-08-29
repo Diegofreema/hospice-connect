@@ -12,7 +12,7 @@ export const palette = {
   white: '#ffffff',
 
   blue: '#4C55FF',
-
+  orange: '#FFA500',
   redDark: '#F63A3A',
   redLight: 'rgba(246, 58, 58, 0.13)',
 

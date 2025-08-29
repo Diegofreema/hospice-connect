@@ -1,3 +1,4 @@
+import { AnimatedProgressBar } from '@/components/progress/AnimatedProgress';
 import { Toast } from '@/components/toast';
 import { Button } from '@/features/shared/components/button';
 import {
@@ -18,11 +19,12 @@ import {
   IconMail,
   IconX,
 } from '@tabler/icons-react-native';
+
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { TouchableOpacity } from 'react-native';
-import { loginSchema, LoginSchema } from '../../validators';
+import { RegisterSchema, registerSchema } from '../../validators';
 import { ControlInput } from './control-input';
 export const RegisterForm = () => {
   const [secured, setSecured] = useState(true);
@@ -34,15 +36,15 @@ export const RegisterForm = () => {
     handleSubmit,
     reset,
     watch,
-  } = useForm<LoginSchema>({
+  } = useForm<RegisterSchema>({
     defaultValues: {
       email: '',
       password: '',
     },
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(registerSchema),
   });
   const { password } = watch();
-  const onSubmit = async (data: LoginSchema) => {
+  const onSubmit = async (data: RegisterSchema) => {
     void signIn('password-custom', {
       email: data.email,
       password: data.password,
@@ -86,37 +88,38 @@ export const RegisterForm = () => {
   const toggleSecure = () => {
     setSecured(!secured);
   };
-  // const getPasswordStrength = (password: string) => {
-  //   if (!password) return { strength: 0, label: '', color: '' };
+  const getPasswordStrength = (password: string) => {
+    if (!password) return { strength: 0, label: '', color: '' };
 
-  //   let strength = 0;
-  //   if (password.length >= 8) strength++;
-  //   if (/[A-Z]/.test(password)) strength++;
-  //   if (/[a-z]/.test(password)) strength++;
-  //   if (/[0-9]/.test(password)) strength++;
-  //   if (/[^A-Za-z0-9]/.test(password)) strength++;
+    let strength = 0;
+    if (password.length >= 6) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[a-z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
 
-  //   const labels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
-  //   const colors = [
-  //     'bg-red-500',
-  //     'bg-orange-500',
-  //     'bg-yellow-500',
-  //     'bg-blue-500',
-  //     'bg-green-500',
-  //   ];
+    const labels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
+    const colors = [
+      palette.redDark,
+      palette.orange,
+      palette.yellowDark,
+      palette.blue,
+      palette.greenDark,
+    ];
 
-  //   return {
-  //     strength,
-  //     label: labels[strength - 1] || '',
-  //     color: colors[strength - 1] || '',
-  //   };
-  // };
+    return {
+      strength,
+      label: labels[strength - 1] || '',
+      color: colors[strength - 1] || '',
+    };
+  };
 
-  // const passwordStrength = getPasswordStrength(password || '');
+  const passwordStrength = getPasswordStrength(password || '');
   const isStrong = password?.length >= 6;
   const hasUppercase = /[A-Z]/.test(password || '');
   const hasSpecialCharacter = /[^A-Za-z0-9]/.test(password || '');
   const hasNumber = /[0-9]/.test(password || '');
+  const progress = (passwordStrength.strength / 5) * 100;
   return (
     <View gap={'m'}>
       <ControlInput
@@ -148,6 +151,20 @@ export const RegisterForm = () => {
         secureTextEntry={secured}
       />
       <View>
+        <View mb="m" g={'s'}>
+          <AnimatedProgressBar
+            progress={progress}
+            width="100%"
+            height={8}
+            progressColor={passwordStrength.color}
+            trackColor={palette.yellowLight}
+            borderRadius={12}
+            animationDuration={600}
+          />
+          <Text variant={'body'} style={{ color: passwordStrength.color }}>
+            {passwordStrength.label}
+          </Text>
+        </View>
         <View flexDirection={'row'} gap="s" alignItems={'center'}>
           <ValidIcon isValid={isStrong} />
           <Text color={isStrong ? 'black' : 'textGrey'}>

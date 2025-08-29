@@ -20,7 +20,7 @@ export const ResendOTPPasswordReset = Resend({
   async sendVerificationRequest({ identifier: email, provider, token }) {
     const resend = new ResendAPI(provider.apiKey);
     const { error } = await resend.emails.send({
-      from: 'HospiceConnect <info@hospice-connect.net>',
+      from: 'HospiceConnect <innovate@learnfactory.com.ng>',
       to: [email],
       subject: `Reset your password`,
       react: ResetPasswordTemplate({
