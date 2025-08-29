@@ -1,7 +1,6 @@
 import Resend from '@auth/core/providers/resend';
 import { RandomReader, generateRandomString } from '@oslojs/crypto/random';
 import { Resend as ResendAPI } from 'resend';
-import { ResetPasswordTemplate } from './passwordReset/PasswordResetemail';
 
 export const ResendOTPPasswordReset = Resend({
   id: 'resend-otp',
@@ -23,14 +22,11 @@ export const ResendOTPPasswordReset = Resend({
       from: 'HospiceConnect <innovate@learnfactory.com.ng>',
       to: [email],
       subject: `Reset your password`,
-      react: ResetPasswordTemplate({
-        code: token,
-        userEmail: email,
-      }),
+      text: 'Your password reset code is ' + token,
     });
 
     if (error) {
-      throw new Error('Email could not be found');
+      throw new Error('Could not send verification code');
     }
   },
 });

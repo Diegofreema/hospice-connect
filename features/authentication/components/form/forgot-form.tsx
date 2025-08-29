@@ -1,10 +1,6 @@
-import { Toast } from '@/components/toast';
 import { Button } from '@/features/shared/components/button';
-import {
-  ErrorToast,
-  SuccessToast,
-} from '@/features/shared/components/error-toast';
 import View from '@/features/shared/components/view';
+import { useToast } from '@/hooks/use-toast';
 import { palette } from '@/theme';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -28,26 +24,28 @@ export const ForgotForm = () => {
     },
     resolver: zodResolver(forgotPasswordSchema),
   });
+  const { showToast } = useToast();
   const onSubmit = (data: ForgotPasswordSchema) => {
+    console.log({ data });
+
     void signIn('password-custom', { email: data.email, flow: 'reset' })
       .then(() => {
-        Toast.show(
-          <SuccessToast title="Success" description="Reset code sent" />,
-          {
-            duration: 5000,
-            type: 'success',
-          }
-        );
+        showToast({
+          title: 'Success',
+          description: 'Reset code sent',
+          type: 'success',
+        });
+
         router.push(`/reset-password?email=${data.email}`);
       })
-      .catch(() => {
-        Toast.show(
-          <ErrorToast title="Error" description="Failed to send reset code" />,
-          {
-            duration: 5000,
-            type: 'error',
-          }
-        );
+      .catch((e) => {
+        console.log('RESEND ERROR', { e });
+
+        showToast({
+          title: 'Error',
+          description: 'Failed to send reset code',
+          type: 'error',
+        });
       });
   };
   return (

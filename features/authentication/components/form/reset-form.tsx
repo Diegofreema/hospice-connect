@@ -1,13 +1,10 @@
 import { OtpInput } from '@/components/otp-input';
-import { Toast } from '@/components/toast';
+import { AnimatedProgressBar } from '@/components/progress/AnimatedProgress';
 import { Button } from '@/features/shared/components/button';
-import {
-  ErrorToast,
-  SuccessToast,
-} from '@/features/shared/components/error-toast';
 import { Spacer } from '@/features/shared/components/spacer';
 import Text from '@/features/shared/components/text';
 import View from '@/features/shared/components/view';
+import { useToast } from '@/hooks/use-toast';
 import { palette } from '@/theme';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -32,6 +29,7 @@ export const ResetForm = ({ email }: { email: string }) => {
   const [secured, setSecured] = useState(true);
   const { signIn } = useAuthActions();
   const { width } = useWindowDimensions();
+  const { showToast } = useToast();
   const otpInputWidth = (width - 50) / 6;
   const {
     control,
@@ -57,17 +55,11 @@ export const ResetForm = ({ email }: { email: string }) => {
       .then(() => {
         router.push(`/`);
         reset();
-        Toast.show(
-          <SuccessToast
-            title="Success"
-            description={'Password reset successfully. Please sign in.'}
-          />,
-          {
-            type: 'success',
-            action: undefined,
-            position: 'top',
-          }
-        );
+        showToast({
+          title: 'Success',
+          description: 'Password reset successfully. Please sign in.',
+          type: 'success',
+        });
       })
       .catch((e) => {
         console.log({ e });
@@ -77,50 +69,48 @@ export const ResetForm = ({ email }: { email: string }) => {
         } else {
           errorMessage = 'Failed to reset password. Please try again.';
         }
-        Toast.show(
-          <ErrorToast title="An error occurred" description={errorMessage} />,
-          {
-            type: 'error',
-            action: undefined,
-            position: 'top',
-          }
-        );
+        showToast({
+          title: 'An error occurred',
+          description: errorMessage,
+          type: 'error',
+        });
       });
   };
   const toggleSecure = () => {
     setSecured(!secured);
   };
-  // const getPasswordStrength = (password: string) => {
-  //   if (!password) return { strength: 0, label: '', color: '' };
+  const getPasswordStrength = (password: string) => {
+    if (!password) return { strength: 0, label: '', color: '' };
 
-  //   let strength = 0;
-  //   if (password.length >= 8) strength++;
-  //   if (/[A-Z]/.test(password)) strength++;
-  //   if (/[a-z]/.test(password)) strength++;
-  //   if (/[0-9]/.test(password)) strength++;
-  //   if (/[^A-Za-z0-9]/.test(password)) strength++;
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[a-z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
 
-  //   const labels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
-  //   const colors = [
-  //     'bg-red-500',
-  //     'bg-orange-500',
-  //     'bg-yellow-500',
-  //     'bg-blue-500',
-  //     'bg-green-500',
-  //   ];
+    const labels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
+    const colors = [
+      'bg-red-500',
+      'bg-orange-500',
+      'bg-yellow-500',
+      'bg-blue-500',
+      'bg-green-500',
+    ];
 
-  //   return {
-  //     strength,
-  //     label: labels[strength - 1] || '',
-  //     color: colors[strength - 1] || '',
-  //   };
-  // };
+    return {
+      strength,
+      label: labels[strength - 1] || '',
+      color: colors[strength - 1] || '',
+    };
+  };
 
-  // const passwordStrength = getPasswordStrength(password || '');
+  const passwordStrength = getPasswordStrength(password || '');
   const isStrong = password?.length >= 6;
   const hasUppercase = /[A-Z]/.test(password || '');
   const hasSpecialCharacter = /[^A-Za-z0-9]/.test(password || '');
   const hasNumber = /[0-9]/.test(password || '');
+  const progress = (passwordStrength.strength / 5) * 100;
   return (
     <View gap={'m'}>
       <View gap={'m'}>
@@ -171,6 +161,20 @@ export const ResetForm = ({ email }: { email: string }) => {
       />
 
       <View>
+        <View mb="m" g={'s'}>
+          <AnimatedProgressBar
+            progress={progress}
+            width="100%"
+            height={8}
+            progressColor={passwordStrength.color}
+            trackColor={palette.yellowLight}
+            borderRadius={12}
+            animationDuration={600}
+          />
+          <Text variant={'body'} style={{ color: passwordStrength.color }}>
+            {passwordStrength.label}
+          </Text>
+        </View>
         <View flexDirection={'row'} gap="s" alignItems={'center'}>
           <ValidIcon isValid={isStrong} />
           <Text color={isStrong ? 'black' : 'textGrey'}>

@@ -41,11 +41,19 @@ export const LoginForm = () => {
       email: data.email,
     })
       .then(() => {
+        showToast({
+          title: 'Login Success',
+          description: 'You have successfully logged in',
+          type: 'success',
+        });
         reset();
       })
       .catch((error) => {
         let errorMessage = 'Failed to login';
-        if (error.message.includes('InvalidAccountId')) {
+        if (
+          error.message.includes('InvalidAccountId') ||
+          error.message.includes('InvalidSecret')
+        ) {
           errorMessage = 'Invalid email or password, please try again.';
         }
         showToast({
