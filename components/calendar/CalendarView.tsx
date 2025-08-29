@@ -1,34 +1,34 @@
 // CalendarView.tsx
+import { TrueSheet } from '@lodev09/react-native-true-sheet';
+import { SymbolView } from 'expo-symbols';
+import moment from 'moment';
 import React, {
-  useState,
-  useRef,
-  useCallback,
-  useMemo,
   forwardRef,
-  useImperativeHandle,
   memo,
-} from "react";
+  useCallback,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
-  View,
-  Text,
-  Pressable,
-  TextInput,
-  Switch,
-  ScrollView,
   FlatList,
-} from "react-native";
-import moment from "moment";
-import { TrueSheet } from "@lodev09/react-native-true-sheet";
+  Pressable,
+  ScrollView,
+  Switch,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  withSpring,
-  withSequence,
-  FadeIn,
   Easing,
-} from "react-native-reanimated";
-import { SymbolView } from "expo-symbols";
+  FadeIn,
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
 import {
   CalendarConfig,
   CalendarDate,
@@ -36,40 +36,40 @@ import {
   CalendarViewProps,
   CalendarViewRef,
   DateRange,
-} from "./Calendar.props";
-import { darkTheme } from "./constants";
-import { calenderStyles as styles } from "./styles";
+} from './Calendar.props';
+import { darkTheme } from './constants';
+import { calenderStyles as styles } from './styles';
 
 const calendarModes: Record<CalendarMode, CalendarConfig> = {
   date: {
-    mode: "date",
-    title: "Select Date",
-    format: "MMMM D, YYYY",
-    viewMode: "day",
+    mode: 'date',
+    title: 'Select Date',
+    format: 'MMMM D, YYYY',
+    viewMode: 'day',
   },
   month: {
-    mode: "month",
-    title: "Select Month",
-    format: "MMMM YYYY",
-    viewMode: "month",
+    mode: 'month',
+    title: 'Select Month',
+    format: 'MMMM YYYY',
+    viewMode: 'month',
   },
   year: {
-    mode: "year",
-    title: "Select Year",
-    format: "YYYY",
-    viewMode: "year",
+    mode: 'year',
+    title: 'Select Year',
+    format: 'YYYY',
+    viewMode: 'year',
   },
-  "month-year": {
-    mode: "month-year",
-    title: "Select Month & Year",
-    format: "MMMM YYYY",
-    viewMode: "month",
+  'month-year': {
+    mode: 'month-year',
+    title: 'Select Month & Year',
+    format: 'MMMM YYYY',
+    viewMode: 'month',
   },
   time: {
-    mode: "time",
-    title: "Select Date & Time",
-    format: "MMMM D, YYYY h:mm A",
-    viewMode: "day",
+    mode: 'time',
+    title: 'Select Date & Time',
+    format: 'MMMM D, YYYY h:mm A',
+    viewMode: 'day',
   },
 };
 
@@ -90,7 +90,7 @@ const CalendarDay = memo<{
       styles.dayCell,
       !item.isCurrentMonth && { opacity: 0.3 },
       item.isToday && {
-        backgroundColor: theme.info + "20",
+        backgroundColor: theme.info + '20',
         borderWidth: 2,
         borderColor: theme.info,
       },
@@ -102,7 +102,7 @@ const CalendarDay = memo<{
         shadowRadius: 8,
         elevation: 6,
       },
-      item.isInRange && { backgroundColor: theme.primary + "30" },
+      item.isInRange && { backgroundColor: theme.primary + '30' },
       item.isRangeStart && {
         backgroundColor: theme.primary,
         borderTopRightRadius: 6,
@@ -115,7 +115,7 @@ const CalendarDay = memo<{
       },
       disabled && { opacity: 0.4 },
     ],
-    [item, theme, disabled],
+    [item, theme, disabled]
   );
 
   const textStyle = useMemo(
@@ -123,19 +123,19 @@ const CalendarDay = memo<{
       styles.dayText,
       { color: theme.foreground },
       !item.isCurrentMonth && { color: theme.mutedForeground },
-      item.isToday && { fontWeight: "800", color: theme.info },
+      item.isToday && { fontWeight: '800', color: theme.info },
       (item.isSelected || item.isRangeStart || item.isRangeEnd) && {
         color: theme.primaryForeground,
-        fontWeight: "800",
+        fontWeight: '800',
       },
       item.isInRange &&
         !item.isRangeStart &&
         !item.isRangeEnd && {
           color: theme.foreground,
-          fontWeight: "700",
+          fontWeight: '700',
         },
     ],
-    [item, theme],
+    [item, theme]
   );
 
   return (
@@ -144,6 +144,8 @@ const CalendarDay = memo<{
     </Pressable>
   );
 });
+
+CalendarDay.displayName = 'CalendarDay';
 
 const MonthCell = memo<{
   month: string;
@@ -167,16 +169,16 @@ const MonthCell = memo<{
         elevation: 6,
       },
     ],
-    [isSelected, theme],
+    [isSelected, theme]
   );
 
   const textStyle = useMemo(
     () => [
       styles.monthText,
       { color: theme.foreground },
-      isSelected && { color: theme.primaryForeground, fontWeight: "800" },
+      isSelected && { color: theme.primaryForeground, fontWeight: '800' },
     ],
-    [isSelected, theme],
+    [isSelected, theme]
   );
 
   return (
@@ -186,6 +188,7 @@ const MonthCell = memo<{
   );
 });
 
+MonthCell.displayName = 'MonthCell';
 // Memoized Year Cell Component
 const YearCell = memo<{
   year: number;
@@ -208,16 +211,16 @@ const YearCell = memo<{
         elevation: 6,
       },
     ],
-    [isSelected, theme],
+    [isSelected, theme]
   );
 
   const textStyle = useMemo(
     () => [
       styles.yearText,
       { color: theme.foreground },
-      isSelected && { color: theme.primaryForeground, fontWeight: "800" },
+      isSelected && { color: theme.primaryForeground, fontWeight: '800' },
     ],
-    [isSelected, theme],
+    [isSelected, theme]
   );
 
   return (
@@ -226,18 +229,19 @@ const YearCell = memo<{
     </Pressable>
   );
 });
+YearCell.displayName = 'YearCell';
 
 const TimePicker = memo<{
-  selectedTime: { hour: number; minute: number; period: "AM" | "PM" };
+  selectedTime: { hour: number; minute: number; period: 'AM' | 'PM' };
   onTimeChange: (
-    type: "hour" | "minute" | "period",
-    value: number | string,
+    type: 'hour' | 'minute' | 'period',
+    value: number | string
   ) => void;
   theme: typeof darkTheme;
 }>(({ selectedTime, onTimeChange, theme }) => {
   const hours = useMemo(() => Array.from({ length: 12 }, (_, i) => i + 1), []);
   const minutes = useMemo(() => [0, 15, 30, 45], []);
-  const periods = useMemo(() => ["AM", "PM"] as const, []);
+  const periods = useMemo(() => ['AM', 'PM'] as const, []);
 
   const renderHourItem = useCallback(
     ({ item }: { item: number }) => (
@@ -251,7 +255,7 @@ const TimePicker = memo<{
               selectedTime.hour === item ? theme.primary : theme.border,
           },
         ]}
-        onPress={() => onTimeChange("hour", item)}
+        onPress={() => onTimeChange('hour', item)}
       >
         <Text
           style={[
@@ -268,7 +272,7 @@ const TimePicker = memo<{
         </Text>
       </Pressable>
     ),
-    [selectedTime.hour, onTimeChange, theme],
+    [selectedTime.hour, onTimeChange, theme]
   );
 
   const renderMinuteItem = useCallback(
@@ -283,7 +287,7 @@ const TimePicker = memo<{
               selectedTime.minute === item ? theme.primary : theme.border,
           },
         ]}
-        onPress={() => onTimeChange("minute", item)}
+        onPress={() => onTimeChange('minute', item)}
       >
         <Text
           style={[
@@ -296,11 +300,11 @@ const TimePicker = memo<{
             },
           ]}
         >
-          {item.toString().padStart(2, "0")}
+          {item.toString().padStart(2, '0')}
         </Text>
       </Pressable>
     ),
-    [selectedTime.minute, onTimeChange, theme],
+    [selectedTime.minute, onTimeChange, theme]
   );
 
   return (
@@ -380,7 +384,7 @@ const TimePicker = memo<{
                         : theme.border,
                   },
                 ]}
-                onPress={() => onTimeChange("period", period)}
+                onPress={() => onTimeChange('period', period)}
               >
                 <Text
                   style={[
@@ -404,11 +408,13 @@ const TimePicker = memo<{
   );
 });
 
+TimePicker.displayName = 'TimePicker';
+
 export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
   (
     {
-      initialDate = moment().format("YYYY-MM-DD"),
-      initialMode = "date",
+      initialDate = moment().format('YYYY-MM-DD'),
+      initialMode = 'date',
       enableRangeMode = false,
       showModeSelector = true,
       showRangeToggle = true,
@@ -423,20 +429,20 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
       disabledDates = [],
       renderTrigger,
       hideTrigger = false,
-      sheetSizes = ["auto"],
+      sheetSizes = ['auto'],
     },
-    ref,
+    ref
   ) => {
     const theme = useMemo(
       () => ({ ...darkTheme, ...customTheme }),
-      [customTheme],
+      [customTheme]
     );
 
     const [selectedDate, setSelectedDate] = useState<string>(initialDate);
     const [selectedTime, setSelectedTime] = useState({
       hour: 12,
       minute: 0,
-      period: "PM" as "AM" | "PM",
+      period: 'PM' as 'AM' | 'PM',
     });
     const [dateRange, setDateRange] = useState<DateRange>({
       start: null,
@@ -445,8 +451,8 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
     const [isRangeMode, setIsRangeMode] = useState(enableRangeMode);
     const [calendarMode, setCalendarMode] = useState<CalendarMode>(initialMode);
     const [currentMonth, setCurrentMonth] = useState(moment(initialDate));
-    const [viewMode, setViewMode] = useState<"day" | "month" | "year">("day");
-    const [yearFilter, setYearFilter] = useState("");
+    const [viewMode, setViewMode] = useState<'day' | 'month' | 'year'>('day');
+    const [yearFilter, setYearFilter] = useState('');
 
     const sheet = useRef<TrueSheet>(null);
     const scrollview = useRef<ScrollView>(null);
@@ -462,37 +468,37 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
         if (maxDate && moment(date).isAfter(maxDate)) return true;
         return false;
       },
-      [disabledDates, minDate, maxDate],
+      [disabledDates, minDate, maxDate]
     );
 
     const calendarDays = useMemo((): CalendarDate[] => {
-      const startOfMonth = currentMonth.clone().startOf("month");
-      const endOfMonth = currentMonth.clone().endOf("month");
-      const startOfWeek = startOfMonth.clone().startOf("week");
-      const endOfWeek = endOfMonth.clone().endOf("week");
+      const startOfMonth = currentMonth.clone().startOf('month');
+      const endOfMonth = currentMonth.clone().endOf('month');
+      const startOfWeek = startOfMonth.clone().startOf('week');
+      const endOfWeek = endOfMonth.clone().endOf('week');
 
       const days: CalendarDate[] = [];
       let day = startOfWeek.clone();
 
-      while (day.isSameOrBefore(endOfWeek, "day")) {
-        const dateStr = day.format("YYYY-MM-DD");
+      while (day.isSameOrBefore(endOfWeek, 'day')) {
+        const dateStr = day.format('YYYY-MM-DD');
         const isInRange =
           isRangeMode &&
           dateRange.start &&
           dateRange.end &&
-          day.isBetween(dateRange.start, dateRange.end, "day", "[]");
+          day.isBetween(dateRange.start, dateRange.end, 'day', '[]');
 
         days.push({
           date: dateStr,
           day: day.date(),
-          isCurrentMonth: day.isSame(currentMonth, "month"),
-          isToday: day.isSame(moment(), "day"),
+          isCurrentMonth: day.isSame(currentMonth, 'month'),
+          isToday: day.isSame(moment(), 'day'),
           isSelected: !isRangeMode && dateStr === selectedDate,
           isInRange: isInRange || false,
           isRangeStart: isRangeMode && dateStr === dateRange.start,
           isRangeEnd: isRangeMode && dateStr === dateRange.end,
         });
-        day.add(1, "day");
+        day.add(1, 'day');
       }
 
       return days;
@@ -502,7 +508,7 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
       const currentYear = moment().year();
       const years = Array.from(
         { length: 201 },
-        (_, i) => currentYear - 100 + i,
+        (_, i) => currentYear - 100 + i
       );
       if (!yearFilter) return years;
       return years.filter((year) => year.toString().includes(yearFilter));
@@ -537,7 +543,7 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
       (date: string) => {
         if (isDateDisabled(date)) return;
 
-        if (calendarMode === "date" || calendarMode === "time") {
+        if (calendarMode === 'date' || calendarMode === 'time') {
           if (isRangeMode) {
             if (!dateRange.start || (dateRange.start && dateRange.end)) {
               const newRange = { start: date, end: null };
@@ -559,10 +565,10 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
             setCurrentMonth(moment(date));
             onDateSelect?.(date);
 
-            if (calendarMode === "date") {
+            if (calendarMode === 'date') {
               scale.value = withSequence(
                 withTiming(1.05, { duration: 100 }),
-                withTiming(1, { duration: 150 }),
+                withTiming(1, { duration: 150 })
               );
               setTimeout(() => hideCalendar(), 200);
             }
@@ -578,14 +584,14 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
         onDateSelect,
         onRangeSelect,
         isDateDisabled,
-      ],
+      ]
     );
 
-    const navigateMonth = useCallback((direction: "prev" | "next") => {
+    const navigateMonth = useCallback((direction: 'prev' | 'next') => {
       setCurrentMonth((prev) =>
-        direction === "prev"
-          ? prev.clone().subtract(1, "month")
-          : prev.clone().add(1, "month"),
+        direction === 'prev'
+          ? prev.clone().subtract(1, 'month')
+          : prev.clone().add(1, 'month')
       );
     }, []);
 
@@ -593,11 +599,11 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
       (mode: CalendarMode) => {
         setCalendarMode(mode);
         onModeChange?.(mode);
-        if (mode !== "date") {
+        if (mode !== 'date') {
           setIsRangeMode(false);
         }
       },
-      [onModeChange],
+      [onModeChange]
     );
 
     const handleMonthSelect = useCallback(
@@ -605,16 +611,16 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
         const newMonth = currentMonth.clone().month(monthIndex);
         setCurrentMonth(newMonth);
 
-        if (calendarMode === "month") {
-          setSelectedDate(newMonth.format("YYYY-MM-DD"));
-          onDateSelect?.(newMonth.format("YYYY-MM-DD"));
+        if (calendarMode === 'month') {
+          setSelectedDate(newMonth.format('YYYY-MM-DD'));
+          onDateSelect?.(newMonth.format('YYYY-MM-DD'));
           setTimeout(() => hideCalendar(), 150);
-        } else if (calendarMode === "month-year") {
+        } else if (calendarMode === 'month-year') {
         } else {
-          setTimeout(() => setViewMode("day"), 100);
+          setTimeout(() => setViewMode('day'), 100);
         }
       },
-      [currentMonth, calendarMode, hideCalendar, onDateSelect],
+      [currentMonth, calendarMode, hideCalendar, onDateSelect]
     );
 
     const handleYearSelect = useCallback(
@@ -622,39 +628,39 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
         const newYear = currentMonth.clone().year(year);
         setCurrentMonth(newYear);
 
-        if (calendarMode === "year") {
-          setSelectedDate(newYear.format("YYYY-MM-DD"));
-          onDateSelect?.(newYear.format("YYYY-MM-DD"));
+        if (calendarMode === 'year') {
+          setSelectedDate(newYear.format('YYYY-MM-DD'));
+          onDateSelect?.(newYear.format('YYYY-MM-DD'));
           setTimeout(() => hideCalendar(), 150);
         } else {
-          setTimeout(() => setViewMode("month"), 100);
+          setTimeout(() => setViewMode('month'), 100);
         }
       },
-      [currentMonth, calendarMode, hideCalendar, onDateSelect],
+      [currentMonth, calendarMode, hideCalendar, onDateSelect]
     );
 
     const handleTimeChange = useCallback(
-      (type: "hour" | "minute" | "period", value: number | string) => {
+      (type: 'hour' | 'minute' | 'period', value: number | string) => {
         const newTime = { ...selectedTime, [type]: value };
         setSelectedTime(newTime);
         onTimeSelect?.(newTime);
       },
-      [selectedTime, onTimeSelect],
+      [selectedTime, onTimeSelect]
     );
 
     const goToToday = useCallback(() => {
       const today = moment();
 
       if (isRangeMode) {
-        const newRange = { start: today.format("YYYY-MM-DD"), end: null };
+        const newRange = { start: today.format('YYYY-MM-DD'), end: null };
         setDateRange(newRange);
         onRangeSelect?.(newRange);
       } else {
-        setSelectedDate(today.format("YYYY-MM-DD"));
-        onDateSelect?.(today.format("YYYY-MM-DD"));
+        setSelectedDate(today.format('YYYY-MM-DD'));
+        onDateSelect?.(today.format('YYYY-MM-DD'));
       }
       setCurrentMonth(today);
-      setViewMode("day");
+      setViewMode('day');
     }, [isRangeMode, onDateSelect, onRangeSelect]);
 
     const clearSelection = useCallback(() => {
@@ -669,7 +675,7 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
       setSelectedDate(initialDate);
       setDateRange({ start: null, end: null });
       setCurrentMonth(moment(initialDate));
-      setViewMode("day");
+      setViewMode('day');
     }, [initialDate]);
 
     const getValue = useCallback(() => {
@@ -685,7 +691,7 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
         setCurrentMonth(moment(date));
         onDateSelect?.(date);
       },
-      [onDateSelect],
+      [onDateSelect]
     );
 
     const setRangeProgrammatically = useCallback(
@@ -693,7 +699,7 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
         setDateRange(range);
         onRangeSelect?.(range);
       },
-      [onRangeSelect],
+      [onRangeSelect]
     );
 
     useImperativeHandle(
@@ -715,33 +721,33 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
         getValue,
         setDateProgrammatically,
         setRangeProgrammatically,
-      ],
+      ]
     );
 
     const formatSelectedValue = useCallback(() => {
       const config = calendarModes[calendarMode];
       const format = dateFormat || config.format;
 
-      if (isRangeMode && calendarMode === "date" && dateRange.start) {
-        const start = moment(dateRange.start).format("MMM D, YYYY");
+      if (isRangeMode && calendarMode === 'date' && dateRange.start) {
+        const start = moment(dateRange.start).format('MMM D, YYYY');
         const end = dateRange.end
-          ? moment(dateRange.end).format("MMM D, YYYY")
-          : "Select end date";
+          ? moment(dateRange.end).format('MMM D, YYYY')
+          : 'Select end date';
         return `${start} — ${end}`;
       }
 
       switch (calendarMode) {
-        case "date":
+        case 'date':
           return moment(selectedDate).format(format);
-        case "month":
+        case 'month':
           return currentMonth.format(format);
-        case "year":
+        case 'year':
           return currentMonth.format(format);
-        case "month-year":
+        case 'month-year':
           return currentMonth.format(format);
-        case "time":
-          const timeStr = `${selectedTime.hour}:${selectedTime.minute.toString().padStart(2, "0")} ${selectedTime.period}`;
-          return `${moment(selectedDate).format("MMM D, YYYY")} ${timeStr}`;
+        case 'time':
+          const timeStr = `${selectedTime.hour}:${selectedTime.minute.toString().padStart(2, '0')} ${selectedTime.period}`;
+          return `${moment(selectedDate).format('MMM D, YYYY')} ${timeStr}`;
         default:
           return moment(selectedDate).format(format);
       }
@@ -762,8 +768,8 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
 
     const getSheetTitle = () => {
       const config = calendarModes[calendarMode];
-      return isRangeMode && calendarMode === "date"
-        ? "Select Date Range"
+      return isRangeMode && calendarMode === 'date'
+        ? 'Select Date Range'
         : config.title;
     };
 
@@ -774,7 +780,7 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
           <View style={styles.header}>
             <Pressable
               style={[styles.navButton, { backgroundColor: theme.muted }]}
-              onPress={() => navigateMonth("prev")}
+              onPress={() => navigateMonth('prev')}
             >
               <SymbolView
                 name="chevron.left"
@@ -789,16 +795,16 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
                 styles.monthYearButton,
                 { backgroundColor: theme.secondary },
               ]}
-              onPress={() => setViewMode("month")}
+              onPress={() => setViewMode('month')}
             >
               <Text style={[styles.monthYearText, { color: theme.foreground }]}>
-                {currentMonth.format("MMMM YYYY")}
+                {currentMonth.format('MMMM YYYY')}
               </Text>
             </Pressable>
 
             <Pressable
               style={[styles.navButton, { backgroundColor: theme.muted }]}
-              onPress={() => navigateMonth("next")}
+              onPress={() => navigateMonth('next')}
             >
               <SymbolView
                 name="chevron.right"
@@ -811,7 +817,7 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
 
           {/* Days header */}
           <View style={styles.daysHeader}>
-            {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
+            {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => (
               <Text
                 key={day}
                 style={[styles.dayHeaderText, { color: theme.mutedForeground }]}
@@ -831,7 +837,7 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
                 theme={theme}
                 disabled={
                   !item.isCurrentMonth ||
-                  (calendarMode !== "date" && calendarMode !== "time") ||
+                  (calendarMode !== 'date' && calendarMode !== 'time') ||
                   isDateDisabled(item.date)
                 }
               />
@@ -839,7 +845,7 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
           </View>
 
           {/* Time picker for time mode */}
-          {calendarMode === "time" && (
+          {calendarMode === 'time' && (
             <TimePicker
               selectedTime={selectedTime}
               onTimeChange={handleTimeChange}
@@ -859,7 +865,7 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
         selectedTime,
         handleTimeChange,
         isDateDisabled,
-      ],
+      ]
     );
 
     const renderMonthView = useCallback(
@@ -869,7 +875,7 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
             <Pressable
               style={[styles.navButton, { backgroundColor: theme.muted }]}
               onPress={() =>
-                calendarMode === "month" ? hideCalendar() : setViewMode("day")
+                calendarMode === 'month' ? hideCalendar() : setViewMode('day')
               }
             >
               <SymbolView
@@ -886,7 +892,7 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
                 { backgroundColor: theme.secondary },
               ]}
               onPress={() =>
-                calendarMode !== "month" ? setViewMode("year") : undefined
+                calendarMode !== 'month' ? setViewMode('year') : undefined
               }
             >
               <Text style={[styles.monthYearText, { color: theme.foreground }]}>
@@ -926,7 +932,7 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
         calendarMode,
         hideCalendar,
         setViewMode,
-      ],
+      ]
     );
 
     const renderYearItem = useCallback(
@@ -935,8 +941,8 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
           ref={scrollview}
           contentContainerStyle={{
             flexGrow: 1,
-            justifyContent: "center",
-            alignItems: "center",
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
           style={{ flex: 1 }}
           nestedScrollEnabled
@@ -949,7 +955,7 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
           />
         </ScrollView>
       ),
-      [currentMonth, handleYearSelect, theme],
+      [currentMonth, handleYearSelect, theme]
     );
 
     const getYearItemLayout = useCallback(
@@ -958,7 +964,7 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
         offset: 76 * index,
         index,
       }),
-      [],
+      []
     );
 
     const renderYearView = useCallback(
@@ -968,7 +974,7 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
             <Pressable
               style={[styles.navButton, { backgroundColor: theme.muted }]}
               onPress={() =>
-                calendarMode === "year" ? hideCalendar() : setViewMode("month")
+                calendarMode === 'year' ? hideCalendar() : setViewMode('month')
               }
             >
               <SymbolView
@@ -1012,7 +1018,7 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
               {yearFilter.length > 0 && (
                 <Pressable
                   style={styles.clearIcon}
-                  onPress={() => setYearFilter("")}
+                  onPress={() => setYearFilter('')}
                 >
                   <SymbolView
                     name="xmark.circle.fill"
@@ -1053,7 +1059,7 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
         hideCalendar,
         setViewMode,
         yearFilter,
-      ],
+      ]
     );
 
     const renderTriggerContent = () => {
@@ -1141,8 +1147,8 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
                     style={[
                       styles.clearButton,
                       {
-                        backgroundColor: theme.destructive + "20",
-                        borderColor: theme.destructive + "40",
+                        backgroundColor: theme.destructive + '20',
+                        borderColor: theme.destructive + '40',
                       },
                     ]}
                     onPress={clearSelection}
@@ -1227,8 +1233,8 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
                             ]}
                           >
                             {calendarModes[mode as CalendarMode].title.replace(
-                              "Select ",
-                              "",
+                              'Select ',
+                              ''
                             )}
                           </Text>
                         </Pressable>
@@ -1237,7 +1243,7 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
                   </View>
                 )}
 
-                {showRangeToggle && calendarMode === "date" && (
+                {showRangeToggle && calendarMode === 'date' && (
                   <View
                     style={[
                       styles.switchContainer,
@@ -1276,12 +1282,14 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
               </View>
             )}
 
-            {viewMode === "day" && renderDayView()}
-            {viewMode === "month" && renderMonthView()}
-            {viewMode === "year" && renderYearView()}
+            {viewMode === 'day' && renderDayView()}
+            {viewMode === 'month' && renderMonthView()}
+            {viewMode === 'year' && renderYearView()}
           </Animated.View>
         </TrueSheet>
       </View>
     );
-  },
+  }
 );
+
+CalendarView.displayName = 'CalendarView';

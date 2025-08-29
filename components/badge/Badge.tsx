@@ -11,23 +11,23 @@
  * ╚════════════════════════════════════════════════════════╝
  */
 
-import React from "react";
-import { View, Text, StyleSheet, ViewStyle, TextStyle } from "react-native";
-import * as constants from "@/constants/components/index";
-
+import React from 'react';
+import { StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native';
+// import * as constants from "@/constants/components/index";
+import { palette } from '@/theme';
+import { borderRadiusStyles, type BorderRadiusKey } from './types';
 export type BadgeVariant =
-  | "default"
-  | "success"
-  | "warning"
-  | "error"
-  | "notifications"
-  | "pending";
-import type { BorderRadiusKey } from "@/constants/components/index";
+  | 'default'
+  | 'success'
+  | 'warning'
+  | 'error'
+  | 'notifications'
+  | 'pending';
 
 export interface BadgeProps {
   label: string;
   variant?: BadgeVariant;
-  size?: "sm" | "md" | "lg";
+  size?: 'sm' | 'md' | 'lg';
   radius?: BorderRadiusKey;
   style?: ViewStyle;
   textStyle?: TextStyle;
@@ -43,24 +43,27 @@ const variantStyles: Record<
     borderWidth?: number;
   }
 > = {
-  default: { backgroundColor: "#c6e8c5", textColor: "#374151" },
-  success: { backgroundColor: "#D1FAE5", textColor: "#065F46" },
-  warning: { backgroundColor: "#FEF3C7", textColor: "#92400E" },
-  error: { backgroundColor: "#FEE2E2", textColor: "#991B1B" },
+  default: { backgroundColor: '#c6e8c5', textColor: '#374151' },
+  success: {
+    backgroundColor: palette.greenLight,
+    textColor: palette.greenDark,
+  },
+  warning: { backgroundColor: '#FEF3C7', textColor: '#92400E' },
+  error: { backgroundColor: '#FEE2E2', textColor: '#991B1B' },
   pending: {
-    backgroundColor: "#edeef8",
-    textColor: "#312db8",
+    backgroundColor: '#edeef8',
+    textColor: '#312db8',
   },
   notifications: {
-    backgroundColor: "transparent",
-    textColor: "#dbdbdb",
-    borderColor: "#e6e6e6",
+    backgroundColor: 'transparent',
+    textColor: '#dbdbdb',
+    borderColor: '#e6e6e6',
     borderWidth: 0.3,
   },
 };
 
 const sizeStyles: Record<
-  "sm" | "md" | "lg",
+  'sm' | 'md' | 'lg',
   { paddingVertical: number; paddingHorizontal: number; fontSize: number }
 > = {
   sm: { paddingVertical: 4, paddingHorizontal: 8, fontSize: 10 },
@@ -70,16 +73,16 @@ const sizeStyles: Record<
 
 export const Badge: React.FC<BadgeProps> = ({
   label,
-  variant = "default",
-  size = "md",
+  variant = 'default',
+  size = 'md',
   style,
   textStyle,
   icon,
-  radius = "md",
+  radius = 'md',
 }) => {
   const vs = variantStyles[variant];
   const ss = sizeStyles[size];
-  const rs = constants.borderRadiusStyles[radius];
+  const rs = borderRadiusStyles[radius];
 
   return (
     <View
@@ -89,12 +92,12 @@ export const Badge: React.FC<BadgeProps> = ({
           backgroundColor: vs.backgroundColor,
           paddingVertical: ss.paddingVertical,
           paddingHorizontal: ss.paddingHorizontal,
-          borderRadius: rs,
+          borderRadius: rs.borderRadius,
           borderColor: vs.borderColor,
           borderWidth: vs.borderWidth,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
         },
         style,
       ]}
@@ -118,7 +121,7 @@ export const Badge: React.FC<BadgeProps> = ({
 const styles = StyleSheet.create({
   badge: {},
   text: {
-    fontWeight: "500",
+    fontWeight: '500',
     marginLeft: 5,
   },
 });

@@ -1,18 +1,20 @@
 import { ThemeProvider } from '@shopify/restyle';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
+import { ErrorBoundaryProps, Stack } from 'expo-router';
+
 import React from 'react';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 import { useAuth } from '@/components/context/auth';
 import Provider from '@/components/provider';
 import { ToastProviderWithViewport } from '@/components/toast';
+import { ErrorComponent } from '@/features/shared/components/error';
 import theme, { palette } from '@/theme';
 import { StyleSheet, View } from 'react-native';
 import 'react-native-reanimated';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
+export function ErrorBoundary({ retry, error }: ErrorBoundaryProps) {
+  return <ErrorComponent refetch={retry} text={error.message} />;
+}
 export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
@@ -30,19 +32,13 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider theme={theme}>
-      <SafeAreaView
-        style={{ flex: 1, backgroundColor: palette.blue }}
-        edges={['top', 'right', 'left']}
-      >
-        <Provider>
-          <View style={styles.container}>
-            <KeyboardProvider>
-              <InitialRoute />
-            </KeyboardProvider>
-          </View>
-        </Provider>
-      </SafeAreaView>
-      <StatusBar style="light" />
+      <Provider>
+        <View style={styles.container}>
+          <KeyboardProvider>
+            <InitialRoute />
+          </KeyboardProvider>
+        </View>
+      </Provider>
     </ThemeProvider>
   );
 }

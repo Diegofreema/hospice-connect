@@ -1,5 +1,10 @@
 PODS:
   - boost (1.84.0)
+  - ComputableLayout (0.7.0):
+    - DGSwiftUtilities (~> 0.11)
+  - ContextMenuAuxiliaryPreview (0.5.2):
+    - DGSwiftUtilities (~> 0.29)
+  - DGSwiftUtilities (0.46.4)
   - DoubleConversion (1.1.6)
   - EXApplication (6.1.5):
     - ExpoModulesCore
@@ -1442,6 +1447,61 @@ PODS:
     - React-jsiexecutor
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
+  - react-native-ios-context-menu (3.1.0):
+    - ContextMenuAuxiliaryPreview (~> 0.5)
+    - DGSwiftUtilities
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.11.18.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-hermes
+    - React-ImageManager
+    - React-jsi
+    - react-native-ios-utilities
+    - React-NativeModulesApple
+    - React-RCTAppDelegate
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
+  - react-native-ios-utilities (5.1.2):
+    - ComputableLayout (~> 0.7)
+    - DGSwiftUtilities (~> 0.46)
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.11.18.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-hermes
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTAppDelegate
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - react-native-keyboard-controller (1.18.5):
     - DoubleConversion
     - glog
@@ -1468,6 +1528,30 @@ PODS:
     - ReactCommon/turbomodule/core
     - Yoga
   - react-native-keyboard-controller/common (1.18.5):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.11.18.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-hermes
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
+  - react-native-menu (1.2.4):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1936,6 +2020,54 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - RNCPicker (2.11.1):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.11.18.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-hermes
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
+  - RNDateTimePicker (8.4.1):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.11.18.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-hermes
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - RNGestureHandler (2.24.0):
     - DoubleConversion
     - glog
@@ -2196,6 +2328,30 @@ PODS:
     - libwebp (~> 1.0)
     - SDWebImage/Core (~> 5.17)
   - SocketRocket (0.7.1)
+  - TrueSheet (2.0.6):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.11.18.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-hermes
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - Yoga (0.0.0)
 
 DEPENDENCIES:
@@ -2259,7 +2415,10 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
+  - react-native-ios-context-menu (from `../node_modules/react-native-ios-context-menu`)
+  - react-native-ios-utilities (from `../node_modules/react-native-ios-utilities`)
   - react-native-keyboard-controller (from `../node_modules/react-native-keyboard-controller`)
+  - "react-native-menu (from `../node_modules/@react-native-menu/menu`)"
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
@@ -2294,14 +2453,20 @@ DEPENDENCIES:
   - ReactCodegen (from `build/generated/ios`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
+  - "RNCPicker (from `../node_modules/@react-native-picker/picker`)"
+  - "RNDateTimePicker (from `../node_modules/@react-native-community/datetimepicker`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
+  - "TrueSheet (from `../node_modules/@lodev09/react-native-true-sheet`)"
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
   trunk:
+    - ComputableLayout
+    - ContextMenuAuxiliaryPreview
+    - DGSwiftUtilities
     - libavif
     - libdav1d
     - libwebp
@@ -2429,8 +2594,14 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   React-microtasksnativemodule:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
+  react-native-ios-context-menu:
+    :path: "../node_modules/react-native-ios-context-menu"
+  react-native-ios-utilities:
+    :path: "../node_modules/react-native-ios-utilities"
   react-native-keyboard-controller:
     :path: "../node_modules/react-native-keyboard-controller"
+  react-native-menu:
+    :path: "../node_modules/@react-native-menu/menu"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-webview:
@@ -2499,6 +2670,10 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
+  RNCPicker:
+    :path: "../node_modules/@react-native-picker/picker"
+  RNDateTimePicker:
+    :path: "../node_modules/@react-native-community/datetimepicker"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
   RNReanimated:
@@ -2507,11 +2682,16 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-screens"
   RNSVG:
     :path: "../node_modules/react-native-svg"
+  TrueSheet:
+    :path: "../node_modules/@lodev09/react-native-true-sheet"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
   boost: 7e761d76ca2ce687f7cc98e698152abd03a18f90
+  ComputableLayout: c50faffac4ed9f8f05b0ce5e6f3a60df1f6042c8
+  ContextMenuAuxiliaryPreview: 20be0be795b783b68f8792732eed4bed9f202c1c
+  DGSwiftUtilities: 536456ae3d0e5083ac42e06b6b720921601864b5
   DoubleConversion: cb417026b2400c8f53ae97020b2be961b59470cb
   EXApplication: 50cc8ea58c138da6e3f25cd789634219c86b90d5
   EXConstants: 9d62a46a36eae6d28cb978efcbc68aef354d1704
@@ -2572,7 +2752,10 @@ SPEC CHECKSUMS:
   React-logger: e6e6164f1753e46d1b7e2c8f0949cd7937eaf31b
   React-Mapbuffer: 5b4959cbd91e7e8fae42ab0f4b7c25b86fd139a1
   React-microtasksnativemodule: 1695ab137281dd03de967b7bbeb4e392601f6432
+  react-native-ios-context-menu: f5c2bc565a9a8599bb4513c43835a38e00d73b3a
+  react-native-ios-utilities: 73c3e0a51544c059f80eecc226a3530609e10c42
   react-native-keyboard-controller: 5f447248875d3d8d1435f067b7b09fdef052fcb1
+  react-native-menu: 0e2676628dee250eb085b63051c50b66f7585eb3
   react-native-safe-area-context: 00d03dc688ba86664be66f9e3f203fc7d747d899
   react-native-webview: cde150463e7caa49b316b0ed1871e7ef8193bef4
   React-NativeModulesApple: 3ecc647742d33ad617bd2805902e3f91f2b3008f
@@ -2607,6 +2790,8 @@ SPEC CHECKSUMS:
   ReactCodegen: 4d001cd4fa72b876bbff500bbb3811e458bb3c72
   ReactCommon: 41137f7e87cf7fd1c041a7124dfa3d0d48aa43f3
   RNCAsyncStorage: c1bbcf629d7206d1e19310827848b98d68a4cbaf
+  RNCPicker: 620d3d6cad22e5279fbcb365f58b3f5da1935198
+  RNDateTimePicker: 792e57dd210f8af940812636708d43777f1f922b
   RNGestureHandler: ccf4105b125002bd88e39d2a1f2b7e6001bcdf34
   RNReanimated: 8b24b49fc13fce9a6e1729ccff645a63d2b7a6d1
   RNScreens: c2e3cc506212228c607b4785b315205e28acbf0f
@@ -2616,6 +2801,7 @@ SPEC CHECKSUMS:
   SDWebImageSVGCoder: 15a300a97ec1c8ac958f009c02220ac0402e936c
   SDWebImageWebPCoder: e38c0a70396191361d60c092933e22c20d5b1380
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
+  TrueSheet: 0f19f04de382dd5760844ca0976ba29f67dd5586
   Yoga: adb397651e1c00672c12e9495babca70777e411e
 
 PODFILE CHECKSUM: 7e2088af14205ea327396a775c4f1a98b146c199

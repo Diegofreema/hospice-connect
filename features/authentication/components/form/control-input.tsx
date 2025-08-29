@@ -34,6 +34,9 @@ export const ControlInput = <TFieldValues extends FieldValues>({
       <Controller
         control={control}
         name={name}
+        rules={{
+          required: true,
+        }}
         render={({ field: { onChange, value } }) => (
           <Input
             onChangeText={onChange}

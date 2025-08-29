@@ -58,7 +58,11 @@ export const Button = ({
   const props = useRestyle(restyleFunctions, rest);
 
   return (
-    <TouchableOpacity onPress={onPress} disabled={disabled}>
+    <TouchableOpacity
+      onPress={onPress}
+      disabled={disabled}
+      style={{ opacity: disabled ? 0.5 : 1 }}
+    >
       <View
         alignItems={'center'}
         justifyContent={'center'}

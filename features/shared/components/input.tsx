@@ -20,7 +20,11 @@ export const Input = ({ label, rightIcon, leftIcon, ...props }: Props) => {
         gap={'s'}
       >
         {leftIcon}
-        <TextInput {...props} style={{ flex: 1 }} />
+        <TextInput
+          {...props}
+          placeholderTextColor={'grey'}
+          style={{ flex: 1 }}
+        />
         {rightIcon}
       </View>
     </View>
@@ -32,7 +36,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'gray',
     borderRadius: 8,
-    paddingVertical: 15,
+    paddingVertical: 18,
     paddingHorizontal: 10,
+    minHeight: 50,
   },
 });

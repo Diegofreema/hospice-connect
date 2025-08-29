@@ -29,6 +29,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
           email: data.email as string,
           name: params.firstName + ' ' + params.lastName,
           isBoarded: false,
+          isNurse: false,
         };
       },
       validatePasswordRequirements: (password: string) => {
@@ -92,6 +93,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         image: args.profile.picture as string,
         emailVerificationTime: args.profile.emailVerificationTime as number,
         isBoarded: false,
+        isNurse: false,
       });
     },
   },

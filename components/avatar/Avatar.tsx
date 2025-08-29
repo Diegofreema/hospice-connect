@@ -1,17 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { View, Image, Text, Pressable, StyleSheet } from "react-native";
+import React, { useEffect, useState } from 'react';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, {
-  useSharedValue,
+  Easing,
+  interpolate,
+  LinearTransition,
   useAnimatedStyle,
+  useSharedValue,
   withRepeat,
   withTiming,
-  interpolate,
-  Easing,
-  FadeIn,
-  FadeOut,
-  LinearTransition,
-} from "react-native-reanimated";
-import type { AvatarGroupProps } from "./Avatar.types";
+} from 'react-native-reanimated';
+import type { AvatarGroupProps } from './Avatar.types';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -20,21 +18,21 @@ export const Avatar: React.FC<AvatarGroupProps> = ({
   size = 40,
   onPress,
   showBorder = true,
-  borderColor = "#fff",
+  borderColor = '#fff',
   borderWidth = 2,
   backgroundColor,
-  textColor = "#fff",
+  textColor = '#fff',
   disabled = false,
   loading = false,
   showAvatar = true,
   showText = false,
-  textPosition = "bottom",
+  textPosition = 'bottom',
   textStyle,
   shimmerSpeed = 1500,
   pressedScale = 0.95,
   pressedOpacity = 0.8,
   showOnlineIndicator = false,
-  onlineIndicatorColor = "#4CAF50",
+  onlineIndicatorColor = '#4CAF50',
   onlineIndicatorSize,
 }) => {
   const [hasError, setHasError] = useState(false);
@@ -53,7 +51,7 @@ export const Avatar: React.FC<AvatarGroupProps> = ({
           easing: Easing.linear,
         }),
         -1,
-        false,
+        false
       );
       fadeOpacity.value = 0;
     } else {
@@ -63,10 +61,10 @@ export const Avatar: React.FC<AvatarGroupProps> = ({
         easing: Easing.out(Easing.quad),
       });
     }
-  }, [loading, shimmerSpeed]);
+  }, [loading, shimmerSpeed, fadeOpacity, shimmerProgress]);
 
   const getInitials = (name?: string): string => {
-    if (!name) return "?";
+    if (!name) return '?';
 
     const words = name.trim().split(/\s+/);
     if (words.length === 1) {
@@ -83,21 +81,21 @@ export const Avatar: React.FC<AvatarGroupProps> = ({
 
     if (image.name) {
       const colors = [
-        "#FF6B6B",
-        "#4ECDC4",
-        "#45B7D1",
-        "#96CEB4",
-        "#FFEAA7",
-        "#DDA0DD",
-        "#98D8C8",
-        "#F7DC6F",
-        "#BB8FCE",
-        "#85C1E9",
-        "#FF8A80",
-        "#82B1FF",
-        "#B39DDB",
-        "#A5D6A7",
-        "#FFCC02",
+        '#FF6B6B',
+        '#4ECDC4',
+        '#45B7D1',
+        '#96CEB4',
+        '#FFEAA7',
+        '#DDA0DD',
+        '#98D8C8',
+        '#F7DC6F',
+        '#BB8FCE',
+        '#85C1E9',
+        '#FF8A80',
+        '#82B1FF',
+        '#B39DDB',
+        '#A5D6A7',
+        '#FFCC02',
       ];
 
       let hash = 0;
@@ -108,7 +106,7 @@ export const Avatar: React.FC<AvatarGroupProps> = ({
       return colors[Math.abs(hash) % colors.length];
     }
 
-    return "#ccc";
+    return '#ccc';
   };
 
   const handleImageLoad = () => {
@@ -150,12 +148,12 @@ export const Avatar: React.FC<AvatarGroupProps> = ({
     const translateX = interpolate(
       shimmerProgress.value,
       [0, 1],
-      [-size * 1.5, size * 1.5],
+      [-size * 1.5, size * 1.5]
     );
     const opacity = interpolate(
       shimmerProgress.value,
       [0, 0.5, 1],
-      [0.3, 0.8, 0.3],
+      [0.3, 0.8, 0.3]
     );
 
     return {
@@ -233,13 +231,14 @@ export const Avatar: React.FC<AvatarGroupProps> = ({
               },
             ]}
             onLoad={() => {
-              console.log("Image loaded!");
+              console.log('Image loaded!');
               handleImageLoad();
             }}
             onError={(e) => {
-              console.error("Image failed to load:", e.nativeEvent);
+              console.error('Image failed to load:', e.nativeEvent);
               handleImageError();
             }}
+            defaultSource={require('../../assets/images/icon.png')}
           />
           {showOnlineIndicator && (
             <Animated.View
@@ -312,8 +311,8 @@ export const Avatar: React.FC<AvatarGroupProps> = ({
       <Text
         style={[
           styles.nameText,
-          textPosition === "right" && styles.nameTextRight,
-          textPosition === "top" && styles.nameTextTop,
+          textPosition === 'right' && styles.nameTextRight,
+          textPosition === 'top' && styles.nameTextTop,
           { fontSize: size * 0.3 },
           textStyle,
         ]}
@@ -328,11 +327,11 @@ export const Avatar: React.FC<AvatarGroupProps> = ({
     <View
       style={[
         styles.container,
-        textPosition === "right" && styles.containerRow,
-        textPosition === "top" && styles.containerColumn,
+        textPosition === 'right' && styles.containerRow,
+        textPosition === 'top' && styles.containerColumn,
       ]}
     >
-      {textPosition === "top" && <TextContent />}
+      {textPosition === 'top' && <TextContent />}
 
       <AnimatedPressable
         onPress={handlePress}
@@ -348,22 +347,22 @@ export const Avatar: React.FC<AvatarGroupProps> = ({
         <AvatarContent />
       </AnimatedPressable>
 
-      {textPosition === "right" && <TextContent />}
-      {textPosition === "bottom" && <TextContent />}
+      {textPosition === 'right' && <TextContent />}
+      {textPosition === 'bottom' && <TextContent />}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: "center",
+    alignItems: 'center',
   },
   containerRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   containerColumn: {
-    flexDirection: "column",
+    flexDirection: 'column',
   },
   pressable: {
     borderRadius: 50,
@@ -372,47 +371,47 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   imageContainer: {
-    position: "relative",
+    position: 'relative',
   },
   avatar: {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: '#f0f0f0',
   },
   fallbackContainer: {
-    position: "relative",
+    position: 'relative',
   },
   fallback: {
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   fallbackText: {
-    fontWeight: "600",
-    textAlign: "center",
+    fontWeight: '600',
+    textAlign: 'center',
   },
   loadingContainer: {
-    position: "relative",
-    overflow: "hidden",
-    justifyContent: "center",
-    alignItems: "center",
+    position: 'relative',
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   shimmerContainer: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
   shimmerOverlay: {
-    position: "absolute",
-    backgroundColor: "rgba(255, 255, 255, 0.6)",
+    position: 'absolute',
+    backgroundColor: 'rgba(255, 255, 255, 0.6)',
     borderRadius: 4,
-    transform: [{ rotate: "20deg" }],
+    transform: [{ rotate: '20deg' }],
   },
   onlineIndicator: {
-    position: "absolute",
+    position: 'absolute',
     borderWidth: 2,
-    borderColor: "#fff",
-    shadowColor: "#000",
+    borderColor: '#fff',
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 1,
@@ -422,9 +421,9 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   nameText: {
-    color: "#333",
-    fontWeight: "500",
-    textAlign: "center",
+    color: '#333',
+    fontWeight: '500',
+    textAlign: 'center',
     marginVertical: 4,
   },
   nameTextRight: {

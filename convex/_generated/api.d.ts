@@ -18,7 +18,9 @@ import type * as ResendOTPPassword from "../ResendOTPPassword.js";
 import type * as VerifyEmail from "../VerifyEmail.js";
 import type * as auth from "../auth.js";
 import type * as errors from "../errors.js";
+import type * as helper from "../helper.js";
 import type * as http from "../http.js";
+import type * as nurses from "../nurses.js";
 import type * as passwordReset_PasswordResetemail from "../passwordReset/PasswordResetemail.js";
 import type * as users from "../users.js";
 
@@ -36,7 +38,9 @@ declare const fullApi: ApiFromModules<{
   VerifyEmail: typeof VerifyEmail;
   auth: typeof auth;
   errors: typeof errors;
+  helper: typeof helper;
   http: typeof http;
+  nurses: typeof nurses;
   "passwordReset/PasswordResetemail": typeof passwordReset_PasswordResetemail;
   users: typeof users;
 }>;

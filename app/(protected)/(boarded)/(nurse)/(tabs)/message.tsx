@@ -1,12 +1,12 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 
-type Props = {};
-
-export const PersonalInfo = (props: Props) => {
+const MessageScreen = () => {
   return (
     <View>
-      <Text>PersonalInfo</Text>
+      <Text>MessageScreen</Text>
     </View>
   );
 };
+
+export default MessageScreen;
