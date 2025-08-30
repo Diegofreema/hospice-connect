@@ -1,11 +1,14 @@
-import { Text, View } from 'react-native';
+import { Availability } from '@/features/nurse/components/availability';
+import { BackButton } from '@/features/shared/components/back-button';
+import { Wrapper } from '@/features/shared/components/wrapper';
 
-const Availability = () => {
+const AvailabilityScreen = () => {
   return (
-    <View>
-      <Text> availability</Text>
-    </View>
+    <Wrapper>
+      <BackButton marginTop={0} title="Availability" />
+      <Availability />
+    </Wrapper>
   );
 };
 
-export default Availability;
+export default AvailabilityScreen;

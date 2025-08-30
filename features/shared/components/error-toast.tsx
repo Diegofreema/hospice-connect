@@ -14,7 +14,12 @@ export const ErrorToast = ({ title, description }: Props) => {
       <Text variant={'subheader'} color={'white'} fontSize={getFontSize(16)}>
         {title}
       </Text>
-      <Text variant={'body'} color={'white'} fontSize={getFontSize(13)}>
+      <Text
+        style={{ marginTop: -10 }}
+        variant={'body'}
+        color={'white'}
+        fontSize={getFontSize(13)}
+      >
         {description}
       </Text>
     </View>
@@ -27,7 +32,12 @@ export const SuccessToast = ({ title, description }: Props) => {
       <Text variant={'subheader'} color={'white'} fontSize={getFontSize(16)}>
         {title}
       </Text>
-      <Text variant={'body'} color={'white'} fontSize={getFontSize(13)}>
+      <Text
+        style={{ marginTop: -10 }}
+        variant={'body'}
+        color={'white'}
+        fontSize={getFontSize(13)}
+      >
         {description}
       </Text>
     </View>

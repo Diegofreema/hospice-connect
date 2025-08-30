@@ -67,10 +67,53 @@ export const getNurse = query({
     if (!nurse) {
       return null;
     }
+
+    const availabilities = await ctx.db
+      .query('availabilities')
+      .withIndex('nurseId', (q) => q.eq('nurseId', nurse._id))
+      .first();
     const image = nurse.imageId ? await getImage(ctx, nurse.imageId) : null;
     return {
       ...nurse,
       image,
+      availabilities,
     };
+  },
+});
+
+export const updateNurseDailyAvailability = mutation({
+  args: {
+    nurseId: v.id('nurses'),
+    day: v.string(),
+    available: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    try {
+      const nurse = await ctx.db.get(args.nurseId);
+      if (!nurse) {
+        throw new ConvexError('Nurse not found');
+      }
+      const availabilities = await ctx.db
+        .query('availabilities')
+        .withIndex('nurseId', (q) => q.eq('nurseId', nurse._id))
+        .first();
+      if (!availabilities) {
+        throw new ConvexError('Availabilities not found');
+      }
+      const days = availabilities.days.map((day) => {
+        if (day.day === args.day) {
+          return {
+            ...day,
+            available: args.available,
+          };
+        }
+        return day;
+      });
+      await ctx.db.patch(availabilities._id, {
+        days,
+      });
+    } catch (error: any) {
+      throw new ConvexError(error);
+    }
   },
 });

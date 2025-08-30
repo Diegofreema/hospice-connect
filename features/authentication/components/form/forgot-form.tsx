@@ -5,13 +5,16 @@ import { palette } from '@/theme';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { IconMail } from '@tabler/icons-react-native';
-import { router } from 'expo-router';
+import { Href, router } from 'expo-router';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { forgotPasswordSchema, ForgotPasswordSchema } from '../../validators';
 import { ControlInput } from './control-input';
 
-export const ForgotForm = () => {
+type Props = {
+  link?: Href;
+};
+export const ForgotForm = ({ link = '/reset-password' }: Props) => {
   const { signIn } = useAuthActions();
   const {
     handleSubmit,
@@ -36,7 +39,7 @@ export const ForgotForm = () => {
           type: 'success',
         });
 
-        router.push(`/reset-password?email=${data.email}`);
+        router.push(`${link}?email=${data.email}` as Href);
       })
       .catch((e) => {
         console.log('RESEND ERROR', { e });

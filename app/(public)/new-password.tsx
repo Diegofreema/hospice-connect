@@ -1,25 +1,27 @@
 import { Subtitle } from '@/components/subtitle/Subtitle';
-import { ForgotForm } from '@/features/authentication/components/form/forgot-form';
+import { ResetForm } from '@/features/authentication/components/form/reset-form';
 import { BackButton } from '@/features/shared/components/back-button';
 import { MyTitle } from '@/features/shared/components/my-title';
 import { Spacer } from '@/features/shared/components/spacer';
 import { Wrapper } from '@/features/shared/components/wrapper';
 import { palette } from '@/theme';
+import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 
-const ResetPassword = () => {
+const NewPassword = () => {
+  const { email } = useLocalSearchParams<{ email: string }>();
   return (
     <Wrapper>
-      <BackButton marginTop={0} />
+      <BackButton />
       <Spacer height={30} />
-      <MyTitle title="Change Password" />
+      <MyTitle title="Create new password" />
       <Subtitle style={{ color: palette.black }}>
-        Enter your email to reset your password
+        Please create a new password
       </Subtitle>
       <Spacer height={50} />
-      <ForgotForm link={'/new-password'} />
+      <ResetForm email={email} />
     </Wrapper>
   );
 };
 
-export default ResetPassword;
+export default NewPassword;

@@ -22,7 +22,14 @@ export const BackButton = ({ title, rightContent, marginTop = 30 }: Props) => {
         <IconArrowLeft size={30} color={palette.black} />
       </TouchableOpacity>
       {title ? (
-        <Text style={{ fontSize: 20, fontFamily: 'PublicSansBold', marginTop }}>
+        <Text
+          style={{
+            fontSize: 20,
+            fontFamily: 'PublicSansBold',
+            marginTop,
+            marginLeft: -20,
+          }}
+        >
           {title}
         </Text>
       ) : (

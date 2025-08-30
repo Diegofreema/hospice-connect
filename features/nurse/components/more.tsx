@@ -38,11 +38,11 @@ const links: LinkType[] = [
   {
     label: 'Support',
     name: 'beats.headphones',
-    link: '/support',
+    link: 'https://hospice-connect-web.vercel.app/contact',
   },
   {
     label: 'Privacy Policy',
     name: 'note.text',
-    link: '/privacy',
+    link: 'https://hospice-connect-web.vercel.app/privacy-policy',
   },
 ];

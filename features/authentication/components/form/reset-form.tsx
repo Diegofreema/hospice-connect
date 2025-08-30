@@ -15,7 +15,7 @@ import {
   IconLock,
   IconX,
 } from '@tabler/icons-react-native';
-import { router } from 'expo-router';
+import { router, usePathname } from 'expo-router';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
@@ -27,6 +27,8 @@ import { resetPasswordSchema, ResetPasswordSchema } from '../../validators';
 import { ControlInput } from './control-input';
 export const ResetForm = ({ email }: { email: string }) => {
   const [secured, setSecured] = useState(true);
+  const pathname = usePathname();
+  const isResetPassword = pathname.includes('new-password');
   const { signIn } = useAuthActions();
   const { width } = useWindowDimensions();
   const { showToast } = useToast();
@@ -53,7 +55,11 @@ export const ResetForm = ({ email }: { email: string }) => {
       email,
     })
       .then(() => {
-        router.push(`/`);
+        if (isResetPassword) {
+          router.back();
+        } else {
+          router.push(`/`);
+        }
         reset();
         showToast({
           title: 'Success',

@@ -1,8 +1,8 @@
 import { ThemeProvider } from '@shopify/restyle';
 import { useFonts } from 'expo-font';
 import { ErrorBoundaryProps, Stack } from 'expo-router';
-
 import React from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 import { useAuth } from '@/components/context/auth';
@@ -46,16 +46,18 @@ export default function RootLayout() {
 const InitialRoute = () => {
   const { isAuthenticated } = useAuth();
   return (
-    <ToastProviderWithViewport>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Protected guard={isAuthenticated}>
-          <Stack.Screen name="(protected)" />
-        </Stack.Protected>
-        <Stack.Protected guard={!isAuthenticated}>
-          <Stack.Screen name="(public)" />
-        </Stack.Protected>
-      </Stack>
-    </ToastProviderWithViewport>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ToastProviderWithViewport>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Protected guard={isAuthenticated}>
+            <Stack.Screen name="(protected)" />
+          </Stack.Protected>
+          <Stack.Protected guard={!isAuthenticated}>
+            <Stack.Screen name="(public)" />
+          </Stack.Protected>
+        </Stack>
+      </ToastProviderWithViewport>
+    </GestureHandlerRootView>
   );
 };
 const styles = StyleSheet.create({
