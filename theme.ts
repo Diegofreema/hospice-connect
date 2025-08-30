@@ -12,6 +12,7 @@ export const palette = {
   white: '#ffffff',
 
   blue: '#4C55FF',
+  lightBlue: 'rgba(76, 85, 255, 0.08)',
   orange: '#FFA500',
   redDark: '#F63A3A',
   redLight: 'rgba(246, 58, 58, 0.13)',
@@ -38,6 +39,7 @@ const theme = createTheme({
     textGrey: palette.textGrey,
     transparent: 'transparent',
     error: palette.redDark,
+    lightBlue: palette.lightBlue,
   },
   spacing: {
     s: 8,
