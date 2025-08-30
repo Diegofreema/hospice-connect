@@ -1,4 +1,5 @@
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import { LogOut } from '@/features/shared/components/log-out';
 import Text from '@/features/shared/components/text';
 import View from '@/features/shared/components/view';
 import { palette } from '@/theme';
@@ -38,6 +39,8 @@ export const MoreLinks = ({ links }: Props) => {
       )}
       keyExtractor={(item) => item.link.toString()}
       contentContainerStyle={{ gap: 10, flexGrow: 1 }}
+      ListFooterComponent={LogOut}
+      ListFooterComponentStyle={{ marginTop: 10 }}
     />
   );
 };

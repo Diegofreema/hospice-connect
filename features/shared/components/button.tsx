@@ -43,6 +43,7 @@ type Props = RestyleProps & {
   disabled?: boolean;
   loading?: boolean;
   loadingText?: string;
+  icon?: ReactNode;
 };
 
 export const Button = ({
@@ -53,6 +54,7 @@ export const Button = ({
   disabled = false,
   loading,
   loadingText,
+  icon,
   ...rest
 }: Props) => {
   const props = useRestyle(restyleFunctions, rest);

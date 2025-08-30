@@ -24,6 +24,7 @@ export const palette = {
   grey: '#ccc',
   iconGrey: '#666666',
   textGrey: '#8D8D8D',
+  buttonGrey: '#F2F2F2',
 };
 
 const theme = createTheme({
@@ -40,6 +41,7 @@ const theme = createTheme({
     transparent: 'transparent',
     error: palette.redDark,
     lightBlue: palette.lightBlue,
+    buttonGrey: palette.buttonGrey,
   },
   spacing: {
     s: 8,
