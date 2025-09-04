@@ -31,6 +31,8 @@ const NurseProfileScreen = () => {
       />
       <Spacer />
       <ProfileCard
+        nurseId={nurse._id}
+        imageId={nurse.imageId}
         nurse
         name={name}
         address={nurse?.address || 'N/A'}

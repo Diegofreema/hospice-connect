@@ -182,3 +182,29 @@ export const editNurse = mutation({
     }
   },
 });
+
+export const updateNurseProfilePicture = mutation({
+  args: {
+    nurseId: v.id('nurses'),
+    imageId: v.id('_storage'),
+    oldImageId: v.optional(v.id('_storage')),
+  },
+  handler: async (ctx, args) => {
+    try {
+      const nurse = await ctx.db.get(args.nurseId);
+      if (!nurse) {
+        throw new ConvexError({ message: 'Nurse not found' });
+      }
+      await ctx.db.patch(nurse._id, {
+        imageId: args.imageId,
+      });
+      if (args.oldImageId) {
+        await ctx.storage.delete(args.oldImageId);
+      }
+    } catch (error: any) {
+      console.log({ error });
+
+      throw new ConvexError({ message: error });
+    }
+  },
+});

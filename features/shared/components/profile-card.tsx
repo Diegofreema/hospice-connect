@@ -1,7 +1,19 @@
 import { Avatar } from '@/components/avatar/Avatar';
-import { IconCamera } from '@tabler/icons-react-native';
+import { SpinnerArc } from '@/components/loaders';
+import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
+import { useToast } from '@/hooks/use-toast';
+import { palette } from '@/theme';
+import { IconUpload } from '@tabler/icons-react-native';
+import { useMutation } from 'convex/react';
+import * as ImagePicker from 'expo-image-picker';
+import { useState } from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
-import { getFontSize } from '../utils';
+import {
+  generateErrorMessage,
+  getFontSize,
+  uploadProfilePicture,
+} from '../utils';
 import { Card } from './card';
 import { FlexText } from './flex-text';
 import Text from './text';
@@ -19,6 +31,8 @@ type Props = {
   discipline?: string;
   nurse?: boolean;
   rate?: number;
+  nurseId: Id<'nurses'>;
+  imageId?: Id<'_storage'>;
 };
 
 export const ProfileCard = ({
@@ -33,21 +47,82 @@ export const ProfileCard = ({
   imageUrl,
   nurse = false,
   rate,
+  nurseId,
+  imageId,
 }: Props) => {
   const headingText = nurse ? `Nurse's` : `Hospice's`;
   const formattedRate = rate ? `$${rate}/hr` : '';
+  const [image, setImage] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const generateUploadUrl = useMutation(api.helper.generateUploadUrl);
+  const updateImage = useMutation(api.nurses.updateNurseProfilePicture);
+  const { showToast } = useToast();
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.5,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
+
+  const uploadImage = async () => {
+    if (!image) return;
+    setUploading(true);
+    try {
+      const response = await uploadProfilePicture(generateUploadUrl, image);
+      if (response) {
+        const { storageId } = response;
+        await updateImage({
+          nurseId,
+          imageId: storageId,
+          oldImageId: imageId,
+        });
+        showToast({
+          title: 'Success',
+          description: 'Image updated',
+          type: 'success',
+        });
+      }
+      setImage(null);
+    } catch (error) {
+      showToast({
+        title: 'Error',
+        description: generateErrorMessage(error, 'Failed to update image'),
+        type: 'error',
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
   return (
     <View gap={'m'}>
-      <View
-        width={100}
-        alignSelf={'center'}
-        height={100}
-        overflow={'hidden'}
-        borderRadius={50}
-      >
+      <View width={120} alignSelf={'center'} height={120} borderRadius={80}>
         <View style={styles.container}>
-          <Avatar image={{ uri: imageUrl || '', name: name }} size={100} />
-          <CameraPreview />
+          <Avatar
+            image={{ uri: image || imageUrl || '', name: name }}
+            size={120}
+            onPress={pickImage}
+          />
+          {image && (
+            <TouchableOpacity
+              onPress={uploadImage}
+              style={[styles.camera, { opacity: uploading ? 0.5 : 1 }]}
+              hitSlop={20}
+              disabled={uploading}
+            >
+              {uploading ? (
+                <SpinnerArc />
+              ) : (
+                <IconUpload size={25} color={palette.white} />
+              )}
+            </TouchableOpacity>
+          )}
         </View>
       </View>
       <View backgroundColor={'cardBackground'} p={'s'}>
@@ -85,35 +160,22 @@ export const ProfileCard = ({
   );
 };
 
-const CameraPreview = () => {
-  return (
-    <TouchableOpacity
-      style={styles.camera}
-      onPress={() => console.log('camera')}
-    >
-      <IconCamera size={30} color={'white'} />
-    </TouchableOpacity>
-  );
-};
-
 const styles = StyleSheet.create({
   camera: {
     position: 'absolute',
     bottom: 0,
-    right: 0,
-    backgroundColor: 'black',
-    opacity: 0.2,
-    width: 100,
-    height: 50,
+    right: -5,
+    backgroundColor: palette.blue,
     justifyContent: 'center',
     alignItems: 'center',
-    backdropFilter: 'blur(5px)',
+    borderRadius: 50,
+    width: 50,
+    height: 50,
     zIndex: 1,
   },
   container: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    overflow: 'hidden',
+    width: 120,
+    height: 120,
+    borderRadius: 80,
   },
 });

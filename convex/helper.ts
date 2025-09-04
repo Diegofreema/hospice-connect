@@ -1,6 +1,6 @@
 import { Infer } from 'convex/values';
 import { Id } from './_generated/dataModel';
-import { QueryCtx } from './_generated/server';
+import { mutation, QueryCtx } from './_generated/server';
 import { day } from './schema';
 
 export const getImage = (ctx: QueryCtx, imageId: Id<'_storage'>) => {
@@ -8,3 +8,7 @@ export const getImage = (ctx: QueryCtx, imageId: Id<'_storage'>) => {
 };
 
 export type DayType = Infer<typeof day>;
+
+export const generateUploadUrl = mutation(async (ctx) => {
+  return await ctx.storage.generateUploadUrl();
+});

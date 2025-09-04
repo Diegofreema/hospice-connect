@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-empty-object-type */
+import { Id } from '@/convex/_generated/dataModel';
+import { ReactMutation } from 'convex/react';
+import { FunctionReference } from 'convex/server';
 import { ConvexError } from 'convex/values';
 import { Dimensions } from 'react-native';
 
@@ -48,5 +52,28 @@ export function validateFields(fieldsToValidate: string[], values: any) {
   return true; // Return true if all fields have values
 }
 
-export const dummyImage =
-  'https://pastel-albatross-709.convex.cloud/api/storage/7bc12514-eb94-49e2-ade7-51adff56cb99';
+export const uploadProfilePicture = async (
+  generateUploadUrl: ReactMutation<
+    FunctionReference<'mutation', 'public', {}, string, string | undefined>
+  >,
+  selectedImage?: string
+): Promise<{ storageId: Id<'_storage'>; uploadUrl: string } | undefined> => {
+  try {
+    if (!selectedImage) return;
+    const uploadUrl = await generateUploadUrl();
+
+    const response = await fetch(selectedImage);
+    const blob = await response.blob();
+
+    const result = await fetch(uploadUrl, {
+      method: 'POST',
+      body: blob,
+      headers: { 'Content-Type': 'image/jpeg' },
+    });
+    const { storageId } = await result.json();
+
+    return { storageId, uploadUrl };
+  } catch (error) {
+    console.log({ error });
+  }
+};
