@@ -20,6 +20,7 @@ type Props<TFieldValues extends FieldValues> = {
   name: FieldPath<TFieldValues>;
   items: { label: string; value: string }[];
   placeholder?: string;
+  disabled?: boolean;
 };
 
 export const ControlSelect = <TFieldValues extends FieldValues>({
@@ -29,6 +30,7 @@ export const ControlSelect = <TFieldValues extends FieldValues>({
   label,
   items,
   placeholder,
+  disabled,
 }: Props<TFieldValues>) => {
   return (
     <KeyboardAvoidingView>
@@ -38,7 +40,7 @@ export const ControlSelect = <TFieldValues extends FieldValues>({
         name={name}
         render={({ field: { onChange, value } }) => (
           <DropdownMenu.Root>
-            <DropdownMenu.Trigger style={styles.container}>
+            <DropdownMenu.Trigger style={styles.container} disabled={disabled}>
               <View
                 flexDirection={'row'}
                 justifyContent={'space-between'}

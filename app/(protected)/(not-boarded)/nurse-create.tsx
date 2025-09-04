@@ -83,7 +83,7 @@ const NurseCreate = () => {
     try {
       await createNurse({
         ...rest,
-        dateOfBirth: format(data.dateOfBirth, 'PPP'),
+        dateOfBirth: format(data?.dateOfBirth || new Date(), 'PPP'),
         stateOfRegistration: licenseState,
       });
       showToast({

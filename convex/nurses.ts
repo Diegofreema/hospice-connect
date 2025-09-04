@@ -157,3 +157,28 @@ export const updateNurseStartAndEndTimeAvailability = mutation({
     }
   },
 });
+
+export const editNurse = mutation({
+  args: {
+    address: v.optional(v.string()),
+
+    rate: v.optional(v.number()),
+    stateOfRegistration: v.optional(v.string()),
+    nurseId: v.id('nurses'),
+  },
+  handler: async (ctx, args) => {
+    try {
+      const nurse = await ctx.db.get(args.nurseId);
+      if (!nurse) {
+        throw new ConvexError({ message: 'Nurse not found' });
+      }
+      await ctx.db.patch(nurse._id, {
+        address: args.address,
+        rate: args.rate,
+        stateOfRegistration: args.stateOfRegistration,
+      });
+    } catch (error: any) {
+      throw new ConvexError({ message: error });
+    }
+  },
+});

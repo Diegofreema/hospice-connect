@@ -23,7 +23,13 @@ export const generateErrorMessage = (
   error: unknown,
   message: string
 ): string => {
-  return error instanceof ConvexError ? (error.data as string) : message;
+  let errorMessage = message;
+
+  if (error instanceof ConvexError) {
+    const { message: errMessage } = error.data;
+    errorMessage = errMessage;
+  }
+  return errorMessage;
 };
 
 export function validateFields(fieldsToValidate: string[], values: any) {

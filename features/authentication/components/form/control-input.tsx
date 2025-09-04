@@ -1,5 +1,6 @@
 import { Input } from '@/features/shared/components/input';
 import Text from '@/features/shared/components/text';
+import { Textarea } from '@/features/shared/components/text-area';
 import React from 'react';
 import {
   Control,
@@ -18,6 +19,7 @@ type Props<TFieldValues extends FieldValues> = TextInputProps & {
   errors: FieldErrors<TFieldValues>;
   control: Control<TFieldValues>;
   name: FieldPath<TFieldValues>;
+  variant?: 'input' | 'textarea';
 };
 
 export const ControlInput = <TFieldValues extends FieldValues>({
@@ -27,6 +29,7 @@ export const ControlInput = <TFieldValues extends FieldValues>({
   label,
   rightIcon,
   leftIcon,
+  variant = 'input',
   ...rest
 }: Props<TFieldValues>) => {
   return (
@@ -37,16 +40,25 @@ export const ControlInput = <TFieldValues extends FieldValues>({
         rules={{
           required: true,
         }}
-        render={({ field: { onChange, value } }) => (
-          <Input
-            onChangeText={onChange}
-            value={value}
-            label={label}
-            rightIcon={rightIcon}
-            leftIcon={leftIcon}
-            {...rest}
-          />
-        )}
+        render={({ field: { onChange, value } }) =>
+          variant === 'input' ? (
+            <Input
+              onChangeText={onChange}
+              value={value}
+              label={label}
+              rightIcon={rightIcon}
+              leftIcon={leftIcon}
+              {...rest}
+            />
+          ) : (
+            <Textarea
+              label={label as string}
+              onChangeText={onChange}
+              value={value}
+              {...rest}
+            />
+          )
+        }
       />
       {errors[name]?.message && (
         <Text variant={'small'} color={'error'}>
