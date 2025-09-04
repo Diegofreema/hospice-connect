@@ -23,9 +23,10 @@ type Props = {
       | 'Saturday'
       | 'Sunday';
   };
+  onPress: () => void;
 };
 
-export const Day = ({ day }: Props) => {
+export const Day = ({ day, onPress }: Props) => {
   const updateAvailabilityMutation = useMutation(
     api.nurses.updateNurseDailyAvailability
   );
@@ -68,7 +69,7 @@ export const Day = ({ day }: Props) => {
       alignItems={'center'}
     >
       <View>
-        <Text variant={'small'} style={{ fontFamily: 'PublicSansBold' }}>
+        <Text variant={'body'} style={{ fontFamily: 'PublicSansBold' }}>
           {day.day}
         </Text>
         {!day.startTime || !day.endTime ? (
@@ -87,7 +88,7 @@ export const Day = ({ day }: Props) => {
           width={40}
           height={20}
         />
-        <PrivacyNoticeLink onPress={() => {}}>
+        <PrivacyNoticeLink onPress={onPress}>
           {timeIsSet ? 'Edit' : 'Set time'}
         </PrivacyNoticeLink>
       </View>

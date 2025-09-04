@@ -36,6 +36,13 @@
           "backgroundColor": "#ffffff"
         }
       ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos"
+        }
+      ],
+
       "react-native-edge-to-edge",
       "expo-secure-store",
       "expo-web-browser"

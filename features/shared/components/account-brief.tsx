@@ -16,7 +16,7 @@ type Props = {
 
 export const AccountBrief = ({ data }: Props) => {
   const onPress = () => {
-    router.push('/(protected)/(boarded)/(nurse)/(other-screens)/profile');
+    router.push('/nurse-profile');
   };
   return (
     <TouchableOpacity onPress={onPress}>

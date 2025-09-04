@@ -10,8 +10,14 @@ type Props = {
   title?: string;
   rightContent?: React.ReactNode;
   marginTop?: number;
+  marginLeft?: number;
 };
-export const BackButton = ({ title, rightContent, marginTop = 30 }: Props) => {
+export const BackButton = ({
+  title,
+  rightContent,
+  marginTop = 30,
+  marginLeft = -20,
+}: Props) => {
   return (
     <View
       flexDirection={'row'}
@@ -27,7 +33,7 @@ export const BackButton = ({ title, rightContent, marginTop = 30 }: Props) => {
             fontSize: 20,
             fontFamily: 'PublicSansBold',
             marginTop,
-            marginLeft: -20,
+            marginLeft,
           }}
         >
           {title}

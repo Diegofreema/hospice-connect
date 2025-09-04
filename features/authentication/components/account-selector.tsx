@@ -2,7 +2,7 @@ import Text from '@/features/shared/components/text';
 import View from '@/features/shared/components/view';
 import { getFontSize } from '@/features/shared/utils';
 import { palette } from '@/theme';
-import Checkbox from 'expo-checkbox';
+import { Checkbox } from 'expo-checkbox';
 import React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 

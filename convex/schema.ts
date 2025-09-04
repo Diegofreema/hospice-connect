@@ -25,6 +25,8 @@ export const Nurse = {
   imageId: v.optional(v.id('_storage')),
   isApproved: v.boolean(),
   userId: v.id('users'),
+  address: v.optional(v.string()),
+  zipCode: v.optional(v.string()),
 };
 
 export const Hospice = {
@@ -36,6 +38,7 @@ export const Hospice = {
   stateOfRegistration: v.string(),
   approved: v.boolean(),
   userId: v.id('users'),
+  faxNumber: v.optional(v.string()),
 };
 
 export const Schedule = {
@@ -87,23 +90,21 @@ export const User = {
   isBoarded: v.boolean(),
   isNurse: v.optional(v.boolean()),
 };
-
-export const days = v.array(
-  v.object({
-    day: v.union(
-      v.literal('Monday'),
-      v.literal('Tuesday'),
-      v.literal('Wednesday'),
-      v.literal('Thursday'),
-      v.literal('Friday'),
-      v.literal('Saturday'),
-      v.literal('Sunday')
-    ),
-    startTime: v.optional(v.number()),
-    endTime: v.optional(v.number()),
-    available: v.boolean(),
-  })
-);
+export const day = v.object({
+  day: v.union(
+    v.literal('Monday'),
+    v.literal('Tuesday'),
+    v.literal('Wednesday'),
+    v.literal('Thursday'),
+    v.literal('Friday'),
+    v.literal('Saturday'),
+    v.literal('Sunday')
+  ),
+  startTime: v.optional(v.number()),
+  endTime: v.optional(v.number()),
+  available: v.boolean(),
+});
+export const days = v.array(day);
 
 export const Availability = {
   nurseId: v.id('nurses'),

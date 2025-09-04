@@ -10,7 +10,7 @@ import {
   useRestyle,
 } from '@shopify/restyle';
 import { ReactNode } from 'react';
-import { TouchableOpacity } from 'react-native';
+import { StyleProp, TouchableOpacity, ViewStyle } from 'react-native';
 import Text from './text';
 import View from './view';
 
@@ -44,6 +44,7 @@ type Props = RestyleProps & {
   loading?: boolean;
   loadingText?: string;
   icon?: ReactNode;
+  style?: StyleProp<ViewStyle>;
 };
 
 export const Button = ({
@@ -55,6 +56,7 @@ export const Button = ({
   loading,
   loadingText,
   icon,
+  style,
   ...rest
 }: Props) => {
   const props = useRestyle(restyleFunctions, rest);
@@ -63,7 +65,7 @@ export const Button = ({
     <TouchableOpacity
       onPress={onPress}
       disabled={disabled}
-      style={{ opacity: disabled ? 0.5 : 1 }}
+      style={[{ opacity: disabled ? 0.5 : 1, flex: 1 }, style]}
     >
       <View
         alignItems={'center'}
