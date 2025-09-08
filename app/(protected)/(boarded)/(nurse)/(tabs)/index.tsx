@@ -1,14 +1,14 @@
-import { Button } from '@/features/shared/components/button';
-import { MyTitle } from '@/features/shared/components/my-title';
+import { useNurse } from '@/components/context/nurse-context';
+import { AccountBrief } from '@/features/shared/components/account-brief';
 import { Wrapper } from '@/features/shared/components/wrapper';
-import { useAuthActions } from '@convex-dev/auth/react';
 
 export default function HomeScreen() {
-  const { signOut } = useAuthActions();
+  const { nurse } = useNurse();
+  if (nurse === null) return null;
+  const name = nurse.firstName + ' ' + nurse.lastName;
   return (
     <Wrapper>
-      <Button label="Sign out" onPress={signOut} />
-      <MyTitle title="Nurse" />
+      <AccountBrief data={{ name, image: nurse.image as string }} isHome />
     </Wrapper>
   );
 }

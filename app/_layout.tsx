@@ -1,16 +1,15 @@
-import { ThemeProvider } from '@shopify/restyle';
-import { useFonts } from 'expo-font';
-import { ErrorBoundaryProps, Stack } from 'expo-router';
-import React from 'react';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { KeyboardProvider } from 'react-native-keyboard-controller';
-
 import { useAuth } from '@/components/context/auth';
 import Provider from '@/components/provider';
 import { ToastProviderWithViewport } from '@/components/toast';
 import { ErrorComponent } from '@/features/shared/components/error';
 import theme, { palette } from '@/theme';
+import { ThemeProvider } from '@shopify/restyle';
+import { useFonts } from 'expo-font';
+import { ErrorBoundaryProps, Stack } from 'expo-router';
+import React from 'react';
 import { StyleSheet, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 import 'react-native-reanimated';
 export function ErrorBoundary({ retry, error }: ErrorBoundaryProps) {
   return <ErrorComponent refetch={retry} text={error.message} />;

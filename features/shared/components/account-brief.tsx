@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
 import { TouchableOpacity } from 'react-native';
 import { getFontSize } from '../utils';
+import { NotificationButton } from './notification-btn';
 import Text from './text';
 import View from './view';
 
@@ -12,9 +13,10 @@ type Props = {
     name: string;
     image?: string;
   };
+  isHome?: boolean;
 };
 
-export const AccountBrief = ({ data }: Props) => {
+export const AccountBrief = ({ data, isHome = false }: Props) => {
   const onPress = () => {
     router.push('/nurse-profile');
   };
@@ -31,21 +33,34 @@ export const AccountBrief = ({ data }: Props) => {
             size={60}
           />
           <View>
-            <Text variant="small" color={'textGrey'} fontSize={getFontSize(11)}>
-              My account
-            </Text>
+            {!isHome && (
+              <Text
+                variant="small"
+                color={'textGrey'}
+                fontSize={getFontSize(11)}
+              >
+                My account
+              </Text>
+            )}
             <Text variant="body">{data.name}</Text>
           </View>
         </View>
-        <Badge
-          label="Verified"
-          radius="full"
-          size="sm"
-          variant="success"
-          icon={
-            <SymbolView name="circle.fill" size={12} tintColor={'lightgreen'} />
-          }
-        />
+        {!isHome && (
+          <Badge
+            label="Verified"
+            radius="full"
+            size="sm"
+            variant="success"
+            icon={
+              <SymbolView
+                name="circle.fill"
+                size={12}
+                tintColor={'lightgreen'}
+              />
+            }
+          />
+        )}
+        {isHome && <NotificationButton />}
       </View>
     </TouchableOpacity>
   );

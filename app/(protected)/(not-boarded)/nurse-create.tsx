@@ -64,7 +64,6 @@ const NurseCreate = () => {
   const values = form.watch();
 
   const stepIsValid = validateFields(fieldsToValidate, values);
-  console.log({ stepIsValid });
 
   const nextStep = async () => {
     if (stepIsValid) {

@@ -1,13 +1,33 @@
 import { useAuth } from '@/components/context/auth';
+import { ActionComponent } from '@/features/shared/components/action-component';
 import { LoadingComponent } from '@/features/shared/components/loading';
+import { addEventListener } from '@react-native-community/netinfo';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 const ProtectedLayout = () => {
   const { user } = useAuth();
+  const [isConnected, setIsConnected] = useState<boolean | null>(null);
+  useEffect(() => {
+    const unsubscribe = addEventListener((state) => {
+      setIsConnected(state.isConnected);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   if (user === undefined) {
     return <LoadingComponent />;
+  }
+  if (!isConnected) {
+    return (
+      <ActionComponent
+        imageUrl={require('@/assets/images/no-internet.png')}
+        title={'Oops, No internet Connection'}
+        description={'Please check your internet connection and try again'}
+      />
+    );
   }
 
   const isBoarded = !!user?.isBoarded;
