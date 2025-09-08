@@ -6,8 +6,8 @@ import { ControlSelect } from '@/features/authentication/components/form/control
 import { MyTitle } from '@/features/shared/components/my-title';
 import { Spacer } from '@/features/shared/components/spacer';
 import View from '@/features/shared/components/view';
+import { disciplines, usStates } from '../../data';
 import { StepProps } from '../../validators';
-import { disciplines, usStates } from '../data';
 
 export const License = ({ form }: StepProps) => {
   return (

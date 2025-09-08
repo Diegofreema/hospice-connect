@@ -2,6 +2,7 @@ import { useAuth } from '@/components/context/auth';
 import Provider from '@/components/provider';
 import { ToastProviderWithViewport } from '@/components/toast';
 import { ErrorComponent } from '@/features/shared/components/error';
+
 import theme, { palette } from '@/theme';
 import { ThemeProvider } from '@shopify/restyle';
 import { useFonts } from 'expo-font';

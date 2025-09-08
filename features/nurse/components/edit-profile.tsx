@@ -14,8 +14,8 @@ import { useMutation } from 'convex/react';
 import { router } from 'expo-router';
 import { View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { usStates } from '../data';
 import { createNurseValidator, CreateNurseValidator } from '../validators';
-import { usStates } from './data';
 
 export const EditProfile = () => {
   const { nurse } = useNurse();

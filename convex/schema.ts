@@ -44,7 +44,7 @@ export const Hospice = {
 export const Schedule = {
   assignmentId: v.id('assignments'),
   status: scheduleStatus,
-  nurseId: v.id('nurses'),
+  nurseId: v.optional(v.id('nurses')),
   startTime: v.string(),
   endTime: v.string(),
   startDate: v.string(),
@@ -68,6 +68,12 @@ export const assignment = {
   state: v.string(),
   zipCode: v.string(),
   notes: v.optional(v.string()),
+  status: v.union(
+    v.literal('completed'),
+    v.literal('not_covered'),
+    v.literal('booked'),
+    v.literal('available')
+  ),
 };
 export const routeSheet = {
   nurseId: v.id('nurses'),
@@ -115,8 +121,8 @@ export default defineSchema({
   users: defineTable(User).index('email', ['email']),
   nurses: defineTable(Nurse).index('userId', ['userId']),
   hospices: defineTable(Hospice),
-  assignments: defineTable(assignment),
-  schedules: defineTable(Schedule),
+  assignments: defineTable(assignment).index('state', ['state', 'status']),
+  schedules: defineTable(Schedule).index('nurse', ['nurseId', 'status']),
   routeSheets: defineTable(routeSheet),
   ratings: defineTable(Rating),
   availabilities: defineTable(Availability).index('nurseId', ['nurseId']),

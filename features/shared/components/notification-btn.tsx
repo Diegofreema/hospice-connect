@@ -1,10 +1,14 @@
 import { IconBell } from '@tabler/icons-react-native';
+import { router } from 'expo-router';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 import View from './view';
 
 export const NotificationButton = () => {
+  const onPress = () => {
+    router.push('/notification');
+  };
   return (
-    <TouchableOpacity style={styles.container}>
+    <TouchableOpacity style={styles.container} onPress={onPress}>
       <IconBell size={25} />
       <View style={styles.badge} />
     </TouchableOpacity>

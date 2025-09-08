@@ -16,6 +16,7 @@ import type {
 import type * as ResendOTP from "../ResendOTP.js";
 import type * as ResendOTPPassword from "../ResendOTPPassword.js";
 import type * as VerifyEmail from "../VerifyEmail.js";
+import type * as assignments from "../assignments.js";
 import type * as auth from "../auth.js";
 import type * as errors from "../errors.js";
 import type * as helper from "../helper.js";
@@ -36,6 +37,7 @@ declare const fullApi: ApiFromModules<{
   ResendOTP: typeof ResendOTP;
   ResendOTPPassword: typeof ResendOTPPassword;
   VerifyEmail: typeof VerifyEmail;
+  assignments: typeof assignments;
   auth: typeof auth;
   errors: typeof errors;
   helper: typeof helper;
