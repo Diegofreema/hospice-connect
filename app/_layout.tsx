@@ -1,4 +1,6 @@
+import { ChatWrapper } from '@/components/chat-wrapper';
 import { useAuth } from '@/components/context/auth';
+import { ChatContext } from '@/components/context/chat-context';
 import Provider from '@/components/provider';
 import { ToastProviderWithViewport } from '@/components/toast';
 import { ErrorComponent } from '@/features/shared/components/error';
@@ -12,6 +14,7 @@ import { StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import 'react-native-reanimated';
+
 export function ErrorBoundary({ retry, error }: ErrorBoundaryProps) {
   return <ErrorComponent refetch={retry} text={error.message} />;
 }
@@ -35,7 +38,11 @@ export default function RootLayout() {
       <Provider>
         <View style={styles.container}>
           <KeyboardProvider>
-            <InitialRoute />
+            <ChatWrapper>
+              <ChatContext>
+                <InitialRoute />
+              </ChatContext>
+            </ChatWrapper>
           </KeyboardProvider>
         </View>
       </Provider>

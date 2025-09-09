@@ -88,8 +88,10 @@ export const Rating = {
 export const User = {
   name: v.optional(v.string()),
   image: v.optional(v.string()),
+  imageId: v.optional(v.id('_storage')),
   email: v.optional(v.string()),
   emailVerificationTime: v.optional(v.number()),
+  streamToken: v.optional(v.string()),
   phone: v.optional(v.string()),
   phoneVerificationTime: v.optional(v.number()),
   isAnonymous: v.optional(v.boolean()),

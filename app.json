@@ -27,6 +27,7 @@
     },
     "plugins": [
       "expo-router",
+
       [
         "expo-splash-screen",
         {
@@ -42,10 +43,23 @@
           "photosPermission": "The app accesses your photos"
         }
       ],
-
       "react-native-edge-to-edge",
       "expo-secure-store",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-video",
+        {
+          "supportsBackgroundPlayback": true,
+          "supportsPictureInPicture": true
+        }
+      ],
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
+        }
+      ],
+      ["expo-build-properties"]
     ],
     "experiments": {
       "typedRoutes": true

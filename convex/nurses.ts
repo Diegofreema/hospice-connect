@@ -26,6 +26,9 @@ export const createNurse = mutation({
         isApproved: false,
         userId,
       });
+      await ctx.db.patch(userId, {
+        name: args.firstName + ' ' + args.lastName,
+      });
       const days = [
         'Monday',
         'Tuesday',
@@ -196,6 +199,9 @@ export const updateNurseProfilePicture = mutation({
         throw new ConvexError({ message: 'Nurse not found' });
       }
       await ctx.db.patch(nurse._id, {
+        imageId: args.imageId,
+      });
+      await ctx.db.patch(nurse.userId, {
         imageId: args.imageId,
       });
       if (args.oldImageId) {

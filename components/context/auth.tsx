@@ -4,21 +4,59 @@ import * as React from 'react';
 import { api } from '@/convex/_generated/api';
 import { Doc } from '@/convex/_generated/dataModel';
 import { LoadingComponent } from '@/features/shared/components/loading';
-import { useQuery } from 'convex/react';
+import { convexQuery } from '@convex-dev/react-query';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
+import { useMutation } from 'convex/react';
 
 WebBrowser.maybeCompleteAuthSession();
 
 const AuthContext = React.createContext({
-  user: null as Doc<'users'> | null | undefined,
+  user: null as Doc<'users'> | null,
   isAuthenticated: false,
+  token: null as string | null,
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const user = useQuery(api.users.getUser, {});
+  const {
+    data: user,
+    isPending,
+    isError,
+  } = useQuery(convexQuery(api.users.getUser, {}));
+  const [token, setToken] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState(false);
+  const updateStreamToken = useMutation(api.users.updateStreamToken);
+  React.useEffect(() => {
+    setLoading(true);
+    const tokenProvider = async () => {
+      try {
+        const { data } = await axios.post(
+          `https://hospice-connect-web.vercel.app/api/token`,
+          {
+            name: user?.name,
+            email: user?.email,
+            image: user?.image || '',
+            id: user?._id,
+          }
+        );
 
+        console.log('🚀 ~ AppLayout ~ tokenProvider ~ data:', data);
+        await updateStreamToken({ streamToken: data.token });
+        setToken(data.token);
+      } catch (error) {
+        console.error('error', error);
+        throw new Error('Failed to fetch user data');
+      } finally {
+        setLoading(false);
+      }
+    };
+    tokenProvider();
+  }, [updateStreamToken, user]);
   const isAuthenticated = !!user;
-  const isLoading = user === undefined;
-
+  const isLoading = isPending || loading;
+  if (isError) {
+    throw new Error('Could not get your data');
+  }
   if (isLoading) {
     return <LoadingComponent />;
   }
@@ -27,6 +65,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       value={{
         user,
         isAuthenticated,
+        token,
       }}
     >
       {children}
