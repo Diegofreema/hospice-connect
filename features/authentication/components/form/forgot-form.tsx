@@ -63,6 +63,7 @@ export const ForgotForm = ({ link = '/reset-password' }: Props) => {
         placeholder="Enter your email"
         autoCapitalize="none"
       />
+
       <Button
         label="Send Reset Code"
         onPress={handleSubmit(onSubmit)}

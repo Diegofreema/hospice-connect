@@ -9,7 +9,7 @@ import React from 'react';
 
 const ForgotPassword = () => {
   return (
-    <Wrapper>
+    <Wrapper gap="s">
       <BackButton />
       <Spacer height={30} />
       <MyTitle title="Forgot Password" />

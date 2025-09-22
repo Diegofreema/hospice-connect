@@ -77,7 +77,6 @@ const NurseCreate = () => {
 
   const onSubmit = async (data: CreateNurseValidator) => {
     const { licenseState, ...rest } = data;
-    console.log(rest);
 
     try {
       await createNurse({

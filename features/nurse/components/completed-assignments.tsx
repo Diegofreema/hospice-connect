@@ -27,7 +27,7 @@ export const CompletedAssignments = () => {
         data={results}
         handleMore={handleFetchMore}
         isLoadingMore={isLoadingMore}
-        title={'No completed assignments'}
+        title={'No completed assignments yet'}
         description={'Please check in later.'}
       />
     </View>

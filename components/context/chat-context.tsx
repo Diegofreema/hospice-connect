@@ -1,18 +1,17 @@
 import React, { PropsWithChildren, useState } from 'react';
-import { Channel } from 'stream-chat-expo';
+import { Channel as ChannelType } from 'stream-chat';
 
-type ChannelType = typeof Channel | null;
 type AppContextType = {
-  channel: ChannelType;
-  setChannel: (channel: ChannelType) => void;
+  channel: ChannelType | undefined;
+  setChannel: React.Dispatch<React.SetStateAction<ChannelType | undefined>>;
 };
 export const AppContext = React.createContext<AppContextType>({
-  channel: null,
+  channel: undefined,
   setChannel: () => {},
 });
 
 export const ChatContext = ({ children }: PropsWithChildren) => {
-  const [channel, setChannel] = useState<ChannelType>(null);
+  const [channel, setChannel] = useState<ChannelType | undefined>(undefined);
 
   return (
     <AppContext.Provider value={{ channel, setChannel }}>
@@ -21,7 +20,7 @@ export const ChatContext = ({ children }: PropsWithChildren) => {
   );
 };
 
-export const useAppContext = () => {
+export const useAppChatContext = () => {
   const context = React.useContext(AppContext);
   if (!context) {
     throw new Error('useAppContext must be used within an AppProvider');

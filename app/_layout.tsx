@@ -1,6 +1,4 @@
-import { ChatWrapper } from '@/components/chat-wrapper';
 import { useAuth } from '@/components/context/auth';
-import { ChatContext } from '@/components/context/chat-context';
 import Provider from '@/components/provider';
 import { ToastProviderWithViewport } from '@/components/toast';
 import { ErrorComponent } from '@/features/shared/components/error';
@@ -38,11 +36,7 @@ export default function RootLayout() {
       <Provider>
         <View style={styles.container}>
           <KeyboardProvider>
-            <ChatWrapper>
-              <ChatContext>
-                <InitialRoute />
-              </ChatContext>
-            </ChatWrapper>
+            <InitialRoute />
           </KeyboardProvider>
         </View>
       </Provider>

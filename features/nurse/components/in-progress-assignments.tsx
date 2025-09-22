@@ -26,7 +26,7 @@ export const InProgressAssignments = () => {
         data={results}
         handleMore={handleFetchMore}
         isLoadingMore={isLoadingMore}
-        title={'No completed assignments'}
+        title={'No assignments in progress'}
         description={'Please check in later.'}
       />
     </View>

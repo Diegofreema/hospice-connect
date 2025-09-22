@@ -17,7 +17,10 @@ const CreateAccountScreen = () => {
   return (
     <Wrapper>
       <BackButton />
-      <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <KeyboardAwareScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        showsVerticalScrollIndicator={false}
+      >
         <Spacer height={20} />
         <MyTitle title="Create an account" />
         <Subtitle style={{ color: palette.black }}>

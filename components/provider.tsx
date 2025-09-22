@@ -6,7 +6,6 @@ import * as SecureStore from 'expo-secure-store';
 import React, { PropsWithChildren } from 'react';
 import { Platform } from 'react-native';
 import { AuthProvider } from './context/auth';
-
 const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL!, {
   unsavedChangesWarning: false,
 });

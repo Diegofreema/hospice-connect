@@ -1,10 +1,10 @@
 import Text from '@/features/shared/components/text';
 import { Wrapper } from '@/features/shared/components/wrapper';
 
-export default function HomeScreen() {
+export default function TabTwoScreen() {
   return (
     <Wrapper>
-      <Text>Home Screen</Text>
+      <Text>The Posts Screen</Text>
     </Wrapper>
   );
 }

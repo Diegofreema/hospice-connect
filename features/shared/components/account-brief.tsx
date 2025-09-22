@@ -1,6 +1,6 @@
 import { Avatar } from '@/components/avatar/Avatar';
 import { Badge } from '@/components/badge/Badge';
-import { router } from 'expo-router';
+import { Href, router } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
 import { TouchableOpacity } from 'react-native';
 import { getFontSize } from '../utils';
@@ -14,11 +14,18 @@ type Props = {
     image?: string;
   };
   isHome?: boolean;
+  title?: string;
+  href?: Href;
 };
 
-export const AccountBrief = ({ data, isHome = false }: Props) => {
+export const AccountBrief = ({
+  data,
+  isHome = false,
+  title = 'My account',
+  href = '/nurse-profile',
+}: Props) => {
   const onPress = () => {
-    router.push('/nurse-profile');
+    router.push(href);
   };
   return (
     <TouchableOpacity onPress={onPress}>
@@ -39,7 +46,7 @@ export const AccountBrief = ({ data, isHome = false }: Props) => {
                 color={'textGrey'}
                 fontSize={getFontSize(11)}
               >
-                My account
+                {title}
               </Text>
             )}
             <Text variant="body">{data.name}</Text>

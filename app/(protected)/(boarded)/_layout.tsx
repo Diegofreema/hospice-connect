@@ -1,4 +1,6 @@
+import { ChatWrapper } from '@/components/chat-wrapper';
 import { useAuth } from '@/components/context/auth';
+import { ChatContext } from '@/components/context/chat-context';
 import { LoadingComponent } from '@/features/shared/components/loading';
 import { Stack } from 'expo-router';
 import React from 'react';
@@ -9,14 +11,18 @@ const BoardedLayout = () => {
 
   const isNurse = !!user.isNurse;
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Protected guard={isNurse}>
-        <Stack.Screen name="(nurse)" />
-      </Stack.Protected>
-      <Stack.Protected guard={!isNurse}>
-        <Stack.Screen name="(hospice)" />
-      </Stack.Protected>
-    </Stack>
+    <ChatWrapper>
+      <ChatContext>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Protected guard={isNurse}>
+            <Stack.Screen name="(nurse)" />
+          </Stack.Protected>
+          <Stack.Protected guard={!isNurse}>
+            <Stack.Screen name="(hospice)" />
+          </Stack.Protected>
+        </Stack>
+      </ChatContext>
+    </ChatWrapper>
   );
 };
 

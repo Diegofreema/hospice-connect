@@ -8,10 +8,10 @@ import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 const ProtectedLayout = () => {
   const { user } = useAuth();
-  const [isConnected, setIsConnected] = useState<boolean | null>(null);
+  const [isConnected, setIsConnected] = useState<boolean>(true);
   useEffect(() => {
     const unsubscribe = addEventListener((state) => {
-      setIsConnected(state.isConnected);
+      setIsConnected(!!state.isConnected);
     });
 
     return () => unsubscribe();

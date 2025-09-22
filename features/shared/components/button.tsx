@@ -65,7 +65,7 @@ export const Button = ({
     <TouchableOpacity
       onPress={onPress}
       disabled={disabled}
-      style={[{ opacity: disabled ? 0.5 : 1, flex: 1 }, style]}
+      style={[{ opacity: disabled ? 0.5 : 1, flex: 1, minHeight: 55 }, style]}
     >
       <View
         alignItems={'center'}

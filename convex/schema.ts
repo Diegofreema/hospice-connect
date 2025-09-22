@@ -31,14 +31,15 @@ export const Nurse = {
 
 export const Hospice = {
   address: v.string(),
-  state: v.string(),
-  zipCode: v.string(),
-  name: v.string(),
+  businessName: v.string(),
   licenseNumber: v.string(),
-  stateOfRegistration: v.string(),
+  state: v.string(),
   approved: v.boolean(),
   userId: v.id('users'),
   faxNumber: v.optional(v.string()),
+  phoneNumber: v.string(),
+  email: v.string(),
+  isApproved: v.optional(v.boolean()),
 };
 
 export const Schedule = {
@@ -122,7 +123,7 @@ export default defineSchema({
   ...authTables,
   users: defineTable(User).index('email', ['email']),
   nurses: defineTable(Nurse).index('userId', ['userId']),
-  hospices: defineTable(Hospice),
+  hospices: defineTable(Hospice).index('userId', ['userId']),
   assignments: defineTable(assignment).index('state', ['state', 'status']),
   schedules: defineTable(Schedule).index('nurse', ['nurseId', 'status']),
   routeSheets: defineTable(routeSheet),

@@ -6,18 +6,21 @@ import { Spacer } from '@/features/shared/components/spacer';
 import { Wrapper } from '@/features/shared/components/wrapper';
 import { palette } from '@/theme';
 import React from 'react';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 
 const ResetPassword = () => {
   return (
     <Wrapper>
-      <BackButton marginTop={0} />
-      <Spacer height={30} />
-      <MyTitle title="Change Password" />
-      <Subtitle style={{ color: palette.black }}>
-        Enter your email to reset your password
-      </Subtitle>
-      <Spacer height={50} />
-      <ForgotForm link={'/new-password'} />
+      <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
+        <BackButton marginTop={0} />
+        <Spacer height={30} />
+        <MyTitle title="Change Password" />
+        <Subtitle style={{ color: palette.black }}>
+          Enter your email to reset your password
+        </Subtitle>
+        <Spacer height={50} />
+        <ForgotForm link={'/new-password'} />
+      </KeyboardAwareScrollView>
     </Wrapper>
   );
 };

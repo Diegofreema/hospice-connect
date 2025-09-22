@@ -5,7 +5,7 @@ type Props = {
   gap?: 's' | 'm' | 'l' | 'xl';
 };
 
-export const Wrapper = ({ children, gap }: PropsWithChildren<Props>) => {
+export const Wrapper = ({ children, gap = 'm' }: PropsWithChildren<Props>) => {
   return (
     <View
       flex={1}

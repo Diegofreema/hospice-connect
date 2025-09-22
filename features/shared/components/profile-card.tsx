@@ -31,7 +31,8 @@ type Props = {
   discipline?: string;
   nurse?: boolean;
   rate?: number;
-  nurseId: Id<'nurses'>;
+  nurseId?: Id<'nurses'>;
+  hospiceId?: Id<'hospices'>;
   imageId?: Id<'_storage'>;
 };
 
@@ -49,6 +50,7 @@ export const ProfileCard = ({
   rate,
   nurseId,
   imageId,
+  hospiceId,
 }: Props) => {
   const headingText = nurse ? `Nurse's` : `Hospice's`;
   const formattedRate = rate ? `$${rate}/hr` : '';
@@ -56,6 +58,7 @@ export const ProfileCard = ({
   const [uploading, setUploading] = useState(false);
   const generateUploadUrl = useMutation(api.helper.generateUploadUrl);
   const updateImage = useMutation(api.nurses.updateNurseProfilePicture);
+  const updateHospiceImage = useMutation(api.hospices.updateHospiceImage);
   const { showToast } = useToast();
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -78,11 +81,19 @@ export const ProfileCard = ({
       const response = await uploadProfilePicture(generateUploadUrl, image);
       if (response) {
         const { storageId } = response;
-        await updateImage({
-          nurseId,
-          imageId: storageId,
-          oldImageId: imageId,
-        });
+        if (nurseId) {
+          await updateImage({
+            nurseId,
+            imageId: storageId,
+            oldImageId: imageId,
+          });
+        } else if (hospiceId) {
+          await updateHospiceImage({
+            hospiceId,
+            imageId: storageId,
+            oldImageId: imageId,
+          });
+        }
         showToast({
           title: 'Success',
           description: 'Image updated',

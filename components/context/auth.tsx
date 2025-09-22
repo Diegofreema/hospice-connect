@@ -27,6 +27,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = React.useState(false);
   const updateStreamToken = useMutation(api.users.updateStreamToken);
   React.useEffect(() => {
+    if (!user) return;
     setLoading(true);
     const tokenProvider = async () => {
       try {
@@ -53,6 +54,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     tokenProvider();
   }, [updateStreamToken, user]);
   const isAuthenticated = !!user;
+  console.log({ isPending, loading, isError });
+
   const isLoading = isPending || loading;
   if (isError) {
     throw new Error('Could not get your data');

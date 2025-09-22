@@ -19,7 +19,7 @@ export const createNurse = mutation({
     try {
       const userId = await getAuthUserId(ctx);
       if (!userId) {
-        throw new ConvexError('Unauthorized');
+        throw new ConvexError({ message: 'Unauthorized' });
       }
       const nurseId = await ctx.db.insert('nurses', {
         ...args,
@@ -51,7 +51,7 @@ export const createNurse = mutation({
         isNurse: true,
       });
     } catch (error: any) {
-      throw new ConvexError(error);
+      throw new ConvexError({ message: error.message });
     }
   },
 });
@@ -96,14 +96,14 @@ export const updateNurseDailyAvailability = mutation({
     try {
       const nurse = await ctx.db.get(args.nurseId);
       if (!nurse) {
-        throw new ConvexError('Nurse not found');
+        throw new ConvexError({ message: 'Nurse not found' });
       }
       const availabilities = await ctx.db
         .query('availabilities')
         .withIndex('nurseId', (q) => q.eq('nurseId', nurse._id))
         .first();
       if (!availabilities) {
-        throw new ConvexError('Availabilities not found');
+        throw new ConvexError({ message: 'Availabilities not found' });
       }
       const days = availabilities.days.map((day) => {
         if (day.day === args.day) {
@@ -118,7 +118,7 @@ export const updateNurseDailyAvailability = mutation({
         days,
       });
     } catch (error: any) {
-      throw new ConvexError(error);
+      throw new ConvexError({ message: error.message });
     }
   },
 });
@@ -133,14 +133,14 @@ export const updateNurseStartAndEndTimeAvailability = mutation({
     try {
       const nurse = await ctx.db.get(args.nurseId);
       if (!nurse) {
-        throw new ConvexError('Nurse not found');
+        throw new ConvexError({ message: 'Nurse not found' });
       }
       const availabilities = await ctx.db
         .query('availabilities')
         .withIndex('nurseId', (q) => q.eq('nurseId', nurse._id))
         .first();
       if (!availabilities) {
-        throw new ConvexError('Availabilities not found');
+        throw new ConvexError({ message: 'Availabilities not found' });
       }
       const days = availabilities.days.map((day) => {
         if (day.day === args.day) {
@@ -156,7 +156,7 @@ export const updateNurseStartAndEndTimeAvailability = mutation({
         days,
       });
     } catch (error: any) {
-      throw new ConvexError(error);
+      throw new ConvexError({ message: error.message });
     }
   },
 });
@@ -210,7 +210,7 @@ export const updateNurseProfilePicture = mutation({
     } catch (error: any) {
       console.log({ error });
 
-      throw new ConvexError({ message: error });
+      throw new ConvexError({ message: error.message });
     }
   },
 });
