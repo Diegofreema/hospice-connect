@@ -60,6 +60,7 @@ export const getHospiceByUserId = query({
     if (user.imageId) {
       image = await ctx.storage.getUrl(user.imageId);
     }
+    console.log({ hospice, image, user });
 
     return {
       ...hospice,

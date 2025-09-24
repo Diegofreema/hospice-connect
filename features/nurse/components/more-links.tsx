@@ -1,8 +1,9 @@
-import { IconSymbol } from '@/components/ui/IconSymbol';
 import { LogOut } from '@/features/shared/components/log-out';
+import { TabBarIcon } from '@/features/shared/components/tab-bar-icon';
 import Text from '@/features/shared/components/text';
 import View from '@/features/shared/components/view';
 import { palette } from '@/theme';
+import { IconChevronRight } from '@tabler/icons-react-native';
 import { Href, router } from 'expo-router';
 import { openBrowserAsync } from 'expo-web-browser';
 import { FlatList, TouchableOpacity } from 'react-native';
@@ -19,6 +20,7 @@ export const MoreLinks = ({ links }: Props) => {
       router.push(link);
     }
   };
+
   return (
     <FlatList
       data={links}
@@ -41,11 +43,15 @@ export const MoreLinks = ({ links }: Props) => {
                   padding={'s'}
                   backgroundColor={'lightBlue'}
                 >
-                  <IconSymbol name={item.name} size={24} color={palette.blue} />
+                  <TabBarIcon icon={item.icon} size={24} color={palette.blue} />
                 </View>
                 <Text variant="body">{item.label}</Text>
               </View>
-              <IconSymbol name="chevron.right" size={20} color={palette.blue} />
+              <TabBarIcon
+                icon={IconChevronRight}
+                size={25}
+                color={palette.blue}
+              />
             </View>
           </TouchableOpacity>
         );

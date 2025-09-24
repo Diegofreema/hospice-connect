@@ -1,6 +1,12 @@
 import { useNurse } from '@/components/context/nurse-context';
 import { AccountBrief } from '@/features/shared/components/account-brief';
 import { Spacer } from '@/features/shared/components/spacer';
+import {
+  IconCalendarWeek,
+  IconCreditCardPay,
+  IconHeadset,
+  IconShieldCheck,
+} from '@tabler/icons-react-native';
 import View from '../../shared/components/view';
 import { LinkType } from '../types';
 import { MoreLinks } from './more-links';
@@ -22,27 +28,27 @@ export const More = () => {
 const links: LinkType[] = [
   {
     label: 'Availability',
-    name: 'calendar.and.person',
+    icon: IconCalendarWeek,
     link: '/(protected)/(boarded)/(nurse)/(other-screens)/availability',
   },
   {
     label: 'Card and Billing',
-    name: 'creditcard',
+    icon: IconCreditCardPay,
     link: '/(protected)/(boarded)/(nurse)/(other-screens)/billing',
   },
-  {
-    label: 'Reset Password',
-    name: 'lock',
-    link: '/reset-password',
-  },
+  // {
+  //   label: 'Reset Password',
+  //   icon: IconPasswordUser,
+  //   link: '/reset-password',
+  // },
   {
     label: 'Support',
-    name: 'beats.headphones',
+    icon: IconHeadset,
     link: 'https://hospice-connect-web.vercel.app/contact',
   },
   {
     label: 'Privacy Policy',
-    name: 'note.text',
+    icon: IconShieldCheck,
     link: 'https://hospice-connect-web.vercel.app/privacy-policy',
   },
 ];

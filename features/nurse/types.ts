@@ -1,4 +1,5 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { Icon } from '@tabler/icons-react-native';
 import { Href } from 'expo-router';
 import { SymbolViewProps } from 'expo-symbols';
 import { ComponentProps } from 'react';
@@ -15,7 +16,7 @@ export const MAPPING = {
   'chevron.right': 'chevron-right',
 } as IconMapping;
 export type LinkType = {
-  name: IconSymbolName;
+  icon: Icon;
   label: string;
   link: Href;
 };

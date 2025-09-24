@@ -11,13 +11,14 @@ type Props = TextInputProps & {
 
 export const Input = ({ label, rightIcon, leftIcon, ...props }: Props) => {
   return (
-    <View style={{ width: '100%', gap: 10, minHeight: 55 }}>
-      <Text>{label}</Text>
+    <View style={{ gap: 10, minHeight: 55 }} flex={1}>
+      {label && <Text>{label}</Text>}
       <View
         style={styles.container}
         flexDirection={'row'}
         alignItems={'center'}
         gap={'s'}
+        flex={1}
       >
         {leftIcon}
         <TextInput

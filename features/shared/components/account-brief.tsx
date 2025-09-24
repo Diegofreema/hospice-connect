@@ -25,10 +25,13 @@ export const AccountBrief = ({
   href = '/nurse-profile',
 }: Props) => {
   const onPress = () => {
+    if (!href) return;
     router.push(href);
   };
+  const fontSize = isHome ? 14 : 11;
+  const fontColor = isHome ? 'black' : 'textGrey';
   return (
-    <TouchableOpacity onPress={onPress}>
+    <TouchableOpacity onPress={onPress} disabled={isHome}>
       <View
         flexDirection={'row'}
         justifyContent={'space-between'}
@@ -40,15 +43,15 @@ export const AccountBrief = ({
             size={60}
           />
           <View>
-            {!isHome && (
-              <Text
-                variant="small"
-                color={'textGrey'}
-                fontSize={getFontSize(11)}
-              >
-                {title}
-              </Text>
-            )}
+            <Text
+              variant="small"
+              color={fontColor}
+              fontSize={getFontSize(fontSize)}
+              fontFamily={'PublicSansSemiBold'}
+            >
+              {title}
+            </Text>
+
             <Text variant="body">{data.name}</Text>
           </View>
         </View>

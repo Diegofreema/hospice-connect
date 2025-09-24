@@ -3,10 +3,15 @@ import React from 'react';
 import { Platform } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
+import { TabBarIcon } from '@/features/shared/components/tab-bar-icon';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import {
+  IconDotsCircleHorizontal,
+  IconHome2,
+  IconMessageCircle,
+} from '@tabler/icons-react-native';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -31,8 +36,8 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="house.fill" color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <TabBarIcon size={size} icon={IconHome2} color={color} />
           ),
         }}
       />
@@ -40,8 +45,8 @@ export default function TabLayout() {
         name="message"
         options={{
           title: 'Messages',
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="message" color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <TabBarIcon size={size} icon={IconMessageCircle} color={color} />
           ),
         }}
       />
@@ -49,8 +54,12 @@ export default function TabLayout() {
         name="more"
         options={{
           title: 'More',
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="ellipsis.circle" color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <TabBarIcon
+              size={size}
+              icon={IconDotsCircleHorizontal}
+              color={color}
+            />
           ),
         }}
       />

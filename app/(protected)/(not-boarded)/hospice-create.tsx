@@ -1,5 +1,5 @@
 import { Subtitle } from '@/components/subtitle/Subtitle';
-import { BusinessInformation } from '@/features/hospice/steps/business-information';
+import { BusinessInformation } from '@/features/hospice/components/steps/business-information';
 import { BackButton } from '@/features/shared/components/back-button';
 import { MyTitle } from '@/features/shared/components/my-title';
 import { Wrapper } from '@/features/shared/components/wrapper';

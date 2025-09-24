@@ -1,9 +1,14 @@
 import { useHospice } from '@/components/context/hospice-context';
+import { MoreLinks } from '@/features/nurse/components/more-links';
+import { LinkType } from '@/features/nurse/types';
 import { AccountBrief } from '@/features/shared/components/account-brief';
 import { Spacer } from '@/features/shared/components/spacer';
-import { MoreLinks } from '../nurse/components/more-links';
-import { LinkType } from '../nurse/types';
-import View from '../shared/components/view';
+import View from '@/features/shared/components/view';
+import {
+  IconCreditCardPay,
+  IconHeadset,
+  IconShieldCheck,
+} from '@tabler/icons-react-native';
 
 export const HospiceMore = () => {
   const { hospice } = useHospice();
@@ -13,7 +18,10 @@ export const HospiceMore = () => {
     <View>
       <Spacer height={30} />
       <AccountBrief
-        data={{ name: hospice.name || 'N/A', image: hospice.image as string }}
+        data={{
+          name: hospice.businessName || 'N/A',
+          image: hospice.image as string,
+        }}
         title="Business Profile"
         href={'/business-profile'}
       />
@@ -26,18 +34,19 @@ export const HospiceMore = () => {
 const links: LinkType[] = [
   {
     label: 'Subscriptions',
-    name: 'calendar.badge.checkmark',
+    icon: IconCreditCardPay,
+    // @ts-ignore
     link: '/(other-screens)/subscription',
   },
 
   {
     label: 'Support',
-    name: 'beats.headphones',
+    icon: IconHeadset,
     link: 'https://hospice-connect-web.vercel.app/contact',
   },
   {
     label: 'Privacy Policy',
-    name: 'note.text',
+    icon: IconShieldCheck,
     link: 'https://hospice-connect-web.vercel.app/privacy-policy',
   },
 ];

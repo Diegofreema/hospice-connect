@@ -1,4 +1,6 @@
 import { getAuthUserId } from '@convex-dev/auth/server';
+import { filter } from 'convex-helpers/server/filter';
+import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { mutation, query } from './_generated/server';
 import { getImage } from './helper';
@@ -212,5 +214,47 @@ export const updateNurseProfilePicture = mutation({
 
       throw new ConvexError({ message: error.message });
     }
+  },
+});
+
+export const getNurses = query({
+  args: {
+    range1: v.number(),
+    range2: v.number(),
+    discipline: v.union(
+      v.literal('RN'),
+      v.literal('LVN'),
+      v.literal('HHA'),
+      v.literal('All')
+    ),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    const minRange = Math.min(args.range1, args.range2);
+    const maxRange = Math.max(args.range1, args.range2);
+
+    // Build the query with TypeScript filter
+    const nurses = await filter(ctx.db.query('nurses'), (nurse) => {
+      // Apply discipline filter
+      const matchesDiscipline =
+        args.discipline === 'All' || nurse.discipline === args.discipline;
+      // Apply range filter
+      const matchesRange =
+        (nurse.rate || 0) >= minRange && (nurse.rate || 0) <= maxRange;
+      return matchesDiscipline && matchesRange;
+    }).paginate(args.paginationOpts);
+    const nursesImage = await Promise.all(
+      nurses.page.map(async (nurse) => {
+        const image = await getImage(ctx, nurse.imageId);
+        return {
+          ...nurse,
+          image,
+        };
+      })
+    );
+    return {
+      ...nurses,
+      page: nursesImage,
+    };
   },
 });

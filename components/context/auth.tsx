@@ -14,7 +14,6 @@ WebBrowser.maybeCompleteAuthSession();
 const AuthContext = React.createContext({
   user: null as Doc<'users'> | null,
   isAuthenticated: false,
-  token: null as string | null,
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -23,7 +22,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     isPending,
     isError,
   } = useQuery(convexQuery(api.users.getUser, {}));
-  const [token, setToken] = React.useState<string | null>(null);
+
   const [loading, setLoading] = React.useState(false);
   const updateStreamToken = useMutation(api.users.updateStreamToken);
   React.useEffect(() => {
@@ -41,9 +40,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           }
         );
 
-        console.log('🚀 ~ AppLayout ~ tokenProvider ~ data:', data);
         await updateStreamToken({ streamToken: data.token });
-        setToken(data.token);
       } catch (error) {
         console.error('error', error);
         throw new Error('Failed to fetch user data');
@@ -54,7 +51,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     tokenProvider();
   }, [updateStreamToken, user]);
   const isAuthenticated = !!user;
-  console.log({ isPending, loading, isError });
 
   const isLoading = isPending || loading;
   if (isError) {
@@ -68,7 +64,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       value={{
         user,
         isAuthenticated,
-        token,
       }}
     >
       {children}

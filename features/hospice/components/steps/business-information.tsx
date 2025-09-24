@@ -11,7 +11,10 @@ import { generateErrorMessage } from '@/features/shared/utils';
 import { useToast } from '@/hooks/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from 'convex/react';
-import { createHospiceValidator, CreateHospiceValidator } from '../validator';
+import {
+  createHospiceValidator,
+  CreateHospiceValidator,
+} from '../../validator';
 
 export const BusinessInformation = () => {
   const { showToast } = useToast();

@@ -1,3 +1,4 @@
+import { getFontSize } from '@/features/shared/utils';
 import React from 'react';
 import { Text } from 'react-native';
 import type { TitleProps } from './Title.types';
@@ -14,7 +15,7 @@ export const Title: React.FC<TitleProps> = ({
       style={[
         style,
         {
-          fontSize: size ? size : 18,
+          fontSize: getFontSize(size ? size : 18),
         },
       ]}
     >

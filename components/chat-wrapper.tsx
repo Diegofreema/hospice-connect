@@ -6,20 +6,12 @@ import { Chat, OverlayProvider } from 'stream-chat-expo';
 import { useAuth } from './context/auth';
 const client = StreamChat.getInstance(chatApiKey as string);
 export const ChatWrapper = ({ children }: PropsWithChildren) => {
-  const { user, token } = useAuth();
-  const name = user?.name;
-  const email = user?.email;
-  const image = user?.image;
-  const id = user?._id;
-  console.log({ name, email, image, id, token });
-  // Track whether the chat client is ready (connected)
-  const [isReady, setIsReady] = useState(false);
-  // Get authentication state from AuthProvider
+  const { user } = useAuth();
 
-  // Connect to Stream Chat when the user is authenticated
+  const [isReady, setIsReady] = useState(false);
+
   useEffect(() => {
-    // Skip if user is not authenticated
-    if (!user || !token) {
+    if (!user) {
       return;
     }
 
@@ -33,7 +25,7 @@ export const ChatWrapper = ({ children }: PropsWithChildren) => {
           name: user.name!,
           image: user.image!,
         },
-        token
+        user?.streamToken
       );
       setIsReady(true);
     };
@@ -48,7 +40,7 @@ export const ChatWrapper = ({ children }: PropsWithChildren) => {
       }
       setIsReady(false);
     };
-  }, [user, token, isReady]);
+  }, [user, isReady]);
   // const chatClient = useCreateChatClient({
   //   apiKey: chatApiKey,
   //   userData: {
@@ -58,6 +50,7 @@ export const ChatWrapper = ({ children }: PropsWithChildren) => {
   //   },
   //   tokenOrProvider: token,
   // });
+  console.log({ isClient: !!client });
 
   if (!client) {
     return <LoadingComponent />;
