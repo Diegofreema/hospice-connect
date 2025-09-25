@@ -27,7 +27,7 @@ export const ControlledDatePicker = <TFieldValues extends FieldValues>({
   control,
   errors,
   name,
-  placeholder,
+
   mode = 'date',
 }: Props<TFieldValues>) => {
   const [open, setOpen] = useState(false);
@@ -47,7 +47,9 @@ export const ControlledDatePicker = <TFieldValues extends FieldValues>({
               style={styles.container}
             >
               <Text style={{ color: value ? 'black' : 'grey' }}>
-                {format(value || new Date(), 'PPP')}
+                {mode === 'time'
+                  ? format(value || new Date(), 'HH:mm')
+                  : format(value || new Date(), 'PPP')}
               </Text>
             </TouchableOpacity>
             {open && (

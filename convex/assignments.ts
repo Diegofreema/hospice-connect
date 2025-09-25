@@ -1,9 +1,10 @@
 import { getAuthUserId } from '@convex-dev/auth/server';
 import { filter } from 'convex-helpers/server/filter';
 import { paginationOptsValidator, PaginationResult } from 'convex/server';
-import { v } from 'convex/values';
+import { ConvexError, v } from 'convex/values';
 import { Doc } from './_generated/dataModel';
-import { query } from './_generated/server';
+import { mutation, query } from './_generated/server';
+import { careLevel, discipline } from './schema';
 
 export const availableAssignments = query({
   args: {
@@ -135,5 +136,53 @@ export const completedAssignments = query({
       ...schedules,
       page: finalArray,
     };
+  },
+});
+
+export const createAssignment = mutation({
+  args: {
+    additionalNotes: v.optional(v.string()),
+    address: v.string(),
+    dateOfBirth: v.string(),
+    discipline: discipline,
+    endDate: v.string(),
+    firstName: v.string(),
+    gender: v.string(),
+    lastName: v.string(),
+    phoneNumber: v.string(),
+    rate: v.number(),
+    startDate: v.string(),
+    state: v.string(),
+    openShift: v.string(),
+    hospiceId: v.id('hospices'),
+    careLevel: careLevel,
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new ConvexError({ message: 'Unauthorized' });
+    }
+    const hospice = await ctx.db.get(args.hospiceId);
+    if (!hospice) {
+      throw new ConvexError({ message: 'Hospice not found' });
+    }
+    await ctx.db.insert('assignments', {
+      notes: args.additionalNotes,
+      patientAddress: args.address,
+      dateOfBirth: args.dateOfBirth,
+      discipline: args.discipline,
+      endDate: args.endDate,
+      patientFirstName: args.firstName,
+      gender: args.gender,
+      patientLastName: args.lastName,
+      phoneNumber: args.phoneNumber,
+      rate: args.rate,
+      startDate: args.startDate,
+      state: args.state,
+      openShift: args.openShift,
+      hospiceId: args.hospiceId,
+      status: 'not_covered',
+      careLevel: args.careLevel,
+    });
   },
 });

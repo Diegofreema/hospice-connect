@@ -12,6 +12,17 @@ export const discipline = v.union(
   v.literal('LVN'),
   v.literal('HHA')
 );
+
+export const careLevel = v.union(
+  v.union(
+    v.literal('Initial Evaluation'),
+    v.literal('Follow Up'),
+    v.literal('Continuous Care'),
+    v.literal('Supervision'),
+    v.literal('Recertification'),
+    v.literal('Discharge')
+  )
+);
 export const Nurse = {
   firstName: v.string(),
   lastName: v.string(),
@@ -67,7 +78,7 @@ export const assignment = {
   openShift: v.string(),
   patientAddress: v.string(),
   state: v.string(),
-  zipCode: v.string(),
+  zipCode: v.optional(v.string()),
   notes: v.optional(v.string()),
   status: v.union(
     v.literal('completed'),
@@ -75,6 +86,8 @@ export const assignment = {
     v.literal('booked'),
     v.literal('available')
   ),
+  rate: v.number(),
+  careLevel,
 };
 export const routeSheet = {
   nurseId: v.id('nurses'),
