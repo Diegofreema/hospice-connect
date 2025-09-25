@@ -2,8 +2,10 @@ import { api } from '@/convex/_generated/api';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { usePaginatedQuery } from 'convex/react';
 
+import { Title } from '@/components/title/Title';
 import View from '@/features/shared/components/view';
 import { LegendList } from '@legendapp/list';
+import { format } from 'date-fns';
 import { NurseType } from '../types';
 import { NurseCard } from './nurse-card';
 
@@ -14,9 +16,12 @@ type Props = {
 };
 
 export const FetchNurses = ({ nurseType, rate1, rate2 }: Props) => {
+  const todayToText = format(new Date(), 'EEEE');
+  console.log({ todayToText });
+
   const { loadMore, results, status } = usePaginatedQuery(
     api.nurses.getNurses,
-    { discipline: nurseType, range1: rate1, range2: rate2 },
+    { discipline: nurseType, range1: rate1, range2: rate2, todayToText },
     { initialNumItems: 30 }
   );
   const onLoadMore = () => {
@@ -28,9 +33,11 @@ export const FetchNurses = ({ nurseType, rate1, rate2 }: Props) => {
   if (status === 'LoadingFirstPage') {
     return <SmallLoader />;
   }
+
   return (
-    <View>
+    <View flex={1}>
       <LegendList
+        ListHeaderComponent={<Title size={20}>Nurses</Title>}
         data={results}
         recycleItems
         onEndReached={onLoadMore}
@@ -38,6 +45,10 @@ export const FetchNurses = ({ nurseType, rate1, rate2 }: Props) => {
         renderItem={({ item }) => <NurseCard nurse={item} />}
         keyExtractor={(item) => item._id}
         ListFooterComponent={status === 'LoadingMore' ? <SmallLoader /> : null}
+        contentContainerStyle={{ gap: 20, paddingBottom: 100, flexGrow: 1 }}
+        columnWrapperStyle={{ gap: 20 }}
+        showsVerticalScrollIndicator={false}
+        style={{ flex: 1 }}
       />
     </View>
   );

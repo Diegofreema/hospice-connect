@@ -22,7 +22,8 @@ export type BadgeVariant =
   | 'warning'
   | 'error'
   | 'notifications'
-  | 'pending';
+  | 'pending'
+  | 'available';
 
 export interface BadgeProps {
   label: string;
@@ -59,6 +60,10 @@ const variantStyles: Record<
     textColor: '#dbdbdb',
     borderColor: '#e6e6e6',
     borderWidth: 0.3,
+  },
+  available: {
+    backgroundColor: palette.white,
+    textColor: palette.black,
   },
 };
 

@@ -77,3 +77,14 @@ export const uploadProfilePicture = async (
     console.log({ error });
   }
 };
+
+export const changeFirstLetterToCapital = (str: string) => {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
+export const trimText = (text: string, maxLength: number) => {
+  if (text.length > maxLength) {
+    return text.substring(0, maxLength - 3) + '...';
+  }
+  return text;
+};

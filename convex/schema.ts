@@ -127,6 +127,6 @@ export default defineSchema({
   assignments: defineTable(assignment).index('state', ['state', 'status']),
   schedules: defineTable(Schedule).index('nurse', ['nurseId', 'status']),
   routeSheets: defineTable(routeSheet),
-  ratings: defineTable(Rating),
+  ratings: defineTable(Rating).index('nurseId', ['nurseId']),
   availabilities: defineTable(Availability).index('nurseId', ['nurseId']),
 });

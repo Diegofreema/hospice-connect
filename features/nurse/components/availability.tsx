@@ -24,17 +24,19 @@ export const Availability = () => {
     bottomSheetRef.current?.close();
   };
   return (
-    <View flex={1} mt="m">
-      <FlatList
-        data={nurse?.availabilities?.days}
-        renderItem={({ item }) => (
-          <Day day={item} onPress={() => handlePress(item)} />
-        )}
-        keyExtractor={(item) => item.day}
-        contentContainerStyle={{ gap: 10 }}
-        showsVerticalScrollIndicator={false}
-      />
+    <>
+      <View flex={1} mt="m">
+        <FlatList
+          data={nurse?.availabilities?.days}
+          renderItem={({ item }) => (
+            <Day day={item} onPress={() => handlePress(item)} />
+          )}
+          keyExtractor={(item) => item.day}
+          contentContainerStyle={{ gap: 10 }}
+          showsVerticalScrollIndicator={false}
+        />
+      </View>
       <AvailabilitySheet ref={bottomSheetRef} onClose={handleClose} />
-    </View>
+    </>
   );
 };

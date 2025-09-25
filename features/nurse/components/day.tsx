@@ -34,6 +34,14 @@ export const Day = ({ day, onPress }: Props) => {
   const { showToast } = useToast();
   const updateAvailability = async (value: boolean) => {
     if (!nurse?._id) return;
+    if (!day.available && (!day.startTime || !day.endTime)) {
+      showToast({
+        title: 'Failed to update availability',
+        description: 'Please set start and end shift first',
+        type: 'error',
+      });
+      return;
+    }
     try {
       await updateAvailabilityMutation({
         nurseId: nurse?._id,

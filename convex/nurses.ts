@@ -3,7 +3,7 @@ import { filter } from 'convex-helpers/server/filter';
 import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { mutation, query } from './_generated/server';
-import { getImage } from './helper';
+import { getAvailability, getImage, getRatings } from './helper';
 import { discipline } from './schema';
 
 export const createNurse = mutation({
@@ -227,6 +227,7 @@ export const getNurses = query({
       v.literal('HHA'),
       v.literal('All')
     ),
+    todayToText: v.string(),
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
@@ -246,9 +247,17 @@ export const getNurses = query({
     const nursesImage = await Promise.all(
       nurses.page.map(async (nurse) => {
         const image = await getImage(ctx, nurse.imageId);
+        const available = await getAvailability(
+          ctx,
+          nurse._id,
+          args.todayToText
+        );
+        const ratings = await getRatings(ctx, nurse._id);
         return {
           ...nurse,
           image,
+          available,
+          ratings,
         };
       })
     );

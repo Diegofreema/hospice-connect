@@ -7,7 +7,10 @@ import View from '@/features/shared/components/view';
 import { generateErrorMessage } from '@/features/shared/utils';
 import { useToast } from '@/hooks/use-toast';
 import { palette } from '@/theme';
-import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetView,
+} from '@gorhom/bottom-sheet';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { IconX } from '@tabler/icons-react-native';
 import { useMutation } from 'convex/react';
@@ -93,6 +96,7 @@ export const AvailabilitySheet = forwardRef<BottomSheet, Props>(
         snapPoints={snapPoints}
         enablePanDownToClose
         handleComponent={null}
+        backdropComponent={BottomSheetBackdrop}
       >
         <BottomSheetView style={styles.contentContainer}>
           <View
