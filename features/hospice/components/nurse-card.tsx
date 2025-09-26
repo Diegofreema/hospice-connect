@@ -145,7 +145,7 @@ export const NurseCard = ({ nurse }: Props) => {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: palette.greyLight,
+    backgroundColor: palette.cardGrey,
   },
   header: {
     flexDirection: 'row',

@@ -4,7 +4,7 @@ import { paginationOptsValidator, PaginationResult } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
-import { careLevel, discipline } from './schema';
+import { careLevel, discipline, gender } from './schema';
 
 export const availableAssignments = query({
   args: {
@@ -147,7 +147,7 @@ export const createAssignment = mutation({
     discipline: discipline,
     endDate: v.string(),
     firstName: v.string(),
-    gender: v.string(),
+    gender: gender,
     lastName: v.string(),
     phoneNumber: v.string(),
     rate: v.number(),
@@ -181,8 +181,115 @@ export const createAssignment = mutation({
       state: args.state,
       openShift: args.openShift,
       hospiceId: args.hospiceId,
-      status: 'not_covered',
+      status: 'not_booked',
       careLevel: args.careLevel,
     });
+  },
+});
+
+export const getAssignment = query({
+  args: {
+    assignmentId: v.id('assignments'),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      return null;
+    }
+    const assignment = await ctx.db.get(args.assignmentId);
+    if (!assignment) {
+      return null;
+    }
+    return assignment;
+  },
+});
+
+export const updateAssignment = mutation({
+  args: {
+    additionalNotes: v.optional(v.string()),
+    address: v.string(),
+    dateOfBirth: v.string(),
+    discipline: discipline,
+    endDate: v.string(),
+    firstName: v.string(),
+    gender: gender,
+    lastName: v.string(),
+    phoneNumber: v.string(),
+    rate: v.number(),
+    startDate: v.string(),
+    state: v.string(),
+    openShift: v.string(),
+    hospiceId: v.id('hospices'),
+    careLevel: careLevel,
+    assignmentId: v.id('assignments'),
+  },
+  handler: async (ctx, { assignmentId, ...args }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new ConvexError({ message: 'Unauthorized' });
+    }
+    const hospice = await ctx.db.get(args.hospiceId);
+    if (!hospice) {
+      throw new ConvexError({ message: 'Hospice not found' });
+    }
+    const assignment = await ctx.db.get(assignmentId);
+    if (!assignment) {
+      return new ConvexError({ message: 'Assignment not found' });
+    }
+    if (assignment.hospiceId !== args.hospiceId) {
+      throw new ConvexError({
+        message: 'You not permitted to update this assignment',
+      });
+    }
+    await ctx.db.patch(assignmentId, {
+      notes: args.additionalNotes,
+      patientAddress: args.address,
+      dateOfBirth: args.dateOfBirth,
+      discipline: args.discipline,
+      endDate: args.endDate,
+      patientFirstName: args.firstName,
+      gender: args.gender,
+      patientLastName: args.lastName,
+      phoneNumber: args.phoneNumber,
+      rate: args.rate,
+      startDate: args.startDate,
+      state: args.state,
+      openShift: args.openShift,
+      hospiceId: args.hospiceId,
+      status: 'not_booked',
+      careLevel: args.careLevel,
+    });
+  },
+});
+
+export const deleteAssignment = mutation({
+  args: {
+    assignmentId: v.id('assignments'),
+    hospiceId: v.id('hospices'),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new ConvexError({ message: 'Unauthorized' });
+    }
+    const hospice = await ctx.db.get(args.hospiceId);
+    if (!hospice) {
+      throw new ConvexError({ message: 'Hospice not found' });
+    }
+    const assignment = await ctx.db.get(args.assignmentId);
+    if (!assignment) {
+      throw new ConvexError({ message: 'Assignment not found' });
+    }
+
+    if (assignment.status !== 'not_booked') {
+      throw new ConvexError({ message: 'This assignment cannot be deleted' });
+    }
+    if (assignment.hospiceId !== args.hospiceId) {
+      throw new ConvexError({
+        message: 'You do not have permission to delete this assignment',
+      });
+    }
+
+    await ctx.db.delete(args.assignmentId);
   },
 });

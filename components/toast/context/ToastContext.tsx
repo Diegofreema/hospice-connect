@@ -4,13 +4,13 @@ import React, {
   useContext,
   useEffect,
   useState,
-} from "react";
-import type { Toast, ToastContextValue, ToastOptions } from "../Toast.types";
+} from 'react';
+import type { Toast, ToastContextValue, ToastOptions } from '../Toast.types';
 
 const DEFAULT_TOAST_OPTIONS: Required<ToastOptions> = {
   duration: 3000,
-  type: "default",
-  position: "bottom",
+  type: 'default',
+  position: 'bottom',
   onClose: () => {},
   action: {},
 };
@@ -20,7 +20,7 @@ const ToastContext = createContext<ToastContextValue | undefined>(undefined);
 export const useToast = (): ToastContextValue => {
   const context = useContext(ToastContext);
   if (!context) {
-    throw new Error("useToast must be used within a ToastProvider");
+    throw new Error('useToast must be used within a ToastProvider');
   }
   return context;
 };
@@ -87,6 +87,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
           dismiss(toast.id);
           toast.options.onClose?.();
         }, toast.options.duration);
+        // @ts-ignore
         timeouts.push(timeout);
       }
     });

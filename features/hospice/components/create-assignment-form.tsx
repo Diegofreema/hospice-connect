@@ -22,8 +22,14 @@ const careLevel = [
 ];
 type Props = {
   onSubmit: (data: CreateAssignmentValidator) => void;
+  initialValues?: CreateAssignmentValidator;
+  btnTitle?: string;
 };
-export const CreateAssignmentForm = ({ onSubmit }: Props) => {
+export const CreateAssignmentForm = ({
+  onSubmit,
+  initialValues,
+  btnTitle = 'Create',
+}: Props) => {
   const {
     handleSubmit,
     control,
@@ -44,6 +50,7 @@ export const CreateAssignmentForm = ({ onSubmit }: Props) => {
       startDate: new Date(),
       state: '',
       openShift: new Date(),
+      ...initialValues,
     },
     resolver: zodResolver(createAssignmentValidator),
   });
@@ -171,7 +178,7 @@ export const CreateAssignmentForm = ({ onSubmit }: Props) => {
         variant="textarea"
       />
       <Button
-        label="Create"
+        label={btnTitle}
         onPress={handleSubmit(onSubmit)}
         disabled={isSubmitting}
       />

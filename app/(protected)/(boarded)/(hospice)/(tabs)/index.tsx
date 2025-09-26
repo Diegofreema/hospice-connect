@@ -1,5 +1,4 @@
 import { useHospice } from '@/components/context/hospice-context';
-import { FetchNurses } from '@/features/hospice/components/fetch-nurses';
 import { RateRange } from '@/features/hospice/components/rate-range';
 import { nurseFilter } from '@/features/hospice/constants';
 import { NurseType } from '@/features/hospice/types';
@@ -62,11 +61,11 @@ export default function HomeScreen() {
           selected={selected}
           setSelected={(selected) => setSelected(selected as 'All' | NurseType)}
         />
-        <FetchNurses
+        {/* <FetchNurses
           nurseType={selected}
           rate1={range.rate1}
           rate2={range.rate2}
-        />
+        /> */}
       </Wrapper>
       <CustomSheet title="Filter" ref={bottomSheetRef} onClose={onCloseSheet}>
         <RateRange setRange={setRange} range={range} />

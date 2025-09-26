@@ -22,6 +22,7 @@ import type * as hospices from "../hospices.js";
 import type * as http from "../http.js";
 import type * as nurses from "../nurses.js";
 import type * as passwordReset_PasswordResetemail from "../passwordReset/PasswordResetemail.js";
+import type * as posts from "../posts.js";
 import type * as sendEmail from "../sendEmail.js";
 import type * as users from "../users.js";
 
@@ -54,6 +55,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   nurses: typeof nurses;
   "passwordReset/PasswordResetemail": typeof passwordReset_PasswordResetemail;
+  posts: typeof posts;
   sendEmail: typeof sendEmail;
   users: typeof users;
 }>;

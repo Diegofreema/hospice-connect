@@ -2,6 +2,7 @@ import { useAuth } from '@/components/context/auth';
 import Provider from '@/components/provider';
 import { ToastProviderWithViewport } from '@/components/toast';
 import { ErrorComponent } from '@/features/shared/components/error';
+import { ToastProvider } from '../components/demos/toast';
 
 import theme, { palette } from '@/theme';
 import { ThemeProvider } from '@shopify/restyle';
@@ -48,16 +49,18 @@ const InitialRoute = () => {
   const { isAuthenticated } = useAuth();
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ToastProviderWithViewport>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Protected guard={isAuthenticated}>
-            <Stack.Screen name="(protected)" />
-          </Stack.Protected>
-          <Stack.Protected guard={!isAuthenticated}>
-            <Stack.Screen name="(public)" />
-          </Stack.Protected>
-        </Stack>
-      </ToastProviderWithViewport>
+      <ToastProvider>
+        <ToastProviderWithViewport>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Protected guard={isAuthenticated}>
+              <Stack.Screen name="(protected)" />
+            </Stack.Protected>
+            <Stack.Protected guard={!isAuthenticated}>
+              <Stack.Screen name="(public)" />
+            </Stack.Protected>
+          </Stack>
+        </ToastProviderWithViewport>
+      </ToastProvider>
     </GestureHandlerRootView>
   );
 };

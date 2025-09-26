@@ -64,13 +64,19 @@ export const Schedule = {
   rate: v.number(),
 };
 
+export const gender = v.union(
+  v.literal('male'),
+  v.literal('female'),
+  v.literal('others')
+);
+
 export const assignment = {
   hospiceId: v.id('hospices'),
   assignedTo: v.optional(v.id('nurses')),
   phoneNumber: v.string(),
   patientFirstName: v.string(),
   patientLastName: v.string(),
-  gender: v.string(),
+  gender: gender,
   dateOfBirth: v.string(),
   discipline: discipline,
   startDate: v.string(),
@@ -84,7 +90,8 @@ export const assignment = {
     v.literal('completed'),
     v.literal('not_covered'),
     v.literal('booked'),
-    v.literal('available')
+    v.literal('available'),
+    v.literal('not_booked')
   ),
   rate: v.number(),
   careLevel,
@@ -137,7 +144,9 @@ export default defineSchema({
   users: defineTable(User).index('email', ['email']),
   nurses: defineTable(Nurse).index('userId', ['userId']),
   hospices: defineTable(Hospice).index('userId', ['userId']),
-  assignments: defineTable(assignment).index('state', ['state', 'status']),
+  assignments: defineTable(assignment)
+    .index('state', ['state', 'status'])
+    .index('hospiceId', ['hospiceId']),
   schedules: defineTable(Schedule).index('nurse', ['nurseId', 'status']),
   routeSheets: defineTable(routeSheet),
   ratings: defineTable(Rating).index('nurseId', ['nurseId']),

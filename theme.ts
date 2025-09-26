@@ -25,6 +25,7 @@ export const palette = {
   iconGrey: '#666666',
   textGrey: '#8D8D8D',
   buttonGrey: '#F2F2F2',
+  cardGrey: '#efefef',
 };
 
 const theme = createTheme({
