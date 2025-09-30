@@ -1,15 +1,16 @@
+import { useToast } from '@/components/demos/toast';
 import { OtpInput } from '@/components/otp-input';
 import { PrivacyNoticeLink } from '@/components/privacy-notice/privacy-notice-link';
 import { Button } from '@/features/shared/components/button';
 import { Spacer } from '@/features/shared/components/spacer';
-import Text from '@/features/shared/components/text';
-import View from '@/features/shared/components/view';
+import { Text } from '@/features/shared/components/text';
+
 import { useTimer } from '@/hooks/use-timer';
-import { useToast } from '@/hooks/use-toast';
-import { palette } from '@/theme';
+
 import { useAuthActions } from '@convex-dev/auth/react';
 import React, { useState } from 'react';
-import { StyleSheet, useWindowDimensions } from 'react-native';
+import { useWindowDimensions, View } from 'react-native';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
 type Props = {
   email: string;
@@ -18,6 +19,7 @@ type Props = {
 
 export const VerifyEmailForm = ({ email, password }: Props) => {
   const { signIn } = useAuthActions();
+  const { theme } = useUnistyles();
   const [otpValue, setOtpValue] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const { startTimer, timeLeft } = useTimer();
@@ -43,16 +45,14 @@ export const VerifyEmailForm = ({ email, password }: Props) => {
       .then(() => {
         showToast({
           title: 'Success',
-          description: 'Verification code sent successfully.',
-          type: 'success',
+          subtitle: 'Verification code sent successfully.',
         });
       })
       .catch(() => {
         showToast({
           title: 'Error',
-          description:
+          subtitle:
             'Failed to verify email. Check if your email or verification code is correct.',
-          type: 'error',
         });
       })
       .finally(() => {
@@ -70,23 +70,20 @@ export const VerifyEmailForm = ({ email, password }: Props) => {
         clearOtp();
         showToast({
           title: 'Success',
-          description:
-            'Your email has been verified. welcome to HospiceConnect',
-          type: 'success',
+          subtitle: 'Your email has been verified. welcome to HospiceConnect',
         });
       })
       .catch((e) => {
         showToast({
           title: 'Error',
-          description:
+          subtitle:
             'Failed to verify email. Check if your email or verification code is correct.',
-          type: 'error',
         });
       });
   };
 
   return (
-    <View alignItems={'flex-start'} gap={'s'} width={'100%'}>
+    <View>
       <OtpInput
         otpCount={5}
         containerStyle={styles.otpInputContainer}
@@ -98,27 +95,20 @@ export const VerifyEmailForm = ({ email, password }: Props) => {
         enableAutoFocus={true}
         onInputChange={handleOtpChange}
         onInputFinished={handleOtpFinished}
-        focusedColor={palette.greenLight}
+        focusedColor={theme.colors.greenLight}
       />
-      <Text variant={'body'}>Didn’t receive the code ?</Text>
+      <Text>Didn’t receive the code ?</Text>
       <PrivacyNoticeLink onPress={handleResendCode} disabled={timeLeft > 0}>
         Resend Code
       </PrivacyNoticeLink>
       <Spacer />
-      <View width={'100%'}>
-        <Button
-          label="Verify"
-          onPress={onSubmit}
-          disabled={loading}
-          loading={loading}
-          loadingText="Verifying..."
-        />
-      </View>
+
+      <Button title="Verify" onPress={onSubmit} disabled={loading} />
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   otpContainer: {
     marginBottom: 24,
     marginTop: 24,
@@ -127,8 +117,8 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   otpInputStyle: {
-    backgroundColor: palette.greenLight,
-    color: palette.black,
+    backgroundColor: theme.colors.greenLight,
+    color: theme.colors.black,
     fontSize: 24,
     fontWeight: '600',
     textAlign: 'center',
@@ -142,8 +132,8 @@ const styles = StyleSheet.create({
   },
 
   otpTextStyle: {
-    color: palette.black,
+    color: theme.colors.black,
     fontSize: 24,
     fontWeight: '600',
   },
-});
+}));

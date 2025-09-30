@@ -1,11 +1,12 @@
 import { useHospice } from '@/components/context/hospice-context';
+import { useToast } from '@/components/demos/toast';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 import { CreateAssignmentForm } from '@/features/hospice/components/create-assignment-form';
 import { CreateAssignmentValidator } from '@/features/hospice/validator';
 import { Wrapper } from '@/features/shared/components/wrapper';
 import { generateErrorMessage } from '@/features/shared/utils';
-import { useToast } from '@/hooks/use-toast';
+
 import { useMutation } from 'convex/react';
 import { format } from 'date-fns';
 import { router } from 'expo-router';
@@ -30,8 +31,7 @@ const CreateScreen = () => {
       });
       showToast({
         title: 'Success',
-        description: 'Assignment created successfully',
-        type: 'success',
+        subtitle: 'Assignment created successfully',
       });
       router.push('/posts');
     } catch (error) {
@@ -42,8 +42,7 @@ const CreateScreen = () => {
 
       showToast({
         title: 'Error',
-        description: errorMessage,
-        type: 'error',
+        subtitle: errorMessage,
       });
     }
   };

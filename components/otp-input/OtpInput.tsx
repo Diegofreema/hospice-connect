@@ -1,4 +1,3 @@
-import { palette } from '@/theme';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { TextInput } from 'react-native';
 import Animated, {
@@ -19,7 +18,7 @@ export const OtpInput = ({
   containerStyle = {},
   otpInputStyle = {},
   textStyle = {},
-  focusedColor = palette.blue,
+  focusedColor = '#4C55FF',
 
   editable = true,
   enteringAnimated = FadeInDown,

@@ -3,7 +3,8 @@ import { MoreLinks } from '@/features/nurse/components/more-links';
 import { LinkType } from '@/features/nurse/types';
 import { AccountBrief } from '@/features/shared/components/account-brief';
 import { Spacer } from '@/features/shared/components/spacer';
-import View from '@/features/shared/components/view';
+import { Stack } from '@/features/shared/components/v-stack';
+
 import {
   IconCreditCardPay,
   IconHeadset,
@@ -15,7 +16,7 @@ export const HospiceMore = () => {
   if (hospice === null) return null;
 
   return (
-    <View>
+    <Stack>
       <Spacer height={30} />
       <AccountBrief
         data={{
@@ -27,7 +28,7 @@ export const HospiceMore = () => {
       />
       <Spacer height={30} />
       <MoreLinks links={links} />
-    </View>
+    </Stack>
   );
 };
 

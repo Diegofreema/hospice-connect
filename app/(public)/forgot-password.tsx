@@ -4,18 +4,16 @@ import { BackButton } from '@/features/shared/components/back-button';
 import { MyTitle } from '@/features/shared/components/my-title';
 import { Spacer } from '@/features/shared/components/spacer';
 import { Wrapper } from '@/features/shared/components/wrapper';
-import { palette } from '@/theme';
+
 import React from 'react';
 
 const ForgotPassword = () => {
   return (
-    <Wrapper gap="s">
+    <Wrapper gap="sm">
       <BackButton />
       <Spacer height={30} />
       <MyTitle title="Forgot Password" />
-      <SubTitle style={{ color: palette.black }}>
-        Enter your email to reset your password
-      </SubTitle>
+      <SubTitle isBlack>Enter your email to reset your password</SubTitle>
       <Spacer height={50} />
       <ForgotForm />
     </Wrapper>

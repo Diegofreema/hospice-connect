@@ -1,5 +1,5 @@
 import { Input } from '@/features/shared/components/input';
-import Text from '@/features/shared/components/text';
+import { Text } from '@/features/shared/components/text';
 import { Textarea } from '@/features/shared/components/text-area';
 import React from 'react';
 import {
@@ -61,7 +61,7 @@ export const ControlInput = <TFieldValues extends FieldValues>({
         }
       />
       {errors[name]?.message && (
-        <Text variant={'small'} color={'error'}>
+        <Text size="small" color={'red'}>
           {typeof errors[name]?.message === 'string'
             ? errors[name]?.message
             : 'Invalid input'}

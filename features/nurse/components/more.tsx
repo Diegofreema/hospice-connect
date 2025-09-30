@@ -7,7 +7,8 @@ import {
   IconHeadset,
   IconShieldCheck,
 } from '@tabler/icons-react-native';
-import View from '../../shared/components/view';
+
+import { View } from 'react-native';
 import { LinkType } from '../types';
 import { MoreLinks } from './more-links';
 

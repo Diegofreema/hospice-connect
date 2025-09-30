@@ -1,4 +1,3 @@
-import { palette } from '@/theme';
 import React, { useEffect } from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 import Animated, {
@@ -18,7 +17,7 @@ export const AnimatedSwitch: React.FC<AnimatedSwitchProps> = ({
   disabled = false,
   width = 56,
   height = 32,
-  onColor = palette.blue,
+  onColor = '#4C55FF',
   offColor = '#E9E9EA',
   thumbColor = '#FFFFFF',
   thumbSize,

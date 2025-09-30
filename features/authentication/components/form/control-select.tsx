@@ -1,5 +1,4 @@
-import Text from '@/features/shared/components/text';
-import View from '@/features/shared/components/view';
+import { Text } from '@/features/shared/components/text';
 import { IconChevronDown } from '@tabler/icons-react-native';
 import React from 'react';
 import {
@@ -9,12 +8,13 @@ import {
   FieldPath,
   FieldValues,
 } from 'react-hook-form';
-import { StyleSheet } from 'react-native';
+import { View } from '../../../shared/components/view';
+
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
+import { StyleSheet } from 'react-native-unistyles';
 import * as DropdownMenu from 'zeego/dropdown-menu';
 type Props<TFieldValues extends FieldValues> = {
   label?: string;
-
   errors: FieldErrors<TFieldValues>;
   control: Control<TFieldValues>;
   name: FieldPath<TFieldValues>;
@@ -47,7 +47,7 @@ export const ControlSelect = <TFieldValues extends FieldValues>({
                 width={'100%'}
                 alignItems={'center'}
               >
-                <Text style={{ color: value ? 'black' : 'grey' }}>
+                <Text color={value ? 'black' : 'grey'} size="normal">
                   {items.find((item) => item.value === value)?.label ||
                     placeholder}
                 </Text>
@@ -72,7 +72,7 @@ export const ControlSelect = <TFieldValues extends FieldValues>({
         )}
       />
       {errors[name]?.message && (
-        <Text variant={'small'} color={'error'}>
+        <Text size="small" color={'red'}>
           {typeof errors[name]?.message === 'string'
             ? errors[name]?.message
             : 'Invalid input'}

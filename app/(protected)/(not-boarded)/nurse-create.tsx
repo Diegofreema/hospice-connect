@@ -1,3 +1,4 @@
+import { useToast } from '@/components/demos/toast';
 import { api } from '@/convex/_generated/api';
 import { License } from '@/features/nurse/components/step/license';
 import { PersonalInfo } from '@/features/nurse/components/step/personal-info';
@@ -8,16 +9,18 @@ import {
 
 import { BackButton } from '@/features/shared/components/back-button';
 import { Button } from '@/features/shared/components/button';
-import Text from '@/features/shared/components/text';
-import View from '@/features/shared/components/view';
+import { Text } from '@/features/shared/components/text';
+import { Stack } from '@/features/shared/components/v-stack';
+
 import { Wrapper } from '@/features/shared/components/wrapper';
 import { generateErrorMessage, validateFields } from '@/features/shared/utils';
-import { useToast } from '@/hooks/use-toast';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from 'convex/react';
 import { format } from 'date-fns';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 
 const STEPS = [
@@ -86,8 +89,7 @@ const NurseCreate = () => {
       });
       showToast({
         title: 'Success',
-        description: 'Nurse account created successfully',
-        type: 'success',
+        subtitle: 'Nurse account created successfully',
       });
     } catch (error) {
       const errorMessage = generateErrorMessage(
@@ -97,8 +99,7 @@ const NurseCreate = () => {
 
       showToast({
         title: 'Error',
-        description: errorMessage,
-        type: 'error',
+        subtitle: errorMessage,
       });
     }
   };
@@ -107,32 +108,30 @@ const NurseCreate = () => {
     <Wrapper>
       <BackButton />
       <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
-        <Text alignSelf={'flex-end'}>
+        <Text style={{ alignSelf: 'flex-end' }}>
           Step {currentStep} of {STEPS.length}
         </Text>
         <CurrentStepComponent form={form} />
-        <View flexDirection={'row'} gap={'m'}>
+        <Stack mode={'flex'} gap={'md'}>
           {currentStep > 1 && (
-            <View flex={1}>
-              <Button label="Previous" onPress={prevStep} />
+            <View style={{ flex: 1 }}>
+              <Button title="Previous" onPress={prevStep} />
             </View>
           )}
           {currentStep < STEPS.length ? (
-            <View flex={1}>
-              <Button label="Next" onPress={nextStep} disabled={!stepIsValid} />
+            <View style={{ flex: 1 }}>
+              <Button title="Next" onPress={nextStep} disabled={!stepIsValid} />
             </View>
           ) : (
-            <View flex={1}>
+            <View style={{ flex: 1 }}>
               <Button
-                label="Submit"
+                title="Submit"
                 onPress={form.handleSubmit(onSubmit)}
                 disabled={!stepIsValid}
-                loading={form.formState.isSubmitting}
-                loadingText="Submitting..."
               />
             </View>
           )}
-        </View>
+        </Stack>
       </KeyboardAwareScrollView>
     </Wrapper>
   );

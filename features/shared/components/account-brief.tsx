@@ -5,8 +5,8 @@ import { SymbolView } from 'expo-symbols';
 import { TouchableOpacity } from 'react-native';
 import { getFontSize } from '../utils';
 import { NotificationButton } from './notification-btn';
-import Text from './text';
-import View from './view';
+import { Text } from './text';
+import { View } from './view';
 
 type Props = {
   data: {
@@ -37,22 +37,22 @@ export const AccountBrief = ({
         justifyContent={'space-between'}
         alignItems={'center'}
       >
-        <View flexDirection={'row'} alignItems={'center'} gap="s">
+        <View flexDirection={'row'} alignItems={'center'} gap="sm">
           <Avatar
             image={{ uri: data.image || '', name: data.name }}
             size={60}
           />
           <View>
             <Text
-              variant="small"
+              size="small"
               color={fontColor}
               fontSize={getFontSize(fontSize)}
-              fontFamily={'PublicSansSemiBold'}
+              isBold
             >
               {title}
             </Text>
 
-            <Text variant="body">{data.name}</Text>
+            <Text size="normal">{data.name}</Text>
           </View>
         </View>
         {!isHome && (

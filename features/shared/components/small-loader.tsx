@@ -1,19 +1,20 @@
 import { SpinnerArc } from '@/components/loaders';
-import { palette } from '@/theme';
-import View from './view';
+import { useUnistyles } from 'react-native-unistyles';
+import { Stack } from './v-stack';
 
 type Props = {
   size?: number;
 };
 
 export const SmallLoader = ({ size = 20 }: Props) => {
+  const { theme } = useUnistyles();
   return (
-    <View width={'100%'} alignItems={'center'} justifyContent={'center'}>
+    <Stack flex={1} isCentered>
       <SpinnerArc
         size={size}
-        colorEnd={palette.blue}
-        colorStart={palette.lightBlue}
+        colorEnd={theme.colors.blue}
+        colorStart={theme.colors.lightBlue}
       />
-    </View>
+    </Stack>
   );
 };

@@ -4,7 +4,8 @@ import { ControlInput } from '@/features/authentication/components/form/control-
 import { ControlSelect } from '@/features/authentication/components/form/control-select';
 import { MyTitle } from '@/features/shared/components/my-title';
 import { Spacer } from '@/features/shared/components/spacer';
-import View from '@/features/shared/components/view';
+
+import { Stack } from '@/features/shared/components/v-stack';
 import React from 'react';
 import { StepProps } from '../../validators';
 
@@ -14,14 +15,14 @@ export const PersonalInfo = ({ form }: StepProps) => {
     formState: { errors },
   } = form;
   return (
-    <View mb="xl">
+    <Stack mb="xl">
       <Spacer />
       <MyTitle title="Personal Information" />
       <Subtitle style={{ color: 'black' }}>
         Please ensure the accuracy of all Information
       </Subtitle>
       <Spacer height={50} />
-      <View gap="m">
+      <Stack gap="md">
         <ControlInput
           control={control}
           errors={errors}
@@ -66,7 +67,7 @@ export const PersonalInfo = ({ form }: StepProps) => {
           label="Date of Birth"
           placeholder="Enter date of birth"
         />
-      </View>
-    </View>
+      </Stack>
+    </Stack>
   );
 };

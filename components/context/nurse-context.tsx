@@ -1,8 +1,8 @@
 import { api } from '@/convex/_generated/api';
 import { LoadingComponent } from '@/features/shared/components/loading';
 import { UnderReview } from '@/features/shared/components/under-review';
-import { convexQuery } from '@convex-dev/react-query';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery } from 'convex/react';
+
 import { FunctionReturnType } from 'convex/server';
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
@@ -14,16 +14,9 @@ const AuthContext = React.createContext({
 });
 
 export const NurseProvider = ({ children }: { children: React.ReactNode }) => {
-  const {
-    data: nurse,
-    isPending,
-    isError,
-  } = useQuery(convexQuery(api.nurses.getNurse, {}));
-  if (isError) {
-    throw new Error('Could not get your data');
-  }
+  const nurse = useQuery(api.nurses.getNurse);
 
-  if (isPending) {
+  if (nurse === undefined) {
     return <LoadingComponent />;
   }
 

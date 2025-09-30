@@ -6,9 +6,9 @@ import { InProgressAssignments } from '@/features/nurse/components/in-progress-a
 import { AccountBrief } from '@/features/shared/components/account-brief';
 
 import { Wrapper } from '@/features/shared/components/wrapper';
-import { palette } from '@/theme';
+
 import { useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native-unistyles';
 
 type Variants = 'available' | 'in-progress' | 'completed';
 export default function HomeScreen() {
@@ -19,7 +19,7 @@ export default function HomeScreen() {
   const name = nurse.firstName + ' ' + nurse.lastName;
 
   return (
-    <Wrapper gap="m">
+    <Wrapper gap="md">
       <AccountBrief data={{ name, image: nurse.image as string }} isHome />
       <SegmentedControl.Root
         value={selectedValue}
@@ -60,13 +60,13 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   active: {
-    borderBottomColor: palette.blue,
+    borderBottomColor: theme.colors.blue,
   },
   normal: {
     borderBottomWidth: 1.5,
     borderBottomColor: '#ccc',
     flex: 1,
   },
-});
+}));

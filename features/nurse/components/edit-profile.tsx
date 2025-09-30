@@ -8,7 +8,8 @@ import { Button } from '@/features/shared/components/button';
 import { api } from '@/convex/_generated/api';
 import { ControlSelect } from '@/features/authentication/components/form/control-select';
 import { generateErrorMessage } from '@/features/shared/utils';
-import { useToast } from '@/hooks/use-toast';
+
+import { useToast } from '@/components/demos/toast';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from 'convex/react';
 import { router } from 'expo-router';
@@ -53,8 +54,7 @@ export const EditProfile = () => {
       });
       showToast({
         title: 'Success',
-        description: 'Information updated successfully',
-        type: 'success',
+        subtitle: 'Information updated successfully',
       });
       router.back();
     } catch (error) {
@@ -65,8 +65,7 @@ export const EditProfile = () => {
 
       showToast({
         title: 'Error',
-        description: errorMessage,
-        type: 'error',
+        subtitle: errorMessage,
       });
     }
   };
@@ -140,11 +139,9 @@ export const EditProfile = () => {
 
         <View style={{ marginTop: 'auto' }}>
           <Button
-            label="Save changes"
+            title="Save changes"
             onPress={handleSubmit(onSubmit)}
             disabled={isSubmitting}
-            loading={isSubmitting}
-            loadingText="Saving..."
             style={{ marginBottom: 50 }}
           />
         </View>

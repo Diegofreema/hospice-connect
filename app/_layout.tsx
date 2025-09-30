@@ -1,18 +1,16 @@
 import { useAuth } from '@/components/context/auth';
 import Provider from '@/components/provider';
-import { ToastProviderWithViewport } from '@/components/toast';
 import { ErrorComponent } from '@/features/shared/components/error';
 import { ToastProvider } from '../components/demos/toast';
 
-import theme, { palette } from '@/theme';
-import { ThemeProvider } from '@shopify/restyle';
 import { useFonts } from 'expo-font';
 import { ErrorBoundaryProps, Stack } from 'expo-router';
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import 'react-native-reanimated';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
 export function ErrorBoundary({ retry, error }: ErrorBoundaryProps) {
   return <ErrorComponent refetch={retry} text={error.message} />;
@@ -33,43 +31,51 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider theme={theme}>
-      <Provider>
-        <View style={styles.container}>
-          <KeyboardProvider>
-            <InitialRoute />
-          </KeyboardProvider>
-        </View>
-      </Provider>
-    </ThemeProvider>
+    <Provider>
+      <View style={styles.container}>
+        <KeyboardProvider>
+          <InitialRoute />
+        </KeyboardProvider>
+      </View>
+    </Provider>
   );
 }
 
 const InitialRoute = () => {
+  const { theme } = useUnistyles();
   const { isAuthenticated } = useAuth();
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ToastProvider>
-        <ToastProviderWithViewport>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Protected guard={isAuthenticated}>
-              <Stack.Screen name="(protected)" />
-            </Stack.Protected>
-            <Stack.Protected guard={!isAuthenticated}>
-              <Stack.Screen name="(public)" />
-            </Stack.Protected>
-          </Stack>
-        </ToastProviderWithViewport>
+        <Stack
+          screenOptions={{
+            headerStyle: {
+              backgroundColor: theme.colors.background,
+            },
+            headerTitleStyle: {
+              color: theme.colors.typography,
+            },
+            headerTintColor: theme.colors.typography,
+            headerShown: false,
+          }}
+        >
+          <Stack.Protected guard={isAuthenticated}>
+            <Stack.Screen name="(protected)" />
+          </Stack.Protected>
+          <Stack.Protected guard={!isAuthenticated}>
+            <Stack.Screen name="(public)" />
+          </Stack.Protected>
+        </Stack>
       </ToastProvider>
     </GestureHandlerRootView>
   );
 };
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
-    backgroundColor: palette.white,
+    backgroundColor: theme.colors.white,
     overflow: 'hidden',
     borderTopRightRadius: 25,
     borderTopLeftRadius: 25,
   },
-});
+}));

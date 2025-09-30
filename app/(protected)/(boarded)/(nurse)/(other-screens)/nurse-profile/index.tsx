@@ -4,12 +4,14 @@ import { BackButton } from '@/features/shared/components/back-button';
 import { LoadingComponent } from '@/features/shared/components/loading';
 import { ProfileCard } from '@/features/shared/components/profile-card';
 import { Spacer } from '@/features/shared/components/spacer';
-import View from '@/features/shared/components/view';
+import { Stack } from '@/features/shared/components/v-stack';
+
 import { Wrapper } from '@/features/shared/components/wrapper';
-import { palette } from '@/theme';
+
 import { IconChevronRight } from '@tabler/icons-react-native';
 import { router } from 'expo-router';
 import React from 'react';
+import { useUnistyles } from 'react-native-unistyles';
 
 const NurseProfileScreen = () => {
   const { nurse } = useNurse();
@@ -52,10 +54,11 @@ export default NurseProfileScreen;
 
 const RightContent = () => {
   const onPress = () => router.push('/nurse-profile/edit-profile');
+  const { theme } = useUnistyles();
   return (
-    <View flexDirection={'row'} alignItems={'center'}>
+    <Stack mode="flexCentered">
       <PrivacyNoticeLink onPress={onPress}>Edit Profile</PrivacyNoticeLink>
-      <IconChevronRight size={20} color={palette.blue} />
-    </View>
+      <IconChevronRight size={20} color={theme.colors.blue} />
+    </Stack>
   );
 };

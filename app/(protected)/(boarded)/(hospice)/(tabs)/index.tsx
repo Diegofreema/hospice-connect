@@ -1,19 +1,21 @@
 import { useHospice } from '@/components/context/hospice-context';
+import { FetchNurses } from '@/features/hospice/components/fetch-nurses';
 import { RateRange } from '@/features/hospice/components/rate-range';
 import { nurseFilter } from '@/features/hospice/constants';
 import { NurseType } from '@/features/hospice/types';
 import { AccountBrief } from '@/features/shared/components/account-brief';
 import { CustomSheet } from '@/features/shared/components/custom-bottom-sheet';
 import { CustomerSelector } from '@/features/shared/components/custom-selector';
-import { HStack } from '@/features/shared/components/HStack';
+
 import { PressableIcon } from '@/features/shared/components/pressable-icon';
 import { SearchComponent } from '@/features/shared/components/search-component';
+import { Stack } from '@/features/shared/components/v-stack';
 import { Wrapper } from '@/features/shared/components/wrapper';
-import { palette } from '@/theme';
+
 import BottomSheet from '@gorhom/bottom-sheet';
 import { IconFilter2 } from '@tabler/icons-react-native';
 import { useRef, useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native-unistyles';
 
 export default function HomeScreen() {
   const { hospice } = useHospice();
@@ -44,7 +46,7 @@ export default function HomeScreen() {
           href={'/business-profile'}
           isHome
         />
-        <HStack gap={'s'}>
+        <Stack gap={'lg'} mode="flexCentered">
           <SearchComponent
             placeholder="Search for nurses"
             path={'/search-nurses'}
@@ -55,17 +57,17 @@ export default function HomeScreen() {
             icon={IconFilter2}
             style={styles.icon}
           />
-        </HStack>
+        </Stack>
         <CustomerSelector
           data={nurseFilter}
           selected={selected}
           setSelected={(selected) => setSelected(selected as 'All' | NurseType)}
         />
-        {/* <FetchNurses
+        <FetchNurses
           nurseType={selected}
           rate1={range.rate1}
           rate2={range.rate2}
-        /> */}
+        />
       </Wrapper>
       <CustomSheet title="Filter" ref={bottomSheetRef} onClose={onCloseSheet}>
         <RateRange setRange={setRange} range={range} />
@@ -74,10 +76,10 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   icon: {
-    backgroundColor: palette.buttonGrey,
+    backgroundColor: theme.colors.buttonGrey,
     borderRadius: 8,
     padding: 14,
   },
-});
+}));

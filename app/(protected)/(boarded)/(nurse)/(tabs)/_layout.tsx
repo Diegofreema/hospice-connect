@@ -4,22 +4,21 @@ import { Platform } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
 import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
+
 import { TabBarIcon } from '@/features/shared/components/tab-bar-icon';
-import { useColorScheme } from '@/hooks/useColorScheme';
 import {
   IconDotsCircleHorizontal,
   IconHome2,
   IconMessageCircle,
 } from '@tabler/icons-react-native';
+import { useUnistyles } from 'react-native-unistyles';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
+  const { theme } = useUnistyles();
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: theme.colors.blue,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,

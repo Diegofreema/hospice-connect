@@ -1,24 +1,30 @@
 import { Title } from '@/components/title/Title';
-import View from '@/features/shared/components/view';
-import { palette } from '@/theme';
+
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { IconX } from '@tabler/icons-react-native';
 import { forwardRef, useMemo } from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+import { Stack } from './v-stack';
 
 type Props = {
   onClose: () => void;
   children: React.ReactNode;
   title: string;
+  customSnapPoints?: string[];
 };
 
 export const CustomSheet = forwardRef<BottomSheet, Props>(
-  ({ onClose, children, title }, ref) => {
-    const snapPoints = useMemo(() => ['25%', '50%'], []);
-
+  ({ onClose, children, title, customSnapPoints }, ref) => {
+    const snapPoints = useMemo(() => {
+      if (customSnapPoints && customSnapPoints?.length > 0)
+        return customSnapPoints;
+      return ['25%', '50%'];
+    }, [customSnapPoints]);
+    const { theme } = useUnistyles();
     return (
       <BottomSheet
         ref={ref}
@@ -29,18 +35,14 @@ export const CustomSheet = forwardRef<BottomSheet, Props>(
         backdropComponent={BottomSheetBackdrop}
       >
         <BottomSheetView style={styles.contentContainer}>
-          <View
-            flexDirection={'row'}
-            justifyContent={'space-between'}
-            alignItems={'center'}
-          >
+          <Stack mode="flex">
             <Title style={{ fontFamily: 'PublicSansSemiBold' }} size={20}>
               {title}
             </Title>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <IconX size={20} color={palette.blue} />
+              <IconX size={20} color={theme.colors.blue} />
             </TouchableOpacity>
-          </View>
+          </Stack>
           <View>{children}</View>
         </BottomSheetView>
       </BottomSheet>
@@ -50,7 +52,7 @@ export const CustomSheet = forwardRef<BottomSheet, Props>(
 
 CustomSheet.displayName = 'CustomSheet';
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   contentContainer: {
     flex: 1,
     paddingVertical: 36,
@@ -59,7 +61,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     borderWidth: 1,
-    borderColor: palette.grey,
+    borderColor: theme.colors.grey,
     borderRadius: 100,
     padding: 5,
   },
@@ -73,8 +75,8 @@ const styles = StyleSheet.create({
     paddingLeft: 5,
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: palette.grey,
+    borderColor: theme.colors.grey,
     width: '100%',
     flex: 1,
   },
-});
+}));

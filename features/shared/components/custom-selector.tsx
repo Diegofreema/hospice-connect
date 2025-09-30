@@ -1,8 +1,8 @@
-import { palette } from '@/theme';
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native-unistyles';
 import { CustomPressable } from './custom-pressable';
-import { HStack } from './HStack';
-import Text from './text';
+
+import { Text } from './text';
+import { Stack } from './v-stack';
 
 type Props = {
   data: string[];
@@ -12,7 +12,7 @@ type Props = {
 
 export const CustomerSelector = ({ data, selected, setSelected }: Props) => {
   return (
-    <HStack justifyContent={'flex-start'} gap={'s'}>
+    <Stack isFlexCentered mode="flex" gap={'sm'}>
       {data.map((item) => (
         <CustomPressable
           key={item}
@@ -23,18 +23,18 @@ export const CustomerSelector = ({ data, selected, setSelected }: Props) => {
           ]}
         >
           <Text
-            variant={'small'}
+            size={'small'}
             style={selected === item ? styles.activeText : styles.text}
           >
             {item}
           </Text>
         </CustomPressable>
       ))}
-    </HStack>
+    </Stack>
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   selector: {
     paddingHorizontal: 20,
     paddingVertical: 5,
@@ -42,14 +42,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  normal: { backgroundColor: palette.buttonGrey },
+  normal: { backgroundColor: theme.colors.buttonGrey },
   active: {
-    backgroundColor: palette.blue,
+    backgroundColor: theme.colors.blue,
   },
   text: {
-    color: palette.black,
+    color: theme.colors.black,
   },
   activeText: {
-    color: palette.white,
+    color: theme.colors.white,
   },
-});
+}));

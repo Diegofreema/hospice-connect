@@ -1,13 +1,16 @@
 import { useNurse } from '@/components/context/nurse-context';
+import { useToast } from '@/components/demos/toast';
 import { PrivacyNoticeLink } from '@/components/privacy-notice/privacy-notice-link';
 import { AnimatedSwitch } from '@/components/switch/AnimatedSwitch';
+
 import { api } from '@/convex/_generated/api';
-import Text from '@/features/shared/components/text';
-import View from '@/features/shared/components/view';
+import { Text } from '@/features/shared/components/text';
+import { Stack } from '@/features/shared/components/v-stack';
+
 import { generateErrorMessage } from '@/features/shared/utils';
-import { useToast } from '@/hooks/use-toast';
 import { useMutation } from 'convex/react';
 import { format } from 'date-fns';
+import { useUnistyles } from 'react-native-unistyles';
 
 type Props = {
   day: {
@@ -32,13 +35,14 @@ export const Day = ({ day, onPress }: Props) => {
   );
   const { nurse } = useNurse();
   const { showToast } = useToast();
+  const { theme } = useUnistyles();
   const updateAvailability = async (value: boolean) => {
     if (!nurse?._id) return;
     if (!day.available && (!day.startTime || !day.endTime)) {
       showToast({
         title: 'Failed to update availability',
-        description: 'Please set start and end shift first',
-        type: 'error',
+
+        subtitle: 'Please set start and end shift first',
       });
       return;
     }
@@ -50,8 +54,7 @@ export const Day = ({ day, onPress }: Props) => {
       });
       showToast({
         title: 'Success',
-        description: 'Availability updated',
-        type: 'success',
+        subtitle: 'Availability updated',
       });
     } catch (error) {
       const errorMessage = generateErrorMessage(
@@ -61,35 +64,32 @@ export const Day = ({ day, onPress }: Props) => {
 
       showToast({
         title: 'Error',
-        description: errorMessage,
-        type: 'error',
+        subtitle: errorMessage,
       });
     }
   };
   const timeIsSet = !!day.startTime && !!day.endTime;
   return (
-    <View
-      flexDirection={'row'}
-      justifyContent={'space-between'}
-      backgroundColor={'cardBackground'}
-      borderRadius={8}
-      padding={'m'}
-      alignItems={'center'}
+    <Stack
+      mode="flex"
+      backgroundColor={theme.colors.cardGrey}
+      borderRadius={'md'}
+      padding={'md'}
     >
-      <View>
-        <Text variant={'body'} style={{ fontFamily: 'PublicSansBold' }}>
+      <Stack>
+        <Text size={'normal'} style={{ fontFamily: 'PublicSansBold' }}>
           {day.day}
         </Text>
         {!day.startTime || !day.endTime ? (
           <Text>--</Text>
         ) : (
-          <Text variant={'small'}>
+          <Text size={'small'}>
             {' '}
             {format(day.startTime, 'h:mm a')} - {format(day.endTime, 'h:mm a')}
           </Text>
         )}
-      </View>
-      <View gap="s">
+      </Stack>
+      <Stack gap="sm">
         <AnimatedSwitch
           value={day.available}
           onValueChange={updateAvailability}
@@ -99,7 +99,7 @@ export const Day = ({ day, onPress }: Props) => {
         <PrivacyNoticeLink onPress={onPress}>
           {timeIsSet ? 'Edit' : 'Set time'}
         </PrivacyNoticeLink>
-      </View>
-    </View>
+      </Stack>
+    </Stack>
   );
 };

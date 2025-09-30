@@ -2,7 +2,7 @@ import { Center } from '@/components/center/center';
 import { Image } from 'expo-image';
 
 import { MyTitle } from './my-title';
-import Text from './text';
+import { Text } from './text';
 import { Wrapper } from './wrapper';
 
 export const UnderReview = () => {
@@ -17,7 +17,7 @@ export const UnderReview = () => {
           contentFit="contain"
         />
         <MyTitle title="Account Under Review" />
-        <Text variant={'body'} textAlign={'center'}>
+        <Text size={'normal'} textAlign={'center'}>
           We are currently verifying your information. You will be contacted
           shortly
         </Text>

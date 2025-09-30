@@ -14,7 +14,7 @@
 import React from 'react';
 import { StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native';
 // import * as constants from "@/constants/components/index";
-import { palette } from '@/theme';
+
 import { borderRadiusStyles, type BorderRadiusKey } from './types';
 export type BadgeVariant =
   | 'default'
@@ -46,8 +46,8 @@ const variantStyles: Record<
 > = {
   default: { backgroundColor: '#c6e8c5', textColor: '#374151' },
   success: {
-    backgroundColor: palette.greenLight,
-    textColor: palette.greenDark,
+    backgroundColor: 'rgba(240, 255, 249, 0.7)',
+    textColor: '#00A25C',
   },
   warning: { backgroundColor: '#FEF3C7', textColor: '#92400E' },
   error: { backgroundColor: '#FEE2E2', textColor: '#991B1B' },
@@ -62,8 +62,8 @@ const variantStyles: Record<
     borderWidth: 0.3,
   },
   available: {
-    backgroundColor: palette.white,
-    textColor: palette.black,
+    backgroundColor: 'white',
+    textColor: 'black',
   },
 };
 

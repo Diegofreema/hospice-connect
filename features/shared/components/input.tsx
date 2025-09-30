@@ -1,7 +1,6 @@
 import React, { ReactNode } from 'react';
-import { StyleSheet, TextInput, TextInputProps } from 'react-native';
-import Text from './text';
-import View from './view';
+import { StyleSheet, TextInput, TextInputProps, View } from 'react-native';
+import { Text } from './text';
 
 type Props = TextInputProps & {
   label?: string;
@@ -11,15 +10,9 @@ type Props = TextInputProps & {
 
 export const Input = ({ label, rightIcon, leftIcon, ...props }: Props) => {
   return (
-    <View style={{ gap: 10, minHeight: 55 }} flex={1}>
+    <View style={{ gap: 10, minHeight: 55, flex: 1 }}>
       {label && <Text>{label}</Text>}
-      <View
-        style={styles.container}
-        flexDirection={'row'}
-        alignItems={'center'}
-        gap={'s'}
-        flex={1}
-      >
+      <View style={styles.container}>
         {leftIcon}
         <TextInput
           {...props}
@@ -40,5 +33,9 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     paddingHorizontal: 10,
     minHeight: 50,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    flex: 1,
   },
 });

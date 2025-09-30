@@ -6,9 +6,11 @@ import { ControlInput } from '@/features/authentication/components/form/control-
 import { ControlSelect } from '@/features/authentication/components/form/control-select';
 import { usStates } from '@/features/nurse/data';
 import { Button } from '@/features/shared/components/button';
-import View from '@/features/shared/components/view';
+import { Stack } from '@/features/shared/components/v-stack';
+
 import { generateErrorMessage } from '@/features/shared/utils';
-import { useToast } from '@/hooks/use-toast';
+
+import { useToast } from '@/components/demos/toast';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from 'convex/react';
 import {
@@ -32,8 +34,7 @@ export const BusinessInformation = () => {
       await createHospice(data);
       showToast({
         title: 'Success',
-        description: 'Nurse account created successfully',
-        type: 'success',
+        subtitle: 'Nurse account created successfully',
       });
     } catch (error) {
       const errorMessage = generateErrorMessage(
@@ -43,13 +44,12 @@ export const BusinessInformation = () => {
 
       showToast({
         title: 'Error',
-        description: errorMessage,
-        type: 'error',
+        subtitle: errorMessage,
       });
     }
   };
   return (
-    <View g={'m'}>
+    <Stack gap="md">
       <ControlInput
         control={control}
         errors={errors}
@@ -90,14 +90,12 @@ export const BusinessInformation = () => {
         label="State of registration"
         items={usStates}
       />
-      <View flex={1}>
-        <Button
-          onPress={handleSubmit(onSubmit)}
-          label="Create"
-          loading={isSubmitting}
-          disabled={isSubmitting}
-        />
-      </View>
-    </View>
+
+      <Button
+        onPress={handleSubmit(onSubmit)}
+        title="Create"
+        disabled={isSubmitting}
+      />
+    </Stack>
   );
 };

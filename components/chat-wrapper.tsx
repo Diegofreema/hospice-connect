@@ -41,16 +41,6 @@ export const ChatWrapper = ({ children }: PropsWithChildren) => {
       setIsReady(false);
     };
   }, [user, isReady]);
-  // const chatClient = useCreateChatClient({
-  //   apiKey: chatApiKey,
-  //   userData: {
-  //     id: id!,
-  //     name: name,
-  //     image: image || '',
-  //   },
-  //   tokenOrProvider: token,
-  // });
-  console.log({ isClient: !!client });
 
   if (!client) {
     return <LoadingComponent />;

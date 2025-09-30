@@ -8,7 +8,7 @@ import { BackButton } from '@/features/shared/components/back-button';
 import { MyTitle } from '@/features/shared/components/my-title';
 import { Spacer } from '@/features/shared/components/spacer';
 import { Wrapper } from '@/features/shared/components/wrapper';
-import { palette } from '@/theme';
+
 import { router } from 'expo-router';
 import React from 'react';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
@@ -23,12 +23,9 @@ const CreateAccountScreen = () => {
       >
         <Spacer height={20} />
         <MyTitle title="Create an account" />
-        <Subtitle style={{ color: palette.black }}>
+        <Subtitle isBlack>
           Already have an account?{' '}
-          <PrivacyNoticeLink
-            tint={palette.blue}
-            onPress={() => router.push('/')}
-          >
+          <PrivacyNoticeLink onPress={() => router.push('/')}>
             Log in
           </PrivacyNoticeLink>
         </Subtitle>

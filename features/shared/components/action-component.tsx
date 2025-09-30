@@ -1,8 +1,9 @@
 import { Image } from 'expo-image';
 import { ReactNode } from 'react';
 import { ImageSourcePropType } from 'react-native';
-import Text from './text';
-import View from './view';
+import { Text } from './text';
+
+import { Stack } from './v-stack';
 import { Wrapper } from './wrapper';
 
 type Props = {
@@ -20,21 +21,21 @@ export const ActionComponent = ({
 }: Props) => {
   return (
     <Wrapper>
-      <View flex={1} gap={'l'} justifyContent={'center'} alignItems={'center'}>
+      <Stack flex={1} gap={'lg'} isCentered>
         <Image
           source={imageUrl}
           style={{ width: 200, height: 200 }}
           contentFit="contain"
         />
 
-        <Text variant={'subheader'} textAlign={'center'}>
+        <Text size={'large'} textAlign={'center'}>
           {title}
         </Text>
-        <Text variant={'body'} textAlign={'center'}>
+        <Text size={'normal'} textAlign={'center'}>
           {description}
         </Text>
         {button}
-      </View>
+      </Stack>
     </Wrapper>
   );
 };

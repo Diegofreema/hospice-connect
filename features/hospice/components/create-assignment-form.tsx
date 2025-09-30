@@ -6,7 +6,8 @@ import { useForm } from 'react-hook-form';
 import { ControlledDatePicker } from '@/features/authentication/components/form/control-date-picker';
 import { ControlSelect } from '@/features/authentication/components/form/control-select';
 import { usStates } from '@/features/nurse/data';
-import View from '@/features/shared/components/view';
+
+import { Stack } from '@/features/shared/components/v-stack';
 import { useEffect } from 'react';
 import {
   createAssignmentValidator,
@@ -62,7 +63,7 @@ export const CreateAssignmentForm = ({
   }, [isSubmitSuccessful, reset]);
 
   return (
-    <View gap={'m'}>
+    <Stack gap={'xl'}>
       <ControlInput
         control={control}
         errors={errors}
@@ -178,10 +179,10 @@ export const CreateAssignmentForm = ({
         variant="textarea"
       />
       <Button
-        label={btnTitle}
+        title={btnTitle}
         onPress={handleSubmit(onSubmit)}
         disabled={isSubmitting}
       />
-    </View>
+    </Stack>
   );
 };

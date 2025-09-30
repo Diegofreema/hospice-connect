@@ -1,11 +1,11 @@
-import { palette } from '@/theme';
 import { useContext, useEffect } from 'react';
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { Pressable, Text } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+import { StyleSheet } from 'react-native-unistyles';
 import type { SegmentedControlItemProps } from '../SegmentedControl.types';
 import { SegmentedControlContext } from '../context/SegmentedControlContext';
 
@@ -63,7 +63,7 @@ export const SegmentedControlItem: React.FC<SegmentedControlItemProps> = ({
     </Pressable>
   );
 };
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   container: {
     flexDirection: 'row',
     height: 40,
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     color: '#71717a',
   },
   selectedLabel: {
-    color: palette.blue,
+    color: theme.colors.blue,
     fontWeight: '600',
   },
-});
+}));

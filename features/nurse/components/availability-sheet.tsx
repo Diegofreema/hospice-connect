@@ -2,11 +2,11 @@ import { useNurse } from '@/components/context/nurse-context';
 import { Title } from '@/components/title/Title';
 import { api } from '@/convex/_generated/api';
 import { Button } from '@/features/shared/components/button';
-import Text from '@/features/shared/components/text';
-import View from '@/features/shared/components/view';
+import { Text } from '@/features/shared/components/text';
+
 import { generateErrorMessage } from '@/features/shared/utils';
-import { useToast } from '@/hooks/use-toast';
-import { palette } from '@/theme';
+
+import { useToast } from '@/components/demos/toast';
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
@@ -17,8 +17,11 @@ import { useMutation } from 'convex/react';
 import { format } from 'date-fns';
 import { Checkbox } from 'expo-checkbox';
 import { forwardRef, useMemo, useState } from 'react';
-import { Pressable, StyleSheet, TouchableOpacity } from 'react-native';
+import { Pressable, TouchableOpacity } from 'react-native';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+import { View } from '../../../features/shared/components/view';
 import { useNurseSheet } from '../lib/zustand/use-nurse-sheet';
+
 type Props = {
   onClose: () => void;
 };
@@ -27,6 +30,7 @@ export const AvailabilitySheet = forwardRef<BottomSheet, Props>(
   ({ onClose }, ref) => {
     const snapPoints = useMemo(() => ['25%', '40%'], []);
     const { nurse } = useNurse();
+    const { theme } = useUnistyles();
     const [loading, setLoading] = useState(false);
     const updateTime = useMutation(
       api.nurses.updateNurseStartAndEndTimeAvailability
@@ -66,8 +70,7 @@ export const AvailabilitySheet = forwardRef<BottomSheet, Props>(
 
         showToast({
           title: 'Error',
-          description: errorMessage,
-          type: 'error',
+          subtitle: errorMessage,
         });
       } finally {
         setLoading(false);
@@ -108,24 +111,24 @@ export const AvailabilitySheet = forwardRef<BottomSheet, Props>(
               Select time for this day
             </Title>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <IconX size={20} color={palette.blue} />
+              <IconX size={20} color={theme.colors.blue} />
             </TouchableOpacity>
           </View>
           <View
-            p={'m'}
-            backgroundColor={'cardBackground'}
-            borderRadius={8}
-            gap={'s'}
+            p={'md'}
+            backgroundColor={theme.colors.cardGrey}
+            borderRadius={'lg'}
+            gap={'sm'}
           >
-            <View gap={'m'} flexDirection={'row'} alignItems={'center'}>
+            <View gap={'md'} flexDirection={'row'} alignItems={'center'}>
               <Checkbox value={item.available} style={styles.checkBox} />
-              <Text variant={'small'} fontFamily={'PublicSansSemiBold'}>
+              <Text size={'small'} isMedium>
                 {item.day}
               </Text>
             </View>
-            <View flexDirection={'row'} gap={'s'}>
+            <View flexDirection={'row'} gap={'sm'}>
               <View flex={1}>
-                <Text variant={'small'}>Time Begin</Text>
+                <Text size={'small'}>Time Begin</Text>
                 <View flex={1}>
                   <Pressable onPress={showMode} style={styles.border}>
                     <Text>
@@ -136,7 +139,7 @@ export const AvailabilitySheet = forwardRef<BottomSheet, Props>(
                 </View>
               </View>
               <View flex={1}>
-                <Text variant={'small'}>Time End</Text>
+                <Text size={'small'}>Time End</Text>
                 <View flex={1}>
                   <Pressable onPress={showMode2} style={styles.border}>
                     <Text>
@@ -175,26 +178,18 @@ export const AvailabilitySheet = forwardRef<BottomSheet, Props>(
               }
             />
           )}
-          <View
-            flexDirection={'row'}
-            gap={'m'}
-            alignItems={'center'}
-            style={{ marginTop: 30 }}
-          >
+          <View flexDirection={'row'} gap={'md'} alignItems={'center'} mt="md">
             <Button
-              label="Cancel"
+              title="Cancel"
               onPress={onClose}
-              backgroundColor={'transparent'}
-              borderWidth={1}
-              borderColor={'borderColor'}
-              color={'blue'}
+              bg={'transparent'}
+              style={{ borderWidth: 1, borderColor: theme.colors.buttonGrey }}
+              color={theme.colors.blue}
             />
             <Button
-              label="Apply"
+              title="Apply"
               onPress={onUpdateAvailability}
-              loading={loading}
               disabled={loading}
-              loadingText="Updating"
             />
           </View>
         </BottomSheetView>
@@ -205,7 +200,7 @@ export const AvailabilitySheet = forwardRef<BottomSheet, Props>(
 
 AvailabilitySheet.displayName = 'AvailabilitySheet';
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   contentContainer: {
     flex: 1,
     paddingVertical: 36,
@@ -214,7 +209,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     borderWidth: 1,
-    borderColor: palette.grey,
+    borderColor: theme.colors.grey,
     borderRadius: 100,
     padding: 5,
   },
@@ -228,8 +223,8 @@ const styles = StyleSheet.create({
     paddingLeft: 5,
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: palette.grey,
+    borderColor: theme.colors.grey,
     width: '100%',
     flex: 1,
   },
-});
+}));

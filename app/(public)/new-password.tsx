@@ -4,7 +4,7 @@ import { BackButton } from '@/features/shared/components/back-button';
 import { MyTitle } from '@/features/shared/components/my-title';
 import { Spacer } from '@/features/shared/components/spacer';
 import { Wrapper } from '@/features/shared/components/wrapper';
-import { palette } from '@/theme';
+
 import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 
@@ -15,9 +15,7 @@ const NewPassword = () => {
       <BackButton />
       <Spacer height={30} />
       <MyTitle title="Create new password" />
-      <Subtitle style={{ color: palette.black }}>
-        Please create a new password
-      </Subtitle>
+      <Subtitle isBlack>Please create a new password</Subtitle>
       <Spacer height={50} />
       <ResetForm email={email} />
     </Wrapper>

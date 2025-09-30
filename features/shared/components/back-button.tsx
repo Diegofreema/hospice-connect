@@ -1,10 +1,9 @@
-import { palette } from '@/theme';
 import { IconArrowLeft } from '@tabler/icons-react-native';
 import { router } from 'expo-router';
 import React from 'react';
-import { Text, TouchableOpacity } from 'react-native';
-
-import View from './view';
+import { Text, TouchableOpacity, View } from 'react-native';
+import { useUnistyles } from 'react-native-unistyles';
+import { Stack } from './v-stack';
 
 type Props = {
   title?: string;
@@ -18,14 +17,11 @@ export const BackButton = ({
   marginTop = 30,
   marginLeft = -20,
 }: Props) => {
+  const { theme } = useUnistyles();
   return (
-    <View
-      flexDirection={'row'}
-      alignItems={'center'}
-      justifyContent={'space-between'}
-    >
+    <Stack mode="flex">
       <TouchableOpacity onPress={() => router.back()} style={{ marginTop }}>
-        <IconArrowLeft size={30} color={palette.black} />
+        <IconArrowLeft size={30} color={theme.colors.black} />
       </TouchableOpacity>
       {title ? (
         <Text
@@ -39,9 +35,9 @@ export const BackButton = ({
           {title}
         </Text>
       ) : (
-        <View height={30} width={10} />
+        <View style={{ height: 30, width: 10 }} />
       )}
-      {rightContent ? rightContent : <View height={30} width={10} />}
-    </View>
+      {rightContent ? rightContent : <View style={{ height: 30, width: 10 }} />}
+    </Stack>
   );
 };

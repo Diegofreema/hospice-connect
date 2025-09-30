@@ -1,8 +1,8 @@
-import { palette } from '@/theme';
 import { SFSymbol } from 'expo-symbols';
 import { StyleSheet } from 'react-native';
+import { useUnistyles } from 'react-native-unistyles';
 import * as DropdownMenu from 'zeego/dropdown-menu';
-import Text from './text';
+import { Text } from './text';
 
 type Props = {
   trigger: React.ReactNode;
@@ -10,6 +10,7 @@ type Props = {
   onClick: (value: string) => void;
 };
 export function MyMenu({ trigger, menuItems, onClick }: Props) {
+  const { theme } = useUnistyles();
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger style={styles.trigger}>
@@ -28,7 +29,9 @@ export function MyMenu({ trigger, menuItems, onClick }: Props) {
                 hierarchicalColor: {
                   dark: 'white',
                   light:
-                    item.value === 'delete' ? palette.redDark : palette.black,
+                    item.value === 'delete'
+                      ? theme.colors.redDark
+                      : theme.colors.black,
                 },
               }}
               androidIconName={item.android}

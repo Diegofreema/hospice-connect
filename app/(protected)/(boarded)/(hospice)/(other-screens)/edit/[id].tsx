@@ -9,16 +9,18 @@ import { CreateAssignmentValidator } from '@/features/hospice/validator';
 import { BackButton } from '@/features/shared/components/back-button';
 import { Wrapper } from '@/features/shared/components/wrapper';
 import { generateErrorMessage } from '@/features/shared/utils';
-import { palette } from '@/theme';
+
 import { IconCheck, IconX } from '@tabler/icons-react-native';
 import { useMutation, useQuery } from 'convex/react';
 import { format } from 'date-fns';
 import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
+import { useUnistyles } from 'react-native-unistyles';
 
 const EditScreen = () => {
   const { id } = useLocalSearchParams<{ id: Id<'assignments'> }>();
   const { hospice } = useHospice();
+  const { theme } = useUnistyles();
   const assignment = useQuery(api.assignments.getAssignment, {
     assignmentId: id!,
   });
@@ -41,7 +43,7 @@ const EditScreen = () => {
         title: 'Success',
         subtitle: 'Assignment updated successfully',
         autodismiss: true,
-        leading: () => <IconCheck size={20} color={palette.greenDark} />,
+        leading: () => <IconCheck size={20} color={theme.colors.greenDark} />,
       });
     } catch (error) {
       const errorMessage = generateErrorMessage(
@@ -52,7 +54,7 @@ const EditScreen = () => {
         title: 'Error',
         subtitle: errorMessage,
         autodismiss: true,
-        leading: () => <IconX size={20} color={palette.redDark} />,
+        leading: () => <IconX size={20} color={theme.colors.redDark} />,
       });
     }
   };

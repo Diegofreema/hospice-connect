@@ -1,8 +1,8 @@
 import { api } from '@/convex/_generated/api';
 import { LoadingComponent } from '@/features/shared/components/loading';
 import { UnderReview } from '@/features/shared/components/under-review';
-import { convexQuery } from '@convex-dev/react-query';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery } from 'convex/react';
+
 import { FunctionReturnType } from 'convex/server';
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
@@ -20,16 +20,9 @@ export const HospiceProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const {
-    data: hospice,
-    isPending,
-    isError,
-  } = useQuery(convexQuery(api.hospices.getHospiceByUserId, {}));
-  if (isError) {
-    throw new Error('Could not get your data');
-  }
+  const hospice = useQuery(api.hospices.getHospiceByUserId);
 
-  if (isPending) {
+  if (hospice === undefined) {
     return <LoadingComponent />;
   }
 

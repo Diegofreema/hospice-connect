@@ -1,30 +1,29 @@
-import { useToast } from '@/hooks/use-toast';
-import { palette } from '@/theme';
+import { useToast } from '@/components/demos/toast';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { IconLogout2 } from '@tabler/icons-react-native';
 import { useState } from 'react';
+import { useUnistyles } from 'react-native-unistyles';
 import { Button } from './button';
 
 export const LogOut = () => {
   const { signOut } = useAuthActions();
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
+  const { theme } = useUnistyles();
   const onPress = async () => {
     setLoading(true);
     try {
       await signOut();
       showToast({
         title: 'Success',
-        description: 'You have successfully logged out',
-        type: 'success',
+        subtitle: 'You have successfully logged out',
       });
     } catch (error) {
       console.log({ error });
 
       showToast({
         title: 'Error',
-        description: 'Failed to log out',
-        type: 'error',
+        subtitle: 'Failed to log out',
       });
     } finally {
       setLoading(false);
@@ -32,14 +31,12 @@ export const LogOut = () => {
   };
   return (
     <Button
-      label="Logout"
+      title="Logout"
       onPress={onPress}
-      loading={loading}
       disabled={loading}
-      loadingText="Logging out"
-      backgroundColor={'buttonGrey'}
-      color="backgroundRed"
-      rightIcon={<IconLogout2 size={20} color={palette.redDark} />}
+      bg={theme.colors.buttonGrey}
+      color={theme.colors.redDark}
+      rightIcon={<IconLogout2 size={20} color={theme.colors.redDark} />}
     />
   );
 };

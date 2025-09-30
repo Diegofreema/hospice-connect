@@ -1,19 +1,16 @@
 import { PropsWithChildren } from 'react';
+import { useUnistyles } from 'react-native-unistyles';
+import { Stack } from './v-stack';
 
-import View from './view';
 type Props = {
-  gap?: 's' | 'm' | 'l' | 'xl';
+  gap?: 'sm' | 'md' | 'lg' | 'xl';
 };
 
-export const Wrapper = ({ children, gap = 'm' }: PropsWithChildren<Props>) => {
+export const Wrapper = ({ children, gap = 'xl' }: PropsWithChildren<Props>) => {
+  const { theme } = useUnistyles();
   return (
-    <View
-      flex={1}
-      paddingHorizontal={'m'}
-      gap={gap}
-      backgroundColor={'mainBackground'}
-    >
+    <Stack flex={1} ph={15} gap={gap} backgroundColor={theme.colors.background}>
       {children}
-    </View>
+    </Stack>
   );
 };

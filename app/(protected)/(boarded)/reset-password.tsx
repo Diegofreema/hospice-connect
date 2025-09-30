@@ -4,7 +4,7 @@ import { BackButton } from '@/features/shared/components/back-button';
 import { MyTitle } from '@/features/shared/components/my-title';
 import { Spacer } from '@/features/shared/components/spacer';
 import { Wrapper } from '@/features/shared/components/wrapper';
-import { palette } from '@/theme';
+
 import React from 'react';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 
@@ -15,9 +15,7 @@ const ResetPassword = () => {
         <BackButton marginTop={0} />
         <Spacer height={30} />
         <MyTitle title="Change Password" />
-        <Subtitle style={{ color: palette.black }}>
-          Enter your email to reset your password
-        </Subtitle>
+        <Subtitle isBlack>Enter your email to reset your password</Subtitle>
         <Spacer height={50} />
         <ForgotForm link={'/new-password'} />
       </KeyboardAwareScrollView>

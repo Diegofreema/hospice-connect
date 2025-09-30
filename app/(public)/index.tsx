@@ -2,7 +2,8 @@ import { GoogleButton } from '@/features/authentication/components/google-button
 import { PrivacyTermsLink } from '@/features/authentication/components/privacy-term';
 import { MyTitle } from '@/features/shared/components/my-title';
 import { Spacer } from '@/features/shared/components/spacer';
-import View from '@/features/shared/components/view';
+import { Stack } from '@/features/shared/components/v-stack';
+
 import { Wrapper } from '@/features/shared/components/wrapper';
 import React from 'react';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
@@ -28,14 +29,9 @@ const LoginScreen = () => {
         <Spacer height={30} />
         <LoginForm />m
         <DividerWithText /> */}
-        <View
-          flex={1}
-          justifyContent="center"
-          alignItems="center"
-          flexDirection={'row'}
-        >
+        <Stack flex={1} mode="flex" isCentered>
           <GoogleButton />
-        </View>
+        </Stack>
         <PrivacyTermsLink />
       </KeyboardAwareScrollView>
     </Wrapper>

@@ -1,13 +1,14 @@
 import { Button } from '@/features/shared/components/button';
-import View from '@/features/shared/components/view';
-import { useToast } from '@/hooks/use-toast';
-import { palette } from '@/theme';
+import { View } from '../../../shared/components/view';
+
+import { useToast } from '@/components/demos/toast';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { IconMail } from '@tabler/icons-react-native';
 import { Href, router } from 'expo-router';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { useUnistyles } from 'react-native-unistyles';
 import { forgotPasswordSchema, ForgotPasswordSchema } from '../../validators';
 import { ControlInput } from './control-input';
 
@@ -16,6 +17,7 @@ type Props = {
 };
 export const ForgotForm = ({ link = '/reset-password' }: Props) => {
   const { signIn } = useAuthActions();
+  const { theme } = useUnistyles();
   const {
     handleSubmit,
     control,
@@ -35,8 +37,7 @@ export const ForgotForm = ({ link = '/reset-password' }: Props) => {
       .then(() => {
         showToast({
           title: 'Success',
-          description: 'Reset code sent',
-          type: 'success',
+          subtitle: 'Reset code sent',
         });
 
         router.push(`${link}?email=${data.email}` as Href);
@@ -46,8 +47,7 @@ export const ForgotForm = ({ link = '/reset-password' }: Props) => {
 
         showToast({
           title: 'Error',
-          description: 'Failed to send reset code',
-          type: 'error',
+          subtitle: 'Failed to send reset code',
         });
       });
   };
@@ -58,18 +58,16 @@ export const ForgotForm = ({ link = '/reset-password' }: Props) => {
         name="email"
         label="Email"
         errors={errors}
-        leftIcon={<IconMail color={palette.iconGrey} />}
+        leftIcon={<IconMail color={theme.colors.iconGrey} />}
         keyboardType="email-address"
         placeholder="Enter your email"
         autoCapitalize="none"
       />
 
       <Button
-        label="Send Reset Code"
+        title="Send Reset Code"
         onPress={handleSubmit(onSubmit)}
         disabled={isSubmitting}
-        loading={isSubmitting}
-        loadingText="Sending..."
       />
     </View>
   );

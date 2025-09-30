@@ -1,9 +1,10 @@
-import { palette } from '@/theme';
 import { IconSearch } from '@tabler/icons-react-native';
 import { Href, router } from 'expo-router';
-import { StyleSheet, TextInput, TextInputProps } from 'react-native';
-import { HStack } from './HStack';
+import { TextInput, TextInputProps } from 'react-native';
+
+import { useUnistyles } from 'react-native-unistyles';
 import { CustomPressable } from './custom-pressable';
+import { Stack } from './v-stack';
 
 type Props = TextInputProps & {
   path?: Href;
@@ -11,6 +12,7 @@ type Props = TextInputProps & {
 };
 
 export const SearchComponent = ({ path, isButton, ...props }: Props) => {
+  const { theme } = useUnistyles();
   const onPress = () => {
     if (path) {
       router.push(path);
@@ -19,35 +21,31 @@ export const SearchComponent = ({ path, isButton, ...props }: Props) => {
   if (isButton) {
     return (
       <CustomPressable onPress={onPress} style={{ flex: 1 }}>
-        <HStack
-          justifyContent={'flex-start'}
-          gap={'s'}
-          borderRadius={8}
-          padding={'m'}
-          style={styles.container}
+        <Stack
+          mode={'flex'}
+          gap={'sm'}
+          isFlexCentered
+          borderRadius={'md'}
+          padding={'xxl'}
+          backgroundColor={theme.colors.buttonGrey}
         >
           <IconSearch size={20} />
           <TextInput {...props} editable={false} />
-        </HStack>
+        </Stack>
       </CustomPressable>
     );
   }
   return (
-    <HStack
-      justifyContent={'flex-start'}
-      gap={'s'}
-      borderRadius={8}
-      padding={'m'}
-      style={styles.container}
+    <Stack
+      mode={'flex'}
+      isFlexCentered
+      gap={'sm'}
+      borderRadius={'md'}
+      padding={'md'}
+      backgroundColor={theme.colors.buttonGrey}
     >
       <IconSearch size={20} />
       <TextInput {...props} />
-    </HStack>
+    </Stack>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: palette.buttonGrey,
-  },
-});

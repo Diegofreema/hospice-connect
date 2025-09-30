@@ -1,7 +1,8 @@
 import { useNurse } from '@/components/context/nurse-context';
 import { DayType } from '@/convex/helper';
 import { LoadingComponent } from '@/features/shared/components/loading';
-import View from '@/features/shared/components/view';
+
+import { Stack } from '@/features/shared/components/v-stack';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useRef } from 'react';
 import { FlatList } from 'react-native';
@@ -25,7 +26,7 @@ export const Availability = () => {
   };
   return (
     <>
-      <View flex={1} mt="m">
+      <Stack flex={1} mt="md">
         <FlatList
           data={nurse?.availabilities?.days}
           renderItem={({ item }) => (
@@ -35,7 +36,7 @@ export const Availability = () => {
           contentContainerStyle={{ gap: 10 }}
           showsVerticalScrollIndicator={false}
         />
-      </View>
+      </Stack>
       <AvailabilitySheet ref={bottomSheetRef} onClose={handleClose} />
     </>
   );

@@ -2,22 +2,23 @@ import { Avatar } from '@/components/avatar/Avatar';
 import { SpinnerArc } from '@/components/loaders';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
-import { useToast } from '@/hooks/use-toast';
-import { palette } from '@/theme';
+
 import { IconUpload } from '@tabler/icons-react-native';
 import { useMutation } from 'convex/react';
 import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import {
   generateErrorMessage,
   getFontSize,
   uploadProfilePicture,
 } from '../utils';
-import { Card } from './card';
+
+import { Card, CardContent } from '@/components/card';
+import { useToast } from '@/components/demos/toast';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { FlexText } from './flex-text';
-import Text from './text';
-import View from './view';
+import { Text } from './text';
 
 type Props = {
   imageUrl?: string;
@@ -55,6 +56,7 @@ export const ProfileCard = ({
   const headingText = nurse ? `Nurse's` : `Hospice's`;
   const formattedRate = rate ? `$${rate}/hr` : '';
   const [image, setImage] = useState<string | null>(null);
+  const { theme } = useUnistyles();
   const [uploading, setUploading] = useState(false);
   const generateUploadUrl = useMutation(api.helper.generateUploadUrl);
   const updateImage = useMutation(api.nurses.updateNurseProfilePicture);
@@ -96,24 +98,22 @@ export const ProfileCard = ({
         }
         showToast({
           title: 'Success',
-          description: 'Image updated',
-          type: 'success',
+          subtitle: 'Image updated',
         });
       }
       setImage(null);
     } catch (error) {
       showToast({
         title: 'Error',
-        description: generateErrorMessage(error, 'Failed to update image'),
-        type: 'error',
+        subtitle: generateErrorMessage(error, 'Failed to update image'),
       });
     } finally {
       setUploading(false);
     }
   };
   return (
-    <View gap={'m'}>
-      <View width={120} alignSelf={'center'} height={120} borderRadius={80}>
+    <View style={{ gap: 10 }}>
+      <View style={styles.top}>
         <View style={styles.container}>
           <Avatar
             image={{ uri: image || imageUrl || '', name: name }}
@@ -130,53 +130,51 @@ export const ProfileCard = ({
               {uploading ? (
                 <SpinnerArc />
               ) : (
-                <IconUpload size={25} color={palette.white} />
+                <IconUpload size={25} color={theme.colors.white} />
               )}
             </TouchableOpacity>
           )}
         </View>
       </View>
-      <View backgroundColor={'cardBackground'} p={'s'}>
-        <Text
-          variant={'subheader'}
-          fontSize={getFontSize(16)}
-          textAlign={'center'}
-        >
+      <View style={{ backgroundColor: theme.colors.cardGrey, padding: 5 }}>
+        <Text size={'large'} fontSize={getFontSize(16)} textAlign={'center'}>
           {headingText} information
         </Text>
-        <Card backgroundColor={'white'} p={'m'} borderRadius={8}>
-          <FlexText leftText="Name" rightText={name} />
-          <FlexText leftText="Email" rightText={email} />
-          <FlexText leftText="Mobile number" rightText={phoneNumber} />
-          {licenseNumber && (
-            <FlexText leftText="License number" rightText={licenseNumber} />
-          )}
-          {discipline && (
-            <FlexText leftText="Discipline" rightText={discipline} />
-          )}
-          {address && <FlexText leftText="Address" rightText={address} />}
+        <Card style={{ backgroundColor: 'white' }}>
+          <CardContent>
+            <FlexText leftText="Name" rightText={name} />
+            <FlexText leftText="Email" rightText={email} />
+            <FlexText leftText="Mobile number" rightText={phoneNumber} />
+            {licenseNumber && (
+              <FlexText leftText="License number" rightText={licenseNumber} />
+            )}
+            {discipline && (
+              <FlexText leftText="Discipline" rightText={discipline} />
+            )}
+            {address && <FlexText leftText="Address" rightText={address} />}
 
-          {formattedRate && (
-            <FlexText leftText="Rate/hr" rightText={formattedRate} />
-          )}
-          {zipCode && !nurse && (
-            <FlexText leftText="Zip code" rightText={zipCode} />
-          )}
-          {faxNumber && (
-            <FlexText leftText="Fax number" rightText={faxNumber} />
-          )}
+            {formattedRate && (
+              <FlexText leftText="Rate/hr" rightText={formattedRate} />
+            )}
+            {zipCode && !nurse && (
+              <FlexText leftText="Zip code" rightText={zipCode} />
+            )}
+            {faxNumber && (
+              <FlexText leftText="Fax number" rightText={faxNumber} />
+            )}
+          </CardContent>
         </Card>
       </View>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   camera: {
     position: 'absolute',
     bottom: 0,
     right: -5,
-    backgroundColor: palette.blue,
+    backgroundColor: theme.colors.blue,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 50,
@@ -189,4 +187,10 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 80,
   },
-});
+  top: {
+    width: 120,
+    height: 120,
+    borderRadius: 80,
+    alignSelf: 'center',
+  },
+}));

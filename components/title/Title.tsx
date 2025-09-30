@@ -8,6 +8,7 @@ export const Title: React.FC<TitleProps> = ({
   size = 18,
   style,
   className,
+  textAlign,
 }): React.ReactNode => {
   return (
     <Text
@@ -16,6 +17,7 @@ export const Title: React.FC<TitleProps> = ({
         style,
         {
           fontSize: getFontSize(size ? size : 18),
+          textAlign,
         },
       ]}
     >

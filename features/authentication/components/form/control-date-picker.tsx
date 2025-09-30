@@ -1,5 +1,4 @@
-import Text from '@/features/shared/components/text';
-import View from '@/features/shared/components/view';
+import { Text } from '@/features/shared/components/text';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
 import React, { useState } from 'react';
@@ -10,7 +9,9 @@ import {
   FieldPath,
   FieldValues,
 } from 'react-hook-form';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { TouchableOpacity } from 'react-native';
+import { StyleSheet } from 'react-native-unistyles';
+import { View } from '../../../shared/components/view';
 type Props<TFieldValues extends FieldValues> = {
   label?: string;
 
@@ -27,7 +28,6 @@ export const ControlledDatePicker = <TFieldValues extends FieldValues>({
   control,
   errors,
   name,
-
   mode = 'date',
 }: Props<TFieldValues>) => {
   const [open, setOpen] = useState(false);
@@ -35,8 +35,8 @@ export const ControlledDatePicker = <TFieldValues extends FieldValues>({
     setOpen(true);
   };
   return (
-    <View gap="m" flex={1}>
-      <Text>{label}</Text>
+    <View gap="md" flex={1}>
+      <Text size="normal">{label}</Text>
       <Controller
         control={control}
         name={name}
@@ -46,7 +46,7 @@ export const ControlledDatePicker = <TFieldValues extends FieldValues>({
               onPress={onShowDatePicker}
               style={styles.container}
             >
-              <Text style={{ color: value ? 'black' : 'grey' }}>
+              <Text size="normal" color={value ? 'black' : 'grey'}>
                 {mode === 'time'
                   ? format(value || new Date(), 'HH:mm')
                   : format(value || new Date(), 'PPP')}
@@ -71,7 +71,7 @@ export const ControlledDatePicker = <TFieldValues extends FieldValues>({
         )}
       />
       {errors[name]?.message && (
-        <Text variant={'small'} color={'error'}>
+        <Text size="small" color={'red'}>
           {typeof errors[name]?.message === 'string'
             ? errors[name]?.message
             : 'Invalid input'}

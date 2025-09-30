@@ -1,9 +1,10 @@
 import { PrivacyNoticeLink } from '@/components/privacy-notice/privacy-notice-link';
 import { Button } from '@/features/shared/components/button';
 import { Spacer } from '@/features/shared/components/spacer';
-import View from '@/features/shared/components/view';
-import { useToast } from '@/hooks/use-toast';
-import { palette } from '@/theme';
+
+import { View } from '../../../shared/components/view';
+
+import { useToast } from '@/components/demos/toast';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -16,12 +17,14 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { TouchableOpacity } from 'react-native';
+import { useUnistyles } from 'react-native-unistyles';
 import { loginSchema, LoginSchema } from '../../validators';
 import { ControlInput } from './control-input';
 export const LoginForm = () => {
   const [secured, setSecured] = useState(true);
   const { signIn } = useAuthActions();
   const { showToast } = useToast();
+  const { theme } = useUnistyles();
   const {
     control,
     formState: { errors, isSubmitting },
@@ -43,8 +46,7 @@ export const LoginForm = () => {
       .then(() => {
         showToast({
           title: 'Login Success',
-          description: 'You have successfully logged in',
-          type: 'success',
+          subtitle: 'You have successfully logged in',
         });
         reset();
       })
@@ -58,8 +60,7 @@ export const LoginForm = () => {
         }
         showToast({
           title: 'Login Failed',
-          description: errorMessage,
-          type: 'error',
+          subtitle: errorMessage,
         });
         console.error('Login error:', error.message);
         // Optionally, display an error message to the user here
@@ -69,14 +70,14 @@ export const LoginForm = () => {
     setSecured(!secured);
   };
   return (
-    <View gap={'m'}>
+    <View gap={'md'}>
       <ControlInput
         control={control}
         errors={errors}
         name="email"
         label="Email Address"
         placeholder="Johndoe@gmail.com"
-        leftIcon={<IconMail color={palette.iconGrey} />}
+        leftIcon={<IconMail color={theme.colors.iconGrey} />}
         autoCapitalize="none"
       />
       <ControlInput
@@ -86,13 +87,13 @@ export const LoginForm = () => {
         autoCapitalize="none"
         label="Password"
         placeholder="Enter password"
-        leftIcon={<IconLock color={palette.iconGrey} />}
+        leftIcon={<IconLock color={theme.colors.iconGrey} />}
         rightIcon={
           <TouchableOpacity onPress={toggleSecure}>
             {secured ? (
-              <IconEyeOff color={palette.iconGrey} />
+              <IconEyeOff color={theme.colors.iconGrey} />
             ) : (
-              <IconEye color={palette.iconGrey} />
+              <IconEye color={theme.colors.iconGrey} />
             )}
           </TouchableOpacity>
         }
@@ -106,11 +107,9 @@ export const LoginForm = () => {
       </PrivacyNoticeLink>
       <Spacer />
       <Button
-        label="Login"
+        title="Login"
         disabled={isSubmitting}
         onPress={handleSubmit(onSubmit)}
-        loading={isSubmitting}
-        loadingText="Logging in..."
       />
     </View>
   );

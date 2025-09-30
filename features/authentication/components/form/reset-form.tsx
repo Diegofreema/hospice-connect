@@ -2,10 +2,11 @@ import { OtpInput } from '@/components/otp-input';
 import { AnimatedProgressBar } from '@/components/progress/AnimatedProgress';
 import { Button } from '@/features/shared/components/button';
 import { Spacer } from '@/features/shared/components/spacer';
-import Text from '@/features/shared/components/text';
-import View from '@/features/shared/components/view';
-import { useToast } from '@/hooks/use-toast';
-import { palette } from '@/theme';
+import { Text } from '@/features/shared/components/text';
+
+import { View } from '../../../../features/shared/components/view';
+
+import { useToast } from '@/components/demos/toast';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -18,16 +19,14 @@ import {
 import { router, usePathname } from 'expo-router';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import {
-  StyleSheet,
-  TouchableOpacity,
-  useWindowDimensions,
-} from 'react-native';
+import { TouchableOpacity, useWindowDimensions } from 'react-native';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { resetPasswordSchema, ResetPasswordSchema } from '../../validators';
 import { ControlInput } from './control-input';
 export const ResetForm = ({ email }: { email: string }) => {
   const [secured, setSecured] = useState(true);
   const pathname = usePathname();
+  const { theme } = useUnistyles();
   const isResetPassword = pathname.includes('new-password');
   const { signIn } = useAuthActions();
   const { width } = useWindowDimensions();
@@ -63,8 +62,7 @@ export const ResetForm = ({ email }: { email: string }) => {
         reset();
         showToast({
           title: 'Success',
-          description: 'Password reset successfully. Please sign in.',
-          type: 'success',
+          subtitle: 'Password reset successfully. Please sign in.',
         });
       })
       .catch((e) => {
@@ -77,8 +75,7 @@ export const ResetForm = ({ email }: { email: string }) => {
         }
         showToast({
           title: 'An error occurred',
-          description: errorMessage,
-          type: 'error',
+          subtitle: errorMessage,
         });
       });
   };
@@ -118,8 +115,8 @@ export const ResetForm = ({ email }: { email: string }) => {
   const hasNumber = /[0-9]/.test(password || '');
   const progress = (passwordStrength.strength / 5) * 100;
   return (
-    <View gap={'m'}>
-      <View gap={'m'}>
+    <View gap={'md'}>
+      <View gap={'md'}>
         <Controller
           render={({ field: { onChange } }) => (
             <OtpInput
@@ -132,14 +129,14 @@ export const ResetForm = ({ email }: { email: string }) => {
               inputBorderRadius={12}
               enableAutoFocus={true}
               onInputChange={onChange}
-              focusedColor={palette.greenLight}
+              focusedColor={theme.colors.greenLight}
             />
           )}
           control={control}
           name="code"
         />
         {errors['code']?.message && (
-          <Text variant={'small'} color={'error'}>
+          <Text size={'small'} color={'error'}>
             {typeof errors['code']?.message === 'string'
               ? errors['code']?.message
               : 'Invalid input'}
@@ -153,13 +150,13 @@ export const ResetForm = ({ email }: { email: string }) => {
         autoCapitalize="none"
         label="Password"
         placeholder="Enter password"
-        leftIcon={<IconLock color={palette.iconGrey} />}
+        leftIcon={<IconLock color={theme.colors.iconGrey} />}
         rightIcon={
           <TouchableOpacity onPress={toggleSecure}>
             {secured ? (
-              <IconEyeOff color={palette.iconGrey} />
+              <IconEyeOff color={theme.colors.iconGrey} />
             ) : (
-              <IconEye color={palette.iconGrey} />
+              <IconEye color={theme.colors.iconGrey} />
             )}
           </TouchableOpacity>
         }
@@ -167,35 +164,33 @@ export const ResetForm = ({ email }: { email: string }) => {
       />
 
       <View>
-        <View mb="m" g={'s'}>
+        <View mb="md" gap={'sm'}>
           <AnimatedProgressBar
             progress={progress}
             width="100%"
             height={8}
             progressColor={passwordStrength.color}
-            trackColor={palette.yellowLight}
+            trackColor={theme.colors.yellowLight}
             borderRadius={12}
             animationDuration={600}
           />
-          <Text variant={'body'} style={{ color: passwordStrength.color }}>
-            {passwordStrength.label}
-          </Text>
+          <Text color={passwordStrength.color}>{passwordStrength.label}</Text>
         </View>
-        <View flexDirection={'row'} gap="s" alignItems={'center'}>
+        <View flexDirection={'row'} gap="sm" alignItems={'center'}>
           <ValidIcon isValid={isStrong} />
           <Text color={isStrong ? 'black' : 'textGrey'}>
             At least 6 characters
           </Text>
         </View>
-        <View flexDirection={'row'} gap="s" alignItems={'center'}>
+        <View flexDirection={'row'} gap="sm" alignItems={'center'}>
           <ValidIcon isValid={hasUppercase} />
           <Text color={hasUppercase ? 'black' : 'textGrey'}>Use uppercase</Text>
         </View>
-        <View flexDirection={'row'} gap="s" alignItems={'center'}>
+        <View flexDirection={'row'} gap="sm" alignItems={'center'}>
           <ValidIcon isValid={hasNumber} />
           <Text color={hasNumber ? 'black' : 'textGrey'}>One number</Text>
         </View>
-        <View flexDirection={'row'} gap="s" alignItems={'center'}>
+        <View flexDirection={'row'} gap="sm" alignItems={'center'}>
           <ValidIcon isValid={hasSpecialCharacter} />
           <Text color={hasSpecialCharacter ? 'black' : 'textGrey'}>
             Use special characters
@@ -205,25 +200,24 @@ export const ResetForm = ({ email }: { email: string }) => {
 
       <Spacer />
       <Button
-        label="Create"
+        title="Create"
         disabled={isSubmitting}
         onPress={handleSubmit(onSubmit)}
-        loading={isSubmitting}
-        loadingText="Creating..."
       />
     </View>
   );
 };
 
 const ValidIcon = ({ isValid }: { isValid: boolean }) => {
+  const { theme } = useUnistyles();
   return isValid ? (
-    <IconCheck color={palette.greenDark} size={25} />
+    <IconCheck color={theme.colors.greenDark} size={25} />
   ) : (
-    <IconX color={palette.redDark} size={25} />
+    <IconX color={theme.colors.redDark} size={25} />
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   otpContainer: {
     marginBottom: 24,
     marginTop: 24,
@@ -232,8 +226,8 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   otpInputStyle: {
-    backgroundColor: palette.greenLight,
-    color: palette.black,
+    backgroundColor: theme.colors.greenLight,
+    color: theme.colors.black,
     fontSize: 24,
     fontWeight: '600',
     textAlign: 'center',
@@ -247,8 +241,8 @@ const styles = StyleSheet.create({
   },
 
   otpTextStyle: {
-    color: palette.black,
+    color: theme.colors.black,
     fontSize: 24,
     fontWeight: '600',
   },
-});
+}));

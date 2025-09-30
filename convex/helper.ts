@@ -22,7 +22,6 @@ export const getAvailability = async (
     .query('availabilities')
     .withIndex('nurseId', (q) => q.eq('nurseId', nurseId))
     .first();
-  console.log({ availabilities });
 
   return availabilities?.days.find((d) => d.day === day);
 };

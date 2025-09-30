@@ -1,11 +1,12 @@
 import { Button } from '@/features/shared/components/button';
-import { HStack } from '@/features/shared/components/HStack';
-import Text from '@/features/shared/components/text';
-import View from '@/features/shared/components/view';
+
+import { Text } from '@/features/shared/components/text';
 import { getFontSize } from '@/features/shared/utils';
-import { palette } from '@/theme';
+import { View } from '../../shared/components/view';
+
 import { Dispatch, SetStateAction, useState } from 'react';
-import { StyleSheet, TextInput } from 'react-native';
+import { TextInput } from 'react-native';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
 type Props = {
   setRange: Dispatch<
@@ -24,6 +25,7 @@ export const RateRange = ({ setRange, range }: Props) => {
   const [localRange, setLocalRange] = useState(range);
   const [isFocused, setIsFocused] = useState(false);
   const [isFocused2, setIsFocused2] = useState(false);
+  const { theme } = useUnistyles();
   const handleRateChange = (value: string, field: 'rate1' | 'rate2') => {
     setLocalRange((prevRange) => ({
       ...prevRange,
@@ -43,12 +45,23 @@ export const RateRange = ({ setRange, range }: Props) => {
   };
 
   return (
-    <View gap={'m'} flex={1}>
-      <View g={'s'} backgroundColor={'cardBackground'} borderRadius={8} p={'m'}>
-        <Text variant={'body'} fontSize={getFontSize(16)}>
+    <View gap={'md'} flex={1}>
+      <View
+        gap={'sm'}
+        backgroundColor={'cardBackground'}
+        borderRadius={'lg'}
+        p={'md'}
+      >
+        <Text size={'normal'} fontSize={getFontSize(16)}>
           Price Range
         </Text>
-        <HStack gap={'s'} justifyContent={'flex-start'} flex={1}>
+        <View
+          gap={'sm'}
+          flexDirection="row"
+          alignItems="center"
+          justifyContent={'flex-start'}
+          flex={1}
+        >
           <TextInput
             value={localRange.rate1.toString()}
             keyboardType="numeric"
@@ -67,24 +80,23 @@ export const RateRange = ({ setRange, range }: Props) => {
             onBlur={() => setIsFocused2(false)}
             placeholder="Max rate"
           />
-        </HStack>
+        </View>
       </View>
-      <HStack gap={'s'} justifyContent={'flex-start'} flex={1} marginTop={'l'}>
+      <View gap={'sm'} justifyContent={'flex-start'} flex={1} mt={'lg'}>
         <Button
-          label="Reset"
+          title="Reset"
           onPress={onReset}
-          backgroundColor={'transparent'}
-          color="blue"
-          borderWidth={1}
-          borderColor="blue"
+          bg={'transparent'}
+          color={theme.colors.blue}
+          style={{ borderWidth: 1, borderColor: theme.colors.blue }}
         />
-        <Button label="Apply" onPress={onApply} />
-      </HStack>
+        <Button title="Apply" onPress={onApply} />
+      </View>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   textInput: {
     backgroundColor: 'white',
     borderRadius: 8,
@@ -95,6 +107,6 @@ const styles = StyleSheet.create({
   },
   active: {
     borderWidth: 1,
-    borderColor: palette.blue,
+    borderColor: theme.colors.blue,
   },
-});
+}));

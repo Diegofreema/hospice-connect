@@ -1,18 +1,20 @@
 import { LogOut } from '@/features/shared/components/log-out';
 import { TabBarIcon } from '@/features/shared/components/tab-bar-icon';
-import Text from '@/features/shared/components/text';
-import View from '@/features/shared/components/view';
-import { palette } from '@/theme';
+import { Text } from '@/features/shared/components/text';
+import { View } from '../../shared/components/view';
+
 import { IconChevronRight } from '@tabler/icons-react-native';
 import { Href, router } from 'expo-router';
 import { openBrowserAsync } from 'expo-web-browser';
 import { FlatList, TouchableOpacity } from 'react-native';
+import { useUnistyles } from 'react-native-unistyles';
 import { LinkType } from '../types';
 type Props = {
   links: LinkType[];
 };
 
 export const MoreLinks = ({ links }: Props) => {
+  const { theme } = useUnistyles();
   const onPress = async (link: Href, type: 'external' | 'internal') => {
     if (type === 'external') {
       await openBrowserAsync(link as string);
@@ -35,22 +37,26 @@ export const MoreLinks = ({ links }: Props) => {
               flexDirection={'row'}
               alignItems={'center'}
               justifyContent={'space-between'}
-              padding={'m'}
+              p={'md'}
             >
-              <View gap="s" flexDirection={'row'} alignItems={'center'}>
+              <View gap="sm" flexDirection={'row'} alignItems={'center'}>
                 <View
-                  borderRadius={100}
-                  padding={'s'}
-                  backgroundColor={'lightBlue'}
+                  borderRadius={'full'}
+                  p={'lg'}
+                  backgroundColor={theme.colors.lightBlue}
                 >
-                  <TabBarIcon icon={item.icon} size={24} color={palette.blue} />
+                  <TabBarIcon
+                    icon={item.icon}
+                    size={24}
+                    color={theme.colors.blue}
+                  />
                 </View>
-                <Text variant="body">{item.label}</Text>
+                <Text size="normal">{item.label}</Text>
               </View>
               <TabBarIcon
                 icon={IconChevronRight}
                 size={25}
-                color={palette.blue}
+                color={theme.colors.blue}
               />
             </View>
           </TouchableOpacity>

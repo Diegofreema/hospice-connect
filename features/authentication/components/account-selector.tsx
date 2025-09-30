@@ -1,10 +1,10 @@
-import Text from '@/features/shared/components/text';
+import { Text } from '@/features/shared/components/text';
 import View from '@/features/shared/components/view';
-import { getFontSize } from '@/features/shared/utils';
-import { palette } from '@/theme';
+
 import { Checkbox } from 'expo-checkbox';
 import React from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { TouchableOpacity } from 'react-native';
+import { StyleSheet } from 'react-native-unistyles';
 
 const accountTypes = [
   { type: 'nurse', text: 'Nurse' },
@@ -28,7 +28,7 @@ export const AccountSelector = ({ selected, setSelected }: Props) => {
             style={styles.checkBox}
           />
 
-          <Text variant={'subheader'} fontSize={getFontSize(20)}>
+          <Text size={'large'} isBold>
             {accountType.text}
           </Text>
         </TouchableOpacity>
@@ -37,13 +37,13 @@ export const AccountSelector = ({ selected, setSelected }: Props) => {
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   checkBox: {
     borderRadius: 100,
   },
   press: {
     borderWidth: 1,
-    borderColor: palette.grey,
+    borderColor: theme.colors.grey,
     paddingHorizontal: 10,
     paddingVertical: 15,
     borderRadius: 10,
@@ -51,4 +51,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 5,
   },
-});
+}));

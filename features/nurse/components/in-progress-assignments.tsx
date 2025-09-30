@@ -1,6 +1,7 @@
 import { api } from '@/convex/_generated/api';
 import { LoadingComponent } from '@/features/shared/components/loading';
-import View from '@/features/shared/components/view';
+
+import { Stack } from '@/features/shared/components/v-stack';
 import { usePaginatedQuery } from 'convex/react';
 import { AssignmentsForNurses } from './assignments';
 
@@ -21,7 +22,7 @@ export const InProgressAssignments = () => {
   };
   const isLoadingMore = status === 'LoadingMore';
   return (
-    <View flex={1}>
+    <Stack flex={1}>
       <AssignmentsForNurses
         data={results}
         handleMore={handleFetchMore}
@@ -29,6 +30,6 @@ export const InProgressAssignments = () => {
         title={'No assignments in progress'}
         description={'Please check in later.'}
       />
-    </View>
+    </Stack>
   );
 };

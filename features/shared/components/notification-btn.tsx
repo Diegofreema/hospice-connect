@@ -1,7 +1,6 @@
 import { IconBell } from '@tabler/icons-react-native';
 import { router } from 'expo-router';
-import { StyleSheet, TouchableOpacity } from 'react-native';
-import View from './view';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 export const NotificationButton = () => {
   const onPress = () => {

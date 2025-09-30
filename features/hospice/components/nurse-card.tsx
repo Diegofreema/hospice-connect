@@ -2,16 +2,16 @@ import { Badge } from '@/components/badge/Badge';
 import { Card, CardContent, CardHeader } from '@/components/card';
 import { Id } from '@/convex/_generated/dataModel';
 import { CustomPressable } from '@/features/shared/components/custom-pressable';
-import { HStack } from '@/features/shared/components/HStack';
-import Text from '@/features/shared/components/text';
-import View from '@/features/shared/components/view';
+
+import { Text } from '@/features/shared/components/text';
+import { View } from '../../shared/components/view';
 
 import {
   changeFirstLetterToCapital,
   getFontSize,
   trimText,
 } from '@/features/shared/utils';
-import { palette } from '@/theme';
+
 import {
   IconMapPin,
   IconSend,
@@ -20,7 +20,8 @@ import {
 import { format } from 'date-fns';
 import { Image } from 'expo-image';
 import { SymbolView } from 'expo-symbols';
-import { StyleSheet } from 'react-native';
+
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
 type Props = {
   nurse: {
@@ -65,34 +66,44 @@ export const NurseCard = ({ nurse }: Props) => {
   const badgeText = isAvailable ? 'Available' : 'Unavailable';
   const name = nurse.firstName + ' ' + nurse.lastName;
   const onMessage = () => {};
+  const { theme } = useUnistyles();
   return (
     <Card style={styles.card}>
       <CardHeader style={styles.header}>
-        <View style={{ gap: 2 }}>
-          <HStack
+        <View gap="md">
+          <View
             justifyContent={'center'}
-            style={{ backgroundColor: palette.white, maxWidth: 70 }}
-            padding={'s'}
+            flexDirection="row"
+            alignItems="center"
+            maxWidth={70}
+            p="lg"
             flex={0}
-            borderRadius={5}
+            borderRadius={'lg'}
+            backgroundColor={theme.colors.white}
           >
-            <IconStarFilled size={getFontSize(20)} color={palette.yellowDark} />
-            <Text style={{ marginLeft: -10 }}>
-              {nurse.ratings ? nurse.ratings : 'N/A'}
-            </Text>
-          </HStack>
+            <IconStarFilled
+              size={getFontSize(20)}
+              color={theme.colors.yellowDark}
+            />
+            <Text>{nurse.ratings ? nurse.ratings : 'N/A'}</Text>
+          </View>
           <Text>Discipline: {nurse.discipline}</Text>
-          <Text variant={'subheader'} fontSize={getFontSize(20)}>
+          <Text size={'medium'} isMedium>
             {trimText(name, 15)}
           </Text>
-          <HStack justifyContent={'flex-start'} gap={'s'}>
+          <View
+            justifyContent={'flex-start'}
+            flexDirection="row"
+            alignItems="center"
+            gap={'lg'}
+          >
             <IconMapPin
               size={getFontSize(14)}
-              color={palette.iconGrey}
+              color={theme.colors.iconGrey}
               style={{ marginRight: -4 }}
             />
             <Text>{changeFirstLetterToCapital(nurse.stateOfRegistration)}</Text>
-          </HStack>
+          </View>
           <View flexDirection={'row'} alignItems={'baseline'}>
             <Text style={styles.rate}>${nurse.rate}</Text>
             <Text>/hr</Text>
@@ -122,18 +133,22 @@ export const NurseCard = ({ nurse }: Props) => {
             placeholder={require('@/assets/images/person.jpg')}
           />
           <CustomPressable onPress={onMessage} style={styles.messageBtn}>
-            <IconSend size={25} fill={palette.blue} color={palette.blue} />
+            <IconSend
+              size={25}
+              fill={theme.colors.blue}
+              color={theme.colors.blue}
+            />
           </CustomPressable>
         </View>
       </CardHeader>
       <CardContent style={styles.content}>
-        <Text variant={'subheader'} fontSize={getFontSize(16)}>
+        <Text size={'medium'} isMedium fontSize={getFontSize(16)}>
           Available Shift
         </Text>
         {nurse.available?.available &&
           nurse.available.startTime &&
           nurse.available.endTime && (
-            <Text variant={'small'}>
+            <Text size={'small'}>
               {format(nurse.available.startTime, 'h:mm a')} -{' '}
               {format(nurse.available.endTime, 'h:mm a')}
             </Text>
@@ -143,9 +158,9 @@ export const NurseCard = ({ nurse }: Props) => {
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   card: {
-    backgroundColor: palette.cardGrey,
+    backgroundColor: theme.colors.cardGrey,
   },
   header: {
     flexDirection: 'row',
@@ -154,10 +169,10 @@ const styles = StyleSheet.create({
   },
   rate: {
     fontSize: getFontSize(20),
-    color: palette.blue,
+    color: theme.colors.blue,
   },
   content: {
-    backgroundColor: palette.white,
+    backgroundColor: theme.colors.white,
     borderRadius: 8,
     padding: 12,
   },
@@ -165,7 +180,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 5,
     right: 5,
-    backgroundColor: palette.white,
+    backgroundColor: theme.colors.white,
     padding: 5,
     borderRadius: 30,
     height: 50,
@@ -176,4 +191,4 @@ const styles = StyleSheet.create({
   image: {
     flex: 1,
   },
-});
+}));

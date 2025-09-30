@@ -1,7 +1,8 @@
 import { Title } from '@/components/title/Title';
-import { palette } from '@/theme';
+
 import React from 'react';
-import { StyleProp, StyleSheet, TextStyle } from 'react-native';
+import { StyleProp, TextStyle } from 'react-native';
+import { StyleSheet } from 'react-native-unistyles';
 import { getFontSize } from '../utils';
 
 type Props = {
@@ -17,9 +18,9 @@ export const MyTitle = ({ title, style }: Props) => {
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   title: {
-    color: palette.black,
+    color: theme.colors.black,
     fontFamily: 'PublicSansBold',
   },
-});
+}));

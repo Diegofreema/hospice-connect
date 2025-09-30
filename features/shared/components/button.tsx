@@ -1,87 +1,74 @@
-import { Theme } from '@/theme';
+import { Icon } from '@tabler/icons-react-native';
+import React, { forwardRef } from 'react';
 import {
-  backgroundColor,
-  BackgroundColorProps,
-  border,
-  BorderProps,
-  composeRestyleFunctions,
-  spacing,
-  SpacingProps,
-  useRestyle,
-} from '@shopify/restyle';
-import { ReactNode } from 'react';
-import { StyleProp, TouchableOpacity, ViewStyle } from 'react-native';
-import Text from './text';
-import View from './view';
+  Text,
+  TouchableOpacity,
+  TouchableOpacityProps,
+  View,
+} from 'react-native';
+import { StyleSheet } from 'react-native-unistyles';
 
-type RestyleProps = SpacingProps<Theme> &
-  BorderProps<Theme> &
-  BackgroundColorProps<Theme>;
+type ButtonProps = {
+  title?: string;
+  color?: string;
+  size?: number;
+  icon?: Icon;
+  bg?: string;
+  rightIcon?: React.ReactNode;
+} & TouchableOpacityProps;
 
-const restyleFunctions = composeRestyleFunctions<Theme, RestyleProps>([
-  spacing,
-  // @ts-ignore
-  border,
-  backgroundColor,
-]);
-
-type Props = RestyleProps & {
-  onPress: () => void;
-  label: string;
-  rightIcon?: ReactNode;
-  color?:
-    | 'mainBackground'
-    | 'cardBackground'
-    | 'buttonBackground'
-    | 'backgroundRed'
-    | 'black'
-    | 'borderColor'
-    | 'blue'
-    | 'white'
-    | 'textGrey'
-    | 'transparent';
-  disabled?: boolean;
-  loading?: boolean;
-  loadingText?: string;
-  icon?: ReactNode;
-  style?: StyleProp<ViewStyle>;
-};
-
-export const Button = ({
-  onPress,
-  label,
-  rightIcon,
-  color = 'white',
-  disabled = false,
-  loading,
-  loadingText,
-  icon,
-  style,
-  ...rest
-}: Props) => {
-  const props = useRestyle(restyleFunctions, rest);
-
-  return (
-    <TouchableOpacity
-      onPress={onPress}
-      disabled={disabled}
-      style={[{ opacity: disabled ? 0.5 : 1, flex: 1, minHeight: 55 }, style]}
-    >
-      <View
-        alignItems={'center'}
-        justifyContent={'center'}
-        p={'m'}
-        backgroundColor={'blue'}
-        borderRadius={5}
-        flexDirection={'row'}
-        g={'s'}
-        {...props}
+export const Button = forwardRef<View, ButtonProps>(
+  (
+    { title, color, size, icon: Icon, bg, rightIcon, ...touchableProps },
+    ref
+  ) => {
+    return (
+      <TouchableOpacity
+        ref={ref}
+        {...touchableProps}
+        style={[
+          styles.button(bg),
+          touchableProps.style,
+          { opacity: touchableProps.disabled ? 0.5 : 1 },
+        ]}
       >
+        {Icon && (
+          <Icon
+            size={size || 16}
+            color={color || '#fff'}
+            style={{ marginRight: 8 }}
+          />
+        )}
+        <Text style={styles.buttonText(color, size)}>{title}</Text>
         {rightIcon}
-        <Text variant="body" color={color}>
-          {loading ? loadingText : label}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  );
-};
+      </TouchableOpacity>
+    );
+  }
+);
+
+Button.displayName = 'Button';
+
+const styles = StyleSheet.create((theme) => ({
+  button: (bg?: string) => ({
+    alignItems: 'center',
+    backgroundColor: bg || theme.colors.blue,
+    borderRadius: 6,
+    elevation: 5,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      height: 2,
+      width: 0,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  }),
+  buttonText: (color?: string, size?: number) => ({
+    color: color || theme.colors.buttonText,
+    fontSize: size || 16,
+    fontWeight: '600',
+    textAlign: 'center',
+  }),
+}));
