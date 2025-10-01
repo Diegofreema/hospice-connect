@@ -17,6 +17,7 @@ export const LogOut = () => {
       showToast({
         title: 'Success',
         subtitle: 'You have successfully logged out',
+        autodismiss: true,
       });
     } catch (error) {
       console.log({ error });
@@ -24,6 +25,7 @@ export const LogOut = () => {
       showToast({
         title: 'Error',
         subtitle: 'Failed to log out',
+        autodismiss: true,
       });
     } finally {
       setLoading(false);

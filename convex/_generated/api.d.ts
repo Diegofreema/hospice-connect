@@ -10,6 +10,7 @@
 
 import type * as ResendOTP from "../ResendOTP.js";
 import type * as ResendOTPPassword from "../ResendOTPPassword.js";
+import type * as actions from "../actions.js";
 import type * as assignments from "../assignments.js";
 import type * as auth from "../auth.js";
 import type * as crons from "../crons.js";
@@ -24,6 +25,7 @@ import type * as nurses from "../nurses.js";
 import type * as passwordReset_PasswordResetemail from "../passwordReset/PasswordResetemail.js";
 import type * as posts from "../posts.js";
 import type * as sendEmail from "../sendEmail.js";
+import type * as shifts from "../shifts.js";
 import type * as users from "../users.js";
 
 import type {
@@ -43,6 +45,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   ResendOTP: typeof ResendOTP;
   ResendOTPPassword: typeof ResendOTPPassword;
+  actions: typeof actions;
   assignments: typeof assignments;
   auth: typeof auth;
   crons: typeof crons;
@@ -57,6 +60,7 @@ declare const fullApi: ApiFromModules<{
   "passwordReset/PasswordResetemail": typeof passwordReset_PasswordResetemail;
   posts: typeof posts;
   sendEmail: typeof sendEmail;
+  shifts: typeof shifts;
   users: typeof users;
 }>;
 declare const fullApiWithMounts: typeof fullApi;

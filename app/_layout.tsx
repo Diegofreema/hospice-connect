@@ -3,6 +3,8 @@ import Provider from '@/components/provider';
 import { ErrorComponent } from '@/features/shared/components/error';
 import { ToastProvider } from '../components/demos/toast';
 
+import { StackedModalProvider } from '@/components/demos/modal/modal-manager';
+import { setupBackgroundUpdates } from '@/updates';
 import { useFonts } from 'expo-font';
 import { ErrorBoundaryProps, Stack } from 'expo-router';
 import React from 'react';
@@ -12,6 +14,7 @@ import { KeyboardProvider } from 'react-native-keyboard-controller';
 import 'react-native-reanimated';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
+setupBackgroundUpdates();
 export function ErrorBoundary({ retry, error }: ErrorBoundaryProps) {
   return <ErrorComponent refetch={retry} text={error.message} />;
 }
@@ -47,25 +50,27 @@ const InitialRoute = () => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ToastProvider>
-        <Stack
-          screenOptions={{
-            headerStyle: {
-              backgroundColor: theme.colors.background,
-            },
-            headerTitleStyle: {
-              color: theme.colors.typography,
-            },
-            headerTintColor: theme.colors.typography,
-            headerShown: false,
-          }}
-        >
-          <Stack.Protected guard={isAuthenticated}>
-            <Stack.Screen name="(protected)" />
-          </Stack.Protected>
-          <Stack.Protected guard={!isAuthenticated}>
-            <Stack.Screen name="(public)" />
-          </Stack.Protected>
-        </Stack>
+        <StackedModalProvider>
+          <Stack
+            screenOptions={{
+              headerStyle: {
+                backgroundColor: theme.colors.background,
+              },
+              headerTitleStyle: {
+                color: theme.colors.typography,
+              },
+              headerTintColor: theme.colors.typography,
+              headerShown: false,
+            }}
+          >
+            <Stack.Protected guard={isAuthenticated}>
+              <Stack.Screen name="(protected)" />
+            </Stack.Protected>
+            <Stack.Protected guard={!isAuthenticated}>
+              <Stack.Screen name="(public)" />
+            </Stack.Protected>
+          </Stack>
+        </StackedModalProvider>
       </ToastProvider>
     </GestureHandlerRootView>
   );

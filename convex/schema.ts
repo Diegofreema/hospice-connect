@@ -23,6 +23,14 @@ export const careLevel = v.union(
     v.literal('Discharge')
   )
 );
+
+export const shifts = v.object({
+  start: v.string(),
+  end: v.string(),
+  startShift: v.string(),
+  endShift: v.string(),
+});
+
 export const Nurse = {
   firstName: v.string(),
   lastName: v.string(),
@@ -147,7 +155,9 @@ export default defineSchema({
   assignments: defineTable(assignment)
     .index('state', ['state', 'status'])
     .index('hospiceId', ['hospiceId']),
-  schedules: defineTable(Schedule).index('nurse', ['nurseId', 'status']),
+  schedules: defineTable(Schedule)
+    .index('nurse', ['nurseId', 'status'])
+    .index('by_assignment_id', ['assignmentId']),
   routeSheets: defineTable(routeSheet),
   ratings: defineTable(Rating).index('nurseId', ['nurseId']),
   availabilities: defineTable(Availability).index('nurseId', ['nurseId']),

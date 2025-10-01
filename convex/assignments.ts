@@ -4,7 +4,7 @@ import { paginationOptsValidator, PaginationResult } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
-import { careLevel, discipline, gender } from './schema';
+import { careLevel, discipline, gender, shifts } from './schema';
 
 export const availableAssignments = query({
   args: {
@@ -156,8 +156,15 @@ export const createAssignment = mutation({
     openShift: v.string(),
     hospiceId: v.id('hospices'),
     careLevel: careLevel,
+    shifts: v.array(shifts),
   },
   handler: async (ctx, args) => {
+    console.log({
+      startDate: args.startDate,
+      endDate: args.endDate,
+      openShift: args.openShift,
+    });
+
     const userId = await getAuthUserId(ctx);
     if (!userId) {
       throw new ConvexError({ message: 'Unauthorized' });
@@ -166,7 +173,7 @@ export const createAssignment = mutation({
     if (!hospice) {
       throw new ConvexError({ message: 'Hospice not found' });
     }
-    await ctx.db.insert('assignments', {
+    const assignmentId = await ctx.db.insert('assignments', {
       notes: args.additionalNotes,
       patientAddress: args.address,
       dateOfBirth: args.dateOfBirth,
@@ -184,6 +191,18 @@ export const createAssignment = mutation({
       status: 'not_booked',
       careLevel: args.careLevel,
     });
+
+    for (const shift of args.shifts) {
+      await ctx.db.insert('schedules', {
+        assignmentId: assignmentId,
+        endDate: shift.end,
+        endTime: shift.endShift,
+        startDate: shift.start,
+        startTime: shift.startShift,
+        rate: args.rate,
+        status: 'available',
+      });
+    }
   },
 });
 
@@ -281,9 +300,9 @@ export const deleteAssignment = mutation({
       throw new ConvexError({ message: 'Assignment not found' });
     }
 
-    if (assignment.status !== 'not_booked') {
-      throw new ConvexError({ message: 'This assignment cannot be deleted' });
-    }
+    // if (assignment.status !== 'not_booked') {
+    //   throw new ConvexError({ message: 'This assignment cannot be deleted' });
+    // }
     if (assignment.hospiceId !== args.hospiceId) {
       throw new ConvexError({
         message: 'You do not have permission to delete this assignment',

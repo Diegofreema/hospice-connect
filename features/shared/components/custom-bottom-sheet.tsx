@@ -2,7 +2,7 @@ import { Title } from '@/components/title/Title';
 
 import BottomSheet, {
   BottomSheetBackdrop,
-  BottomSheetView,
+  BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 import { IconX } from '@tabler/icons-react-native';
 import { forwardRef, useMemo } from 'react';
@@ -34,7 +34,10 @@ export const CustomSheet = forwardRef<BottomSheet, Props>(
         handleComponent={null}
         backdropComponent={BottomSheetBackdrop}
       >
-        <BottomSheetView style={styles.contentContainer}>
+        <BottomSheetScrollView
+          style={styles.contentContainer}
+          showsVerticalScrollIndicator={false}
+        >
           <Stack mode="flex">
             <Title style={{ fontFamily: 'PublicSansSemiBold' }} size={20}>
               {title}
@@ -44,7 +47,7 @@ export const CustomSheet = forwardRef<BottomSheet, Props>(
             </TouchableOpacity>
           </Stack>
           <View>{children}</View>
-        </BottomSheetView>
+        </BottomSheetScrollView>
       </BottomSheet>
     );
   }

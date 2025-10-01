@@ -25,10 +25,9 @@ export const GoogleButton = () => {
   };
   return (
     <Button
-      backgroundColor={'transparent'}
-      borderColor={'borderColor'}
-      borderWidth={1}
-      label="Google"
+      bg={'transparent'}
+      style={{ borderColor: 'grey', borderWidth: 1, width: '100%' }}
+      title="Google"
       rightIcon={
         <Image
           source={require('@/assets/images/google.png')}

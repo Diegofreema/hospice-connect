@@ -8,12 +8,13 @@ type Props = {
   trigger: React.ReactNode;
   menuItems: { label: string; value: string; ios: SFSymbol; android: string }[];
   onClick: (value: string) => void;
+  disabled?: boolean;
 };
-export function MyMenu({ trigger, menuItems, onClick }: Props) {
+export function MyMenu({ trigger, menuItems, onClick, disabled }: Props) {
   const { theme } = useUnistyles();
   return (
     <DropdownMenu.Root>
-      <DropdownMenu.Trigger style={styles.trigger}>
+      <DropdownMenu.Trigger style={styles.trigger} disabled={disabled}>
         {trigger}
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>

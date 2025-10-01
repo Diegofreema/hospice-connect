@@ -21,6 +21,8 @@
       "package": "com.diegodark.hospiceconnect",
       "permissions": [
         "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS"
       ]
     },
@@ -64,7 +66,8 @@
       ],
       [
         "expo-build-properties"
-      ]
+      ],
+      "expo-background-task"
     ],
     "experiments": {
       "typedRoutes": true
@@ -74,6 +77,10 @@
       "eas": {
         "projectId": "a979187d-6475-4a18-86a1-60eec5b5dee6"
       }
+    },
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/a979187d-6475-4a18-86a1-60eec5b5dee6"
     }
   }
 }

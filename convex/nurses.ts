@@ -2,7 +2,8 @@ import { getAuthUserId } from '@convex-dev/auth/server';
 import { filter } from 'convex-helpers/server/filter';
 import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
-import { mutation, query } from './_generated/server';
+import { Id } from './_generated/dataModel';
+import { mutation, query, QueryCtx } from './_generated/server';
 import { getAvailability, getImage, getRatings } from './helper';
 import { discipline } from './schema';
 
@@ -267,3 +268,25 @@ export const getNurses = query({
     };
   },
 });
+
+// helpers
+
+export const getNurseDetails = async (
+  ctx: QueryCtx,
+  nurseId?: Id<'nurses'>
+) => {
+  if (!nurseId) {
+    return null;
+  }
+  const nurse = await ctx.db.get(nurseId);
+  if (!nurse) {
+    return null;
+  }
+  const nurseUser = await ctx.db.get(nurse.userId);
+  const image = nurse.imageId ? await getImage(ctx, nurse.imageId) : null;
+  return {
+    ...nurse,
+    image,
+    nurseUser,
+  };
+};

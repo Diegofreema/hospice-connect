@@ -52,6 +52,8 @@ PODS:
     - ExpoModulesCore
   - ExpoAudio (0.4.9):
     - ExpoModulesCore
+  - ExpoBackgroundTask (0.2.8):
+    - ExpoModulesCore
   - ExpoBlur (14.1.5):
     - ExpoModulesCore
   - ExpoClipboard (7.1.5):
@@ -132,6 +134,9 @@ PODS:
   - ExpoWebBrowser (14.2.0):
     - ExpoModulesCore
   - EXStructuredHeaders (4.1.0)
+  - EXTaskManager (13.1.6):
+    - ExpoModulesCore
+    - UMAppLoader
   - EXUpdates (0.28.17):
     - DoubleConversion
     - EASClient
@@ -2471,6 +2476,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - UMAppLoader (5.1.3)
   - Unistyles (3.0.0):
     - DoubleConversion
     - glog
@@ -2511,6 +2517,7 @@ DEPENDENCIES:
   - Expo (from `../node_modules/expo`)
   - ExpoAsset (from `../node_modules/expo-asset/ios`)
   - ExpoAudio (from `../node_modules/expo-audio/ios`)
+  - ExpoBackgroundTask (from `../node_modules/expo-background-task/ios`)
   - ExpoBlur (from `../node_modules/expo-blur/ios`)
   - ExpoClipboard (from `../node_modules/expo-clipboard/ios`)
   - ExpoCrypto (from `../node_modules/expo-crypto/ios`)
@@ -2536,6 +2543,7 @@ DEPENDENCIES:
   - ExpoVideo (from `../node_modules/expo-video/ios`)
   - ExpoWebBrowser (from `../node_modules/expo-web-browser/ios`)
   - EXStructuredHeaders (from `../node_modules/expo-structured-headers/ios`)
+  - EXTaskManager (from `../node_modules/expo-task-manager/ios`)
   - EXUpdates (from `../node_modules/expo-updates/ios`)
   - EXUpdatesInterface (from `../node_modules/expo-updates-interface/ios`)
   - fast_float (from `../node_modules/react-native/third-party-podspecs/fast_float.podspec`)
@@ -2625,6 +2633,7 @@ DEPENDENCIES:
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - "TrueSheet (from `../node_modules/@lodev09/react-native-true-sheet`)"
+  - UMAppLoader (from `../node_modules/unimodules-app-loader/ios`)
   - Unistyles (from `../node_modules/react-native-unistyles`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -2668,6 +2677,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-asset/ios"
   ExpoAudio:
     :path: "../node_modules/expo-audio/ios"
+  ExpoBackgroundTask:
+    :path: "../node_modules/expo-background-task/ios"
   ExpoBlur:
     :path: "../node_modules/expo-blur/ios"
   ExpoClipboard:
@@ -2718,6 +2729,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-web-browser/ios"
   EXStructuredHeaders:
     :path: "../node_modules/expo-structured-headers/ios"
+  EXTaskManager:
+    :path: "../node_modules/expo-task-manager/ios"
   EXUpdates:
     :path: "../node_modules/expo-updates/ios"
   EXUpdatesInterface:
@@ -2893,6 +2906,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-svg"
   TrueSheet:
     :path: "../node_modules/@lodev09/react-native-true-sheet"
+  UMAppLoader:
+    :path: "../node_modules/unimodules-app-loader/ios"
   Unistyles:
     :path: "../node_modules/react-native-unistyles"
   Yoga:
@@ -2914,6 +2929,7 @@ SPEC CHECKSUMS:
   Expo: f715b0c058ac26efde6fb3b4f18ffdd8bd933605
   ExpoAsset: 7bdbbacf4e6752ae6e3cf70555cee076f6229e6e
   ExpoAudio: 052e187744415b4e04fc5c9bec08a51058983122
+  ExpoBackgroundTask: 9a714431a3510646bdd3317bac6d894f9b560318
   ExpoBlur: 846780b2c90f59e964b9a50385d4deb67174ebfb
   ExpoClipboard: 6b9aae54fd48a579473fb101051ad693435b9294
   ExpoCrypto: fcb6a8a08d1929f346cb95eb05a8f7818627177a
@@ -2939,6 +2955,7 @@ SPEC CHECKSUMS:
   ExpoVideo: 84edf8e48b71317fb1d7f17c3d49a310476dc0f4
   ExpoWebBrowser: eeb47f52e85b2686b56178749675cf90d0822f86
   EXStructuredHeaders: 32bec6771c2db18c4cd47cecae530d1d06cdf972
+  EXTaskManager: 2b246319ee42b15142caa0b9a168d52979821700
   EXUpdates: 4d0c660588ef3f3671d5fb49c16536e924e10690
   EXUpdatesInterface: 64f35449b8ef89ce08cdd8952a4d119b5de6821d
   fast_float: 06eeec4fe712a76acc9376682e4808b05ce978b6
@@ -3035,6 +3052,7 @@ SPEC CHECKSUMS:
   SDWebImageWebPCoder: e38c0a70396191361d60c092933e22c20d5b1380
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   TrueSheet: 0f19f04de382dd5760844ca0976ba29f67dd5586
+  UMAppLoader: 55159b69750129faa7a51c493cb8ea55a7b64eb9
   Unistyles: f24e05e1a5e24b079ef1f389f05e52b8c66dd040
   Yoga: adb397651e1c00672c12e9495babca70777e411e
 

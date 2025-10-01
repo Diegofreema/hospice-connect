@@ -33,3 +33,75 @@ export const getRatings = async (ctx: QueryCtx, nurseId: Id<'nurses'>) => {
     .collect();
   return ratings.reduce((acc, rating) => acc + rating.rate, 0);
 };
+interface Shift {
+  status: string;
+
+  startTime: string;
+  endTime: string;
+  startDate: string;
+  endDate: string;
+  rate: number;
+}
+export function generateShifts(
+  startDate: string, // e.g., '2025-09-30'
+  endDate: string, // e.g., '2025-10-02'
+  openingShiftTime: string, // e.g., '08:00'
+  status: string = 'open',
+  rate: number = 50
+): Shift[] {
+  const shifts: Shift[] = [];
+
+  // Parse input dates
+  const start = new Date(`${startDate}T${openingShiftTime}:00.000Z`);
+  const end = new Date(`${endDate}T23:59:59.999Z`); // Extend end date to end of day
+
+  // Validate inputs
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+    throw new Error('Invalid start or end date');
+  }
+  if (start > end) {
+    throw new Error('Start date must be before end date');
+  }
+
+  let current = new Date(start);
+
+  while (current <= end) {
+    // Calculate shift end time (12 hours later)
+    const shiftEnd = new Date(current.getTime() + 12 * 60 * 60 * 1000);
+
+    // If shift end exceeds end date, adjust to end date
+    const effectiveEnd = shiftEnd <= end ? shiftEnd : end;
+
+    // Format dates and times as ISO strings
+    const startTime = current.toISOString();
+    const endTime = effectiveEnd.toISOString();
+
+    // Extract date part for startDate and endDate
+    const startDateStr = startTime.split('T')[0];
+    const endDateStr = endTime.split('T')[0];
+
+    shifts.push({
+      status,
+
+      startTime,
+      endTime,
+      startDate: startDateStr,
+      endDate: endDateStr,
+      rate,
+    });
+
+    // Move to next shift (12 hours later)
+    current = new Date(current.getTime() + 12 * 60 * 60 * 1000);
+
+    // If next shift starts after midnight, align to next day's opening shift time
+    if (current.getUTCHours() !== start.getUTCHours()) {
+      current.setUTCDate(current.getUTCDate() + 1);
+      current.setUTCHours(start.getUTCHours(), 0, 0, 0);
+    }
+
+    // Break if next shift starts after end date
+    if (current > end) break;
+  }
+
+  return shifts;
+}
