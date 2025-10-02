@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-empty-object-type */
 import { Id } from '@/convex/_generated/dataModel';
+import { scheduleStatus } from '@/convex/schema';
 import { ReactMutation } from 'convex/react';
 import { FunctionReference } from 'convex/server';
-import { ConvexError } from 'convex/values';
+import { ConvexError, Infer } from 'convex/values';
 import { Dimensions } from 'react-native';
 
 const { width } = Dimensions.get('window');
@@ -87,4 +88,36 @@ export const trimText = (text: string, maxLength: number) => {
     return text.substring(0, maxLength - 3) + '...';
   }
   return text;
+};
+
+export const getScheduleStatusText = (status: Infer<typeof scheduleStatus>) => {
+  switch (status) {
+    case 'available':
+      return 'Available';
+    case 'booked':
+      return 'Booked';
+    case 'completed':
+      return 'Completed';
+    default:
+      return 'Not Covered';
+  }
+};
+
+export const getScheduleStatusAndColor = (
+  status: Infer<typeof scheduleStatus>
+) => {
+  switch (status) {
+    case 'completed':
+      return {
+        status: 'success',
+        color: '#00A25C',
+      };
+    case 'booked':
+      return { status: 'pending', color: '#9747FF' };
+
+    case 'not_covered':
+      return { status: 'error', color: '#991B1B' };
+    default:
+      return { status: 'warning', color: '#FFBF00' };
+  }
 };

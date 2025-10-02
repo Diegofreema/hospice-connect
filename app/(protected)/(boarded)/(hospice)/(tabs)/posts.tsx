@@ -1,6 +1,7 @@
 import { useHospice } from '@/components/context/hospice-context';
 import { api } from '@/convex/_generated/api';
 import { RenderPosts } from '@/features/hospice/components/render-posts';
+import { SmallLoader } from '@/features/shared/components/small-loader';
 import { usePaginatedQuery } from 'convex/react';
 import { useCallback } from 'react';
 
@@ -16,6 +17,9 @@ export default function TabTwoScreen() {
       loadMore(25);
     }
   }, [status, loadMore]);
+  if (status === 'LoadingFirstPage') {
+    return <SmallLoader size={30} />;
+  }
   return (
     <RenderPosts
       posts={results}

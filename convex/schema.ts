@@ -70,6 +70,8 @@ export const Schedule = {
   startDate: v.string(),
   endDate: v.string(),
   rate: v.number(),
+  isCancelled: v.optional(v.boolean()),
+  isEdited: v.optional(v.boolean()),
 };
 
 export const gender = v.union(

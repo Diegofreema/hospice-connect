@@ -1,9 +1,6 @@
 import { Title } from '@/components/title/Title';
 
-import BottomSheet, {
-  BottomSheetBackdrop,
-  BottomSheetScrollView,
-} from '@gorhom/bottom-sheet';
+import BottomSheet, { BottomSheetBackdrop } from '@gorhom/bottom-sheet';
 import { IconX } from '@tabler/icons-react-native';
 import { forwardRef, useMemo } from 'react';
 import { TouchableOpacity, View } from 'react-native';
@@ -33,21 +30,20 @@ export const CustomSheet = forwardRef<BottomSheet, Props>(
         enablePanDownToClose
         handleComponent={null}
         backdropComponent={BottomSheetBackdrop}
+        enableDynamicSizing={false}
+        style={{ padding: 10 }}
       >
-        <BottomSheetScrollView
-          style={styles.contentContainer}
-          showsVerticalScrollIndicator={false}
-        >
-          <Stack mode="flex">
-            <Title style={{ fontFamily: 'PublicSansSemiBold' }} size={20}>
-              {title}
-            </Title>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <IconX size={20} color={theme.colors.blue} />
-            </TouchableOpacity>
-          </Stack>
-          <View>{children}</View>
-        </BottomSheetScrollView>
+        {/* <BottomSheetView style={styles.contentContainer}> */}
+        <Stack mode="flex">
+          <Title style={{ fontFamily: 'PublicSansSemiBold' }} size={20}>
+            {title}
+          </Title>
+          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <IconX size={20} color={theme.colors.blue} />
+          </TouchableOpacity>
+        </Stack>
+        <View>{children}</View>
+        {/* </BottomSheetView> */}
       </BottomSheet>
     );
   }

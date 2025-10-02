@@ -49,11 +49,11 @@ const variantStyles: Record<
     backgroundColor: 'rgba(240, 255, 249, 0.7)',
     textColor: '#00A25C',
   },
-  warning: { backgroundColor: '#FEF3C7', textColor: '#92400E' },
+  warning: { backgroundColor: 'rgba(255, 191, 0, 0.1)', textColor: '#FFBF00' },
   error: { backgroundColor: '#FEE2E2', textColor: '#991B1B' },
   pending: {
-    backgroundColor: '#edeef8',
-    textColor: '#312db8',
+    backgroundColor: '#8C6FF7',
+    textColor: '#9747FF',
   },
   notifications: {
     backgroundColor: 'transparent',
@@ -68,10 +68,11 @@ const variantStyles: Record<
 };
 
 const sizeStyles: Record<
-  'sm' | 'md' | 'lg',
+  'xs' | 'sm' | 'md' | 'lg',
   { paddingVertical: number; paddingHorizontal: number; fontSize: number }
 > = {
-  sm: { paddingVertical: 4, paddingHorizontal: 8, fontSize: 10 },
+  xs: { paddingVertical: 4, paddingHorizontal: 8, fontSize: 10 },
+  sm: { paddingVertical: 5, paddingHorizontal: 10, fontSize: 12 },
   md: { paddingVertical: 7, paddingHorizontal: 15, fontSize: 16 },
   lg: { paddingVertical: 12, paddingHorizontal: 20, fontSize: 25 },
 };

@@ -5,12 +5,15 @@ import { Title } from '@/components/title/Title';
 import { CustomSheet } from '@/features/shared/components/custom-bottom-sheet';
 import { Wrapper } from '@/features/shared/components/wrapper';
 import BottomSheet from '@gorhom/bottom-sheet';
-import { Fragment, useRef } from 'react';
+import { Fragment, useCallback, useRef } from 'react';
 import { FlatList } from 'react-native';
 import { useSelectAssignment } from '../hooks/use-select-assignment';
 import { PostType } from '../types';
 import { AssignmentSchedule } from './assignment-schedule';
+import { CancelSchedule } from './cancel-schedule';
+import { EditSchedule } from './edit-schedule';
 import { Post } from './post';
+import { RateNurse } from './rate-nurse';
 
 type Props = {
   posts: PostType[];
@@ -20,6 +23,10 @@ type Props = {
 
 export const RenderPosts = ({ posts, loadMore, loadingMore }: Props) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
+  const bottomSheetRefCancelSchedule = useRef<BottomSheet>(null);
+  const bottomSheetRefEditSchedule = useRef<BottomSheet>(null);
+  const bottomSheetRefRateNurse = useRef<BottomSheet>(null);
+
   const { hospice } = useHospice();
   const clearSelected = useSelectAssignment((state) => state.clear);
   const onViewSchedule = () => {
@@ -30,6 +37,30 @@ export const RenderPosts = ({ posts, loadMore, loadingMore }: Props) => {
     bottomSheetRef.current?.close();
     clearSelected();
   };
+  const onCloseSheetRateNurse = () => {
+    bottomSheetRefRateNurse.current?.close();
+  };
+  const onCloseSheetCancelSchedule = () => {
+    bottomSheetRefCancelSchedule.current?.close();
+  };
+  const onCloseSheetEditSchedule = () => {
+    bottomSheetRefEditSchedule.current?.close();
+  };
+  const onCancelSchedule = useCallback(() => {
+    bottomSheetRef.current?.close();
+    bottomSheetRefCancelSchedule.current?.expand();
+  }, []);
+  const onEditSchedule = useCallback(() => {
+    bottomSheetRef.current?.close();
+    bottomSheetRefEditSchedule.current?.expand();
+  }, []);
+  const onRateNurse = useCallback(() => {
+    bottomSheetRef.current?.close();
+    bottomSheetRefRateNurse.current?.expand();
+  }, []);
+  const onViewRouteSheet = useCallback(() => {
+    bottomSheetRef.current?.close();
+  }, []);
   return (
     <Fragment>
       <Wrapper>
@@ -62,7 +93,36 @@ export const RenderPosts = ({ posts, loadMore, loadingMore }: Props) => {
         title="View Schedule"
         customSnapPoints={['25%', '60%']}
       >
-        <AssignmentSchedule />
+        <AssignmentSchedule
+          onCancelSchedule={onCancelSchedule}
+          onEditSchedule={onEditSchedule}
+          onRateNurse={onRateNurse}
+          onViewRouteSheet={onViewRouteSheet}
+        />
+      </CustomSheet>
+      <CustomSheet
+        ref={bottomSheetRefRateNurse}
+        onClose={onCloseSheetRateNurse}
+        title="Rate Nurse"
+        customSnapPoints={['25%', '50%']}
+      >
+        <RateNurse />
+      </CustomSheet>
+      <CustomSheet
+        ref={bottomSheetRefCancelSchedule}
+        onClose={onCloseSheetCancelSchedule}
+        title="Cancel Schedule"
+        customSnapPoints={['25%']}
+      >
+        <CancelSchedule />
+      </CustomSheet>
+      <CustomSheet
+        ref={bottomSheetRefEditSchedule}
+        onClose={onCloseSheetEditSchedule}
+        title="Edit Schedule"
+        customSnapPoints={['25%', '50%']}
+      >
+        <EditSchedule />
       </CustomSheet>
     </Fragment>
   );

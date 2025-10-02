@@ -114,7 +114,7 @@ export const Post = ({ post, onView, hospiceId }: Props) => {
         <FlexText leftText="Discipline" rightText={post.discipline} />
         <FlexText
           leftText="Location"
-          rightText={trimText(post.patientAddress, 15)}
+          rightText={trimText(post.patientAddress, 20)}
         />
         <View flexDirection="row" gap="lg" style={styles.footer}>
           <CustomPressable

@@ -3,11 +3,24 @@ import { api } from '@/convex/_generated/api';
 import { useQuery } from 'convex/react';
 
 import { SmallLoader } from '@/features/shared/components/small-loader';
+import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { View } from '../../shared/components/view';
 import { useSelectAssignment } from '../hooks/use-select-assignment';
 import { ShiftCard } from './shift-card';
 
-export const AssignmentSchedule = () => {
+type Props = {
+  onCancelSchedule: () => void;
+  onEditSchedule: () => void;
+  onRateNurse: () => void;
+  onViewRouteSheet: () => void;
+};
+
+export const AssignmentSchedule = ({
+  onCancelSchedule,
+  onEditSchedule,
+  onRateNurse,
+  onViewRouteSheet,
+}: Props) => {
   const assignmentId = useSelectAssignment((state) => state.id);
   const { hospice } = useHospice();
   const data = useQuery(
@@ -23,10 +36,22 @@ export const AssignmentSchedule = () => {
   if (data === null) return null;
 
   return (
-    <View pt="xl">
-      {data.map((shift) => (
-        <ShiftCard key={shift._id} />
-      ))}
+    <View pt="xl" gap="md" mt="lg">
+      <BottomSheetFlatList
+        showsVerticalScrollIndicator={false}
+        data={data}
+        renderItem={({ item }) => (
+          <ShiftCard
+            shift={item}
+            onCancelSchedule={onCancelSchedule}
+            onEditSchedule={onEditSchedule}
+            onRateNurse={onRateNurse}
+            onViewRouteSheet={onViewRouteSheet}
+          />
+        )}
+        keyExtractor={(item) => item._id}
+        contentContainerStyle={{ gap: 20, paddingBottom: 100, flexGrow: 1 }}
+      />
     </View>
   );
 };
