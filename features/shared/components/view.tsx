@@ -44,7 +44,7 @@ export const View = ({
   flex,
   alignItems,
   flexDirection,
-  gap = 'none',
+  gap,
   p,
   mt = 'none',
   mr = 'none',

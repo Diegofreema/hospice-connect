@@ -21,9 +21,14 @@ import { format } from 'date-fns';
 import { Image } from 'expo-image';
 import { SymbolView } from 'expo-symbols';
 
+import { Button } from '@/features/shared/components/button';
+import { Stack } from '@/features/shared/components/v-stack';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+import { useGetNurseId } from '../hooks/use-get-nurse-id';
 
 type Props = {
+  isAssigned?: boolean;
+  onAction?: () => void;
   nurse: {
     image: string | null;
     _id: Id<'nurses'>;
@@ -61,12 +66,18 @@ type Props = {
   };
 };
 
-export const NurseCard = ({ nurse }: Props) => {
+export const NurseCard = ({ nurse, isAssigned, onAction }: Props) => {
   const isAvailable = !!nurse.available?.available;
+  const setNurseId = useGetNurseId((state) => state.setId);
   const badgeText = isAvailable ? 'Available' : 'Unavailable';
   const name = nurse.firstName + ' ' + nurse.lastName;
   const onMessage = () => {};
   const { theme } = useUnistyles();
+  const onHandleAction = () => {
+    onAction && onAction();
+    setNurseId(nurse._id);
+  };
+
   return (
     <Card style={styles.card}>
       <CardHeader style={styles.header}>
@@ -142,17 +153,28 @@ export const NurseCard = ({ nurse }: Props) => {
         </View>
       </CardHeader>
       <CardContent style={styles.content}>
-        <Text size={'medium'} isMedium fontSize={getFontSize(16)}>
-          Available Shift
-        </Text>
-        {nurse.available?.available &&
-          nurse.available.startTime &&
-          nurse.available.endTime && (
-            <Text size={'small'}>
-              {format(nurse.available.startTime, 'h:mm a')} -{' '}
-              {format(nurse.available.endTime, 'h:mm a')}
+        <Stack mode="flex">
+          <View>
+            <Text size={'medium'} isMedium fontSize={getFontSize(16)}>
+              Available Shift
             </Text>
+            {nurse.available?.available &&
+              nurse.available.startTime &&
+              nurse.available.endTime && (
+                <Text size={'small'}>
+                  {format(nurse.available.startTime, 'h:mm a')} -{' '}
+                  {format(nurse.available.endTime, 'h:mm a')}
+                </Text>
+              )}
+          </View>
+          {isAssigned && isAvailable && (
+            <Button
+              title="Assign"
+              style={{ padding: 10 }}
+              onPress={onHandleAction}
+            />
           )}
+        </Stack>
       </CardContent>
     </Card>
   );

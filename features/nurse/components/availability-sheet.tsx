@@ -1,12 +1,12 @@
 import { useNurse } from '@/components/context/nurse-context';
 import { Title } from '@/components/title/Title';
 import { api } from '@/convex/_generated/api';
-import { Button } from '@/features/shared/components/button';
 import { Text } from '@/features/shared/components/text';
 
 import { generateErrorMessage } from '@/features/shared/utils';
 
 import { useToast } from '@/components/demos/toast';
+import { FlexButtons } from '@/features/shared/components/flex-buttons';
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
@@ -61,6 +61,11 @@ export const AvailabilitySheet = forwardRef<BottomSheet, Props>(
           endTime: endTime.getTime(),
           nurseId: nurse._id,
         });
+        showToast({
+          title: 'Success',
+          subtitle: 'Availability updated',
+          autodismiss: true,
+        });
         onClose();
       } catch (error) {
         const errorMessage = generateErrorMessage(
@@ -71,6 +76,7 @@ export const AvailabilitySheet = forwardRef<BottomSheet, Props>(
         showToast({
           title: 'Error',
           subtitle: errorMessage,
+          autodismiss: true,
         });
       } finally {
         setLoading(false);
@@ -115,10 +121,10 @@ export const AvailabilitySheet = forwardRef<BottomSheet, Props>(
             </TouchableOpacity>
           </View>
           <View
-            p={'md'}
-            backgroundColor={theme.colors.cardGrey}
+            p={'xl'}
+            backgroundColor={theme.colors.greyLight}
             borderRadius={'lg'}
-            gap={'sm'}
+            gap={'md'}
           >
             <View gap={'md'} flexDirection={'row'} alignItems={'center'}>
               <Checkbox value={item.available} style={styles.checkBox} />
@@ -126,7 +132,7 @@ export const AvailabilitySheet = forwardRef<BottomSheet, Props>(
                 {item.day}
               </Text>
             </View>
-            <View flexDirection={'row'} gap={'sm'}>
+            <View flexDirection={'row'} gap={'md'}>
               <View flex={1}>
                 <Text size={'small'}>Time Begin</Text>
                 <View flex={1}>
@@ -178,20 +184,14 @@ export const AvailabilitySheet = forwardRef<BottomSheet, Props>(
               }
             />
           )}
-          <View flexDirection={'row'} gap={'md'} alignItems={'center'} mt="md">
-            <Button
-              title="Cancel"
-              onPress={onClose}
-              bg={'transparent'}
-              style={{ borderWidth: 1, borderColor: theme.colors.buttonGrey }}
-              color={theme.colors.blue}
-            />
-            <Button
-              title="Apply"
-              onPress={onUpdateAvailability}
-              disabled={loading}
-            />
-          </View>
+
+          <FlexButtons
+            onCancel={onClose}
+            onPress={onUpdateAvailability}
+            buttonText="Cancel"
+            buttonText2="Apply"
+            disabled={loading}
+          />
         </BottomSheetView>
       </BottomSheet>
     );

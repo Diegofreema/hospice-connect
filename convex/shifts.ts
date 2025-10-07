@@ -40,3 +40,27 @@ export const getShifts = query({
     return await Promise.all(shifts);
   },
 });
+export const getShift = query({
+  args: {
+    scheduleId: v.id('schedules'),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      return null;
+    }
+
+    const schedule = await ctx.db.get(args.scheduleId);
+
+    if (!schedule) {
+      return null;
+    }
+
+    const shiftWithNurse = await getNurseDetails(ctx, schedule.nurseId);
+
+    return {
+      ...schedule,
+      nurse: shiftWithNurse,
+    };
+  },
+});

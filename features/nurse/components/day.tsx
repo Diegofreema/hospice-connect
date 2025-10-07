@@ -43,6 +43,7 @@ export const Day = ({ day, onPress }: Props) => {
         title: 'Failed to update availability',
 
         subtitle: 'Please set start and end shift first',
+        autodismiss: true,
       });
       return;
     }
@@ -55,6 +56,7 @@ export const Day = ({ day, onPress }: Props) => {
       showToast({
         title: 'Success',
         subtitle: 'Availability updated',
+        autodismiss: true,
       });
     } catch (error) {
       const errorMessage = generateErrorMessage(
@@ -65,6 +67,7 @@ export const Day = ({ day, onPress }: Props) => {
       showToast({
         title: 'Error',
         subtitle: errorMessage,
+        autodismiss: true,
       });
     }
   };
@@ -74,7 +77,7 @@ export const Day = ({ day, onPress }: Props) => {
       mode="flex"
       backgroundColor={theme.colors.cardGrey}
       borderRadius={'md'}
-      padding={'md'}
+      padding={'xl'}
     >
       <Stack>
         <Text size={'normal'} style={{ fontFamily: 'PublicSansBold' }}>

@@ -114,7 +114,6 @@ export const routeSheet = {
 export const Rating = {
   nurseId: v.id('nurses'),
   rate: v.number(),
-  text: v.string(),
 };
 export const User = {
   name: v.optional(v.string()),
@@ -149,6 +148,35 @@ export const Availability = {
   nurseId: v.id('nurses'),
   days: days,
 };
+export const NurseNotification = {
+  nurseId: v.id('nurses'),
+  isRead: v.boolean(),
+  type: v.union(
+    v.literal('assignment'),
+    v.literal('normal'),
+    v.literal('admin')
+  ),
+  title: v.string(),
+  description: v.optional(v.string()),
+  hospiceId: v.optional(v.id('hospices')),
+  scheduleId: v.optional(v.id('schedules')),
+  status: v.optional(v.union(v.literal('accepted'), v.literal('declined'))),
+};
+export const HospiceNotification = {
+  hospiceId: v.id('hospices'),
+  isRead: v.boolean(),
+  type: v.union(
+    v.literal('case_request'),
+    v.literal('route_sheet'),
+    v.literal('cancel_request'),
+    v.literal('admin'),
+    v.literal('assignment')
+  ),
+  title: v.string(),
+  description: v.optional(v.string()),
+  routeSheetId: v.optional(v.id('routeSheets')),
+  scheduleId: v.optional(v.id('schedules')),
+};
 export default defineSchema({
   ...authTables,
   users: defineTable(User).index('email', ['email']),
@@ -159,8 +187,16 @@ export default defineSchema({
     .index('hospiceId', ['hospiceId']),
   schedules: defineTable(Schedule)
     .index('nurse', ['nurseId', 'status'])
-    .index('by_assignment_id', ['assignmentId']),
+    .index('by_assignment_id', ['assignmentId', 'status']),
   routeSheets: defineTable(routeSheet),
   ratings: defineTable(Rating).index('nurseId', ['nurseId']),
   availabilities: defineTable(Availability).index('nurseId', ['nurseId']),
+  nurseNotifications: defineTable(NurseNotification).index('by_nurseId', [
+    'nurseId',
+    'isRead',
+  ]),
+  hospiceNotifications: defineTable(HospiceNotification).index(
+    'by_hospice_id',
+    ['hospiceId', 'isRead']
+  ),
 });

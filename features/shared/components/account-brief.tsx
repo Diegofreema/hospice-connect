@@ -16,6 +16,7 @@ type Props = {
   isHome?: boolean;
   title?: string;
   href?: Href;
+  count?: number;
 };
 
 export const AccountBrief = ({
@@ -23,6 +24,7 @@ export const AccountBrief = ({
   isHome = false,
   title = 'My account',
   href = '/nurse-profile',
+  count,
 }: Props) => {
   const onPress = () => {
     if (!href) return;
@@ -70,7 +72,7 @@ export const AccountBrief = ({
             }
           />
         )}
-        {isHome && <NotificationButton />}
+        {isHome && <NotificationButton count={count} />}
       </View>
     </TouchableOpacity>
   );

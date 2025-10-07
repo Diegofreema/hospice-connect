@@ -57,6 +57,28 @@ export const createAssignmentValidator = z
     path: ['startDate'],
   });
 
+export const editScheduleValidator = z
+  .object({
+    startDate: z.date(),
+    endDate: z.date(),
+    openShift: z.date(),
+    endShift: z.date(),
+    rate: z.string().min(1, 'Rate is required'),
+  })
+  .refine((data) => data.endDate >= data.startDate, {
+    message: 'End date cannot be before start date',
+    path: ['endDate'],
+  })
+  .refine((data) => data.endShift >= data.openShift, {
+    message: 'End of shift cannot be before opening shift',
+    path: ['endShift'],
+  })
+  .refine((data) => data.startDate > new Date(), {
+    message: 'Start date of this assignment cannot be in the past',
+    path: ['startDate'],
+  });
+
+export type EditScheduleValidator = z.infer<typeof editScheduleValidator>;
 export type CreateAssignmentValidator = z.infer<
   typeof createAssignmentValidator
 >;

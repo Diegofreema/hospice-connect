@@ -218,6 +218,26 @@ export const updateNurseProfilePicture = mutation({
   },
 });
 
+export const rateNurse = mutation({
+  args: { rate: v.number(), nurseId: v.id('nurses') },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new ConvexError({ message: 'Unauthorized' });
+    }
+
+    const nurse = await ctx.db.get(args.nurseId);
+    if (!nurse) {
+      throw new ConvexError({ message: 'Nurse not found' });
+    }
+    await ctx.db.insert('ratings', {
+      nurseId: args.nurseId,
+      rate: args.rate,
+    });
+  },
+});
+
+// ? queries
 export const getNurses = query({
   args: {
     range1: v.number(),
@@ -269,7 +289,7 @@ export const getNurses = query({
   },
 });
 
-// helpers
+// ? helpers
 
 export const getNurseDetails = async (
   ctx: QueryCtx,

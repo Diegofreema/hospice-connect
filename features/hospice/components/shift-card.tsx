@@ -6,16 +6,20 @@ import { api } from '@/convex/_generated/api';
 import { Text } from '@/features/shared/components/text';
 import { Stack } from '@/features/shared/components/v-stack';
 import {
+  convertTimeStringToDate,
   getScheduleStatusAndColor,
   getScheduleStatusText,
 } from '@/features/shared/utils';
 
+import { useMutation } from 'convex/react';
 import { FunctionReturnType } from 'convex/server';
-import { format } from 'date-fns';
+import { format, parse } from 'date-fns';
 import { Image } from 'expo-image';
 import { SymbolView } from 'expo-symbols';
+import { useEffect } from 'react';
 import { useWindowDimensions, View } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
+import { useGetScheduleId } from '../hooks/use-get-schedule-id';
 
 type Props = {
   shift: FunctionReturnType<typeof api.shifts.getShifts>[number];
@@ -36,6 +40,64 @@ export const ShiftCard = ({
   const size = width * 0.13;
   const statusText = getScheduleStatusText(shift.status);
   const statusInfo = getScheduleStatusAndColor(shift.status);
+  const getScheduleId = useGetScheduleId((state) => state.setId);
+  const startDate = parse(shift.startDate, 'dd-MM-yyyy', new Date());
+  const endDate = parse(shift.endDate, 'dd-MM-yyyy', new Date());
+  const openingShift = convertTimeStringToDate(shift.startTime);
+  const updateStatus = useMutation(api.schedules.updateScheduleStatus);
+  useEffect(() => {
+    const onUpdate = async () => {
+      await updateStatus({
+        scheduleId: shift._id,
+        status: 'not_covered',
+      });
+    };
+
+    // Combine date and time
+    const shiftStartDateTime = new Date(startDate);
+    shiftStartDateTime.setHours(
+      openingShift.getHours(),
+      openingShift.getMinutes(),
+      0,
+      0
+    );
+
+    const now = new Date();
+
+    // Check if shift start time has passed and it's not covered
+    if (
+      !shift.nurseId &&
+      shift.status !== 'not_covered' &&
+      shiftStartDateTime < now
+    ) {
+      onUpdate();
+    }
+  }, [
+    shift.nurseId,
+    shift.status,
+    shift.startDate,
+    shift.startTime,
+    updateStatus,
+    shift._id,
+    openingShift,
+    startDate,
+  ]);
+  const handleCancelSchedule = () => {
+    onCancelSchedule();
+    getScheduleId(shift._id);
+  };
+
+  const handleEditSchedule = () => {
+    onEditSchedule();
+    getScheduleId(shift._id);
+  };
+
+  const handleRateNurse = () => {
+    // if (!shift.nurse) return;
+    onRateNurse();
+    getScheduleId(shift._id);
+  };
+
   return (
     <Card style={styles.card}>
       <CardHeader style={{ gap: 10 }}>
@@ -49,8 +111,7 @@ export const ShiftCard = ({
                 {shift.nurse?.firstName || 'No nurse assigned'}
               </Text>
               <Text size="normal" isBold>
-                {format(shift.startDate, 'PPP')} -{' '}
-                {format(shift.endDate, 'PPP')}
+                {format(startDate, 'PP')} - {format(endDate, 'PP')}
               </Text>
               <Text size="small">
                 {shift.startTime} - {shift.endTime}
@@ -81,21 +142,21 @@ export const ShiftCard = ({
               View Route Sheet
             </PrivacyNoticeLink>
           )}
-          {shift.status !== 'completed' && (
-            <PrivacyNoticeLink onPress={onCancelSchedule}>
+          {shift.status !== 'completed' && shift.nurseId && (
+            <PrivacyNoticeLink onPress={handleCancelSchedule}>
               Cancel Schedule
             </PrivacyNoticeLink>
           )}
           {shift.status !== 'booked' && (
-            <PrivacyNoticeLink onPress={onEditSchedule}>
+            <PrivacyNoticeLink onPress={handleEditSchedule}>
               Edit Schedule
             </PrivacyNoticeLink>
           )}
-          {/* {shift.status === 'completed' && ( */}
-          <PrivacyNoticeLink onPress={onRateNurse}>
-            Rate nurse
-          </PrivacyNoticeLink>
-          {/* )} */}
+          {shift.status === 'completed' && (
+            <PrivacyNoticeLink onPress={handleRateNurse}>
+              Rate nurse
+            </PrivacyNoticeLink>
+          )}
         </Stack>
       </CardHeader>
     </Card>

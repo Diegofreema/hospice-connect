@@ -14,9 +14,17 @@ type Props = {
   nurseType: 'All' | NurseType;
   rate1: number;
   rate2: number;
+  isAssigned?: boolean;
+  onAction?: () => void;
 };
 
-export const FetchNurses = ({ nurseType, rate1, rate2 }: Props) => {
+export const FetchNurses = ({
+  nurseType,
+  rate1,
+  rate2,
+  isAssigned,
+  onAction,
+}: Props) => {
   const todayToText = format(new Date(), 'EEEE');
 
   const { loadMore, results, status } = usePaginatedQuery(
@@ -31,7 +39,7 @@ export const FetchNurses = ({ nurseType, rate1, rate2 }: Props) => {
   };
 
   if (status === 'LoadingFirstPage') {
-    return <SmallLoader />;
+    return <SmallLoader size={50} />;
   }
 
   return (
@@ -42,7 +50,9 @@ export const FetchNurses = ({ nurseType, rate1, rate2 }: Props) => {
         recycleItems
         onEndReached={onLoadMore}
         onEndReachedThreshold={0.5}
-        renderItem={({ item }) => <NurseCard nurse={item} />}
+        renderItem={({ item }) => (
+          <NurseCard nurse={item} isAssigned={isAssigned} onAction={onAction} />
+        )}
         keyExtractor={(item) => item._id}
         ListFooterComponent={status === 'LoadingMore' ? <SmallLoader /> : null}
         contentContainerStyle={{ gap: 20, paddingBottom: 100, flexGrow: 1 }}

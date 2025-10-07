@@ -1,6 +1,7 @@
 import { getAuthUserId } from '@convex-dev/auth/server';
 import { ConvexError, v } from 'convex/values';
-import { mutation, query } from './_generated/server';
+import { Id } from './_generated/dataModel';
+import { mutation, query, QueryCtx } from './_generated/server';
 
 export const createHospice = mutation({
   args: {
@@ -95,3 +96,30 @@ export const updateHospiceImage = mutation({
     }
   },
 });
+
+// ? helpers
+
+export const getHospiceAndImage = async (
+  ctx: QueryCtx,
+  hospiceId?: Id<'hospices'>
+) => {
+  if (!hospiceId) {
+    return null;
+  }
+  const hospice = await ctx.db.get(hospiceId);
+  if (!hospice) {
+    return null;
+  }
+  const user = await ctx.db.get(hospice.userId);
+  if (!user) {
+    return null;
+  }
+  let image;
+  if (user.imageId) {
+    image = await ctx.storage.getUrl(user.imageId);
+  }
+  return {
+    ...hospice,
+    image,
+  };
+};

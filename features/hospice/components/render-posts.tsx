@@ -2,11 +2,14 @@ import { SmallLoader } from '@/features/shared/components/small-loader';
 
 import { useHospice } from '@/components/context/hospice-context';
 import { Title } from '@/components/title/Title';
+import { api } from '@/convex/_generated/api';
 import { CustomSheet } from '@/features/shared/components/custom-bottom-sheet';
 import { Wrapper } from '@/features/shared/components/wrapper';
 import BottomSheet from '@gorhom/bottom-sheet';
+import { useQuery } from 'convex/react';
 import { Fragment, useCallback, useRef } from 'react';
 import { FlatList } from 'react-native';
+import { useGetScheduleId } from '../hooks/use-get-schedule-id';
 import { useSelectAssignment } from '../hooks/use-select-assignment';
 import { PostType } from '../types';
 import { AssignmentSchedule } from './assignment-schedule';
@@ -26,7 +29,15 @@ export const RenderPosts = ({ posts, loadMore, loadingMore }: Props) => {
   const bottomSheetRefCancelSchedule = useRef<BottomSheet>(null);
   const bottomSheetRefEditSchedule = useRef<BottomSheet>(null);
   const bottomSheetRefRateNurse = useRef<BottomSheet>(null);
-
+  const scheduleId = useGetScheduleId((state) => state.id);
+  const initialValues = useQuery(
+    api.schedules.getSchedule,
+    scheduleId
+      ? {
+          scheduleId,
+        }
+      : 'skip'
+  );
   const { hospice } = useHospice();
   const clearSelected = useSelectAssignment((state) => state.clear);
   const onViewSchedule = () => {
@@ -106,23 +117,30 @@ export const RenderPosts = ({ posts, loadMore, loadingMore }: Props) => {
         title="Rate Nurse"
         customSnapPoints={['25%', '50%']}
       >
-        <RateNurse />
+        <RateNurse onClose={onCloseSheetRateNurse} />
       </CustomSheet>
       <CustomSheet
         ref={bottomSheetRefCancelSchedule}
         onClose={onCloseSheetCancelSchedule}
-        title="Cancel Schedule"
-        customSnapPoints={['25%']}
+        title="Cancel Schedule?"
+        customSnapPoints={['25%', '30%']}
       >
-        <CancelSchedule />
+        <CancelSchedule onClose={onCloseSheetCancelSchedule} />
       </CustomSheet>
       <CustomSheet
         ref={bottomSheetRefEditSchedule}
         onClose={onCloseSheetEditSchedule}
         title="Edit Schedule"
-        customSnapPoints={['25%', '50%']}
+        customSnapPoints={['25%', '70%']}
       >
-        <EditSchedule />
+        {initialValues === undefined ? (
+          <SmallLoader />
+        ) : (
+          <EditSchedule
+            onClose={onCloseSheetEditSchedule}
+            initialValues={initialValues}
+          />
+        )}
       </CustomSheet>
     </Fragment>
   );

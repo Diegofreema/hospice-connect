@@ -198,9 +198,11 @@ export const lightTheme = {
     xxl: 16,
   },
   fontFamily: {
-    regular: 'InterLight',
-    medium: 'InterMedium',
-    bold: 'InterBold',
+    light: 'PublicSansLight',
+    regular: 'PublicSansRegular',
+    medium: 'PublicSansMedium',
+    semibold: 'PublicSansSemiBold',
+    bold: 'PublicSansBold',
   },
 } as const;
 

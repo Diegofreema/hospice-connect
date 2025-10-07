@@ -6,7 +6,7 @@ import { ToastProvider } from '../components/demos/toast';
 import { StackedModalProvider } from '@/components/demos/modal/modal-manager';
 import { setupBackgroundUpdates } from '@/updates';
 import { useFonts } from 'expo-font';
-import { ErrorBoundaryProps, Stack } from 'expo-router';
+import { ErrorBoundaryProps, Stack, usePathname } from 'expo-router';
 import React from 'react';
 import { View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -47,6 +47,9 @@ export default function RootLayout() {
 const InitialRoute = () => {
   const { theme } = useUnistyles();
   const { isAuthenticated } = useAuth();
+  const pathname = usePathname();
+  console.log({ pathname });
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ToastProvider>

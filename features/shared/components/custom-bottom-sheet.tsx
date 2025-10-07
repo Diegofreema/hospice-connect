@@ -42,7 +42,7 @@ export const CustomSheet = forwardRef<BottomSheet, Props>(
             <IconX size={20} color={theme.colors.blue} />
           </TouchableOpacity>
         </Stack>
-        <View>{children}</View>
+        <View style={{ paddingBottom: 50, flex: 1 }}>{children}</View>
         {/* </BottomSheetView> */}
       </BottomSheet>
     );

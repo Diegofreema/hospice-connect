@@ -105,3 +105,54 @@ export function generateShifts(
 
   return shifts;
 }
+export function stringToDate(dateString: string): Date | null {
+  // Validate format with regex: DD-MM-YYYY
+  const dateRegex = /^(\d{2})-(\d{2})-(\d{4})$/;
+  if (!dateRegex.test(dateString)) {
+    console.warn(`Invalid date format: "${dateString}". Expected DD-MM-YYYY.`);
+    return null;
+  }
+
+  // Split the string into day, month, year
+  const [day, month, year] = dateString.split('-').map(Number);
+
+  // Create Date object (month is 0-based in JS, so subtract 1)
+  const date = new Date(year, month - 1, day);
+
+  // Validate the date is valid (e.g., not 30-02-2025)
+  if (
+    date.getDate() !== day ||
+    date.getMonth() !== month - 1 ||
+    date.getFullYear() !== year
+  ) {
+    console.warn(`Invalid date: "${dateString}".`);
+    return null;
+  }
+
+  return date;
+}
+export function convertTimeStringToDate(timeString: string) {
+  // Get current date to use as base
+  const now = new Date();
+
+  // Parse the time string (e.g., "3:59 AM")
+  const [time, period] = timeString.split(/\s+/);
+  const [hours, minutes] = time.split(':').map(Number);
+
+  // Convert to 24-hour format
+  let hours24 = hours;
+  if (period.toUpperCase() === 'PM' && hours !== 12) {
+    hours24 += 12;
+  } else if (period.toUpperCase() === 'AM' && hours === 12) {
+    hours24 = 0;
+  }
+
+  // Create new Date object with today's date and parsed time
+  return new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    hours24,
+    minutes
+  );
+}

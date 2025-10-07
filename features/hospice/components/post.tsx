@@ -92,7 +92,9 @@ export const Post = ({ post, onView, hospiceId }: Props) => {
       });
     }
   };
-
+  const onAssign = () => {
+    router.push(`/assign-nurse?id=${post._id}`);
+  };
   return (
     <Card style={styles.card}>
       <CardHeader style={styles.header}>
@@ -112,6 +114,7 @@ export const Post = ({ post, onView, hospiceId }: Props) => {
         <FlexText leftText="Phone number" rightText={post.phoneNumber} />
         <FlexText leftText="Care level" rightText={post.careLevel} />
         <FlexText leftText="Discipline" rightText={post.discipline} />
+
         <FlexText
           leftText="Location"
           rightText={trimText(post.patientAddress, 20)}
@@ -129,7 +132,7 @@ export const Post = ({ post, onView, hospiceId }: Props) => {
             </Text>
           </CustomPressable>
           <CustomPressable
-            onPress={() => {}}
+            onPress={onAssign}
             style={[styles.button, styles.assign]}
           >
             <Text size={'normal'} color={'white'}>
