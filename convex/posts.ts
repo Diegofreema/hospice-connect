@@ -64,7 +64,7 @@ export const acceptAssignment = mutation({
   args: {
     scheduleId: v.id('schedules'),
     nurseId: v.id('nurses'),
-    nurseNotificationId: v.id('nurseNotifications'),
+    nurseNotificationId: v.optional(v.id('nurseNotifications')),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -83,8 +83,6 @@ export const acceptAssignment = mutation({
     if (!assignment) {
       throw new ConvexError({ message: 'Assignment not found' });
     }
-
-    const notification = await ctx.db.get(args.nurseNotificationId);
 
     // logic to check if schedule time has passed
     const openingShift = convertTimeStringToDate(schedule.startTime);
@@ -125,14 +123,19 @@ export const acceptAssignment = mutation({
       isRead: false,
       hospiceId: assignment.hospiceId,
       type: 'assignment',
-      title: 'Assignment accepted',
+      title: 'Shift accepted',
       scheduleId: args.scheduleId,
-      description: `${user.name} has declined your assignment.`,
+      description: `${user.name} has accepted a shift.`,
+      nurseId: args.nurseId,
     });
-    if (notification) {
-      await ctx.db.patch(args.nurseNotificationId, {
-        status: 'accepted',
-      });
+    if (args.nurseNotificationId) {
+      const notification = await ctx.db.get(args.nurseNotificationId);
+
+      if (notification) {
+        await ctx.db.patch(args.nurseNotificationId, {
+          status: 'accepted',
+        });
+      }
     }
   },
 });
@@ -176,6 +179,7 @@ export const declineAssignment = mutation({
       title: 'Assignment Declined',
       scheduleId: args.scheduleId,
       description: `${user.name} has declined your assignment.`,
+      nurseId: notification.nurseId,
     });
   },
 });

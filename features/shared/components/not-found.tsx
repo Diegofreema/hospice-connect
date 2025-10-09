@@ -14,7 +14,7 @@ export const NotFound = ({ description }: Props) => {
     <Wrapper>
       <View style={styles.container}>
         <Image
-          source={require('@/assets/images/no-internet.png')}
+          source={require('@/assets/images/404.png')}
           style={styles.image}
           contentFit="contain"
         />

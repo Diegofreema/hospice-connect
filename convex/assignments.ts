@@ -5,37 +5,54 @@ import { ConvexError, v } from 'convex/values';
 import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import { careLevel, discipline, gender, shifts } from './schema';
+import { AvailableAssignmentType } from './types';
 
 export const availableAssignments = query({
   args: {
-    status: v.union(
-      v.literal('completed'),
-      v.literal('not_covered'),
-      v.literal('booked'),
-      v.literal('available')
-    ),
+    nurseId: v.id('nurses'),
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) {
-      return {} as PaginationResult<Doc<'assignments'>>;
+      return {} as PaginationResult<AvailableAssignmentType>;
     }
-    const nurse = await ctx.db
-      .query('nurses')
-      .withIndex('userId', (q) => q.eq('userId', userId))
-      .first();
+    const nurse = await ctx.db.get(args.nurseId);
     if (!nurse) {
-      return {} as PaginationResult<Doc<'assignments'>>;
+      return {} as PaginationResult<AvailableAssignmentType>;
     }
     const result = await ctx.db
       .query('assignments')
-      .withIndex('state', (q) =>
-        q.eq('state', nurse.stateOfRegistration).eq('status', args.status)
-      )
+      .withIndex('state', (q) => q.eq('state', nurse.stateOfRegistration))
       .paginate(args.paginationOpts);
+    // ? getting schedules by assignment id
+    const assignments = await Promise.all(
+      result.page.map(async (assignment) => {
+        const schedules = await ctx.db
+          .query('schedules')
+          .withIndex('by_assignment_id', (q) =>
+            q.eq('assignmentId', assignment._id)
+          )
+          .collect();
+        const hospice = await ctx.db.get(assignment.hospiceId);
+        return {
+          ...assignment,
+          schedules,
+          hospice,
+        };
+      })
+    );
+    // ? filtering to return only assignments that all their shifts are available
+    const availableAssignments = assignments.filter(
+      (assignment) =>
+        assignment.schedules.length > 0 &&
+        assignment.schedules.some((sch) => sch.status === 'available')
+    );
 
-    return result;
+    return {
+      ...result,
+      page: availableAssignments,
+    };
   },
 });
 export const inProgressAssignments = query({

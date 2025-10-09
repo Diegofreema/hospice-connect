@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 
 type Props = TextInputProps & {
-  label: string;
+  label?: string;
 };
 
 export const Textarea = ({ label, ...props }: Props) => {

@@ -7,6 +7,9 @@ export const cancelSchedule = mutation({
   args: {
     scheduleId: v.id('schedules'),
     hospiceId: v.id('hospices'),
+    nurseId: v.id('nurses'),
+    hospiceName: v.string(),
+    notificationId: v.optional(v.id('hospiceNotifications')),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -16,7 +19,11 @@ export const cancelSchedule = mutation({
 
     const schedule = await ctx.db.get(args.scheduleId);
     if (!schedule) {
-      throw new ConvexError({ message: 'Schedule not found' });
+      throw new ConvexError({ message: 'Shift not found' });
+    }
+
+    if (schedule.status !== 'booked') {
+      throw new ConvexError({ message: 'You cannot cancel this schedule' });
     }
 
     const assignment = await ctx.db.get(schedule.assignmentId);
@@ -32,7 +39,27 @@ export const cancelSchedule = mutation({
     await ctx.db.patch(args.scheduleId, {
       status: 'available',
       nurseId: undefined,
+      canceledAt: Date.now(),
     });
+
+    const nurse = await ctx.db.get(args.nurseId);
+    if (!nurse) {
+      throw new ConvexError({ message: 'Nurse not found' });
+    }
+    await ctx.db.insert('nurseNotifications', {
+      nurseId: args.nurseId,
+      isRead: false,
+      hospiceId: args.hospiceId,
+      scheduleId: args.scheduleId,
+      description: `${args.hospiceName} has cancelled your schedule.`,
+      title: 'Schedule cancelled',
+      type: 'normal',
+    });
+    if (args.notificationId) {
+      await ctx.db.patch(args.notificationId, {
+        status: 'accepted',
+      });
+    }
   },
 });
 
@@ -116,6 +143,54 @@ export const sendScheduleNotification = mutation({
   },
 });
 
+export const declineSchedule = mutation({
+  args: {
+    scheduleId: v.id('schedules'),
+    hospiceId: v.id('hospices'),
+    nurseId: v.id('nurses'),
+    hospiceName: v.string(),
+    notificationId: v.id('hospiceNotifications'),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new ConvexError({ message: 'Unauthorized' });
+    }
+
+    const schedule = await ctx.db.get(args.scheduleId);
+    if (!schedule) {
+      throw new ConvexError({ message: 'Shift not found' });
+    }
+
+    const assignment = await ctx.db.get(schedule.assignmentId);
+    if (!assignment) {
+      throw new ConvexError({ message: 'Assignment not found' });
+    }
+    if (assignment.hospiceId !== args.hospiceId) {
+      throw new ConvexError({
+        message: 'You do not have permission to decline this cancel request',
+      });
+    }
+
+    const nurse = await ctx.db.get(args.nurseId);
+    if (!nurse) {
+      throw new ConvexError({ message: 'Nurse not found' });
+    }
+    await ctx.db.insert('nurseNotifications', {
+      nurseId: args.nurseId,
+      isRead: false,
+      hospiceId: args.hospiceId,
+      scheduleId: args.scheduleId,
+      description: `${args.hospiceName} has declined your cancel request.`,
+      title: 'Cancel request declined',
+      type: 'normal',
+    });
+    await ctx.db.patch(args.notificationId, {
+      status: 'declined',
+    });
+  },
+});
+
 // ! queries
 
 export const getSchedule = query({
@@ -171,6 +246,24 @@ export const fetchAvailableSchedules = query({
     }
 
     if (assignment.hospiceId !== args.hospiceId) {
+      return [];
+    }
+    return await ctx.db
+      .query('schedules')
+      .withIndex('by_assignment_id', (q) =>
+        q.eq('assignmentId', args.assignmentId).eq('status', 'available')
+      )
+      .collect();
+  },
+});
+
+export const getSchedulesByAssignmentId = query({
+  args: {
+    assignmentId: v.id('assignments'),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
       return [];
     }
     return await ctx.db

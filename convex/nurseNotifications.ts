@@ -12,6 +12,7 @@ export const getNurseNotifications = query({
     const notifications = await ctx.db
       .query('nurseNotifications')
       .withIndex('by_nurseId', (q) => q.eq('nurseId', nurseId))
+      .order('desc')
       .paginate(paginationOpts);
     const notificationsWithHospice = notifications.page.map(
       async (notification) => {

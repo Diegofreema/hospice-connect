@@ -52,7 +52,7 @@ const variantStyles: Record<
   warning: { backgroundColor: 'rgba(255, 191, 0, 0.1)', textColor: '#FFBF00' },
   error: { backgroundColor: '#FEE2E2', textColor: '#991B1B' },
   pending: {
-    backgroundColor: '#8C6FF7',
+    backgroundColor: '#9747FF1A',
     textColor: '#9747FF',
   },
   notifications: {

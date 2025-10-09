@@ -45,6 +45,7 @@ const NurseProfileScreen = () => {
         licenseNumber={nurse.licenseNumber || 'N/A'}
         rate={nurse.rate || 0}
         imageUrl={nurse.image as string}
+        state={nurse.stateOfRegistration}
       />
     </Wrapper>
   );

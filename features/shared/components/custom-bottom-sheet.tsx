@@ -5,6 +5,7 @@ import { IconX } from '@tabler/icons-react-native';
 import { forwardRef, useMemo } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+import { Text } from './text';
 import { Stack } from './v-stack';
 
 type Props = {
@@ -12,10 +13,11 @@ type Props = {
   children: React.ReactNode;
   title: string;
   customSnapPoints?: string[];
+  subTitle?: string;
 };
 
 export const CustomSheet = forwardRef<BottomSheet, Props>(
-  ({ onClose, children, title, customSnapPoints }, ref) => {
+  ({ onClose, children, title, customSnapPoints, subTitle }, ref) => {
     const snapPoints = useMemo(() => {
       if (customSnapPoints && customSnapPoints?.length > 0)
         return customSnapPoints;
@@ -35,9 +37,12 @@ export const CustomSheet = forwardRef<BottomSheet, Props>(
       >
         {/* <BottomSheetView style={styles.contentContainer}> */}
         <Stack mode="flex">
-          <Title style={{ fontFamily: 'PublicSansSemiBold' }} size={20}>
-            {title}
-          </Title>
+          <View>
+            <Title style={{ fontFamily: 'PublicSansSemiBold' }} size={20}>
+              {title}
+            </Title>
+            {subTitle && <Text size="small">{subTitle}</Text>}
+          </View>
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             <IconX size={20} color={theme.colors.blue} />
           </TouchableOpacity>

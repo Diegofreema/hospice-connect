@@ -78,7 +78,6 @@ export const Post = ({ post, onView, hospiceId }: Props) => {
     if (value === 'edit') {
       router.push(`/edit/${post._id}`);
     }
-    console.log({ value });
 
     if (value === 'delete') {
       showModal({
@@ -95,6 +94,7 @@ export const Post = ({ post, onView, hospiceId }: Props) => {
   const onAssign = () => {
     router.push(`/assign-nurse?id=${post._id}`);
   };
+
   return (
     <Card style={styles.card}>
       <CardHeader style={styles.header}>

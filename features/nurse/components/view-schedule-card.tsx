@@ -1,53 +1,65 @@
 import { Badge } from '@/components/badge/Badge';
 import { BadgeVariant } from '@/components/badge/types';
 import { Card, CardHeader } from '@/components/card';
+import { useToast } from '@/components/demos/toast';
 import { PrivacyNoticeLink } from '@/components/privacy-notice/privacy-notice-link';
 import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
+import { useGetScheduleId } from '@/features/hospice/hooks/use-get-schedule-id';
 import { Text } from '@/features/shared/components/text';
 import { Stack } from '@/features/shared/components/v-stack';
 import {
   convertTimeStringToDate,
+  generateErrorMessage,
   getScheduleStatusAndColor,
   getScheduleStatusText,
 } from '@/features/shared/utils';
-
 import { useUpdateUpdateStatus } from '@/hooks/use-update-status';
+
+import { useMutation } from 'convex/react';
 import { FunctionReturnType } from 'convex/server';
 import { format, parse } from 'date-fns';
 import { Image } from 'expo-image';
 import { SymbolView } from 'expo-symbols';
+import { useState } from 'react';
 import { useWindowDimensions, View } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
-import { useGetScheduleId } from '../hooks/use-get-schedule-id';
 
 type Props = {
   shift: FunctionReturnType<typeof api.shifts.getShifts>[number];
-  onCancelSchedule: () => void;
-  onEditSchedule: () => void;
-  onRateNurse: () => void;
-  onViewRouteSheet: () => void;
+
+  onAcceptSchedule: () => void;
+  nurseId: Id<'nurses'>;
+  onOpenSheetCancelSchedule: () => void;
+  onClose: () => void;
 };
 
-export const ShiftCard = ({
+export const ViewShiftCard = ({
   shift,
-  onCancelSchedule,
-  onEditSchedule,
-  onRateNurse,
-  onViewRouteSheet,
+
+  onAcceptSchedule,
+  nurseId,
+  onClose,
+  onOpenSheetCancelSchedule,
 }: Props) => {
   const { width } = useWindowDimensions();
+
   const size = width * 0.13;
+
   const statusText = getScheduleStatusText(shift.status);
   const statusInfo = getScheduleStatusAndColor(shift.status);
   const getScheduleId = useGetScheduleId((state) => state.setId);
+  const sendCaseRequest = useMutation(
+    api.hospiceNotification.sendCaseRequestNotification
+  );
+  const [sending, setSending] = useState(false);
+  const { showToast } = useToast();
   const startDate = parse(shift.startDate, 'dd-MM-yyyy', new Date());
   const endDate = parse(shift.endDate, 'dd-MM-yyyy', new Date());
   const openingShift = convertTimeStringToDate(shift.startTime);
-  const closingShift = convertTimeStringToDate(shift.endTime);
-
   useUpdateUpdateStatus({
     nurseId: shift.nurseId!,
-    closingShift,
+    closingShift: convertTimeStringToDate(shift.endTime),
     shiftId: shift._id,
     startDate,
     status: shift.status,
@@ -55,21 +67,44 @@ export const ShiftCard = ({
     openingShift,
   });
   const handleCancelSchedule = () => {
-    onCancelSchedule();
+    onOpenSheetCancelSchedule();
     getScheduleId(shift._id);
   };
 
-  const handleEditSchedule = () => {
-    onEditSchedule();
-    getScheduleId(shift._id);
+  const handleAcceptSchedule = async () => {
+    setSending(true);
+    try {
+      await sendCaseRequest({
+        nurseId,
+        scheduleId: shift._id,
+      });
+      showToast({
+        title: 'Success',
+        subtitle: 'Case request sent successfully',
+        autodismiss: true,
+      });
+      onClose();
+    } catch (error) {
+      const errorMessage = generateErrorMessage(
+        error,
+        'Failed to send case request'
+      );
+      showToast({
+        title: 'Error',
+        subtitle: errorMessage,
+        autodismiss: true,
+      });
+    } finally {
+      setSending(false);
+    }
   };
 
-  const handleRateNurse = () => {
-    // if (!shift.nurse) return;
-    onRateNurse();
-    getScheduleId(shift._id);
-  };
-
+  const isMine = shift.nurseId === nurseId;
+  const name = isMine
+    ? shift.nurse?.firstName
+    : !isMine && shift.nurseId
+      ? 'Assigned to a nurse'
+      : 'No nurse assigned';
   return (
     <Card style={styles.card}>
       <CardHeader style={{ gap: 10 }}>
@@ -80,7 +115,7 @@ export const ShiftCard = ({
             </View>
             <View>
               <Text size="normal" isBold>
-                {shift.nurse?.firstName || 'No nurse assigned'}
+                {name}
               </Text>
               <Text size="normal" isBold>
                 {format(startDate, 'PP')} - {format(endDate, 'PP')}
@@ -109,24 +144,17 @@ export const ShiftCard = ({
           </View>
         </View>
         <Stack mode="flex" gap="lg">
-          {shift.status === 'completed' && (
-            <PrivacyNoticeLink onPress={onViewRouteSheet}>
-              View Route Sheet
+          {shift.status === 'available' && (
+            <PrivacyNoticeLink
+              onPress={handleAcceptSchedule}
+              disabled={sending}
+            >
+              Accept
             </PrivacyNoticeLink>
           )}
-          {shift.status !== 'completed' && shift.nurseId && (
+          {shift.status !== 'completed' && shift.nurseId && isMine && (
             <PrivacyNoticeLink onPress={handleCancelSchedule}>
               Cancel Schedule
-            </PrivacyNoticeLink>
-          )}
-          {shift.status !== 'booked' && (
-            <PrivacyNoticeLink onPress={handleEditSchedule}>
-              Edit Schedule
-            </PrivacyNoticeLink>
-          )}
-          {shift.status === 'completed' && (
-            <PrivacyNoticeLink onPress={handleRateNurse}>
-              Rate nurse
             </PrivacyNoticeLink>
           )}
         </Stack>

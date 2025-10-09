@@ -94,6 +94,7 @@ export const View = ({
           width,
           maxWidth
         ),
+        style,
       ]}
     >
       {children}

@@ -1,42 +1,39 @@
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 import { SmallLoader } from '@/features/shared/components/small-loader';
-import { LegendList } from '@legendapp/list';
 import { usePaginatedQuery } from 'convex/react';
-import React from 'react';
-import { NurseNotification } from './nurse-notification';
-
+import { FlatList } from 'react-native';
+import { HospiceNotification } from './hospsice-notification';
 type Props = {
-  nurseId: Id<'nurses'>;
+  hospiceId: Id<'hospices'>;
 };
-
-export const FetchNurseNotification = ({ nurseId }: Props) => {
-  const { results, loadMore, status } = usePaginatedQuery(
-    api.nurseNotifications.getNurseNotifications,
-    {
-      nurseId,
-    },
+export const Notifications = ({ hospiceId }: Props) => {
+  const { loadMore, results, status } = usePaginatedQuery(
+    api.hospiceNotification.getNotifications,
+    { hospiceId },
     { initialNumItems: 25 }
   );
   if (status === 'LoadingFirstPage') {
     return <SmallLoader size={50} />;
   }
+
   const onLoadMore = () => {
     if (status === 'CanLoadMore') {
       loadMore(25);
     }
   };
   return (
-    <LegendList
+    <FlatList
       data={results}
-      renderItem={({ item }) => <NurseNotification notification={item} />}
+      renderItem={({ item }) => <HospiceNotification notification={item} />}
       onEndReached={onLoadMore}
-      recycleItems
-      columnWrapperStyle={{ gap: 20 }}
       keyExtractor={(item) => item._id}
       onEndReachedThreshold={0.5}
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ gap: 20, paddingBottom: 100 }}
+      contentContainerStyle={{ paddingBottom: 100, gap: 20 }}
+      ListFooterComponent={
+        status === 'LoadingMore' ? <SmallLoader size={15} /> : null
+      }
     />
   );
 };

@@ -4,9 +4,11 @@ import { Button } from '@/features/shared/components/button';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 
 import { useToast } from '@/components/demos/toast';
+import { convertTimeStringToDate } from '@/convex/helper';
 import { CustomPressable } from '@/features/shared/components/custom-pressable';
 import { Text } from '@/features/shared/components/text';
 import { generateErrorMessage } from '@/features/shared/utils';
+import { useUpdateUpdateStatus } from '@/hooks/use-update-status';
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { IconCircle, IconCircleCheckFilled } from '@tabler/icons-react-native';
 import { useMutation, useQuery } from 'convex/react';
@@ -90,7 +92,7 @@ export const SelectSchedule = ({ id, hospiceId, name, onClose }: Props) => {
   );
 };
 
-const Schedule = ({
+export const Schedule = ({
   item,
   selectedId,
   onSelect,
@@ -101,6 +103,18 @@ const Schedule = ({
 }) => {
   const startDate = parse(item.startDate, 'dd-MM-yyyy', new Date());
   const endDate = parse(item.endDate, 'dd-MM-yyyy', new Date());
+  const openingShift = convertTimeStringToDate(item.startTime);
+  const closingShift = convertTimeStringToDate(item.endTime);
+  useUpdateUpdateStatus({
+    startDate,
+    endDate,
+    nurseId: item.nurseId!,
+    openingShift,
+    shiftId: item._id,
+    closingShift,
+    status: item.status,
+  });
+  console.log({ status: item.status });
 
   const isSelected = selectedId === item._id;
   return (

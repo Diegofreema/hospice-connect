@@ -1,4 +1,4 @@
-import { Id } from '@/convex/_generated/dataModel';
+import { Doc, Id } from '@/convex/_generated/dataModel';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Icon } from '@tabler/icons-react-native';
 import { Href } from 'expo-router';
@@ -48,4 +48,9 @@ export type NurseNotificationType = {
   isRead: boolean;
   title: string;
   status?: 'accepted' | 'declined';
+};
+
+export type AvailableAssignmentType = Doc<'assignments'> & {
+  hospice: Doc<'hospices'> | null;
+  schedules: Doc<'schedules'>[];
 };

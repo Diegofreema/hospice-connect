@@ -1,12 +1,14 @@
 import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
 import { LoadingComponent } from '@/features/shared/components/loading';
 
 import { Stack } from '@/features/shared/components/v-stack';
 import { usePaginatedQuery } from 'convex/react';
 import React from 'react';
-import { AssignmentsForNurses } from './assignments';
-
-export const CompletedAssignments = () => {
+type Props = {
+  nurseId: Id<'nurses'>;
+};
+export const CompletedAssignments = ({ nurseId }: Props) => {
   const { loadMore, results, status } = usePaginatedQuery(
     api.assignments.completedAssignments,
     { status: 'not_covered' },
@@ -22,15 +24,5 @@ export const CompletedAssignments = () => {
     }
   };
   const isLoadingMore = status === 'LoadingMore';
-  return (
-    <Stack flex={1}>
-      <AssignmentsForNurses
-        data={results}
-        handleMore={handleFetchMore}
-        isLoadingMore={isLoadingMore}
-        title={'No completed assignments yet'}
-        description={'Please check in later.'}
-      />
-    </Stack>
-  );
+  return <Stack flex={1}></Stack>;
 };

@@ -132,7 +132,7 @@
 // export default theme;
 
 const sharedColors = {
-  purpleLight: '#8C6FF7',
+  purpleLight: '#9747FF1A',
   purpleDark: '#9747FF',
   greenDark: '#00A25C',
   greenLight: 'rgba(240, 255, 249, 0.7)',

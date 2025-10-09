@@ -9,12 +9,12 @@ import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import {
+  changeFirstLetterToCapital,
   generateErrorMessage,
   getFontSize,
   uploadProfilePicture,
 } from '../utils';
 
-import { Card, CardContent } from '@/components/card';
 import { useToast } from '@/components/demos/toast';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { FlexText } from './flex-text';
@@ -35,6 +35,7 @@ type Props = {
   nurseId?: Id<'nurses'>;
   hospiceId?: Id<'hospices'>;
   imageId?: Id<'_storage'>;
+  state?: string;
 };
 
 export const ProfileCard = ({
@@ -52,9 +53,12 @@ export const ProfileCard = ({
   nurseId,
   imageId,
   hospiceId,
+  state,
 }: Props) => {
   const headingText = nurse ? `Nurse's` : `Hospice's`;
   const formattedRate = rate ? `$${rate}/hr` : '';
+  console.log({ nurseState: state });
+
   const [image, setImage] = useState<string | null>(null);
   const { theme } = useUnistyles();
   const [uploading, setUploading] = useState(false);
@@ -136,18 +140,25 @@ export const ProfileCard = ({
           )}
         </View>
       </View>
-      <View style={{ backgroundColor: theme.colors.cardGrey, padding: 5 }}>
+      <View style={{ backgroundColor: theme.colors.cardGrey, padding: 10 }}>
         <Text size={'large'} fontSize={getFontSize(16)} textAlign={'center'}>
           {headingText} information
         </Text>
-        <Card style={{ backgroundColor: 'white' }}>
-          <CardContent>
+        <View style={styles.card}>
+          <View style={styles.content}>
             <FlexText leftText="Name" rightText={name} />
             <FlexText leftText="Email" rightText={email} />
             <FlexText leftText="Mobile number" rightText={phoneNumber} />
             {licenseNumber && (
               <FlexText leftText="License number" rightText={licenseNumber} />
             )}
+            {state && (
+              <FlexText
+                leftText="State"
+                rightText={changeFirstLetterToCapital(state)}
+              />
+            )}
+
             {discipline && (
               <FlexText leftText="Discipline" rightText={discipline} />
             )}
@@ -162,8 +173,8 @@ export const ProfileCard = ({
             {faxNumber && (
               <FlexText leftText="Fax number" rightText={faxNumber} />
             )}
-          </CardContent>
-        </Card>
+          </View>
+        </View>
       </View>
     </View>
   );
@@ -193,4 +204,11 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: 80,
     alignSelf: 'center',
   },
+  card: {
+    backgroundColor: 'white',
+    padding: theme.paddings.xl,
+    borderRadius: theme.borderRadius.md,
+    marginTop: theme.margins.md,
+  },
+  content: {},
 }));

@@ -1,15 +1,16 @@
-import { Doc } from '@/convex/_generated/dataModel';
 import { ActionComponent } from '@/features/shared/components/action-component';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { LegendList } from '@legendapp/list';
-import { Text } from 'react-native';
+import { AvailableAssignmentType } from '../types';
+import { AssignmentAvailableCard } from './assignment-card';
 
 type Props = {
-  data: Doc<'assignments'>[];
+  data: AvailableAssignmentType[];
   handleMore: () => void;
   isLoadingMore: boolean;
   title?: string;
   description?: string;
+  onOpenSheet: () => void;
 };
 export const AssignmentsForNurses = ({
   data,
@@ -17,23 +18,29 @@ export const AssignmentsForNurses = ({
   isLoadingMore,
   description = 'Please check in later.',
   title = 'No available assignments',
+  onOpenSheet,
 }: Props) => {
   return (
-    <LegendList
-      data={data}
-      renderItem={({ item }) => <Text>{item.patientFirstName}</Text>}
-      keyExtractor={(item) => item._id}
-      onEndReached={handleMore}
-      onEndReachedThreshold={0.5}
-      recycleItems
-      ListFooterComponent={isLoadingMore ? <SmallLoader /> : null}
-      ListEmptyComponent={
-        <ActionComponent
-          title={title}
-          description={description}
-          imageUrl={require('@/assets/images/review.png')}
-        />
-      }
-    />
+    <>
+      <LegendList
+        data={data}
+        renderItem={({ item }) => (
+          <AssignmentAvailableCard onOpenSheet={onOpenSheet} item={item} />
+        )}
+        keyExtractor={(item) => item._id}
+        onEndReached={handleMore}
+        onEndReachedThreshold={0.5}
+        style={{ paddingHorizontal: 15 }}
+        recycleItems
+        ListFooterComponent={isLoadingMore ? <SmallLoader /> : null}
+        ListEmptyComponent={
+          <ActionComponent
+            title={title}
+            description={description}
+            imageUrl={require('@/assets/images/review.png')}
+          />
+        }
+      />
+    </>
   );
 };

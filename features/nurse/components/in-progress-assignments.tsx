@@ -1,18 +1,22 @@
 import { api } from '@/convex/_generated/api';
-import { LoadingComponent } from '@/features/shared/components/loading';
+import { Id } from '@/convex/_generated/dataModel';
 
+import { SmallLoader } from '@/features/shared/components/small-loader';
 import { Stack } from '@/features/shared/components/v-stack';
 import { usePaginatedQuery } from 'convex/react';
-import { AssignmentsForNurses } from './assignments';
-
-export const InProgressAssignments = () => {
+import { InProgress } from './in-progress';
+type Props = {
+  nurseId: Id<'nurses'>;
+  onOpenSheet: () => void;
+};
+export const InProgressAssignments = ({ nurseId, onOpenSheet }: Props) => {
   const { loadMore, results, status } = usePaginatedQuery(
-    api.assignments.inProgressAssignments,
-    { status: 'not_covered' },
+    api.shifts.getInProgressShifts,
+    { nurseId },
     { initialNumItems: 25 }
   );
   if (status === 'LoadingFirstPage') {
-    return <LoadingComponent />;
+    return <SmallLoader size={50} />;
   }
 
   const handleFetchMore = () => {
@@ -23,12 +27,11 @@ export const InProgressAssignments = () => {
   const isLoadingMore = status === 'LoadingMore';
   return (
     <Stack flex={1}>
-      <AssignmentsForNurses
+      <InProgress
         data={results}
         handleMore={handleFetchMore}
         isLoadingMore={isLoadingMore}
-        title={'No assignments in progress'}
-        description={'Please check in later.'}
+        onOpenSheet={onOpenSheet}
       />
     </Stack>
   );

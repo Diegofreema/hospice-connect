@@ -29,6 +29,7 @@ import type * as posts from "../posts.js";
 import type * as schedules from "../schedules.js";
 import type * as sendEmail from "../sendEmail.js";
 import type * as shifts from "../shifts.js";
+import type * as types from "../types.js";
 import type * as users from "../users.js";
 
 import type {
@@ -67,6 +68,7 @@ declare const fullApi: ApiFromModules<{
   schedules: typeof schedules;
   sendEmail: typeof sendEmail;
   shifts: typeof shifts;
+  types: typeof types;
   users: typeof users;
 }>;
 declare const fullApiWithMounts: typeof fullApi;

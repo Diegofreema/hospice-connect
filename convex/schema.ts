@@ -70,7 +70,7 @@ export const Schedule = {
   startDate: v.string(),
   endDate: v.string(),
   rate: v.number(),
-  isCancelled: v.optional(v.boolean()),
+  canceledAt: v.optional(v.number()),
   isEdited: v.optional(v.boolean()),
 };
 
@@ -176,6 +176,8 @@ export const HospiceNotification = {
   description: v.optional(v.string()),
   routeSheetId: v.optional(v.id('routeSheets')),
   scheduleId: v.optional(v.id('schedules')),
+  nurseId: v.optional(v.id('nurses')),
+  status: v.optional(v.union(v.literal('accepted'), v.literal('declined'))),
 };
 export default defineSchema({
   ...authTables,
