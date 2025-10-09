@@ -114,7 +114,6 @@ export const Schedule = ({
     closingShift,
     status: item.status,
   });
-  console.log({ status: item.status });
 
   const isSelected = selectedId === item._id;
   return (

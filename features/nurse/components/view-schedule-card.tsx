@@ -70,6 +70,7 @@ export const ViewShiftCard = ({
     onOpenSheetCancelSchedule();
     getScheduleId(shift._id);
   };
+  console.log({ id: shift._id });
 
   const handleAcceptSchedule = async () => {
     setSending(true);

@@ -1,6 +1,7 @@
 import { getAuthUserId } from '@convex-dev/auth/server';
 import { ConvexError, v } from 'convex/values';
 import { mutation, query } from './_generated/server';
+import { convertTimeStringToDate, getRatings, stringToDate } from './helper';
 import { scheduleStatus } from './schema';
 
 export const cancelSchedule = mutation({
@@ -190,6 +191,134 @@ export const declineSchedule = mutation({
     });
   },
 });
+export const declineCaseRequest = mutation({
+  args: {
+    scheduleId: v.id('schedules'),
+    hospiceId: v.id('hospices'),
+    nurseId: v.id('nurses'),
+    hospiceName: v.string(),
+    notificationId: v.id('hospiceNotifications'),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new ConvexError({ message: 'Unauthorized' });
+    }
+
+    const schedule = await ctx.db.get(args.scheduleId);
+    if (!schedule) {
+      throw new ConvexError({ message: 'Shift not found' });
+    }
+
+    const assignment = await ctx.db.get(schedule.assignmentId);
+    if (!assignment) {
+      throw new ConvexError({ message: 'Assignment not found' });
+    }
+    if (assignment.hospiceId !== args.hospiceId) {
+      throw new ConvexError({
+        message: 'You do not have permission to decline this case request',
+      });
+    }
+
+    const nurse = await ctx.db.get(args.nurseId);
+    if (!nurse) {
+      throw new ConvexError({ message: 'Nurse not found' });
+    }
+    await ctx.db.insert('nurseNotifications', {
+      nurseId: args.nurseId,
+      isRead: false,
+      hospiceId: args.hospiceId,
+      scheduleId: args.scheduleId,
+      description: `${args.hospiceName} has declined your case request.`,
+      title: 'Case request declined',
+      type: 'normal',
+    });
+    await ctx.db.patch(args.notificationId, {
+      status: 'declined',
+    });
+  },
+});
+export const acceptCaseRequest = mutation({
+  args: {
+    scheduleId: v.id('schedules'),
+    hospiceId: v.id('hospices'),
+    nurseId: v.id('nurses'),
+    hospiceName: v.string(),
+    notificationId: v.id('hospiceNotifications'),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new ConvexError({ message: 'Unauthorized' });
+    }
+
+    const schedule = await ctx.db.get(args.scheduleId);
+    if (!schedule) {
+      throw new ConvexError({ message: 'Shift not found' });
+    }
+    // logic to check if schedule time has passed
+    const openingShift = convertTimeStringToDate(schedule.startTime);
+    const startDate = stringToDate(schedule.startDate);
+    const shiftStartDateTime = new Date(startDate as Date);
+    shiftStartDateTime.setHours(
+      openingShift.getHours(),
+      openingShift.getMinutes(),
+      0,
+      0
+    );
+
+    const now = new Date();
+    if (shiftStartDateTime < now) {
+      throw new ConvexError({ message: 'Shift has already passed' });
+    }
+    if (schedule.status === 'not_covered') {
+      throw new ConvexError({ message: 'Shift has already passed' });
+    }
+
+    if (schedule.status === 'booked') {
+      throw new ConvexError({ message: 'Shift already booked' });
+    }
+
+    if (schedule.status === 'completed') {
+      throw new ConvexError({ message: 'Shift already completed' });
+    }
+
+    if (schedule.nurseId) {
+      throw new ConvexError({ message: 'Shift already accepted' });
+    }
+
+    const assignment = await ctx.db.get(schedule.assignmentId);
+    if (!assignment) {
+      throw new ConvexError({ message: 'Assignment not found' });
+    }
+    if (assignment.hospiceId !== args.hospiceId) {
+      throw new ConvexError({
+        message: 'You do not have permission to decline this case request',
+      });
+    }
+
+    const nurse = await ctx.db.get(args.nurseId);
+    if (!nurse) {
+      throw new ConvexError({ message: 'Nurse not found' });
+    }
+    await ctx.db.insert('nurseNotifications', {
+      nurseId: args.nurseId,
+      isRead: false,
+      hospiceId: args.hospiceId,
+      scheduleId: args.scheduleId,
+      description: `${args.hospiceName} has accepted your case request.`,
+      title: 'Case request accepted',
+      type: 'normal',
+    });
+    await ctx.db.patch(args.notificationId, {
+      status: 'accepted',
+    });
+    await ctx.db.patch(args.scheduleId, {
+      status: 'booked',
+      nurseId: args.nurseId,
+    });
+  },
+});
 
 // ! queries
 
@@ -272,5 +401,63 @@ export const getSchedulesByAssignmentId = query({
         q.eq('assignmentId', args.assignmentId).eq('status', 'available')
       )
       .collect();
+  },
+});
+
+export const getCaseRequest = query({
+  args: {
+    hospiceId: v.id('hospices'),
+    nurseId: v.id('nurses'),
+    scheduleId: v.id('schedules'),
+    notificationId: v.id('hospiceNotifications'),
+  },
+  handler: async (ctx, args) => {
+    const userId = getAuthUserId(ctx);
+    if (!userId) {
+      throw new ConvexError({ message: 'Unauthorized' });
+    }
+
+    const hospice = await ctx.db.get(args.hospiceId);
+    if (!hospice) {
+      throw new ConvexError({ message: 'Hospice not found' });
+    }
+
+    const schedule = await ctx.db.get(args.scheduleId);
+    if (!schedule) {
+      throw new ConvexError({ message: 'Schedule not found' });
+    }
+
+    const assignment = await ctx.db.get(schedule.assignmentId);
+    if (!assignment) {
+      throw new ConvexError({ message: 'Assignment not found' });
+    }
+
+    const nurse = await ctx.db.get(args.nurseId);
+    if (!nurse) {
+      throw new ConvexError({ message: 'Nurse not found' });
+    }
+    const notification = await ctx.db.get(args.notificationId);
+    if (!notification) {
+      throw new ConvexError({ message: 'Notification not found' });
+    }
+    const ratings = await getRatings(ctx, nurse._id);
+    let nurseImage;
+
+    if (nurse.imageId) {
+      nurseImage = await ctx.storage.getUrl(nurse.imageId);
+    }
+
+    const nurseWithImage = {
+      ...nurse,
+      image: nurseImage,
+      ratings,
+    };
+
+    return {
+      assignment,
+      nurse: nurseWithImage,
+      schedule,
+      notification,
+    };
   },
 });

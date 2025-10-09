@@ -37,7 +37,7 @@ export const HospiceNotification = ({ notification }: Props) => {
 
     if (notification.type === 'case_request') {
       router.push(
-        `/case-request?nurseId=${notification?.nurseId}&shiftId=${notification?.scheduleId}`
+        `/case-request?nurseId=${notification?.nurseId}&shiftId=${notification?.scheduleId}&notificationId=${notification._id}`
       );
     }
   };
@@ -77,11 +77,6 @@ export const HospiceNotification = ({ notification }: Props) => {
       setProcessing(false);
     }
   };
-  console.log({
-    nurseId: notification.nurseId,
-    scheduleId: notification.scheduleId,
-    description: notification.description,
-  });
 
   const onAccept = async () => {
     if (

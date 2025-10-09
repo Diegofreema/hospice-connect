@@ -19,7 +19,10 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
   const assignmentId = useSelectAssignment((state) => state.id);
 
   const [loading, setLoading] = useState(false);
-  const onSchedule = useMutation(api.posts.acceptAssignment);
+
+  const sendCaseRequest = useMutation(
+    api.hospiceNotification.sendCaseRequestNotification
+  );
   const { showToast } = useToast();
 
   const schedules = useQuery(
@@ -44,7 +47,7 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
     if (!selectedId || !nurseId) return;
     setLoading(true);
     try {
-      await onSchedule({
+      await sendCaseRequest({
         nurseId,
         scheduleId: selectedId,
       });

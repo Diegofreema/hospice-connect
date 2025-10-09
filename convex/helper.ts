@@ -156,3 +156,30 @@ export function convertTimeStringToDate(timeString: string) {
     minutes
   );
 }
+
+export function formatDate(dateString: string): string {
+  // Parse the input date string in DD-MM-YYYY format
+  const [day, month, year] = dateString.split('-').map(Number);
+
+  // Validate input
+  if (!day || !month || !year || isNaN(day) || isNaN(month) || isNaN(year)) {
+    throw new Error('Invalid date format. Expected DD-MM-YYYY');
+  }
+
+  // Create Date object (month is 0-based in JavaScript, so subtract 1)
+  const date = new Date(year, month - 1, day);
+
+  // Check if the date is valid
+  if (isNaN(date.getTime())) {
+    throw new Error('Invalid date');
+  }
+
+  // Format the date using Intl.DateTimeFormat
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: '2-digit',
+    year: 'numeric',
+  })
+    .format(date)
+    .replace(/(\d+),/, '$1,'); // Ensure format is "MMM DD, YYYY"
+}

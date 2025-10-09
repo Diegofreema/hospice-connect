@@ -2,6 +2,7 @@ import { getAuthUserId } from '@convex-dev/auth/server';
 import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { mutation, query } from './_generated/server';
+import { formatDate } from './helper';
 import { getNurseDetails } from './nurses';
 
 export const unreadMessagesCount = query({
@@ -111,7 +112,7 @@ export const cancelShiftNotification = mutation({
       type: 'cancel_request',
       description: args.reason,
       scheduleId: shift._id,
-      title: `${nurse.firstName} ${nurse.lastName} submitted cancel request for ${shift.startDate}-${shift.endDate}: ${shift.startTime}-${shift.endTime}`,
+      title: `${nurse.firstName} ${nurse.lastName} submitted cancel request for ${formatDate(shift.startDate)}-${formatDate(shift.endDate)}: ${shift.startTime}-${shift.endTime}`,
     });
   },
 });
@@ -157,7 +158,8 @@ export const sendCaseRequestNotification = mutation({
       nurseId: nurse._id,
       type: 'case_request',
       description: '',
-      title: `${nurse.firstName} ${nurse.lastName} has submitted a case request for ${shift.startDate}-${shift.endDate}: ${shift.startTime}-${shift.endTime}`,
+      scheduleId: args.scheduleId,
+      title: `${nurse.firstName} ${nurse.lastName} has submitted a case request for ${formatDate(shift.startDate)}-${formatDate(shift.endDate)}: ${shift.startTime}-${shift.endTime}`,
     });
   },
 });

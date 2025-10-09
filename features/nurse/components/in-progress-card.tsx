@@ -74,7 +74,6 @@ const styles = StyleSheet.create((theme) => ({
   content: {
     gap: 10,
     marginTop: -10,
-
     borderRadius: 15,
   },
   footer: {
