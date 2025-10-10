@@ -30,6 +30,7 @@ export const ControlInput = <TFieldValues extends FieldValues>({
   rightIcon,
   leftIcon,
   variant = 'input',
+  placeholder,
   ...rest
 }: Props<TFieldValues>) => {
   return (
@@ -55,6 +56,7 @@ export const ControlInput = <TFieldValues extends FieldValues>({
               label={label as string}
               onChangeText={onChange}
               value={value}
+              placeholder={placeholder}
               {...rest}
             />
           )

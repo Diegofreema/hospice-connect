@@ -1,42 +1,59 @@
 import { Card, CardContent, CardHeader } from '@/components/card';
-import { Doc, Id } from '@/convex/_generated/dataModel';
 import { FlexText } from '@/features/shared/components/flex-text';
 import { trimText } from '@/features/shared/utils';
 import React from 'react';
 
-import { useSelectAssignment } from '@/features/hospice/hooks/use-select-assignment';
+import { useNurse } from '@/components/context/nurse-context';
+import { api } from '@/convex/_generated/api';
 import { FlexButtons } from '@/features/shared/components/flex-buttons';
 import { useMessage } from '@/hooks/use-message';
+import { useQuery } from 'convex/react';
 import { format, parse } from 'date-fns';
+import { router } from 'expo-router';
 import { StyleSheet } from 'react-native-unistyles';
+import { AssignmentsWithHospicesType } from '../types';
 
 type Props = {
-  item: Doc<'assignments'> & {
-    businessName?: string;
-    hospiceUserId: Id<'users'>;
-  };
-  onOpenSheet: () => void;
+  item: AssignmentsWithHospicesType;
 };
 
-export const InProgressCard = ({ item: post, onOpenSheet }: Props) => {
-  const setId = useSelectAssignment((state) => state.setId);
+export const CompletedCard = ({ item: post }: Props) => {
+  const { nurse } = useNurse();
   const name = post.patientFirstName + ' ' + post.patientLastName;
   const startDate = parse(post.startDate, 'dd-MM-yyyy', new Date());
   const endDate = parse(post.endDate, 'dd-MM-yyyy', new Date());
   const dob = parse(post.dateOfBirth, 'dd-MM-yyyy', new Date());
+  const hasSubmittedRouteSheet = useQuery(
+    api.routeSheets.nurseSubmittedRouteSheet,
+    {
+      assignmentId: post._id,
+      nurseId: nurse?._id!,
+    }
+  );
+  const { onMessage } = useMessage({ userToChat: post.hospice?.userId! });
 
-  const { onMessage } = useMessage({ userToChat: post.hospiceUserId });
-  const handleAccept = () => {
-    setId(post._id);
-    onOpenSheet();
+  if (hasSubmittedRouteSheet === undefined) {
+    return null;
+  }
+
+  const onHandleRouteSheet = () => {
+    const path = !hasSubmittedRouteSheet
+      ? '/complete-route-sheet'
+      : '/view-route-sheet';
+
+    router.push(`${path}?assignmentId=${post._id}&nurseId=${nurse?._id}`);
   };
+
+  const buttonText = hasSubmittedRouteSheet
+    ? 'View route sheet'
+    : 'Complete route sheet';
   return (
     <Card style={styles.card}>
       <CardHeader style={styles.header}></CardHeader>
       <CardContent style={styles.content}>
         <FlexText
           leftText="Business name"
-          rightText={post?.businessName || 'N/A'}
+          rightText={post?.hospice?.businessName || 'N/A'}
         />
 
         <FlexText leftText="Patient name" rightText={name} />
@@ -54,9 +71,9 @@ export const InProgressCard = ({ item: post, onOpenSheet }: Props) => {
         />
 
         <FlexButtons
-          onPress={handleAccept}
+          onPress={onHandleRouteSheet}
           onCancel={onMessage}
-          buttonText2="View schedule"
+          buttonText2={buttonText}
           buttonText="Message"
         />
       </CardContent>

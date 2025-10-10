@@ -26,6 +26,7 @@ import type * as nurseNotifications from "../nurseNotifications.js";
 import type * as nurses from "../nurses.js";
 import type * as passwordReset_PasswordResetemail from "../passwordReset/PasswordResetemail.js";
 import type * as posts from "../posts.js";
+import type * as routeSheets from "../routeSheets.js";
 import type * as schedules from "../schedules.js";
 import type * as sendEmail from "../sendEmail.js";
 import type * as shifts from "../shifts.js";
@@ -65,6 +66,7 @@ declare const fullApi: ApiFromModules<{
   nurses: typeof nurses;
   "passwordReset/PasswordResetemail": typeof passwordReset_PasswordResetemail;
   posts: typeof posts;
+  routeSheets: typeof routeSheets;
   schedules: typeof schedules;
   sendEmail: typeof sendEmail;
   shifts: typeof shifts;

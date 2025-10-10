@@ -72,6 +72,7 @@ export const Schedule = {
   rate: v.number(),
   canceledAt: v.optional(v.number()),
   isEdited: v.optional(v.boolean()),
+  isSubmitted: v.optional(v.boolean()),
 };
 
 export const gender = v.union(
@@ -189,7 +190,12 @@ export default defineSchema({
     .index('hospiceId', ['hospiceId']),
   schedules: defineTable(Schedule)
     .index('nurse', ['nurseId', 'status'])
-    .index('by_assignment_id', ['assignmentId', 'status']),
+    .index('by_assignment_id', [
+      'assignmentId',
+      'status',
+      'nurseId',
+      'isSubmitted',
+    ]),
   routeSheets: defineTable(routeSheet),
   ratings: defineTable(Rating).index('nurseId', ['nurseId']),
   availabilities: defineTable(Availability).index('nurseId', ['nurseId']),

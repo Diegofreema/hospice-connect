@@ -28,6 +28,7 @@ export const InProgressAssignments = ({ nurseId, onOpenSheet }: Props) => {
   return (
     <Stack flex={1}>
       <InProgress
+        // @ts-ignore
         data={results}
         handleMore={handleFetchMore}
         isLoadingMore={isLoadingMore}

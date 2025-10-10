@@ -88,6 +88,11 @@ export const SelectSchedule = ({ id, hospiceId, name, onClose }: Props) => {
         <Button title="Schedule" onPress={onSend} disabled={loading} />
       }
       ListFooterComponentStyle={{ marginTop: 'auto', marginBottom: 15 }}
+      ListEmptyComponent={
+        <Text size="large" isBold textAlign="center">
+          No shifts available
+        </Text>
+      }
     />
   );
 };

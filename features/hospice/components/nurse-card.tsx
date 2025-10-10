@@ -23,6 +23,7 @@ import { SymbolView } from 'expo-symbols';
 
 import { Button } from '@/features/shared/components/button';
 import { Stack } from '@/features/shared/components/v-stack';
+import { useMessage } from '@/hooks/use-message';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { useGetNurseId } from '../hooks/use-get-nurse-id';
 
@@ -68,10 +69,11 @@ type Props = {
 
 export const NurseCard = ({ nurse, isAssigned, onAction }: Props) => {
   const isAvailable = !!nurse.available?.available;
+  const { onMessage } = useMessage({ userToChat: nurse.userId });
   const setNurseId = useGetNurseId((state) => state.setId);
   const badgeText = isAvailable ? 'Available' : 'Unavailable';
   const name = nurse.firstName + ' ' + nurse.lastName;
-  const onMessage = () => {};
+
   const { theme } = useUnistyles();
   const onHandleAction = () => {
     onAction && onAction();

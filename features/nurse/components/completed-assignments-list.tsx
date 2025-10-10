@@ -2,32 +2,29 @@ import { ActionComponent } from '@/features/shared/components/action-component';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { LegendList } from '@legendapp/list';
 import React from 'react';
-import { AssignmentWithBusiness } from '../types';
-import { InProgressCard } from './in-progress-card';
+import { AssignmentsWithHospicesType } from '../types';
+import { CompletedCard } from './completed-card';
 
 type Props = {
-  data: AssignmentWithBusiness[];
+  data: AssignmentsWithHospicesType[];
   handleMore: () => void;
   isLoadingMore: boolean;
   title?: string;
   description?: string;
-  onOpenSheet: () => void;
 };
 
-export const InProgress = ({
+export const CompletedAssignmentsList = ({
   data,
   handleMore,
   isLoadingMore,
-  onOpenSheet,
+
   description = 'Please check in later.',
   title = 'No available assignments',
 }: Props) => {
   return (
     <LegendList
       data={data}
-      renderItem={({ item }) => (
-        <InProgressCard onOpenSheet={onOpenSheet} item={item} />
-      )}
+      renderItem={({ item }) => <CompletedCard item={item} />}
       keyExtractor={(item) => item._id}
       onEndReached={handleMore}
       onEndReachedThreshold={0.5}

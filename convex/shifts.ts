@@ -128,12 +128,12 @@ export const getInProgressShifts = query({
         if (!assignment) {
           throw new ConvexError({ message: 'Assignment not found' });
         }
-        const hospice = assignment
-          ? await ctx.db.get(assignment?.hospiceId)
-          : null;
+        const hospice = await ctx.db.get(assignment?.hospiceId);
+
         return {
           ...assignment,
           businessName: hospice?.businessName,
+          hospiceUserId: hospice?.userId!,
         };
       })
     );

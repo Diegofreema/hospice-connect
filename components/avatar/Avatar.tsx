@@ -231,11 +231,9 @@ export const Avatar: React.FC<AvatarGroupProps> = ({
               },
             ]}
             onLoad={() => {
-              console.log('Image loaded!');
               handleImageLoad();
             }}
             onError={(e) => {
-              console.error('Image failed to load:', e.nativeEvent);
               handleImageError();
             }}
             defaultSource={require('../../assets/images/icon.png')}

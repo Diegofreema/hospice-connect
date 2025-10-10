@@ -5,7 +5,7 @@ import { ConvexError, v } from 'convex/values';
 import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import { careLevel, discipline, gender, shifts } from './schema';
-import { AvailableAssignmentType } from './types';
+import { AssignmentsWithHospicesType, AvailableAssignmentType } from './types';
 
 export const availableAssignments = query({
   args: {
@@ -107,25 +107,17 @@ export const inProgressAssignments = query({
 });
 export const completedAssignments = query({
   args: {
-    status: v.union(
-      v.literal('completed'),
-      v.literal('not_covered'),
-      v.literal('booked'),
-      v.literal('available')
-    ),
+    nurseId: v.id('nurses'),
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) {
-      return {} as PaginationResult<Doc<'assignments'>>;
+      return {} as PaginationResult<AssignmentsWithHospicesType>;
     }
-    const nurse = await ctx.db
-      .query('nurses')
-      .withIndex('userId', (q) => q.eq('userId', userId))
-      .first();
+    const nurse = await ctx.db.get(args.nurseId);
     if (!nurse) {
-      return {} as PaginationResult<Doc<'assignments'>>;
+      return {} as PaginationResult<AssignmentsWithHospicesType>;
     }
     const schedules = await filter(
       ctx.db
@@ -148,10 +140,18 @@ export const completedAssignments = query({
     });
 
     const finalArray: Doc<'assignments'>[] = Array.from(uniqueMap.values());
-
+    const assignmentsWithHospices = await Promise.all(
+      finalArray.map(async (assignment) => {
+        const hospice = await ctx.db.get(assignment.hospiceId);
+        return {
+          ...assignment,
+          hospice,
+        };
+      })
+    );
     return {
       ...schedules,
-      page: finalArray,
+      page: assignmentsWithHospices,
     };
   },
 });
@@ -218,6 +218,7 @@ export const createAssignment = mutation({
         startTime: shift.startShift,
         rate: args.rate,
         status: 'available',
+        isSubmitted: false,
       });
     }
   },

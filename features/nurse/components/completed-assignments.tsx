@@ -5,13 +5,14 @@ import { LoadingComponent } from '@/features/shared/components/loading';
 import { Stack } from '@/features/shared/components/v-stack';
 import { usePaginatedQuery } from 'convex/react';
 import React from 'react';
+import { CompletedAssignmentsList } from './completed-assignments-list';
 type Props = {
   nurseId: Id<'nurses'>;
 };
 export const CompletedAssignments = ({ nurseId }: Props) => {
   const { loadMore, results, status } = usePaginatedQuery(
     api.assignments.completedAssignments,
-    { status: 'not_covered' },
+    { nurseId },
     { initialNumItems: 25 }
   );
   if (status === 'LoadingFirstPage') {
@@ -24,5 +25,13 @@ export const CompletedAssignments = ({ nurseId }: Props) => {
     }
   };
   const isLoadingMore = status === 'LoadingMore';
-  return <Stack flex={1}></Stack>;
+  return (
+    <Stack flex={1}>
+      <CompletedAssignmentsList
+        handleMore={handleFetchMore}
+        isLoadingMore={isLoadingMore}
+        data={results}
+      />
+    </Stack>
+  );
 };

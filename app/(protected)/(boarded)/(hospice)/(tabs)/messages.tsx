@@ -1,5 +1,7 @@
 import { useAuth } from '@/components/context/auth';
 import { useAppChatContext } from '@/components/context/chat-context';
+import { CustomListItem } from '@/features/messaging/components/custom-list-item';
+
 import { Wrapper } from '@/features/shared/components/wrapper';
 import { useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
@@ -36,6 +38,7 @@ const MessageScreen = () => {
         sort={sort}
         onSelect={onPress}
         numberOfSkeletons={20}
+        Preview={CustomListItem}
       />
     </Wrapper>
   );

@@ -5,6 +5,7 @@ import React from 'react';
 
 import { useSelectAssignment } from '@/features/hospice/hooks/use-select-assignment';
 import { FlexButtons } from '@/features/shared/components/flex-buttons';
+import { useMessage } from '@/hooks/use-message';
 import { format, parse } from 'date-fns';
 import { StyleSheet } from 'react-native-unistyles';
 import { AvailableAssignmentType } from '../types';
@@ -20,6 +21,7 @@ export const AssignmentAvailableCard = ({ item: post, onOpenSheet }: Props) => {
   const startDate = parse(post.startDate, 'dd-MM-yyyy', new Date());
   const endDate = parse(post.endDate, 'dd-MM-yyyy', new Date());
   const dob = parse(post.dateOfBirth, 'dd-MM-yyyy', new Date());
+  const { onMessage } = useMessage({ userToChat: post.hospice?.userId! });
   const handleAccept = () => {
     setId(post._id);
     onOpenSheet();
@@ -49,7 +51,7 @@ export const AssignmentAvailableCard = ({ item: post, onOpenSheet }: Props) => {
 
         <FlexButtons
           onPress={handleAccept}
-          onCancel={() => {}}
+          onCancel={onMessage}
           buttonText2="Accept"
           buttonText="Message"
         />

@@ -54,3 +54,38 @@ export type AvailableAssignmentType = Doc<'assignments'> & {
   hospice: Doc<'hospices'> | null;
   schedules: Doc<'schedules'>[];
 };
+
+export type AssignmentWithBusiness = {
+  businessName: string | undefined;
+  hospiceUserId: Id<'users'>;
+  _id: Id<'assignments'>;
+  _creationTime: number;
+  zipCode?: string | undefined;
+  assignedTo?: Id<'nurses'> | undefined;
+  notes?: string | undefined;
+  gender: 'male' | 'female' | 'others';
+  phoneNumber: string;
+  dateOfBirth: string;
+  discipline: 'RN' | 'LVN' | 'HHA';
+  rate: number;
+  state: string;
+  hospiceId: Id<'hospices'>;
+  patientFirstName: string;
+  patientLastName: string;
+  startDate: string;
+  endDate: string;
+  openShift: string;
+  patientAddress: string;
+  status: 'completed' | 'not_covered' | 'booked' | 'available' | 'not_booked';
+  careLevel:
+    | 'Initial Evaluation'
+    | 'Follow Up'
+    | 'Continuous Care'
+    | 'Supervision'
+    | 'Recertification'
+    | 'Discharge';
+};
+
+export type AssignmentsWithHospicesType = Doc<'assignments'> & {
+  hospice: Doc<'hospices'> | null;
+};

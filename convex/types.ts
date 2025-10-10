@@ -6,3 +6,7 @@ export type AvailableAssignmentType = AssignmentType & {
   hospice: Doc<'hospices'> | null;
   schedules: Doc<'schedules'>[];
 };
+
+export type AssignmentsWithHospicesType = AssignmentType & {
+  hospice: Doc<'hospices'> | null;
+};

@@ -21,3 +21,13 @@ export type StepProps = {
   form: UseFormReturn<CreateNurseValidator>;
   isEdit?: boolean;
 };
+
+export const routeSheetValidator = z.object({
+  signature: z.string().min(1, 'Signature is required'),
+  comment: z
+    .string()
+    .max(50, 'Comment must be at most 50 characters')
+    .optional(),
+});
+
+export type RouteSheetValidator = z.infer<typeof routeSheetValidator>;

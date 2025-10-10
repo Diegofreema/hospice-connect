@@ -6,6 +6,7 @@ import { HapticTab } from '@/components/HapticTab';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 
 import { TabBarIcon } from '@/features/shared/components/tab-bar-icon';
+import { useUnread } from '@/features/shared/hooks/use-unread';
 import {
   IconDotsCircleHorizontal,
   IconHome2,
@@ -15,6 +16,8 @@ import { useUnistyles } from 'react-native-unistyles';
 
 export default function TabLayout() {
   const { theme } = useUnistyles();
+  const unreadCount = useUnread((state) => state.unread);
+
   return (
     <Tabs
       screenOptions={{
@@ -45,7 +48,12 @@ export default function TabLayout() {
         options={{
           title: 'Messages',
           tabBarIcon: ({ color, size }) => (
-            <TabBarIcon size={size} icon={IconMessageCircle} color={color} />
+            <TabBarIcon
+              size={size}
+              icon={IconMessageCircle}
+              color={color}
+              unreadCount={unreadCount}
+            />
           ),
         }}
       />
