@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-object-type */
-import { Id } from '@/convex/_generated/dataModel';
+import { Doc, Id } from '@/convex/_generated/dataModel';
 import { scheduleStatus } from '@/convex/schema';
 import { ReactMutation } from 'convex/react';
 import { FunctionReference } from 'convex/server';
@@ -146,4 +146,45 @@ export function convertTimeStringToDate(timeString: string) {
     hours24,
     minutes
   );
+}
+
+function timeToHours(timeStr: string) {
+  const [time, period] = timeStr.split(/\s+/);
+  let [hours, minutes] = time.split(':').map(Number);
+
+  if (period === 'PM' && hours !== 12) {
+    hours += 12;
+  } else if (period === 'AM' && hours === 12) {
+    hours = 0;
+  }
+
+  return hours + minutes / 60;
+}
+
+// Function to calculate hours for a single shift
+function calculateShiftHours(shift: Doc<'schedules'>) {
+  let startHours = timeToHours(shift.startTime);
+  let endHours = timeToHours(shift.endTime);
+
+  // Handle overnight shifts (end time is before start time)
+  if (endHours < startHours) {
+    endHours += 24;
+  }
+
+  return endHours - startHours;
+}
+
+// Calculate total hours worked
+export function calculateTotalHours(shifts: Doc<'schedules'>[]) {
+  let totalHours = 0;
+
+  shifts.forEach((shift) => {
+    const hours = calculateShiftHours(shift);
+    console.log(
+      `Shift ${shift.startTime} - ${shift.endTime}: ${hours.toFixed(2)} hours`
+    );
+    totalHours += hours;
+  });
+
+  return totalHours;
 }

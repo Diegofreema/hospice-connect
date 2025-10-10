@@ -73,11 +73,13 @@ export const getDetailsForRouteSheet = query({
           .eq('isSubmitted', false)
       )
       .collect();
+
     return {
       nurse,
       assignment: {
         ...assignment,
         businessName: hospice.businessName,
+        hospiceAddress: hospice.address,
       },
       schedules,
     };

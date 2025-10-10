@@ -2,17 +2,27 @@ import { api } from '@/convex/_generated/api';
 import { Doc, Id } from '@/convex/_generated/dataModel';
 import { ControlInput } from '@/features/authentication/components/form/control-input';
 import { Button } from '@/features/shared/components/button';
+import { CustomPressable } from '@/features/shared/components/custom-pressable';
 import { FlexText } from '@/features/shared/components/flex-text';
+import { RoustSheetComponent } from '@/features/shared/components/route-sheet-component';
+import SignatureComponent from '@/features/shared/components/signature-component';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { Text } from '@/features/shared/components/text';
 import { View } from '@/features/shared/components/view';
+import { ViewSignature } from '@/features/shared/components/view-signature';
 import { trimText } from '@/features/shared/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from 'convex/react';
 import { format, parse } from 'date-fns';
-import React from 'react';
-import { Control, FieldErrors, useForm } from 'react-hook-form';
+import React, { useRef, useState } from 'react';
+import {
+  Control,
+  FieldErrors,
+  useForm,
+  UseFormSetValue,
+} from 'react-hook-form';
 import { FlatList, ScrollView } from 'react-native';
+import { SignatureViewRef } from 'react-native-signature-canvas';
 import { StyleSheet } from 'react-native-unistyles';
 import { routeSheetValidator, RouteSheetValidator } from '../validators';
 
@@ -26,10 +36,13 @@ export const CompleteRouteSheet = ({ assignmentId, nurseId }: Props) => {
     nurseId,
     assignmentId,
   });
+  const [showRouteSheet, setShowRouteSheet] = useState(false);
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
+    watch,
+    setValue,
   } = useForm<RouteSheetValidator>({
     resolver: zodResolver(routeSheetValidator),
     defaultValues: {
@@ -38,29 +51,62 @@ export const CompleteRouteSheet = ({ assignmentId, nurseId }: Props) => {
     },
   });
 
+  const signature = watch('signature');
+
+  const comment = watch('comment');
   const onSubmit = async (data: RouteSheetValidator) => {};
   if (data === undefined) {
     return <SmallLoader size={50} />;
   }
+
+  const onHideRouteSheet = () => setShowRouteSheet(false);
+  const onShowRouteSheet = () => setShowRouteSheet(true);
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
-      <FlatList
-        ListHeaderComponent={() => (
-          <Header assignment={data.assignment} nurse={data.nurse} />
-        )}
-        data={data.schedules}
-        renderItem={({ item }) => <ScheduleCard schedule={item} />}
-        contentContainerStyle={{ paddingBottom: 50, gap: 25 }}
-        showsVerticalScrollIndicator={false}
-        keyExtractor={(item) => item._id}
-        scrollEnabled={false}
-      />
-      <Bottom
-        control={control}
-        errors={errors}
-        handleSubmit={handleSubmit(onSubmit)}
-        isSubmitting={isSubmitting}
-      />
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ paddingBottom: 50 }}
+    >
+      {showRouteSheet ? (
+        <RoustSheetComponent
+          nurse={data.nurse}
+          shifts={data.schedules}
+          comment={comment || ''}
+          signature={signature}
+          hospiceAddress={data.assignment.hospiceAddress}
+          rate={data.assignment.rate}
+          hospiceName={data.assignment.businessName}
+          handleSubmit={handleSubmit(onSubmit)}
+          onGoBack={onHideRouteSheet}
+          careLevel={data.assignment.careLevel}
+          patientName={
+            data.assignment.patientFirstName +
+            ' ' +
+            data.assignment.patientLastName
+          }
+        />
+      ) : (
+        <>
+          <FlatList
+            ListHeaderComponent={() => (
+              <Header assignment={data.assignment} nurse={data.nurse} />
+            )}
+            data={data.schedules}
+            renderItem={({ item }) => <ScheduleCard schedule={item} />}
+            contentContainerStyle={{ paddingBottom: 50, gap: 25 }}
+            showsVerticalScrollIndicator={false}
+            keyExtractor={(item) => item._id}
+            scrollEnabled={false}
+          />
+          <Bottom
+            control={control}
+            errors={errors}
+            isSubmitting={isSubmitting}
+            setValue={setValue}
+            onShowRouteSheet={onShowRouteSheet}
+            signature={signature}
+          />
+        </>
+      )}
     </ScrollView>
   );
 };
@@ -134,17 +180,55 @@ const Header = ({ assignment, nurse }: HeaderProps) => {
 type BottomProps = {
   control: Control<RouteSheetValidator>;
   errors: FieldErrors<RouteSheetValidator>;
-  handleSubmit: () => Promise<void>;
+
   isSubmitting: boolean;
+
+  setValue: UseFormSetValue<RouteSheetValidator>;
+  onShowRouteSheet: () => void;
+  signature: string;
 };
 const Bottom = ({
   control,
   errors,
-  handleSubmit,
+
   isSubmitting,
+  setValue,
+  onShowRouteSheet,
+  signature,
 }: BottomProps) => {
+  const ref = useRef<SignatureViewRef>(null);
+  const onOK = (signature: string) => {
+    setValue('signature', signature);
+  };
+  const onClear = () => {
+    setValue('signature', '');
+  };
   return (
     <View gap="xxl">
+      <View>
+        <Text size="normal">Signature</Text>
+        {signature ? (
+          <>
+            <ViewSignature signature={signature} />
+            <CustomPressable onPress={onClear} style={styles.retake}>
+              <Text size="normal" isBold>
+                Retake
+              </Text>
+            </CustomPressable>
+          </>
+        ) : (
+          <>
+            <SignatureComponent ref={ref} onOK={onOK} onClear={onClear} />
+            {errors.signature?.message && (
+              <Text size="small" color={'red'}>
+                {typeof errors['signature']?.message === 'string'
+                  ? errors['signature']?.message
+                  : 'Invalid input'}
+              </Text>
+            )}
+          </>
+        )}
+      </View>
       <ControlInput
         variant="textarea"
         control={control}
@@ -155,8 +239,8 @@ const Bottom = ({
       />
       <Button
         title="Generate Route Sheet"
-        onPress={handleSubmit}
-        disabled={isSubmitting}
+        onPress={onShowRouteSheet}
+        disabled={isSubmitting || !signature}
       />
     </View>
   );
@@ -179,5 +263,22 @@ const styles = StyleSheet.create((theme) => ({
     padding: theme.paddings.xl,
     borderRadius: 10,
     gap: 10,
+  },
+  signature: {
+    width: '100%',
+    height: '100%',
+  },
+  signatureContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 300,
+    height: 200,
+    backgroundColor: theme.colors.cardGrey,
+    borderRadius: 10,
+    alignSelf: 'center',
+  },
+  retake: {
+    alignSelf: 'center',
+    marginTop: 10,
   },
 }));
