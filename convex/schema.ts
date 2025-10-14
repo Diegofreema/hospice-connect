@@ -30,7 +30,13 @@ export const shifts = v.object({
   startShift: v.string(),
   endShift: v.string(),
 });
-
+export const hospiceSubscription = {
+  hospiceId: v.id('hospices'),
+  stripeCustomerId: v.string(),
+  stripeSubscriptionId: v.string(),
+  stripePriceId: v.string(),
+  stripeCurrentPeriodEnd: v.number(),
+};
 export const Nurse = {
   firstName: v.string(),
   lastName: v.string(),
@@ -101,8 +107,7 @@ export const assignment = {
     v.literal('completed'),
     v.literal('not_covered'),
     v.literal('booked'),
-    v.literal('available'),
-    v.literal('not_booked')
+    v.literal('available')
   ),
   rate: v.number(),
   careLevel,
@@ -110,7 +115,11 @@ export const assignment = {
 export const routeSheet = {
   nurseId: v.id('nurses'),
   hospiceId: v.id('hospices'),
-  scheduleId: v.array(v.id('schedules')),
+  scheduleIds: v.array(v.id('schedules')),
+  assignmentId: v.id('assignments'),
+  isApproved: v.boolean(),
+  signature: v.string(),
+  comment: v.optional(v.string()),
 };
 export const Rating = {
   nurseId: v.id('nurses'),
@@ -196,7 +205,10 @@ export default defineSchema({
       'nurseId',
       'isSubmitted',
     ]),
-  routeSheets: defineTable(routeSheet),
+  routeSheets: defineTable(routeSheet).index('by_assignment_id', [
+    'assignmentId',
+    'nurseId',
+  ]),
   ratings: defineTable(Rating).index('nurseId', ['nurseId']),
   availabilities: defineTable(Availability).index('nurseId', ['nurseId']),
   nurseNotifications: defineTable(NurseNotification).index('by_nurseId', [
@@ -206,5 +218,9 @@ export default defineSchema({
   hospiceNotifications: defineTable(HospiceNotification).index(
     'by_hospice_id',
     ['hospiceId', 'isRead']
+  ),
+  hospiceSubscriptions: defineTable(hospiceSubscription).index(
+    'by_hospice_id',
+    ['hospiceId']
   ),
 });

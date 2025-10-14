@@ -22,6 +22,12 @@ type Props = {
   onGoBack: () => void;
   patientName: string;
   careLevel: string;
+  buttonText?: string;
+  buttonText2?: string;
+  disabled?: boolean;
+  disabled2?: boolean;
+  hideButtons?: boolean;
+  showDebit?: boolean;
 };
 const headers = [
   'Date',
@@ -46,18 +52,24 @@ export const RoustSheetComponent = ({
   onGoBack,
   careLevel,
   patientName,
+  buttonText2 = 'Submit',
+  buttonText = 'Back',
+  disabled2,
+  disabled,
+  hideButtons,
+  showDebit = true,
 }: Props) => {
   const totalHours = calculateTotalHours(shifts);
   const data = [
     ...shifts.map((shift) => [
       ` ${shift.startDate} - ${shift.endDate}`,
       patientName,
-      patientName,
+      careLevel,
       shift.startTime,
       shift.endTime,
       calculateTotalHours([shift]).toFixed(2),
       rate.toFixed(2),
-      (calculateTotalHours([shift]) * rate).toFixed(2),
+      `$${(calculateTotalHours([shift]) * rate).toFixed(2)}`,
     ]),
   ];
   return (
@@ -100,16 +112,22 @@ export const RoustSheetComponent = ({
       <ViewSignature signature={signature} />
       <Text size="normal">Comment: {comment}</Text>
 
-      <FlexButtons
-        onPress={handleSubmit}
-        onCancel={onGoBack}
-        buttonText="Back"
-        buttonText2="Submit"
-      />
-      <Text size="normal" isBold textAlign="center">
-        By submitting i authorise HospiceConnect to charge 5% of the total pay
-        on my card
-      </Text>
+      {!hideButtons && (
+        <FlexButtons
+          onPress={handleSubmit}
+          onCancel={onGoBack}
+          buttonText={buttonText}
+          buttonText2={buttonText2}
+          disabled2={disabled2}
+          disabled={disabled}
+        />
+      )}
+      {showDebit && (
+        <Text size="normal" isBold textAlign="center">
+          By submitting i authorize HospiceConnect to charge 5% of the total pay
+          on my card
+        </Text>
+      )}
     </View>
   );
 };

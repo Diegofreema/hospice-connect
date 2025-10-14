@@ -24,7 +24,11 @@ export const FlexButtons = ({
     <View flexDirection="row" gap="lg" style={styles.footer} mt="lg">
       <CustomPressable
         onPress={onCancel}
-        style={[styles.button, styles.viewSchedule]}
+        style={[
+          styles.button,
+          styles.viewSchedule,
+          { opacity: disabled ? 0.5 : 1 },
+        ]}
         disabled={disabled2}
       >
         <Text size={'normal'} color={'blue'}>
@@ -33,7 +37,7 @@ export const FlexButtons = ({
       </CustomPressable>
       <CustomPressable
         onPress={onPress}
-        style={[styles.button, styles.assign]}
+        style={[styles.button, styles.assign, { opacity: disabled ? 0.5 : 1 }]}
         disabled={disabled}
       >
         <Text size={'normal'} color={'white'}>

@@ -205,7 +205,7 @@ export const createAssignment = mutation({
       state: args.state,
       openShift: args.openShift,
       hospiceId: args.hospiceId,
-      status: 'not_booked',
+      status: 'available',
       careLevel: args.careLevel,
     });
 
@@ -217,6 +217,62 @@ export const createAssignment = mutation({
         startDate: shift.start,
         startTime: shift.startShift,
         rate: args.rate,
+        status: 'available',
+        isSubmitted: false,
+      });
+    }
+  },
+});
+
+export const reopenAssignment = mutation({
+  args: {
+    endDate: v.string(),
+    startDate: v.string(),
+    openShift: v.string(),
+    hospiceId: v.id('hospices'),
+    shifts: v.array(shifts),
+    assignmentId: v.id('assignments'),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new ConvexError({ message: 'Unauthorized' });
+    }
+    const hospice = await ctx.db.get(args.hospiceId);
+    if (!hospice) {
+      throw new ConvexError({ message: 'Hospice not found' });
+    }
+    const assignment = await ctx.db.get(args.assignmentId);
+    if (!assignment) {
+      throw new ConvexError({ message: 'Assignment not found' });
+    }
+    const assignmentId = await ctx.db.insert('assignments', {
+      notes: assignment.notes,
+      patientAddress: assignment.patientAddress,
+      dateOfBirth: assignment.dateOfBirth,
+      discipline: assignment.discipline,
+      endDate: args.endDate,
+      patientFirstName: assignment.patientFirstName,
+      gender: assignment.gender,
+      patientLastName: assignment.patientLastName,
+      phoneNumber: assignment.phoneNumber,
+      rate: assignment.rate,
+      startDate: args.startDate,
+      state: assignment.state,
+      openShift: args.openShift,
+      hospiceId: args.hospiceId,
+      status: 'available',
+      careLevel: assignment.careLevel,
+    });
+
+    for (const shift of args.shifts) {
+      await ctx.db.insert('schedules', {
+        assignmentId: assignmentId,
+        endDate: shift.end,
+        endTime: shift.endShift,
+        startDate: shift.start,
+        startTime: shift.startShift,
+        rate: assignment.rate,
         status: 'available',
         isSubmitted: false,
       });
@@ -293,7 +349,7 @@ export const updateAssignment = mutation({
       state: args.state,
       openShift: args.openShift,
       hospiceId: args.hospiceId,
-      status: 'not_booked',
+      status: 'available',
       careLevel: args.careLevel,
     });
   },
@@ -328,5 +384,43 @@ export const deleteAssignment = mutation({
     }
 
     await ctx.db.delete(args.assignmentId);
+  },
+});
+
+export const updateAssignmentStatus = mutation({
+  args: {
+    assignmentId: v.id('assignments'),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      return;
+    }
+    const assignment = await ctx.db.get(args.assignmentId);
+    if (!assignment) {
+      return;
+    }
+    const schedules = await ctx.db
+      .query('schedules')
+      .withIndex('by_assignment_id', (q) =>
+        q.eq('assignmentId', assignment._id)
+      )
+      .collect();
+
+    const isFullyStaffed = schedules.every((schedule) => schedule.nurseId);
+    const isCompleted = schedules.every(
+      (schedule) => schedule.status === 'completed'
+    );
+    if (isFullyStaffed) {
+      await ctx.db.patch(args.assignmentId, {
+        status: 'booked',
+      });
+    }
+
+    if (isFullyStaffed && isCompleted) {
+      await ctx.db.patch(args.assignmentId, {
+        status: 'completed',
+      });
+    }
   },
 });

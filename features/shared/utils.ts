@@ -102,6 +102,20 @@ export const getScheduleStatusText = (status: Infer<typeof scheduleStatus>) => {
       return 'Not Covered';
   }
 };
+export const getAssignmentStatusText = (
+  status: Infer<typeof scheduleStatus>
+) => {
+  switch (status) {
+    case 'available':
+      return 'Staff needed';
+    case 'booked':
+      return 'Fully staffed';
+    case 'completed':
+      return 'Completed';
+    default:
+      return 'Not Covered';
+  }
+};
 
 export const getScheduleStatusAndColor = (
   status: Infer<typeof scheduleStatus>

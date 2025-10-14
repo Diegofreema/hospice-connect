@@ -8,7 +8,7 @@ export type PostType = {
   zipCode?: string | undefined;
   assignedTo?: Id<'nurses'> | undefined;
   notes?: string | undefined;
-  status: 'completed' | 'not_covered' | 'booked' | 'available' | 'not_booked';
+  status: 'completed' | 'not_covered' | 'booked' | 'available';
   gender: string;
   phoneNumber: string;
   dateOfBirth: string;

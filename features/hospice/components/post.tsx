@@ -3,13 +3,20 @@ import { CustomPressable } from '@/features/shared/components/custom-pressable';
 import { FlexText } from '@/features/shared/components/flex-text';
 import { MyMenu } from '@/features/shared/components/menu';
 
-import { generateErrorMessage, trimText } from '@/features/shared/utils';
+import {
+  generateErrorMessage,
+  getAssignmentStatusText,
+  getScheduleStatusAndColor,
+  trimText,
+} from '@/features/shared/utils';
 import { View } from '../../shared/components/view';
 
 import { IconDots } from '@tabler/icons-react-native';
 import { router } from 'expo-router';
-import { SFSymbol } from 'expo-symbols';
+import { SFSymbol, SymbolView } from 'expo-symbols';
 
+import { Badge } from '@/components/badge/Badge';
+import { BadgeVariant } from '@/components/badge/types';
 import { useModal } from '@/components/demos/modal/hook/use-modal';
 import { useToast } from '@/components/demos/toast';
 import { api } from '@/convex/_generated/api';
@@ -19,12 +26,14 @@ import { useMutation } from 'convex/react';
 import { useState } from 'react';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { useSelectAssignment } from '../hooks/use-select-assignment';
+import { useUpdatePostStatus } from '../hooks/use-update-post-status';
 import { PostType } from '../types';
 
 type Props = {
   post: PostType;
   onView: () => void;
   hospiceId: Id<'hospices'>;
+  onOpenReOpenAssignment: () => void;
 };
 
 const data: { label: string; value: string; ios: SFSymbol; android: string }[] =
@@ -42,12 +51,19 @@ const data: { label: string; value: string; ios: SFSymbol; android: string }[] =
       android: 'ic_delete',
     },
   ];
-export const Post = ({ post, onView, hospiceId }: Props) => {
+export const Post = ({
+  post,
+  onView,
+  hospiceId,
+  onOpenReOpenAssignment,
+}: Props) => {
   const name = post.patientFirstName + ' ' + post.patientLastName;
   const { showModal, clearModal } = useModal();
   const { showToast } = useToast();
   const [deleting, setDeleting] = useState(false);
+
   const deleteAssignment = useMutation(api.assignments.deleteAssignment);
+  useUpdatePostStatus({ assignmentId: post._id });
   const onDelete = async () => {
     setDeleting(true);
     try {
@@ -91,10 +107,22 @@ export const Post = ({ post, onView, hospiceId }: Props) => {
       });
     }
   };
+  const onReOpen = async () => {
+    onOpenReOpenAssignment();
+  };
   const onAssign = () => {
     router.push(`/assign-nurse?id=${post._id}`);
   };
-
+  const onHandleAction = () => {
+    if (post.status === 'completed') {
+      onReOpen();
+      setId(post._id);
+    } else {
+      onAssign();
+    }
+  };
+  const disabled = post.status === 'booked';
+  const buttonText = post.status === 'completed' ? 'Re-Open' : 'Assign';
   return (
     <Card style={styles.card}>
       <CardHeader style={styles.header}>
@@ -111,6 +139,26 @@ export const Post = ({ post, onView, hospiceId }: Props) => {
         />
       </CardHeader>
       <CardContent style={styles.content}>
+        <View
+          flexDirection="row"
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <Text size={'normal'}>Status</Text>
+          <Badge
+            label={getAssignmentStatusText(post.status)}
+            variant={
+              getScheduleStatusAndColor(post.status).status as BadgeVariant
+            }
+            icon={
+              <SymbolView
+                name="circle.fill"
+                size={12}
+                tintColor={getScheduleStatusAndColor(post.status).color}
+              />
+            }
+          />
+        </View>
         <FlexText leftText="Phone number" rightText={post.phoneNumber} />
         <FlexText leftText="Care level" rightText={post.careLevel} />
         <FlexText leftText="Discipline" rightText={post.discipline} />
@@ -132,11 +180,16 @@ export const Post = ({ post, onView, hospiceId }: Props) => {
             </Text>
           </CustomPressable>
           <CustomPressable
-            onPress={onAssign}
-            style={[styles.button, styles.assign]}
+            onPress={onHandleAction}
+            style={[
+              styles.button,
+              styles.assign,
+              { opacity: disabled ? 0.5 : 1 },
+            ]}
+            disabled={disabled}
           >
             <Text size={'normal'} color={'white'}>
-              Assign
+              {buttonText}
             </Text>
           </CustomPressable>
         </View>

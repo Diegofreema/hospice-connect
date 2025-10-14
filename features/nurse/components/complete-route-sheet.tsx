@@ -1,3 +1,4 @@
+import { useToast } from '@/components/demos/toast';
 import { api } from '@/convex/_generated/api';
 import { Doc, Id } from '@/convex/_generated/dataModel';
 import { ControlInput } from '@/features/authentication/components/form/control-input';
@@ -10,10 +11,11 @@ import { SmallLoader } from '@/features/shared/components/small-loader';
 import { Text } from '@/features/shared/components/text';
 import { View } from '@/features/shared/components/view';
 import { ViewSignature } from '@/features/shared/components/view-signature';
-import { trimText } from '@/features/shared/utils';
+import { generateErrorMessage, trimText } from '@/features/shared/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useQuery } from 'convex/react';
+import { useMutation, useQuery } from 'convex/react';
 import { format, parse } from 'date-fns';
+import { router } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import {
   Control,
@@ -36,6 +38,8 @@ export const CompleteRouteSheet = ({ assignmentId, nurseId }: Props) => {
     nurseId,
     assignmentId,
   });
+  const submitRouteSheet = useMutation(api.routeSheets.submitRouteSheet);
+  const { showToast } = useToast();
   const [showRouteSheet, setShowRouteSheet] = useState(false);
   const {
     control,
@@ -54,7 +58,36 @@ export const CompleteRouteSheet = ({ assignmentId, nurseId }: Props) => {
   const signature = watch('signature');
 
   const comment = watch('comment');
-  const onSubmit = async (data: RouteSheetValidator) => {};
+  const onSubmit = async (values: RouteSheetValidator) => {
+    if (!data?.assignment) return;
+    try {
+      await submitRouteSheet({
+        nurseId,
+        assignmentId,
+        scheduleIds: data.schedules.map((schedule) => schedule._id),
+        signature: values.signature,
+        comment: values.comment,
+        hospiceId: data?.assignment.hospiceId,
+      });
+      showToast({
+        title: 'Success',
+        subtitle: 'Route sheet submitted successfully',
+        autodismiss: true,
+      });
+      setShowRouteSheet(false);
+      router.back();
+    } catch (error) {
+      const errorMessage = generateErrorMessage(
+        error,
+        'Failed to submit route sheet'
+      );
+      showToast({
+        title: 'Error',
+        subtitle: errorMessage,
+        autodismiss: true,
+      });
+    }
+  };
   if (data === undefined) {
     return <SmallLoader size={50} />;
   }

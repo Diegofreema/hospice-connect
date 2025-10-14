@@ -48,14 +48,72 @@ export const createAssignmentValidator = z
       }
     ),
   })
-  .refine((data) => data.endDate >= data.startDate, {
-    message: 'End date cannot be before start date',
-    path: ['endDate'],
+  .refine(
+    (data) => {
+      const startDate = new Date(data.startDate);
+      const endDate = new Date(data.endDate);
+
+      // Compare just the date parts
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(0, 0, 0, 0);
+      return endDate >= startDate;
+    },
+    {
+      message: 'End date cannot be before start date',
+      path: ['endDate'],
+    }
+  )
+  .refine(
+    (data) => {
+      const startDate = new Date(data.startDate);
+      const today = new Date();
+
+      // Compare just the date parts
+      startDate.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
+      return startDate >= today;
+    },
+    {
+      message: 'Start date of this assignment cannot be in the past',
+      path: ['startDate'],
+    }
+  );
+export const reopenAssignmentValidator = z
+  .object({
+    startDate: z.date(),
+    endDate: z.date(),
+    openShift: z.date(),
   })
-  .refine((data) => data.startDate > new Date(), {
-    message: 'Start date of this assignment cannot be in the past',
-    path: ['startDate'],
-  });
+  .refine(
+    (data) => {
+      const startDate = new Date(data.startDate);
+      const endDate = new Date(data.endDate);
+
+      // Compare just the date parts
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(0, 0, 0, 0);
+      return endDate >= startDate;
+    },
+    {
+      message: 'End date cannot be before start date',
+      path: ['endDate'],
+    }
+  )
+  .refine(
+    (data) => {
+      const startDate = new Date(data.startDate);
+      const today = new Date();
+
+      // Compare just the date parts
+      startDate.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
+      return startDate >= today;
+    },
+    {
+      message: 'Start date of this assignment cannot be in the past',
+      path: ['startDate'],
+    }
+  );
 
 export const editScheduleValidator = z
   .object({
@@ -65,18 +123,39 @@ export const editScheduleValidator = z
     endShift: z.date(),
     rate: z.string().min(1, 'Rate is required'),
   })
-  .refine((data) => data.endDate >= data.startDate, {
-    message: 'End date cannot be before start date',
-    path: ['endDate'],
-  })
+  .refine(
+    (data) => {
+      const startDate = new Date(data.startDate);
+      const endDate = new Date(data.endDate);
+
+      // Compare just the date parts
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(0, 0, 0, 0);
+
+      return endDate >= startDate;
+    },
+    {
+      message: 'End date cannot be before start date',
+      path: ['endDate'],
+    }
+  )
   .refine((data) => data.endShift >= data.openShift, {
     message: 'End of shift cannot be before opening shift',
     path: ['endShift'],
   })
-  .refine((data) => data.startDate > new Date(), {
-    message: 'Start date of this assignment cannot be in the past',
-    path: ['startDate'],
-  });
+  .refine(
+    (data) => {
+      const startShift = new Date(data.openShift);
+      const today = new Date();
+      startShift.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
+      return startShift >= today;
+    },
+    {
+      message: 'Start date of this assignment cannot be in the past',
+      path: ['startDate'],
+    }
+  );
 
 export type EditScheduleValidator = z.infer<typeof editScheduleValidator>;
 export type CreateAssignmentValidator = z.infer<
@@ -84,3 +163,7 @@ export type CreateAssignmentValidator = z.infer<
 >;
 
 export type CreateHospiceValidator = z.infer<typeof createHospiceValidator>;
+
+export type ReopenAssignmentValidator = z.infer<
+  typeof reopenAssignmentValidator
+>;

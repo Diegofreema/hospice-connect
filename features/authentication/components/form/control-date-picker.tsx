@@ -53,19 +53,21 @@ export const ControlledDatePicker = <TFieldValues extends FieldValues>({
               </Text>
             </TouchableOpacity>
             {open && (
-              <DateTimePicker
-                testID="dateTimePicker"
-                value={value}
-                mode={mode}
-                is24Hour={true}
-                display="spinner"
-                onChange={(event, selectedDate) => {
-                  setOpen(false);
-                  if (event.type !== 'dismissed') {
-                    onChange(selectedDate);
-                  }
-                }}
-              />
+              <View style={{ alignSelf: 'center' }}>
+                <DateTimePicker
+                  testID="dateTimePicker"
+                  value={value}
+                  mode={mode}
+                  is24Hour={true}
+                  display="spinner"
+                  onChange={(event, selectedDate) => {
+                    setOpen(false);
+                    if (event.type !== 'dismissed') {
+                      onChange(selectedDate);
+                    }
+                  }}
+                />
+              </View>
             )}
           </View>
         )}

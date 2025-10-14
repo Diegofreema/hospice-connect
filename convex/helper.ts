@@ -183,3 +183,20 @@ export function formatDate(dateString: string): string {
     .format(date)
     .replace(/(\d+),/, '$1,'); // Ensure format is "MMM DD, YYYY"
 }
+
+export function formatTimeString(dateObj: Date): string {
+  let hours = dateObj.getHours();
+  const minutes = dateObj.getMinutes();
+
+  // Determine AM/PM
+  const period = hours >= 12 ? 'PM' : 'AM';
+
+  // Convert to 12-hour format
+  hours = hours % 12;
+  hours = hours ? hours : 12; // Hour '0' should be '12'
+
+  // Pad minutes with leading zero if needed
+  const minutesStr = minutes.toString().padStart(2, '0');
+
+  return `${hours}:${minutesStr} ${period}`;
+}

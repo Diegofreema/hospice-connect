@@ -1,7 +1,12 @@
 import { getAuthUserId } from '@convex-dev/auth/server';
 import { ConvexError, v } from 'convex/values';
 import { mutation, query } from './_generated/server';
-import { convertTimeStringToDate, getRatings, stringToDate } from './helper';
+import {
+  convertTimeStringToDate,
+  formatTimeString,
+  getRatings,
+  stringToDate,
+} from './helper';
 import { scheduleStatus } from './schema';
 
 export const cancelSchedule = mutation({
@@ -36,10 +41,16 @@ export const cancelSchedule = mutation({
         message: 'You do not have permission to cancel this schedule',
       });
     }
-
+    const { _id, _creationTime, ...rest } = schedule;
     await ctx.db.patch(args.scheduleId, {
       status: 'available',
       nurseId: undefined,
+      canceledAt: Date.now(),
+    });
+    // creating clone schedule
+    await ctx.db.insert('schedules', {
+      ...rest,
+      endTime: formatTimeString(new Date()),
       canceledAt: Date.now(),
     });
 

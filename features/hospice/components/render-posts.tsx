@@ -17,6 +17,7 @@ import { CancelSchedule } from './cancel-schedule';
 import { EditSchedule } from './edit-schedule';
 import { Post } from './post';
 import { RateNurse } from './rate-nurse';
+import { ReopenCase } from './reopen-case';
 
 type Props = {
   posts: PostType[];
@@ -29,6 +30,7 @@ export const RenderPosts = ({ posts, loadMore, loadingMore }: Props) => {
   const bottomSheetRefCancelSchedule = useRef<BottomSheet>(null);
   const bottomSheetRefEditSchedule = useRef<BottomSheet>(null);
   const bottomSheetRefRateNurse = useRef<BottomSheet>(null);
+  const bottomSheetRefReOpenAssignment = useRef<BottomSheet>(null);
   const scheduleId = useGetScheduleId((state) => state.id);
   const initialValues = useQuery(
     api.schedules.getSchedule,
@@ -72,6 +74,12 @@ export const RenderPosts = ({ posts, loadMore, loadingMore }: Props) => {
   const onViewRouteSheet = useCallback(() => {
     bottomSheetRef.current?.close();
   }, []);
+  const onReOpenAssignment = useCallback(() => {
+    bottomSheetRefReOpenAssignment.current?.expand();
+  }, []);
+  const onCloseReOpenAssignment = useCallback(() => {
+    bottomSheetRefReOpenAssignment.current?.close();
+  }, []);
   return (
     <Fragment>
       <Wrapper>
@@ -82,6 +90,7 @@ export const RenderPosts = ({ posts, loadMore, loadingMore }: Props) => {
               post={item}
               onView={onViewSchedule}
               hospiceId={hospice?._id!}
+              onOpenReOpenAssignment={onReOpenAssignment}
             />
           )}
           keyExtractor={(item) => item._id}
@@ -126,6 +135,14 @@ export const RenderPosts = ({ posts, loadMore, loadingMore }: Props) => {
         customSnapPoints={['25%', '30%']}
       >
         <CancelSchedule onClose={onCloseSheetCancelSchedule} />
+      </CustomSheet>
+      <CustomSheet
+        ref={bottomSheetRefReOpenAssignment}
+        onClose={onCloseReOpenAssignment}
+        title="Reopen case"
+        customSnapPoints={['25%', '60%']}
+      >
+        <ReopenCase onClose={onCloseReOpenAssignment} />
       </CustomSheet>
       <CustomSheet
         ref={bottomSheetRefEditSchedule}
