@@ -17,7 +17,7 @@ type Props = {
 };
 
 export const NurseNotification = ({ notification }: Props) => {
-  const date = format(notification._creationTime, 'PP');
+  const date = format(notification._creationTime, 'MM/dd/yy');
   const firstPart = date.split(',')[0];
   const secondPart = date.split(',')[1];
   console.log(notification.type);

@@ -9,8 +9,7 @@ import {
   FieldPath,
   FieldValues,
 } from 'react-hook-form';
-import { TextInputProps } from 'react-native';
-import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
+import { TextInputProps, View } from 'react-native';
 
 type Props<TFieldValues extends FieldValues> = TextInputProps & {
   label?: string;
@@ -34,7 +33,7 @@ export const ControlInput = <TFieldValues extends FieldValues>({
   ...rest
 }: Props<TFieldValues>) => {
   return (
-    <KeyboardAvoidingView>
+    <View>
       <Controller
         control={control}
         name={name}
@@ -49,6 +48,7 @@ export const ControlInput = <TFieldValues extends FieldValues>({
               label={label}
               rightIcon={rightIcon}
               leftIcon={leftIcon}
+              placeholder={placeholder}
               {...rest}
             />
           ) : (
@@ -69,6 +69,6 @@ export const ControlInput = <TFieldValues extends FieldValues>({
             : 'Invalid input'}
         </Text>
       )}
-    </KeyboardAvoidingView>
+    </View>
   );
 };

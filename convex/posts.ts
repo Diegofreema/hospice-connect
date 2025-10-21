@@ -3,6 +3,7 @@ import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { mutation, query } from './_generated/server';
 import { convertTimeStringToDate, stringToDate } from './helper';
+import { discipline } from './schema';
 
 export const getOurPosts = query({
   args: {
@@ -15,6 +16,24 @@ export const getOurPosts = query({
       .withIndex('hospiceId', (q) => q.eq('hospiceId', args.hospiceId))
       .order('desc')
       .paginate(args.paginationOpts);
+  },
+});
+export const getOurAvailablePosts = query({
+  args: {
+    hospiceId: v.id('hospices'),
+    discipline: discipline,
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query('assignments')
+      .withIndex('hospiceId', (q) =>
+        q
+          .eq('hospiceId', args.hospiceId)
+          .eq('status', 'available')
+          .eq('discipline', args.discipline)
+      )
+      .order('desc')
+      .take(50);
   },
 });
 

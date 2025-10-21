@@ -9,9 +9,15 @@ type Props = {
 
 export const FlexText = ({ leftText, rightText }: Props) => {
   return (
-    <Stack mode="flex">
+    <Stack mode="flex" flex={1} gap="xl">
       <Text size={'normal'}>{leftText}</Text>
-      <Text size={'normal'} isMedium fontSize={getFontSize(14)}>
+      <Text
+        size={'normal'}
+        isMedium
+        fontSize={getFontSize(14)}
+        textAlign="right"
+        style={{ flex: 1 }}
+      >
         {rightText}
       </Text>
     </Stack>

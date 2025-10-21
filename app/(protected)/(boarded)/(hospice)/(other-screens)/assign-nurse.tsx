@@ -3,12 +3,9 @@ import { Id } from '@/convex/_generated/dataModel';
 import { FetchNurses } from '@/features/hospice/components/fetch-nurses';
 import { RateRange } from '@/features/hospice/components/rate-range';
 import { SelectSchedule } from '@/features/hospice/components/select-schedule';
-import { nurseFilter } from '@/features/hospice/constants';
 import { useGetNurseId } from '@/features/hospice/hooks/use-get-nurse-id';
-import { NurseType } from '@/features/hospice/types';
 import { BackButton } from '@/features/shared/components/back-button';
 import { CustomSheet } from '@/features/shared/components/custom-bottom-sheet';
-import { CustomerSelector } from '@/features/shared/components/custom-selector';
 import { PressableIcon } from '@/features/shared/components/pressable-icon';
 import { SearchComponent } from '@/features/shared/components/search-component';
 import { Stack } from '@/features/shared/components/v-stack';
@@ -21,12 +18,15 @@ import { StyleSheet } from 'react-native-unistyles';
 
 const AssignNurse = () => {
   const { hospice } = useHospice();
-  const { id } = useLocalSearchParams<{ id: Id<'assignments'> }>();
-  const [selected, setSelected] = useState<'All' | NurseType>('All');
+  const { id, discipline } = useLocalSearchParams<{
+    id: Id<'assignments'>;
+    discipline: 'RN' | 'LVN' | 'HHA';
+  }>();
+
   const clearNurseId = useGetNurseId((state) => state.clear);
   const [range, setRange] = useState({
-    rate1: 5,
-    rate2: 1000,
+    rate1: '5',
+    rate2: '1000',
   });
   const bottomSheetRef = useRef<BottomSheet>(null);
   const scheduleBottomSheetRef = useRef<BottomSheet>(null);
@@ -52,7 +52,7 @@ const AssignNurse = () => {
         <Stack gap={'lg'} mode="flexCentered">
           <SearchComponent
             placeholder="Search for nurses"
-            path={'/search-nurses'}
+            path={`/search-nurses?discipline=${discipline}`}
             isButton
           />
           <PressableIcon
@@ -61,20 +61,21 @@ const AssignNurse = () => {
             style={styles.icon}
           />
         </Stack>
-        <CustomerSelector
-          data={nurseFilter}
-          selected={selected}
-          setSelected={(selected) => setSelected(selected as 'All' | NurseType)}
-        />
+
         <FetchNurses
-          nurseType={selected}
+          nurseType={discipline}
           rate1={range.rate1}
           rate2={range.rate2}
           isAssigned
           onAction={onOpenScheduleSheet}
         />
       </Wrapper>
-      <CustomSheet title="Filter" ref={bottomSheetRef} onClose={onCloseSheet}>
+      <CustomSheet
+        title="Filter"
+        customSnapPoints={['50%']}
+        ref={bottomSheetRef}
+        onClose={onCloseSheet}
+      >
         <RateRange setRange={setRange} range={range} />
       </CustomSheet>
       <CustomSheet

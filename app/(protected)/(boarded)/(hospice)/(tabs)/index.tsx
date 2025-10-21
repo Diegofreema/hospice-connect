@@ -23,8 +23,8 @@ export default function HomeScreen() {
   const { hospice } = useHospice();
   const [selected, setSelected] = useState<'All' | NurseType>('All');
   const [range, setRange] = useState({
-    rate1: 5,
-    rate2: 1000,
+    rate1: '5',
+    rate2: '1000',
   });
   const unreadCount = useQuery(
     api.hospiceNotification.unreadMessagesCount,
@@ -55,7 +55,7 @@ export default function HomeScreen() {
         />
         <Stack gap={'lg'} mode="flexCentered">
           <SearchComponent
-            placeholder="Search for nurses"
+            placeholder="Search"
             path={'/search-nurses'}
             isButton
           />
@@ -76,7 +76,12 @@ export default function HomeScreen() {
           rate2={range.rate2}
         />
       </Wrapper>
-      <CustomSheet title="Filter" ref={bottomSheetRef} onClose={onCloseSheet}>
+      <CustomSheet
+        title="Filter"
+        customSnapPoints={['50%']}
+        ref={bottomSheetRef}
+        onClose={onCloseSheet}
+      >
         <RateRange setRange={setRange} range={range} />
       </CustomSheet>
     </>

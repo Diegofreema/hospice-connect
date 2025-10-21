@@ -34,23 +34,27 @@ export const SelectSchedule = ({ id, hospiceId, name, onClose }: Props) => {
     hospiceId,
   });
   const { showToast } = useToast();
-  const [selectedId, setSelectedId] = useState<Id<'schedules'> | undefined>(
-    schedules?.[0]?._id || undefined
-  );
+  const [selectedIds, setSelectedIds] = useState<Id<'schedules'>[]>([]);
 
   if (schedules === undefined) {
     return <SmallLoader size={30} />;
   }
   const onSelect = (id: Id<'schedules'>) => {
-    setSelectedId(id);
+    setSelectedIds((prev) => {
+      const isInArray = prev.find((item) => item === id);
+      if (isInArray) {
+        return prev.filter((item) => item !== id);
+      }
+      return [...prev, id];
+    });
   };
   const onSend = async () => {
-    if (!selectedId || !nurseId) return;
+    if (!nurseId) return;
     setLoading(true);
     try {
       await onSchedule({
         nurseId,
-        scheduleId: selectedId,
+        scheduleIds: selectedIds,
         hospiceId,
         hospiceName: name,
       });
@@ -79,7 +83,7 @@ export const SelectSchedule = ({ id, hospiceId, name, onClose }: Props) => {
       data={schedules}
       keyExtractor={(item) => item._id}
       renderItem={({ item }) => (
-        <Schedule onSelect={onSelect} item={item} selectedId={selectedId} />
+        <Schedule onSelect={onSelect} item={item} selectedIds={selectedIds} />
       )}
       contentContainerStyle={{ gap: 15, flexGrow: 1 }}
       style={{ flex: 1, marginTop: 20 }}
@@ -99,11 +103,11 @@ export const SelectSchedule = ({ id, hospiceId, name, onClose }: Props) => {
 
 export const Schedule = ({
   item,
-  selectedId,
+  selectedIds,
   onSelect,
 }: {
   item: Doc<'schedules'>;
-  selectedId: Id<'schedules'> | undefined;
+  selectedIds: Id<'schedules'>[] | undefined;
   onSelect: (id: Id<'schedules'>) => void;
 }) => {
   const startDate = parse(item.startDate, 'dd-MM-yyyy', new Date());
@@ -120,7 +124,7 @@ export const Schedule = ({
     status: item.status,
   });
 
-  const isSelected = selectedId === item._id;
+  const isSelected = selectedIds?.find((id) => id === item._id);
   return (
     <CustomPressable onPress={() => onSelect(item._id)}>
       <View style={styles.card}>
@@ -131,7 +135,7 @@ export const Schedule = ({
         )}
         <View>
           <Text size="normal" isBold>
-            {format(startDate, 'PP')} - {format(endDate, 'PP')}
+            {format(startDate, 'MM/dd/yy')} - {format(endDate, 'MM/dd/yy')}
           </Text>
           <Text size="small">
             {item.startTime} - {item.endTime}

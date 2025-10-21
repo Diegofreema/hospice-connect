@@ -31,8 +31,11 @@ export const AssignmentsForNurses = ({
         onEndReached={handleMore}
         onEndReachedThreshold={0.5}
         style={{ paddingHorizontal: 15 }}
+        columnWrapperStyle={{ gap: 20 }}
+        contentContainerStyle={{ gap: 20, paddingBottom: 100 }}
         recycleItems
         ListFooterComponent={isLoadingMore ? <SmallLoader /> : null}
+        showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <ActionComponent
             title={title}

@@ -1,98 +1,95 @@
-import { Button } from '@/features/shared/components/button';
-
 import { Text } from '@/features/shared/components/text';
 import { getFontSize } from '@/features/shared/utils';
 import { View } from '../../shared/components/view';
 
+import BottomSheetKeyboardAwareScrollView from '@/features/shared/components/bottom-sheet-aware-scroll-view';
+import { FlexButtons } from '@/features/shared/components/flex-buttons';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { TextInput } from 'react-native';
-import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+import { StyleSheet } from 'react-native-unistyles';
 
 type Props = {
   setRange: Dispatch<
     SetStateAction<{
-      rate1: number;
-      rate2: number;
+      rate1: string;
+      rate2: string;
     }>
   >;
   range: {
-    rate1: number;
-    rate2: number;
+    rate1: string;
+    rate2: string;
   };
 };
 
 export const RateRange = ({ setRange, range }: Props) => {
-  const [localRange, setLocalRange] = useState(range);
+  const [rate1, setRate1] = useState('5');
+  const [rate2, setRate2] = useState('1000');
   const [isFocused, setIsFocused] = useState(false);
   const [isFocused2, setIsFocused2] = useState(false);
-  const { theme } = useUnistyles();
-  const handleRateChange = (value: string, field: 'rate1' | 'rate2') => {
-    setLocalRange((prevRange) => ({
-      ...prevRange,
-      [field]: parseInt(value),
-    }));
-  };
 
   const onReset = () => {
     setRange({
-      rate1: 5,
-      rate2: 1000,
+      rate1: '5',
+      rate2: '1000',
     });
+    setRate1('5');
+    setRate2('1000');
   };
 
   const onApply = () => {
-    setRange(localRange);
+    setRange({
+      rate1,
+      rate2,
+    });
   };
 
   return (
-    <View gap={'md'} flex={1}>
-      <View
-        gap={'sm'}
-        backgroundColor={'cardBackground'}
-        borderRadius={'lg'}
-        p={'md'}
-      >
-        <Text size={'normal'} fontSize={getFontSize(16)}>
-          Price Range
-        </Text>
+    <BottomSheetKeyboardAwareScrollView>
+      <View gap={'md'} flex={1}>
         <View
           gap={'sm'}
-          flexDirection="row"
-          alignItems="center"
-          justifyContent={'flex-start'}
-          flex={1}
+          backgroundColor={'cardBackground'}
+          borderRadius={'lg'}
+          p={'md'}
         >
-          <TextInput
-            value={localRange.rate1.toString()}
-            keyboardType="numeric"
-            onChangeText={(value) => handleRateChange(value, 'rate1')}
-            style={[styles.textInput, isFocused && styles.active]}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            placeholder="Min rate"
-          />
-          <TextInput
-            value={localRange.rate2.toString()}
-            keyboardType="numeric"
-            onChangeText={(value) => handleRateChange(value, 'rate2')}
-            style={[styles.textInput, isFocused2 && styles.active]}
-            onFocus={() => setIsFocused2(true)}
-            onBlur={() => setIsFocused2(false)}
-            placeholder="Max rate"
-          />
+          <Text size={'normal'} fontSize={getFontSize(16)}>
+            Price Range
+          </Text>
+          <View
+            gap={'lg'}
+            flexDirection="row"
+            alignItems="center"
+            justifyContent={'flex-start'}
+          >
+            <TextInput
+              value={rate1.toString()}
+              keyboardType="numeric"
+              onChangeText={(value) => setRate1(value)}
+              style={[styles.textInput, isFocused && styles.active]}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              placeholder="Min rate"
+            />
+            <TextInput
+              value={rate2.toString()}
+              keyboardType="numeric"
+              onChangeText={(value) => setRate2(value)}
+              style={[styles.textInput, isFocused2 && styles.active]}
+              onFocus={() => setIsFocused2(true)}
+              onBlur={() => setIsFocused2(false)}
+              placeholder="Max rate"
+            />
+          </View>
         </View>
-      </View>
-      <View gap={'sm'} justifyContent={'flex-start'} flex={1} mt={'lg'}>
-        <Button
-          title="Reset"
-          onPress={onReset}
-          bg={'transparent'}
-          color={theme.colors.blue}
-          style={{ borderWidth: 1, borderColor: theme.colors.blue }}
+
+        <FlexButtons
+          buttonText2="Apply"
+          onCancel={onReset}
+          onPress={onApply}
+          buttonText="Reset"
         />
-        <Button title="Apply" onPress={onApply} />
       </View>
-    </View>
+    </BottomSheetKeyboardAwareScrollView>
   );
 };
 
@@ -100,13 +97,14 @@ const styles = StyleSheet.create((theme) => ({
   textInput: {
     backgroundColor: 'white',
     borderRadius: 8,
-    paddingVertical: 18,
+    paddingVertical: 8,
     paddingHorizontal: 10,
     minHeight: 45,
+    borderWidth: 1,
+    borderColor: theme.colors.grey,
     flex: 1,
   },
   active: {
-    borderWidth: 1,
     borderColor: theme.colors.blue,
   },
 }));

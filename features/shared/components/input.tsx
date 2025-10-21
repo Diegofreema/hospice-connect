@@ -10,7 +10,7 @@ type Props = TextInputProps & {
 
 export const Input = ({ label, rightIcon, leftIcon, ...props }: Props) => {
   return (
-    <View style={{ gap: 10, minHeight: 55, flex: 1 }}>
+    <View style={{ gap: 10, minHeight: 55 }}>
       {label && <Text>{label}</Text>}
       <View style={styles.container}>
         {leftIcon}
@@ -30,12 +30,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'gray',
     borderRadius: 8,
-    paddingVertical: 18,
+    paddingVertical: 5,
+    height: 50,
     paddingHorizontal: 10,
-    minHeight: 50,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    flex: 1,
   },
 });

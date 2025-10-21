@@ -18,10 +18,14 @@ const AccountType = () => {
   };
   return (
     <Wrapper>
-      <BackButton />
+      <BackButton marginTop={0} />
       <MyTitle title="Select account type" style={{ marginTop: 20 }} />
       <AccountSelector selected={selected} setSelected={setSelected} />
-      <Button label="Next" onPress={handleNavigation} marginTop={'xl'} />
+      <Button
+        title="Next"
+        onPress={handleNavigation}
+        style={{ marginTop: 20 }}
+      />
       <PrivacyTermsLink />
     </Wrapper>
   );

@@ -12,8 +12,8 @@ import { NurseCard } from './nurse-card';
 
 type Props = {
   nurseType: 'All' | NurseType;
-  rate1: number;
-  rate2: number;
+  rate1: string;
+  rate2: string;
   isAssigned?: boolean;
   onAction?: () => void;
 };
@@ -29,7 +29,7 @@ export const FetchNurses = ({
 
   const { loadMore, results, status } = usePaginatedQuery(
     api.nurses.getNurses,
-    { discipline: nurseType, range1: rate1, range2: rate2, todayToText },
+    { discipline: nurseType, range1: +rate1, range2: +rate2, todayToText },
     { initialNumItems: 30 }
   );
   const onLoadMore = () => {
@@ -45,7 +45,7 @@ export const FetchNurses = ({
   return (
     <Stack flex={1}>
       <LegendList
-        ListHeaderComponent={<Title size={20}>Nurses</Title>}
+        ListHeaderComponent={<Title size={20}>Healthcare Professionals</Title>}
         data={results}
         recycleItems
         onEndReached={onLoadMore}
@@ -55,12 +55,12 @@ export const FetchNurses = ({
         )}
         keyExtractor={(item) => item._id}
         ListFooterComponent={status === 'LoadingMore' ? <SmallLoader /> : null}
-        contentContainerStyle={{ gap: 20, paddingBottom: 100, flexGrow: 1 }}
+        contentContainerStyle={{ gap: 20, paddingBottom: 50, flexGrow: 1 }}
         columnWrapperStyle={{ gap: 20 }}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <Title textAlign="center" size={20}>
-            No nurses found
+            No professionals found.
           </Title>
         }
         style={{ flex: 1 }}

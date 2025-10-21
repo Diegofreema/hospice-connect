@@ -49,7 +49,7 @@ export const ControlledDatePicker = <TFieldValues extends FieldValues>({
               <Text size="normal" color={value ? 'black' : 'grey'}>
                 {mode === 'time'
                   ? format(value || new Date(), 'HH:mm')
-                  : format(value || new Date(), 'PPP')}
+                  : format(value || new Date(), 'MM/dd/yyyy')}
               </Text>
             </TouchableOpacity>
             {open && (

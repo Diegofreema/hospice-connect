@@ -97,6 +97,46 @@ export const updateHospiceImage = mutation({
   },
 });
 
+export const updateHospiceProfile = mutation({
+  args: {
+    address: v.string(),
+    businessName: v.string(),
+    licenseNumber: v.string(),
+    state: v.string(),
+    phoneNumber: v.string(),
+    hospiceId: v.id('hospices'),
+    email: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new ConvexError({ message: 'Unauthorized' });
+    }
+    const user = await ctx.db.get(userId);
+    if (!user) {
+      throw new ConvexError({ message: 'Unauthorized' });
+    }
+    const hospice = await ctx.db.get(args.hospiceId);
+    if (!hospice) {
+      throw new ConvexError({ message: 'Hospice not found' });
+    }
+    if (hospice.userId !== userId) {
+      throw new ConvexError({ message: 'Unauthorized' });
+    }
+
+    return await ctx.db.insert('pendingHospiceProfile', {
+      address: args.address,
+      businessName: args.businessName,
+      licenseNumber: args.licenseNumber,
+      state: args.state,
+      phoneNumber: args.phoneNumber,
+      email: args.email,
+      hospiceId: args.hospiceId,
+      isApproved: false,
+    });
+  },
+});
+
 // ? helpers
 
 export const getHospiceAndImage = async (

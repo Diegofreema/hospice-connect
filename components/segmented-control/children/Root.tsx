@@ -118,14 +118,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     borderRadius: 10,
     height: '90%',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 1,
-    elevation: 1,
   },
   itemContainer: {
     justifyContent: 'center',

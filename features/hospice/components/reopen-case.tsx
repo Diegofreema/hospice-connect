@@ -2,9 +2,9 @@ import { useHospice } from '@/components/context/hospice-context';
 import { useToast } from '@/components/demos/toast';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
-import { generateErrorMessage } from '@/features/shared/utils';
+import { generateErrorMessage, generateShifts } from '@/features/shared/utils';
 import { useMutation } from 'convex/react';
-import { differenceInHours, format } from 'date-fns';
+import { format } from 'date-fns';
 import React from 'react';
 
 import { ControlledDatePicker } from '@/features/authentication/components/form/control-date-picker';
@@ -45,42 +45,11 @@ export const ReopenCase = ({ onClose }: Props) => {
   });
   const onSubmit = async (data: ReopenAssignmentValidator) => {
     if (!hospice) return;
-    const numberOfShifts = Math.round(
-      differenceInHours(data.endDate, data.startDate) / 12
-    );
-    const array: {
-      start: string;
-      end: string;
-      startShift: string;
-      endShift: string;
-    }[] = [];
-    for (let index = 0; index < numberOfShifts; index++) {
-      const shiftStart = new Date(data.startDate);
-      shiftStart.setHours(shiftStart.getHours() + index * 12);
-
-      const shiftEnd = new Date(shiftStart);
-      shiftEnd.setHours(shiftEnd.getHours() + 12);
-
-      // Format times as strings (e.g., "7:00 AM")
-      const startShift = shiftStart.toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      });
-
-      const endShift = shiftEnd.toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      });
-
-      array.push({
-        start: format(shiftStart, 'dd-MM-yyyy'),
-        end: format(shiftEnd, 'dd-MM-yyyy'),
-        startShift,
-        endShift,
-      });
-    }
+    const shifts = generateShifts({
+      endDate: data.endDate,
+      startDate: data.startDate,
+      openShift: format(data.openShift, 'H:mm'),
+    });
 
     try {
       await reopenCase({
@@ -90,7 +59,7 @@ export const ReopenCase = ({ onClose }: Props) => {
 
         hospiceId: hospice._id as Id<'hospices'>,
         assignmentId: id as Id<'assignments'>,
-        shifts: array,
+        shifts,
       });
       showToast({
         title: 'Success',

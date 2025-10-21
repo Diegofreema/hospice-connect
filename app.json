@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "hospice-connect",
+    "name": "HospiceConnect",
     "slug": "hospiceconnect",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -14,7 +14,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
@@ -82,12 +82,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "a979187d-6475-4a18-86a1-60eec5b5dee6"
+        "projectId": "0358faee-7a79-428c-9427-bf188a3c4035"
       }
     },
-    "runtimeVersion": "1.0.0",
-    "updates": {
-      "url": "https://u.expo.dev/a979187d-6475-4a18-86a1-60eec5b5dee6"
-    }
+    "runtimeVersion": "1.0.0"
   }
 }

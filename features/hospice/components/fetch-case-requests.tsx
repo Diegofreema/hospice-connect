@@ -214,7 +214,7 @@ const FetchCaseRequest = ({
         <View style={styles.scheduleCard}>
           <View>
             <Text size="normal" isBold>
-              {format(startDate, 'PP')} - {format(endDate, 'PP')}
+              {format(startDate, 'MM/dd/yy')} - {format(endDate, 'MM/dd/yy')}
             </Text>
             <Text size="small">
               {schedule.startTime} - {schedule.endTime}

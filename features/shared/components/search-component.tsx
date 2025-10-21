@@ -1,17 +1,25 @@
-import { IconSearch } from '@tabler/icons-react-native';
+import { IconSearch, IconX } from '@tabler/icons-react-native';
 import { Href, router } from 'expo-router';
 import { TextInput, TextInputProps } from 'react-native';
 
+import { Dispatch, SetStateAction } from 'react';
 import { useUnistyles } from 'react-native-unistyles';
 import { CustomPressable } from './custom-pressable';
+import { Text } from './text';
 import { Stack } from './v-stack';
 
 type Props = TextInputProps & {
   path?: Href;
   isButton?: boolean;
+  setValue?: Dispatch<SetStateAction<string>>;
 };
 
-export const SearchComponent = ({ path, isButton, ...props }: Props) => {
+export const SearchComponent = ({
+  path,
+  isButton,
+  setValue,
+  ...props
+}: Props) => {
   const { theme } = useUnistyles();
   const onPress = () => {
     if (path) {
@@ -30,7 +38,9 @@ export const SearchComponent = ({ path, isButton, ...props }: Props) => {
           backgroundColor={theme.colors.buttonGrey}
         >
           <IconSearch size={20} />
-          <TextInput {...props} editable={false} />
+          <Text size="normal" color={theme.colors.grey}>
+            {props.placeholder || 'Search'}
+          </Text>
         </Stack>
       </CustomPressable>
     );
@@ -38,14 +48,30 @@ export const SearchComponent = ({ path, isButton, ...props }: Props) => {
   return (
     <Stack
       mode={'flex'}
-      isFlexCentered
       gap={'sm'}
+      isFlexCentered
       borderRadius={'md'}
-      padding={'md'}
+      padding={'xxl'}
       backgroundColor={theme.colors.buttonGrey}
     >
       <IconSearch size={20} />
-      <TextInput {...props} />
+      <TextInput
+        {...props}
+        value={props.value}
+        onChangeText={setValue}
+        autoCapitalize="none"
+        style={{ flex: 1 }}
+      />
+      {props.value && (
+        <CustomPressable
+          onPress={() => {
+            console.log('clear');
+            setValue?.('');
+          }}
+        >
+          <IconX size={25} color={theme.colors.grey} />
+        </CustomPressable>
+      )}
     </Stack>
   );
 };

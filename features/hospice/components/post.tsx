@@ -7,13 +7,12 @@ import {
   generateErrorMessage,
   getAssignmentStatusText,
   getScheduleStatusAndColor,
-  trimText,
 } from '@/features/shared/utils';
 import { View } from '../../shared/components/view';
 
-import { IconDots } from '@tabler/icons-react-native';
+import { IconCircle, IconDots } from '@tabler/icons-react-native';
 import { router } from 'expo-router';
-import { SFSymbol, SymbolView } from 'expo-symbols';
+import { SFSymbol } from 'expo-symbols';
 
 import { Badge } from '@/components/badge/Badge';
 import { BadgeVariant } from '@/components/badge/types';
@@ -42,13 +41,13 @@ const data: { label: string; value: string; ios: SFSymbol; android: string }[] =
       label: 'Edit',
       value: 'edit',
       ios: 'pencil',
-      android: 'edit_text',
+      android: 'mode-edit',
     },
     {
       label: 'Delete',
       value: 'delete',
       ios: 'trash',
-      android: 'ic_delete',
+      android: 'trash',
     },
   ];
 export const Post = ({
@@ -88,6 +87,7 @@ export const Post = ({
       clearModal('delete-post');
     }
   };
+
   const setId = useSelectAssignment((state) => state.setId);
   const { theme } = useUnistyles();
   const onClick = (value: string) => {
@@ -111,10 +111,10 @@ export const Post = ({
     onOpenReOpenAssignment();
   };
   const onAssign = () => {
-    router.push(`/assign-nurse?id=${post._id}`);
+    router.push(`/assign-nurse?id=${post._id}&discipline=${post.discipline}`);
   };
   const onHandleAction = () => {
-    if (post.status === 'completed') {
+    if (post.status === 'completed' || post.status === 'cancelled') {
       onReOpen();
       setId(post._id);
     } else {
@@ -122,11 +122,16 @@ export const Post = ({
     }
   };
   const disabled = post.status === 'booked';
-  const buttonText = post.status === 'completed' ? 'Re-Open' : 'Assign';
+  const buttonText =
+    post.status === 'completed' || post.status === 'cancelled'
+      ? 'Re-Open'
+      : 'Assign';
   return (
     <Card style={styles.card}>
       <CardHeader style={styles.header}>
-        <Text size={'normal'}>{trimText(name, 15)}</Text>
+        <Text size={'medium'} isBold>
+          {name}
+        </Text>
         <MyMenu
           disabled={deleting}
           trigger={
@@ -151,10 +156,10 @@ export const Post = ({
               getScheduleStatusAndColor(post.status).status as BadgeVariant
             }
             icon={
-              <SymbolView
-                name="circle.fill"
+              <IconCircle
                 size={12}
-                tintColor={getScheduleStatusAndColor(post.status).color}
+                fill={getScheduleStatusAndColor(post.status).color}
+                color={getScheduleStatusAndColor(post.status).color}
               />
             }
           />
@@ -163,10 +168,7 @@ export const Post = ({
         <FlexText leftText="Care level" rightText={post.careLevel} />
         <FlexText leftText="Discipline" rightText={post.discipline} />
 
-        <FlexText
-          leftText="Location"
-          rightText={trimText(post.patientAddress, 20)}
-        />
+        <FlexText leftText="Location" rightText={post.patientAddress} />
         <View flexDirection="row" gap="lg" style={styles.footer}>
           <CustomPressable
             onPress={() => {
@@ -179,6 +181,7 @@ export const Post = ({
               View Schedule
             </Text>
           </CustomPressable>
+
           <CustomPressable
             onPress={onHandleAction}
             style={[

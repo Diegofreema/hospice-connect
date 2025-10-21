@@ -15,12 +15,12 @@ import {
   getScheduleStatusText,
 } from '@/features/shared/utils';
 import { useUpdateUpdateStatus } from '@/hooks/use-update-status';
+import { IconCircle } from '@tabler/icons-react-native';
 
 import { useMutation } from 'convex/react';
 import { FunctionReturnType } from 'convex/server';
 import { format, parse } from 'date-fns';
 import { Image } from 'expo-image';
-import { SymbolView } from 'expo-symbols';
 import { useState } from 'react';
 import { useWindowDimensions, View } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
@@ -36,7 +36,6 @@ type Props = {
 
 export const ViewShiftCard = ({
   shift,
-
   onAcceptSchedule,
   nurseId,
   onClose,
@@ -119,7 +118,7 @@ export const ViewShiftCard = ({
                 {name}
               </Text>
               <Text size="normal" isBold>
-                {format(startDate, 'PP')} - {format(endDate, 'PP')}
+                {format(startDate, 'MM/dd/yy')} - {format(endDate, 'MM/dd/yy')}
               </Text>
               <Text size="small">
                 {shift.startTime} - {shift.endTime}
@@ -132,10 +131,10 @@ export const ViewShiftCard = ({
               variant={statusInfo.status as BadgeVariant}
               size="sm"
               icon={
-                <SymbolView
-                  name="circle.fill"
+                <IconCircle
                   size={12}
-                  tintColor={statusInfo.color}
+                  fill={statusInfo.color}
+                  color={statusInfo.color}
                 />
               }
             />

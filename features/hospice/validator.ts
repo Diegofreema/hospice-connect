@@ -20,9 +20,8 @@ export const createAssignmentValidator = z
     firstName: z.string().min(2, 'First name is required'),
     lastName: z.string().min(2, 'Last name is required'),
     phoneNumber: z.string().min(1, 'Phone number is required'),
-    gender: z.enum(['male', 'female', 'others'], {
-      error: 'Gender is required',
-    }),
+    gender: z.string().min(1, 'Please select a gender'),
+    customGender: z.string().optional(),
     dateOfBirth: z.date(),
     discipline: z.enum(['RN', 'LVN', 'HHA'], {
       error: 'Discipline is required',
@@ -76,6 +75,19 @@ export const createAssignmentValidator = z
     {
       message: 'Start date of this assignment cannot be in the past',
       path: ['startDate'],
+    }
+  )
+  .refine(
+    (data) => {
+      // If gender is 'others', customGender must be provided
+      if (data.gender === 'others') {
+        return data.customGender && data.customGender.trim().length > 0;
+      }
+      return true;
+    },
+    {
+      message: 'Please specify your gender',
+      path: ['customGender'],
     }
   );
 export const reopenAssignmentValidator = z
@@ -156,6 +168,20 @@ export const editScheduleValidator = z
       path: ['startDate'],
     }
   );
+
+export const updateProfileValidator = z.object({
+  businessName: z.string().min(1, 'Business name is required'),
+  address: z.string().min(1, 'Address is required'),
+  state: z.string().min(1, 'State is required'),
+  phoneNumber: z.string().min(1, 'Phone number is required'),
+  licenseNumber: z.string().min(1, 'License number is required'),
+
+  email: z
+    .email({ error: 'Please put a valid email' })
+    .min(1, 'Email is required'),
+});
+
+export type UpdateProfileValidator = z.infer<typeof updateProfileValidator>;
 
 export type EditScheduleValidator = z.infer<typeof editScheduleValidator>;
 export type CreateAssignmentValidator = z.infer<

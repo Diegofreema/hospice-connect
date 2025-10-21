@@ -8,7 +8,10 @@ import { CreateAssignmentForm } from '@/features/hospice/components/create-assig
 import { CreateAssignmentValidator } from '@/features/hospice/validator';
 import { BackButton } from '@/features/shared/components/back-button';
 import { Wrapper } from '@/features/shared/components/wrapper';
-import { generateErrorMessage } from '@/features/shared/utils';
+import {
+  convertTimeStringToDate,
+  generateErrorMessage,
+} from '@/features/shared/utils';
 
 import { IconCheck, IconX } from '@tabler/icons-react-native';
 import { useMutation, useQuery } from 'convex/react';
@@ -28,10 +31,14 @@ const EditScreen = () => {
   const updateAssignment = useMutation(api.assignments.updateAssignment);
   const onSubmit = async (data: CreateAssignmentValidator) => {
     if (!hospice) return;
+    const { customGender, ...rest } = data;
     try {
       await updateAssignment({
         assignmentId: id,
-        ...data,
+        ...rest,
+        firstName: data.firstName.trim(),
+        lastName: data.lastName.trim(),
+        gender: data.gender === 'others' ? customGender || 'Male' : data.gender,
         openShift: format(new Date(data.openShift), 'h:mm a'),
         startDate: format(new Date(data.startDate), 'yyyy-MM-dd'),
         endDate: format(new Date(data.endDate), 'yyyy-MM-dd'),
@@ -65,10 +72,16 @@ const EditScreen = () => {
   if (assignment === null) {
     return null;
   }
+  console.log({
+    shift: assignment.openShift,
+    openShift: new Date(convertTimeStringToDate(assignment.openShift)),
+    startDate: new Date(assignment.startDate),
+    endDate: new Date(assignment.endDate),
+  });
 
   const formattedAssignment = {
     ...assignment,
-    openShift: new Date(assignment.openShift),
+    openShift: new Date(convertTimeStringToDate(assignment.openShift)),
     startDate: new Date(assignment.startDate),
     endDate: new Date(assignment.endDate),
     dateOfBirth: new Date(assignment.dateOfBirth),

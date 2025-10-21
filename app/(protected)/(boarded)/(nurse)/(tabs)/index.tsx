@@ -99,7 +99,11 @@ export default function HomeScreen() {
         </SegmentedControl.Root>
       </View>
       {selectedValue === 'available' && (
-        <AvailableAssignments nurseId={nurse._id} onOpenSheet={onOpenSheet} />
+        <AvailableAssignments
+          nurseId={nurse._id}
+          onOpenSheet={onOpenSheet}
+          discipline={nurse.discipline}
+        />
       )}
       {selectedValue === 'in-progress' && (
         <InProgressAssignments

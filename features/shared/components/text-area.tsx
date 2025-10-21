@@ -47,20 +47,6 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     padding: 12,
     minHeight: 120,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: {
-          width: 0,
-          height: 1,
-        },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-      },
-      android: {
-        elevation: 2,
-      },
-    }),
   },
   textareaContainerFocused: {
     borderColor: '#007AFF',

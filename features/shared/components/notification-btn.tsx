@@ -17,7 +17,7 @@ export const NotificationButton = ({ count = 0 }: Props) => {
   const countIsGreaterThanZero = count > 0;
   return (
     <TouchableOpacity style={styles.container} onPress={onPress}>
-      <IconBell size={30} />
+      <IconBell size={25} />
       {countIsGreaterThanZero && (
         <View style={styles.badge}>
           <Text size={'small'} color="white">

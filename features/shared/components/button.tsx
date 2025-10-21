@@ -53,7 +53,7 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: 'center',
     backgroundColor: bg || theme.colors.blue,
     borderRadius: 6,
-    elevation: 5,
+
     flexDirection: 'row',
     justifyContent: 'center',
     padding: 16,

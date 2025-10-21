@@ -58,11 +58,17 @@ export const ViewAssignment = ({ id, nurseId, nurseNotificationId }: Props) => {
         <FlexText leftText="Business name" rightText={hospice.businessName} />
         <FlexText leftText="Patient name" rightText={name} />
         <FlexText leftText="Phone number" rightText={post.phoneNumber} />
-        <FlexText leftText="Start date" rightText={format(startDate, 'PP')} />
-        <FlexText leftText="End date" rightText={format(endDate, 'PP')} />
+        <FlexText
+          leftText="Start date"
+          rightText={format(startDate, 'MM/dd/yy')}
+        />
+        <FlexText leftText="End date" rightText={format(endDate, 'MM/dd/yy')} />
         <FlexText leftText="Open Shift" rightText={schedule.startTime} />
         <FlexText leftText="Close Shift" rightText={schedule.endTime} />
-        <FlexText leftText="Date of birth" rightText={format(dob, 'PP')} />
+        <FlexText
+          leftText="Date of birth"
+          rightText={format(dob, 'MM/dd/yy')}
+        />
         <FlexText leftText="Care level" rightText={post.careLevel} />
         <FlexText leftText="Gender" rightText={post.gender} />
         <FlexText leftText="Discipline" rightText={post.discipline} />

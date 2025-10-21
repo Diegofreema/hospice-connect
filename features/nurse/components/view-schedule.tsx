@@ -28,6 +28,7 @@ export const ViewSchedule = ({
     return <SmallLoader size={30} />;
   }
   if (data === null) return null;
+  console.log('dndjn');
 
   const onAcceptSchedule = () => {};
   return (

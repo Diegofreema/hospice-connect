@@ -12,17 +12,21 @@ export const getShifts = query({
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
+    const emptyData = {
+      shifts: [],
+      assignment: null,
+    };
     if (!userId) {
-      return [];
+      return emptyData;
     }
 
     const assignment = await ctx.db.get(args.assignmentId);
     if (!assignment) {
-      return [];
+      return emptyData;
     }
 
     if (assignment.hospiceId !== args.hospiceId) {
-      return [];
+      return emptyData;
     }
 
     const schedules = await ctx.db
@@ -30,6 +34,7 @@ export const getShifts = query({
       .withIndex('by_assignment_id', (q) =>
         q.eq('assignmentId', args.assignmentId)
       )
+      .order('desc')
       .collect();
 
     const shifts = schedules.map(async (schedule) => {
@@ -39,7 +44,11 @@ export const getShifts = query({
         nurse,
       };
     });
-    return await Promise.all(shifts);
+
+    return {
+      shifts: await Promise.all(shifts),
+      assignment,
+    };
   },
 });
 export const getShiftsByOnlyAssignmentId = query({
@@ -62,6 +71,7 @@ export const getShiftsByOnlyAssignmentId = query({
       .withIndex('by_assignment_id', (q) =>
         q.eq('assignmentId', args.assignmentId)
       )
+      .order('asc')
       .collect();
 
     const shifts = schedules.map(async (schedule) => {

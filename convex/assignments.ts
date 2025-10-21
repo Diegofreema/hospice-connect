@@ -4,12 +4,14 @@ import { paginationOptsValidator, PaginationResult } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
-import { careLevel, discipline, gender, shifts } from './schema';
+import { formatDateString, formatTimeString, stringToDate } from './helper';
+import { careLevel, discipline, shifts } from './schema';
 import { AssignmentsWithHospicesType, AvailableAssignmentType } from './types';
 
 export const availableAssignments = query({
   args: {
     nurseId: v.id('nurses'),
+    discipline: discipline,
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
@@ -23,7 +25,12 @@ export const availableAssignments = query({
     }
     const result = await ctx.db
       .query('assignments')
-      .withIndex('state', (q) => q.eq('state', nurse.stateOfRegistration))
+      .withIndex('state', (q) =>
+        q
+          .eq('state', nurse.stateOfRegistration)
+          .eq('status', 'available')
+          .eq('discipline', args.discipline)
+      )
       .paginate(args.paginationOpts);
     // ? getting schedules by assignment id
     const assignments = await Promise.all(
@@ -164,7 +171,7 @@ export const createAssignment = mutation({
     discipline: discipline,
     endDate: v.string(),
     firstName: v.string(),
-    gender: gender,
+    gender: v.string(),
     lastName: v.string(),
     phoneNumber: v.string(),
     rate: v.number(),
@@ -190,6 +197,14 @@ export const createAssignment = mutation({
     if (!hospice) {
       throw new ConvexError({ message: 'Hospice not found' });
     }
+    const nurses = await ctx.db
+      .query('nurses')
+      .withIndex('by_discipline', (q) =>
+        q
+          .eq('discipline', args.discipline)
+          .eq('stateOfRegistration', args.state)
+      )
+      .collect();
     const assignmentId = await ctx.db.insert('assignments', {
       notes: args.additionalNotes,
       patientAddress: args.address,
@@ -221,6 +236,17 @@ export const createAssignment = mutation({
         isSubmitted: false,
       });
     }
+
+    for (const nurse of nurses) {
+      await ctx.db.insert('nurseNotifications', {
+        nurseId: nurse._id,
+        isRead: false,
+        description:
+          'A new assignment matching your discipline has been posted.',
+        title: 'New Assignment Available',
+        type: 'normal',
+      });
+    }
   },
 });
 
@@ -246,6 +272,14 @@ export const reopenAssignment = mutation({
     if (!assignment) {
       throw new ConvexError({ message: 'Assignment not found' });
     }
+    const nurses = await ctx.db
+      .query('nurses')
+      .withIndex('by_discipline', (q) =>
+        q
+          .eq('discipline', assignment.discipline)
+          .eq('stateOfRegistration', assignment.state)
+      )
+      .collect();
     const assignmentId = await ctx.db.insert('assignments', {
       notes: assignment.notes,
       patientAddress: assignment.patientAddress,
@@ -277,6 +311,16 @@ export const reopenAssignment = mutation({
         isSubmitted: false,
       });
     }
+    for (const nurse of nurses) {
+      await ctx.db.insert('nurseNotifications', {
+        nurseId: nurse._id,
+        isRead: false,
+        description:
+          'A new assignment matching your discipline has been posted.',
+        title: 'New Assignment Available',
+        type: 'normal',
+      });
+    }
   },
 });
 
@@ -305,7 +349,7 @@ export const updateAssignment = mutation({
     discipline: discipline,
     endDate: v.string(),
     firstName: v.string(),
-    gender: gender,
+    gender: v.string(),
     lastName: v.string(),
     phoneNumber: v.string(),
     rate: v.number(),
@@ -408,19 +452,97 @@ export const updateAssignmentStatus = mutation({
       .collect();
 
     const isFullyStaffed = schedules.every((schedule) => schedule.nurseId);
-    const isCompleted = schedules.every(
-      (schedule) => schedule.status === 'completed'
-    );
-    if (isFullyStaffed) {
+    const endDate = stringToDate(assignment.endDate);
+    endDate.setHours(0, 0, 0, 0);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const timeHasPassed = endDate <= today;
+
+    if (isFullyStaffed && !timeHasPassed) {
       await ctx.db.patch(args.assignmentId, {
         status: 'booked',
       });
     }
-
-    if (isFullyStaffed && isCompleted) {
+    if (!isFullyStaffed && !timeHasPassed) {
       await ctx.db.patch(args.assignmentId, {
         status: 'completed',
       });
     }
+
+    if (timeHasPassed) {
+      await ctx.db.patch(args.assignmentId, {
+        status: 'completed',
+      });
+    }
+  },
+});
+
+export const cancelAssignment = mutation({
+  args: {
+    assignmentId: v.id('assignments'),
+    hospiceId: v.id('hospices'),
+    reason: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new ConvexError({ message: 'Unauthorized' });
+    }
+    const hospice = await ctx.db.get(args.hospiceId);
+    if (!hospice) {
+      throw new ConvexError({ message: 'Hospice not found' });
+    }
+    const assignment = await ctx.db.get(args.assignmentId);
+    if (!assignment) {
+      throw new ConvexError({ message: 'Assignment not found' });
+    }
+    if (assignment.hospiceId !== args.hospiceId) {
+      throw new ConvexError({
+        message: 'You do not have permission to cancel this assignment',
+      });
+    }
+
+    const schedules = await ctx.db
+      .query('schedules')
+      .withIndex('by_assignment_id', (q) =>
+        q.eq('assignmentId', args.assignmentId)
+      )
+      .collect();
+    for (const schedule of schedules) {
+      if (schedule.nurseId) {
+        await ctx.db.insert('nurseNotifications', {
+          nurseId: schedule.nurseId,
+          isRead: false,
+          hospiceId: args.hospiceId,
+          scheduleId: schedule._id,
+          description: args.reason,
+          title: 'Assignment Cancelled',
+          type: 'normal',
+        });
+
+        if (
+          schedule.status !== 'completed' &&
+          schedule.status !== 'not_covered'
+        ) {
+          await ctx.db.patch(schedule._id, {
+            status: 'cancelled',
+            canceledAt: Date.now(),
+            endTime: formatTimeString(new Date()),
+            endDate: formatDateString(new Date()),
+          });
+        }
+      }
+
+      if (schedule.status === 'available') {
+        await ctx.db.patch(schedule._id, {
+          status: 'cancelled',
+        });
+      }
+    }
+    await ctx.db.patch(assignment._id, {
+      isCanceled: true,
+      status: 'cancelled',
+    });
   },
 });

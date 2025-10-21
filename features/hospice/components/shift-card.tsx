@@ -11,21 +11,25 @@ import {
   getScheduleStatusText,
 } from '@/features/shared/utils';
 
+import { Id } from '@/convex/_generated/dataModel';
 import { useUpdateUpdateStatus } from '@/hooks/use-update-status';
+import { IconCircle } from '@tabler/icons-react-native';
 import { FunctionReturnType } from 'convex/server';
 import { format, parse } from 'date-fns';
 import { Image } from 'expo-image';
-import { SymbolView } from 'expo-symbols';
 import { useWindowDimensions, View } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 import { useGetScheduleId } from '../hooks/use-get-schedule-id';
 
 type Props = {
-  shift: FunctionReturnType<typeof api.shifts.getShifts>[number];
+  shift: FunctionReturnType<typeof api.shifts.getShifts>['shifts'][number];
   onCancelSchedule: () => void;
   onEditSchedule: () => void;
   onRateNurse: () => void;
-  onViewRouteSheet: () => void;
+  onViewRouteSheet: (
+    assignmentId: Id<'assignments'>,
+    nurseId: Id<'nurses'>
+  ) => void;
 };
 
 export const ShiftCard = ({
@@ -69,7 +73,7 @@ export const ShiftCard = ({
     onRateNurse();
     getScheduleId(shift._id);
   };
-
+  const name = `${shift.nurse?.firstName} ${shift.nurse?.lastName}`;
   return (
     <Card style={styles.card}>
       <CardHeader style={{ gap: 10 }}>
@@ -80,10 +84,10 @@ export const ShiftCard = ({
             </View>
             <View>
               <Text size="normal" isBold>
-                {shift.nurse?.firstName || 'No nurse assigned'}
+                {name || 'No nurse assigned'}
               </Text>
               <Text size="normal" isBold>
-                {format(startDate, 'PP')} - {format(endDate, 'PP')}
+                {format(startDate, 'MM/dd/yy')} - {format(endDate, 'MM/dd/yy')}
               </Text>
               <Text size="small">
                 {shift.startTime} - {shift.endTime}
@@ -96,10 +100,10 @@ export const ShiftCard = ({
               variant={statusInfo.status as BadgeVariant}
               size="sm"
               icon={
-                <SymbolView
-                  name="circle.fill"
+                <IconCircle
                   size={12}
-                  tintColor={statusInfo.color}
+                  fill={statusInfo.color}
+                  color={statusInfo.color}
                 />
               }
             />
@@ -109,21 +113,27 @@ export const ShiftCard = ({
           </View>
         </View>
         <Stack mode="flex" gap="lg">
-          {shift.status === 'completed' && (
-            <PrivacyNoticeLink onPress={onViewRouteSheet}>
-              View Route Sheet
-            </PrivacyNoticeLink>
-          )}
+          {shift.status === 'completed' &&
+            shift.isSubmitted &&
+            shift.nurseId && (
+              <PrivacyNoticeLink
+                onPress={() =>
+                  onViewRouteSheet(shift.assignmentId, shift.nurseId!)
+                }
+              >
+                View Route Sheet
+              </PrivacyNoticeLink>
+            )}
           {shift.status !== 'completed' && shift.nurseId && (
             <PrivacyNoticeLink onPress={handleCancelSchedule}>
               Cancel Schedule
             </PrivacyNoticeLink>
           )}
-          {shift.status !== 'booked' && (
-            <PrivacyNoticeLink onPress={handleEditSchedule}>
-              Edit Schedule
-            </PrivacyNoticeLink>
-          )}
+
+          <PrivacyNoticeLink onPress={handleEditSchedule}>
+            Edit Schedule
+          </PrivacyNoticeLink>
+
           {shift.status === 'completed' && (
             <PrivacyNoticeLink onPress={handleRateNurse}>
               Rate nurse

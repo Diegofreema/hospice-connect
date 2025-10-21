@@ -4,8 +4,14 @@ import { scheduleStatus } from '@/convex/schema';
 import { ReactMutation } from 'convex/react';
 import { FunctionReference } from 'convex/server';
 import { ConvexError, Infer } from 'convex/values';
+import {
+  addHours,
+  differenceInHours,
+  format,
+  setHours,
+  setMinutes,
+} from 'date-fns';
 import { Dimensions } from 'react-native';
-
 const { width } = Dimensions.get('window');
 
 // Device type detection
@@ -98,6 +104,8 @@ export const getScheduleStatusText = (status: Infer<typeof scheduleStatus>) => {
       return 'Booked';
     case 'completed':
       return 'Completed';
+    case 'cancelled':
+      return 'Cancelled';
     default:
       return 'Not Covered';
   }
@@ -112,6 +120,8 @@ export const getAssignmentStatusText = (
       return 'Fully staffed';
     case 'completed':
       return 'Completed';
+    case 'cancelled':
+      return 'Cancelled';
     default:
       return 'Not Covered';
   }
@@ -130,6 +140,8 @@ export const getScheduleStatusAndColor = (
       return { status: 'pending', color: '#9747FF' };
 
     case 'not_covered':
+      return { status: 'error', color: '#991B1B' };
+    case 'cancelled':
       return { status: 'error', color: '#991B1B' };
     default:
       return { status: 'warning', color: '#FFBF00' };
@@ -201,4 +213,106 @@ export function calculateTotalHours(shifts: Doc<'schedules'>[]) {
   });
 
   return totalHours;
+}
+
+interface Shift {
+  start: string;
+  end: string;
+  startShift: string;
+  endShift: string;
+}
+
+interface ShiftData {
+  startDate: Date;
+  endDate: Date;
+  openShift: string;
+}
+
+/**
+ * Generates an array of 12-hour shifts between startDate and endDate.
+ * @param data - Object containing startDate and endDate.
+ * @param includePartial - Whether to include a partial shift at the end (default: false).
+ * @returns Array of shift objects with formatted dates and times.
+ */
+export function generateShifts(
+  data: ShiftData,
+  includePartial: boolean = false
+): Shift[] {
+  // Validate input dates
+  if (!(data.startDate instanceof Date) || isNaN(data.startDate.getTime())) {
+    throw new Error('Invalid startDate');
+  }
+  if (!(data.endDate instanceof Date) || isNaN(data.endDate.getTime())) {
+    throw new Error('Invalid endDate');
+  }
+  if (data.startDate >= data.endDate) {
+    throw new Error('startDate must be before endDate');
+  }
+
+  // Validate and parse openShift time (expecting "HH:mm" format)
+  const timeMatch = data.openShift.match(/^(\d{1,2}):(\d{2})$/);
+  if (!timeMatch) {
+    throw new Error(
+      'Invalid openShift time format. Use HH:mm (e.g., "07:00").'
+    );
+  }
+  const [_, hours, minutes] = timeMatch;
+  const openShiftHours = parseInt(hours, 10);
+  const openShiftMinutes = parseInt(minutes, 10);
+  if (openShiftHours > 23 || openShiftMinutes > 59) {
+    throw new Error('Invalid openShift time values.');
+  }
+
+  // Set the first shift's start time to openShift time on startDate
+  const firstShiftStart = setHours(
+    setMinutes(data.startDate, openShiftMinutes),
+    openShiftHours
+  );
+
+  // Calculate number of 12-hour shifts
+  const hoursDifference = differenceInHours(data.endDate, firstShiftStart);
+  const numberOfShifts = includePartial
+    ? Math.ceil(hoursDifference / 12)
+    : Math.floor(hoursDifference / 12);
+
+  const shifts: Shift[] = [];
+
+  for (let index = 0; index < numberOfShifts; index++) {
+    // Calculate shift start by adding 12 hours per index from firstShiftStart
+    const shiftStart = addHours(firstShiftStart, index * 12);
+
+    // Calculate shift end (12 hours after start or capped at endDate)
+    const shiftEnd = addHours(shiftStart, 12);
+    if (shiftEnd > data.endDate && !includePartial) {
+      break; // Skip partial shift if not included
+    }
+
+    // Cap shift end at endDate
+    const cappedShiftEnd = shiftEnd > data.endDate ? data.endDate : shiftEnd;
+
+    // Format dates as dd-MM-yyyy
+    const start = format(shiftStart, 'dd-MM-yyyy');
+    const end = format(cappedShiftEnd, 'dd-MM-yyyy');
+
+    // Format times as h:mm AM/PM
+    const startShift = shiftStart.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
+    const endShift = cappedShiftEnd.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
+
+    shifts.push({
+      start,
+      end,
+      startShift,
+      endShift,
+    });
+  }
+
+  return shifts;
 }

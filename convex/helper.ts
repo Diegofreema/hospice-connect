@@ -105,12 +105,12 @@ export function generateShifts(
 
   return shifts;
 }
-export function stringToDate(dateString: string): Date | null {
+export function stringToDate(dateString: string): Date {
   // Validate format with regex: DD-MM-YYYY
   const dateRegex = /^(\d{2})-(\d{2})-(\d{4})$/;
   if (!dateRegex.test(dateString)) {
     console.warn(`Invalid date format: "${dateString}". Expected DD-MM-YYYY.`);
-    return null;
+    throw new Error(`Invalid date: "${dateString}".`);
   }
 
   // Split the string into day, month, year
@@ -126,7 +126,7 @@ export function stringToDate(dateString: string): Date | null {
     date.getFullYear() !== year
   ) {
     console.warn(`Invalid date: "${dateString}".`);
-    return null;
+    throw new Error(`Invalid date: "${dateString}".`);
   }
 
   return date;
@@ -200,3 +200,10 @@ export function formatTimeString(dateObj: Date): string {
 
   return `${hours}:${minutesStr} ${period}`;
 }
+export const formatDateString = (date: Date): string => {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+  const year = date.getFullYear();
+
+  return `${day}-${month}-${year}`;
+};

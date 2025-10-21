@@ -156,7 +156,7 @@ const ScheduleCard = ({ schedule }: ScheduleProps) => {
     <View gap="md" style={styles.container}>
       <View>
         <Text size="medium" isMedium>
-          {format(startDate, 'PP')} - {format(endDate, 'PP')}
+          {format(startDate, 'MM/dd/yy')} - {format(endDate, 'MM/dd/yy')}
         </Text>
       </View>
       <View flexDirection="row">

@@ -249,6 +249,7 @@ export const ViewRouteSheet = () => {
   const onPrint = async () => {
     await printToFile();
   };
+  const hasSubmitted = !!routeSheet?._id;
 
   return (
     <ScrollView
@@ -275,6 +276,7 @@ export const ViewRouteSheet = () => {
         buttonText="Download"
         disabled2={loading}
         disabled={loading}
+        showDebit={!hasSubmitted}
       />
     </ScrollView>
   );

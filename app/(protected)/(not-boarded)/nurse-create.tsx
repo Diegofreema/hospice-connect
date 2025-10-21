@@ -86,6 +86,10 @@ const NurseCreate = () => {
         ...rest,
         dateOfBirth: format(data?.dateOfBirth || new Date(), 'PPP'),
         stateOfRegistration: licenseState,
+        licenseNumber: data.licenseNumber.trim(),
+        phoneNumber: data.phoneNumber.trim(),
+        firstName: data.firstName.trim(),
+        lastName: data.lastName.trim(),
       });
       showToast({
         title: 'Success',
@@ -127,7 +131,7 @@ const NurseCreate = () => {
               <Button
                 title="Submit"
                 onPress={form.handleSubmit(onSubmit)}
-                disabled={!stepIsValid}
+                disabled={!stepIsValid || form.formState.isSubmitting}
               />
             </View>
           )}

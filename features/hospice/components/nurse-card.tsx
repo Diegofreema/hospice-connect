@@ -9,17 +9,16 @@ import { View } from '../../shared/components/view';
 import {
   changeFirstLetterToCapital,
   getFontSize,
-  trimText,
 } from '@/features/shared/utils';
 
 import {
+  IconCircle,
   IconMapPin,
   IconSend,
   IconStarFilled,
 } from '@tabler/icons-react-native';
 import { format } from 'date-fns';
 import { Image } from 'expo-image';
-import { SymbolView } from 'expo-symbols';
 
 import { Button } from '@/features/shared/components/button';
 import { Stack } from '@/features/shared/components/v-stack';
@@ -29,7 +28,7 @@ import { useGetNurseId } from '../hooks/use-get-nurse-id';
 
 type Props = {
   isAssigned?: boolean;
-  onAction?: () => void;
+  onAction?: (discipline?: string) => void;
   nurse: {
     image: string | null;
     _id: Id<'nurses'>;
@@ -76,14 +75,14 @@ export const NurseCard = ({ nurse, isAssigned, onAction }: Props) => {
 
   const { theme } = useUnistyles();
   const onHandleAction = () => {
-    onAction && onAction();
+    onAction && onAction(nurse.discipline);
     setNurseId(nurse._id);
   };
 
   return (
     <Card style={styles.card}>
       <CardHeader style={styles.header}>
-        <View gap="md">
+        <View gap="md" flex={1}>
           <View
             justifyContent={'center'}
             flexDirection="row"
@@ -101,8 +100,8 @@ export const NurseCard = ({ nurse, isAssigned, onAction }: Props) => {
             <Text>{nurse.ratings ? nurse.ratings : 'N/A'}</Text>
           </View>
           <Text>Discipline: {nurse.discipline}</Text>
-          <Text size={'medium'} isMedium>
-            {trimText(name, 15)}
+          <Text size={'medium'} isMedium style={{ flex: 1 }}>
+            {name}
           </Text>
           <View
             justifyContent={'flex-start'}
@@ -118,7 +117,7 @@ export const NurseCard = ({ nurse, isAssigned, onAction }: Props) => {
             <Text>{changeFirstLetterToCapital(nurse.stateOfRegistration)}</Text>
           </View>
           <View flexDirection={'row'} alignItems={'baseline'}>
-            <Text style={styles.rate}>${nurse.rate}</Text>
+            <Text style={styles.rate}>${nurse.rate || 0}</Text>
             <Text>/hr</Text>
           </View>
           <View>
@@ -126,10 +125,10 @@ export const NurseCard = ({ nurse, isAssigned, onAction }: Props) => {
               label={badgeText}
               variant={'available'}
               icon={
-                <SymbolView
-                  name="circle.fill"
+                <IconCircle
                   size={12}
-                  tintColor={isAvailable ? 'lightgreen' : 'red'}
+                  fill={isAvailable ? 'lightgreen' : 'red'}
+                  color={isAvailable ? 'lightgreen' : 'red'}
                 />
               }
               size="sm"
@@ -141,7 +140,7 @@ export const NurseCard = ({ nurse, isAssigned, onAction }: Props) => {
           <Image
             source={{ uri: nurse.image as string }}
             style={styles.image}
-            contentFit="contain"
+            contentFit="cover"
             placeholderContentFit="contain"
             placeholder={require('@/assets/images/person.jpg')}
           />
@@ -213,6 +212,9 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: 'center',
   },
   image: {
-    flex: 1,
+    width: 150,
+    height: 180,
+    borderRadius: 8,
+    alignSelf: 'flex-end',
   },
 }));

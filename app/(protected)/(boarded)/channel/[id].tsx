@@ -4,6 +4,7 @@ import { CustomPressable } from '@/features/shared/components/custom-pressable';
 import { LoadingComponent } from '@/features/shared/components/loading';
 import { Text } from '@/features/shared/components/text';
 import { View } from '@/features/shared/components/view';
+import { Wrapper } from '@/features/shared/components/wrapper';
 import { ChannelMemberResponse } from '@/features/shared/types';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { IconSend } from '@tabler/icons-react-native';
@@ -51,6 +52,7 @@ const ChannelScreen = () => {
         hasCommands={false}
         hasFilePicker={false}
         SendButton={SendButton}
+        EmptyStateIndicator={EmptyStateIndicator}
       >
         <View flex={1}>
           <ChatHeader image={channel?.data?.image} />
@@ -82,6 +84,16 @@ export const SendButton = (props: SendButtonProps) => {
   );
 };
 
+const EmptyStateIndicator = () => {
+  return (
+    <Wrapper>
+      <View flex={1} justifyContent="center" alignItems="center">
+        <Text>No messages yet</Text>
+        <Text>Your messages will be found here!</Text>
+      </View>
+    </Wrapper>
+  );
+};
 const styles = StyleSheet.create((theme) => ({
   send: {
     backgroundColor: theme.colors.blue,

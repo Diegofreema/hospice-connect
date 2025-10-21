@@ -76,7 +76,7 @@ export type AssignmentWithBusiness = {
   endDate: string;
   openShift: string;
   patientAddress: string;
-  status: 'completed' | 'not_covered' | 'booked' | 'available' | 'not_booked';
+  status: 'completed' | 'not_covered' | 'booked' | 'available' | 'cancelled';
   careLevel:
     | 'Initial Evaluation'
     | 'Follow Up'

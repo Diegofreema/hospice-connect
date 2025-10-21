@@ -166,26 +166,42 @@ export const updateNurseStartAndEndTimeAvailability = mutation({
 
 export const editNurse = mutation({
   args: {
-    address: v.optional(v.string()),
+    firstName: v.string(),
+    lastName: v.string(),
 
+    phoneNumber: v.string(),
+    licenseNumber: v.string(),
+    stateOfRegistration: v.string(),
+
+    discipline: discipline,
     rate: v.optional(v.number()),
-    stateOfRegistration: v.optional(v.string()),
+    address: v.optional(v.string()),
     nurseId: v.id('nurses'),
   },
   handler: async (ctx, args) => {
-    try {
-      const nurse = await ctx.db.get(args.nurseId);
-      if (!nurse) {
-        throw new ConvexError({ message: 'Nurse not found' });
-      }
-      await ctx.db.patch(nurse._id, {
-        address: args.address,
-        rate: args.rate,
-        stateOfRegistration: args.stateOfRegistration,
-      });
-    } catch (error: any) {
-      throw new ConvexError({ message: error });
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new ConvexError({ message: 'Unauthorized' });
     }
+
+    const nurse = await ctx.db.get(args.nurseId);
+    if (!nurse) {
+      throw new ConvexError({ message: 'Nurse not found' });
+    }
+    await ctx.db.insert('pendingNurseProfile', {
+      address: args.address,
+      firstName: args.firstName,
+      lastName: args.lastName,
+
+      phoneNumber: args.phoneNumber,
+      licenseNumber: args.licenseNumber,
+      stateOfRegistration: args.stateOfRegistration,
+
+      discipline: args.discipline,
+      rate: args.rate,
+      isApproved: false,
+      nurseId: args.nurseId,
+    });
   },
 });
 
@@ -286,6 +302,49 @@ export const getNurses = query({
       ...nurses,
       page: nursesImage,
     };
+  },
+});
+
+export const searchNursesByFirstNameAndLastName = query({
+  args: {
+    name: v.string(),
+    todayToText: v.string(),
+    discipline: v.optional(discipline),
+  },
+  handler: async (ctx, args) => {
+    const nurses = await filter(ctx.db.query('nurses'), (nurse) => {
+      if (!args.name) return false;
+      if (args.discipline) {
+        return (
+          (nurse.firstName.toLowerCase().includes(args.name.toLowerCase()) ||
+            nurse.lastName.toLowerCase().includes(args.name.toLowerCase())) &&
+          nurse.discipline === args.discipline
+        );
+      }
+      return (
+        nurse.firstName.toLowerCase().includes(args.name.toLowerCase()) ||
+        nurse.lastName.toLowerCase().includes(args.name.toLowerCase())
+      );
+    }).take(30);
+    const nursesImage = await Promise.all(
+      nurses.map(async (nurse) => {
+        const image = await getImage(ctx, nurse.imageId);
+        const available = await getAvailability(
+          ctx,
+          nurse._id,
+          args.todayToText
+        );
+        const ratings = await getRatings(ctx, nurse._id);
+        return {
+          ...nurse,
+          image,
+          available,
+          ratings,
+        };
+      })
+    );
+
+    return nursesImage;
   },
 });
 

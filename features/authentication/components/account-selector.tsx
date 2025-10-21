@@ -1,5 +1,5 @@
 import { Text } from '@/features/shared/components/text';
-import View from '@/features/shared/components/view';
+import { View } from '@/features/shared/components/view';
 
 import { Checkbox } from 'expo-checkbox';
 import React from 'react';
@@ -16,7 +16,7 @@ type Props = {
 };
 export const AccountSelector = ({ selected, setSelected }: Props) => {
   return (
-    <View marginTop={'l'} gap="m">
+    <View mt={'lg'} gap="md">
       {accountTypes.map((accountType) => (
         <TouchableOpacity
           key={accountType.type}

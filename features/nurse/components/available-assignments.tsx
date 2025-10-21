@@ -8,12 +8,17 @@ import { AssignmentsForNurses } from './assignments';
 
 type Props = {
   nurseId: Id<'nurses'>;
+  discipline: 'RN' | 'LVN' | 'HHA';
   onOpenSheet: () => void;
 };
-export const AvailableAssignments = ({ nurseId, onOpenSheet }: Props) => {
+export const AvailableAssignments = ({
+  nurseId,
+  onOpenSheet,
+  discipline,
+}: Props) => {
   const { loadMore, results, status } = usePaginatedQuery(
     api.assignments.availableAssignments,
-    { nurseId },
+    { nurseId, discipline: discipline },
     { initialNumItems: 50 }
   );
   if (status === 'LoadingFirstPage') {

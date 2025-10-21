@@ -10,12 +10,12 @@ import { ControlSelect } from '@/features/authentication/components/form/control
 import { generateErrorMessage } from '@/features/shared/utils';
 
 import { useToast } from '@/components/demos/toast';
+import { KeyboardAwareScrollViewComponent } from '@/features/shared/components/key-board-aware-scroll-view';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from 'convex/react';
 import { router } from 'expo-router';
 import { View } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
-import { usStates } from '../data';
+import { disciplines, usStates } from '../data';
 import { createNurseValidator, CreateNurseValidator } from '../validators';
 
 export const EditProfile = () => {
@@ -48,13 +48,18 @@ export const EditProfile = () => {
     try {
       await updateNurse({
         nurseId: nurse?._id,
-        address: data.address,
+        address: data.address?.trim(),
         rate: Number(data.rate),
         stateOfRegistration: data.licenseState,
+        discipline: data.discipline,
+        firstName: data.firstName.trim(),
+        lastName: data.lastName.trim(),
+        phoneNumber: data.phoneNumber.trim(),
+        licenseNumber: data.licenseNumber.trim(),
       });
       showToast({
         title: 'Success',
-        subtitle: 'Information updated successfully',
+        subtitle: 'Pending admin approval',
       });
       router.back();
     } catch (error) {
@@ -73,18 +78,14 @@ export const EditProfile = () => {
   console.log({ errors });
 
   return (
-    <KeyboardAwareScrollView
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ flexGrow: 1 }}
-    >
-      <View style={{ marginTop: 10, flex: 1, gap: 20 }}>
+    <KeyboardAwareScrollViewComponent>
+      <View style={{ marginTop: 10, gap: 20 }}>
         <ControlInput
           control={control}
           name={'firstName'}
           errors={errors}
           label="First name"
           placeholder="John"
-          editable={false}
         />
         <ControlInput
           control={control}
@@ -92,7 +93,6 @@ export const EditProfile = () => {
           errors={errors}
           label="Last name"
           placeholder="Doe"
-          editable={false}
         />
         <ControlInput
           control={control}
@@ -100,7 +100,6 @@ export const EditProfile = () => {
           errors={errors}
           label="Email"
           placeholder="Doe"
-          editable={false}
         />
         <ControlInput
           control={control}
@@ -108,7 +107,7 @@ export const EditProfile = () => {
           errors={errors}
           label="Phone number"
           placeholder="+1 (123) 456-7890"
-          editable={false}
+          keyboardType="number-pad"
         />
 
         <ControlInput
@@ -128,6 +127,14 @@ export const EditProfile = () => {
           label="State of registration"
           items={usStates}
         />
+        <ControlSelect
+          control={control}
+          errors={errors}
+          name="discipline"
+          placeholder="Select a your discipline"
+          label="Discipline"
+          items={disciplines}
+        />
         <ControlInput
           control={control}
           name={'address'}
@@ -146,6 +153,6 @@ export const EditProfile = () => {
           />
         </View>
       </View>
-    </KeyboardAwareScrollView>
+    </KeyboardAwareScrollViewComponent>
   );
 };

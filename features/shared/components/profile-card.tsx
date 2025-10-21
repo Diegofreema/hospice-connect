@@ -3,7 +3,7 @@ import { SpinnerArc } from '@/components/loaders';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 
-import { IconUpload } from '@tabler/icons-react-native';
+import { IconCamera, IconUpload } from '@tabler/icons-react-native';
 import { useMutation } from 'convex/react';
 import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
@@ -11,14 +11,12 @@ import { TouchableOpacity, View } from 'react-native';
 import {
   changeFirstLetterToCapital,
   generateErrorMessage,
-  getFontSize,
   uploadProfilePicture,
 } from '../utils';
 
 import { useToast } from '@/components/demos/toast';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { FlexText } from './flex-text';
-import { Text } from './text';
 
 type Props = {
   imageUrl?: string;
@@ -55,7 +53,6 @@ export const ProfileCard = ({
   hospiceId,
   state,
 }: Props) => {
-  const headingText = nurse ? `Nurse's` : `Hospice's`;
   const formattedRate = rate ? `$${rate}/hr` : '';
   console.log({ nurseState: state });
 
@@ -124,6 +121,9 @@ export const ProfileCard = ({
             size={120}
             onPress={pickImage}
           />
+          <View style={styles.camera} pointerEvents="none">
+            <IconCamera size={25} color={theme.colors.black} />
+          </View>
           {image && (
             <TouchableOpacity
               onPress={uploadImage}
@@ -141,9 +141,6 @@ export const ProfileCard = ({
         </View>
       </View>
       <View style={{ backgroundColor: theme.colors.cardGrey, padding: 10 }}>
-        <Text size={'large'} fontSize={getFontSize(16)} textAlign={'center'}>
-          {headingText} information
-        </Text>
         <View style={styles.card}>
           <View style={styles.content}>
             <FlexText leftText="Name" rightText={name} />
@@ -183,9 +180,9 @@ export const ProfileCard = ({
 const styles = StyleSheet.create((theme) => ({
   camera: {
     position: 'absolute',
-    bottom: 0,
-    right: -5,
-    backgroundColor: theme.colors.blue,
+    bottom: 5,
+    right: 5,
+    backgroundColor: theme.colors.white,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 50,
@@ -209,6 +206,9 @@ const styles = StyleSheet.create((theme) => ({
     padding: theme.paddings.xl,
     borderRadius: theme.borderRadius.md,
     marginTop: theme.margins.md,
+    gap: 15,
   },
-  content: {},
+  content: {
+    gap: 10,
+  },
 }));

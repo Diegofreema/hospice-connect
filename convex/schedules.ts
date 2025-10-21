@@ -119,7 +119,7 @@ export const editSchedule = mutation({
 
 export const sendScheduleNotification = mutation({
   args: {
-    scheduleId: v.id('schedules'),
+    scheduleIds: v.array(v.id('schedules')),
     hospiceId: v.id('hospices'),
     nurseId: v.id('nurses'),
     hospiceName: v.string(),
@@ -129,29 +129,31 @@ export const sendScheduleNotification = mutation({
     if (!userId) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
-    const schedule = await ctx.db.get(args.scheduleId);
-    if (!schedule) {
-      throw new ConvexError({ message: 'Schedule not found' });
-    }
-    const assignment = await ctx.db.get(schedule.assignmentId);
-    if (!assignment) {
-      throw new ConvexError({ message: 'Assignment not found' });
-    }
-    if (assignment.hospiceId !== args.hospiceId) {
-      throw new ConvexError({
-        message: 'You do not have permission to assign this schedule',
+    for (const scheduleId of args.scheduleIds) {
+      const schedule = await ctx.db.get(scheduleId);
+      if (!schedule) {
+        throw new ConvexError({ message: 'Schedule not found' });
+      }
+      const assignment = await ctx.db.get(schedule.assignmentId);
+      if (!assignment) {
+        throw new ConvexError({ message: 'Assignment not found' });
+      }
+      if (assignment.hospiceId !== args.hospiceId) {
+        throw new ConvexError({
+          message: 'You do not have permission to assign this schedule',
+        });
+      }
+
+      await ctx.db.insert('nurseNotifications', {
+        nurseId: args.nurseId,
+        isRead: false,
+        hospiceId: args.hospiceId,
+        scheduleId: scheduleId,
+        description: `${args.hospiceName} has assigned you a schedule.`,
+        title: 'Schedule assigned',
+        type: 'assignment',
       });
     }
-
-    await ctx.db.insert('nurseNotifications', {
-      nurseId: args.nurseId,
-      isRead: false,
-      hospiceId: args.hospiceId,
-      scheduleId: args.scheduleId,
-      description: `${args.hospiceName} has assigned you a schedule.`,
-      title: 'Schedule assigned',
-      type: 'assignment',
-    });
   },
 });
 

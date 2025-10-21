@@ -18,11 +18,17 @@ export default function TabTwoScreen() {
     }
   }, [status, loadMore]);
   if (status === 'LoadingFirstPage') {
-    return <SmallLoader size={30} />;
+    return <SmallLoader size={50} />;
   }
+
+  const sortedResults = results.sort((a, b) => {
+    const dateA = new Date(a._creationTime);
+    const dateB = new Date(b._creationTime);
+    return dateB.getTime() - dateA.getTime();
+  });
   return (
     <RenderPosts
-      posts={results}
+      posts={sortedResults}
       loadMore={handleFetchMore}
       loadingMore={status === 'LoadingMore'}
     />

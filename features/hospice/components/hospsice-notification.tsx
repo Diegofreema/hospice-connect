@@ -21,7 +21,7 @@ type Props = {
 };
 
 export const HospiceNotification = ({ notification }: Props) => {
-  const date = format(notification._creationTime, 'PP');
+  const date = format(notification._creationTime, 'MM/dd/yy');
   const { hospice } = useHospice();
 
   const [processing, setProcessing] = useState(false);
