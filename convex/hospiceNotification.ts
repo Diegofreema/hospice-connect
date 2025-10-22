@@ -120,7 +120,7 @@ export const cancelShiftNotification = mutation({
 export const sendCaseRequestNotification = mutation({
   args: {
     nurseId: v.id('nurses'),
-    scheduleId: v.id('schedules'),
+    scheduleIds: v.array(v.id('schedules')),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -133,33 +133,35 @@ export const sendCaseRequestNotification = mutation({
       throw new ConvexError({ message: 'Nurse not found' });
     }
 
-    const shift = await ctx.db.get(args.scheduleId);
-    if (!shift) {
-      throw new ConvexError({ message: 'Shift not found' });
-    }
+    for (const scheduleId of args.scheduleIds) {
+      const shift = await ctx.db.get(scheduleId);
+      if (!shift) {
+        throw new ConvexError({ message: 'Shift not found' });
+      }
 
-    if (shift.status !== 'available') {
-      throw new ConvexError({ message: 'Shift is not available' });
-    }
+      if (shift.status !== 'available') {
+        throw new ConvexError({ message: 'Shift is not available' });
+      }
 
-    const assignment = await ctx.db.get(shift.assignmentId);
-    if (!assignment) {
-      throw new ConvexError({ message: 'Assignment not found' });
-    }
+      const assignment = await ctx.db.get(shift.assignmentId);
+      if (!assignment) {
+        throw new ConvexError({ message: 'Assignment not found' });
+      }
 
-    const hospice = await ctx.db.get(assignment.hospiceId);
-    if (!hospice) {
-      throw new ConvexError({ message: 'Hospice not found' });
-    }
+      const hospice = await ctx.db.get(assignment.hospiceId);
+      if (!hospice) {
+        throw new ConvexError({ message: 'Hospice not found' });
+      }
 
-    await ctx.db.insert('hospiceNotifications', {
-      isRead: false,
-      hospiceId: assignment.hospiceId,
-      nurseId: nurse._id,
-      type: 'case_request',
-      description: '',
-      scheduleId: args.scheduleId,
-      title: `${nurse.firstName} ${nurse.lastName} has submitted a case request for ${formatDate(shift.startDate)}-${formatDate(shift.endDate)}: ${shift.startTime}-${shift.endTime}`,
-    });
+      await ctx.db.insert('hospiceNotifications', {
+        isRead: false,
+        hospiceId: assignment.hospiceId,
+        nurseId: nurse._id,
+        type: 'case_request',
+        description: '',
+        scheduleId: scheduleId,
+        title: `${nurse.firstName} ${nurse.lastName} has submitted a case request for ${formatDate(shift.startDate)}-${formatDate(shift.endDate)}: ${shift.startTime}-${shift.endTime}`,
+      });
+    }
   },
 });

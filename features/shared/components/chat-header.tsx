@@ -1,24 +1,30 @@
 import { Avatar } from '@/components/avatar/Avatar';
+import { useAuth } from '@/components/context/auth';
 import { IconArrowLeft } from '@tabler/icons-react-native';
 import { router } from 'expo-router';
 import React from 'react';
-import { View } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+import { Channel as ChannelType } from 'stream-chat';
 import { CustomPressable } from './custom-pressable';
-
 type Props = {
-  image?: string;
+  channel: ChannelType;
 };
 
-export const ChatHeader = ({ image }: Props) => {
+export const ChatHeader = ({ channel }: Props) => {
+  const { user } = useAuth();
   const { theme } = useUnistyles();
+  const otherMember = Object.values(channel.state.members).find(
+    (member) => member.user?.id !== user?._id
+  );
+  const image = otherMember?.user?.image;
   return (
-    <View style={styles.header}>
-      <CustomPressable onPress={() => router.back()}>
-        <IconArrowLeft size={30} color={theme.colors.black} />
-      </CustomPressable>
-      <Avatar image={{ uri: image || '', name: 'Av' }} size={50} />
-    </View>
+    <CustomPressable style={styles.header} onPress={() => router.back()}>
+      <IconArrowLeft size={30} color={theme.colors.black} />
+      <Avatar
+        image={{ uri: image || '', name: otherMember?.user?.name }}
+        size={50}
+      />
+    </CustomPressable>
   );
 };
 
@@ -27,5 +33,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 5,
     alignItems: 'center',
+    paddingHorizontal: 5,
   },
 });

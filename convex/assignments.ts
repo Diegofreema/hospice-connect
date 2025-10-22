@@ -464,7 +464,7 @@ export const updateAssignmentStatus = mutation({
         status: 'booked',
       });
     }
-    if (!isFullyStaffed && !timeHasPassed) {
+    if (!isFullyStaffed && timeHasPassed) {
       await ctx.db.patch(args.assignmentId, {
         status: 'completed',
       });

@@ -139,7 +139,7 @@ export default function HomeScreen() {
         onClose={onCloseSheetCancelSchedule}
         title="Cancel Schedule"
         subTitle="Please state the reason you want to cancel the schedule"
-        customSnapPoints={['25%', '60%']}
+        customSnapPoints={['90%']}
       >
         <CancelScheduleNurse
           onClose={onCloseSheetCancelSchedule}

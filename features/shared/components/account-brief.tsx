@@ -51,7 +51,7 @@ export const AccountBrief = ({
               fontSize={getFontSize(fontSize)}
               isBold
             >
-              {title}
+              Hello
             </Text>
 
             <Text size="normal">{data.name}</Text>

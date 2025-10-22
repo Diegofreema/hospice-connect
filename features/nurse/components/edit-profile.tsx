@@ -60,6 +60,7 @@ export const EditProfile = () => {
       showToast({
         title: 'Success',
         subtitle: 'Pending admin approval',
+        autodismiss: true,
       });
       router.back();
     } catch (error) {
@@ -71,6 +72,7 @@ export const EditProfile = () => {
       showToast({
         title: 'Error',
         subtitle: errorMessage,
+        autodismiss: true,
       });
     }
   };

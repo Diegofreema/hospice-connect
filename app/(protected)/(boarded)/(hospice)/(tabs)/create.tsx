@@ -11,6 +11,7 @@ import { useMutation } from 'convex/react';
 import { format } from 'date-fns';
 import { router } from 'expo-router';
 import React from 'react';
+import { Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 
 const CreateScreen = () => {
@@ -65,6 +66,10 @@ const CreateScreen = () => {
       <KeyboardAwareScrollView
         showsVerticalScrollIndicator={false}
         bottomOffset={50}
+        bounces={false}
+        contentContainerStyle={{
+          paddingBottom: Platform.OS === 'ios' ? 100 : 50,
+        }}
       >
         <CreateAssignmentForm onSubmit={onSubmit} />
       </KeyboardAwareScrollView>

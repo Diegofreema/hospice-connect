@@ -113,7 +113,7 @@ export const ProfileCard = ({
     }
   };
   return (
-    <View style={{ gap: 10 }}>
+    <View style={{ gap: 10, height: 400 }}>
       <View style={styles.top}>
         <View style={styles.container}>
           <Avatar
@@ -140,7 +140,9 @@ export const ProfileCard = ({
           )}
         </View>
       </View>
-      <View style={{ backgroundColor: theme.colors.cardGrey, padding: 10 }}>
+      <View
+        style={{ backgroundColor: theme.colors.cardGrey, padding: 10, flex: 1 }}
+      >
         <View style={styles.card}>
           <View style={styles.content}>
             <FlexText leftText="Name" rightText={name} />
@@ -207,8 +209,10 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: theme.borderRadius.md,
     marginTop: theme.margins.md,
     gap: 15,
+    flex: 1,
   },
   content: {
     gap: 10,
+    flex: 1,
   },
 }));

@@ -5,18 +5,15 @@ import { useGetScheduleId } from '../../hospice/hooks/use-get-schedule-id';
 import { useToast } from '@/components/demos/toast';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
+import BottomSheetKeyboardAwareScrollView from '@/features/shared/components/bottom-sheet-aware-scroll-view';
 import { Button } from '@/features/shared/components/button';
 import { CustomPressable } from '@/features/shared/components/custom-pressable';
 import { Text } from '@/features/shared/components/text';
 import { View } from '@/features/shared/components/view';
 import { generateErrorMessage } from '@/features/shared/utils';
-import {
-  BottomSheetFlatList,
-  BottomSheetTextInput,
-} from '@gorhom/bottom-sheet';
 import { IconCircle, IconCircleCheckFilled } from '@tabler/icons-react-native';
 import { useMutation } from 'convex/react';
-import { Platform } from 'react-native';
+import { Platform, TextInput } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 
 type Props = {
@@ -63,25 +60,39 @@ const CancelScheduleNurse = ({ onClose, nurseId }: Props) => {
     }
   };
   return (
-    <BottomSheetFlatList
-      data={data}
-      renderItem={({ item }) => (
-        <Reason
-          item={item}
-          selected={selected}
-          setSelected={setSelected}
-          reason={reason}
-          setReason={setReason}
-        />
-      )}
-      showsVerticalScrollIndicator={false}
-      keyExtractor={(item) => item.id.toString()}
-      style={{ marginTop: 20 }}
-      contentContainerStyle={{ gap: 20, paddingBottom: 50 }}
-      ListFooterComponent={
+    <BottomSheetKeyboardAwareScrollView showsVerticalScrollIndicator={false}>
+      {/* <BottomSheetFlatList
+        data={data}
+        scrollEnabled={false}
+        renderItem={({ item }) => (
+          <Reason
+            item={item}
+            selected={selected}
+            setSelected={setSelected}
+            reason={reason}
+            setReason={setReason}
+          />
+        )}
+        showsVerticalScrollIndicator={false}
+        keyExtractor={(item) => item.id.toString()}
+        style={{ marginTop: 20 }}
+        contentContainerStyle={{ gap: 20, paddingBottom: 50 }} */}
+
+      <View style={{ gap: 10, marginTop: 20, paddingBottom: 50 }}>
+        {data.map((item) => (
+          <Reason
+            item={item}
+            selected={selected}
+            setSelected={setSelected}
+            reason={reason}
+            setReason={setReason}
+            key={item.id}
+          />
+        ))}
+
         <Button title="Submit" onPress={handleSubmit} disabled={submitting} />
-      }
-    />
+      </View>
+    </BottomSheetKeyboardAwareScrollView>
   );
 };
 
@@ -130,7 +141,7 @@ const Reason = ({
       </CustomPressable>
       {selected === 'other' && item.value === 'other' && (
         <View style={styles.container}>
-          <BottomSheetTextInput
+          <TextInput
             placeholder="State reason"
             value={reason}
             onChangeText={setReason}
@@ -145,7 +156,7 @@ const Reason = ({
   );
 };
 
-const styles = StyleSheet.create((theme, rt) => ({
+const styles = StyleSheet.create((theme) => ({
   pressable: {
     borderColor: theme.colors.grey,
     borderWidth: 1,
@@ -170,10 +181,5 @@ const styles = StyleSheet.create((theme, rt) => ({
   },
   container: {
     // paddingTop: rt.insets.top,
-    transform: [
-      {
-        translateY: rt.insets.ime * -1,
-      },
-    ],
   },
 }));

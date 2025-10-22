@@ -33,23 +33,27 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
         }
       : 'skip'
   );
-  const [selectedId, setSelectedId] = useState<Id<'schedules'> | undefined>(
-    schedules?.[0]?._id || undefined
-  );
+  const [selectedIds, setSelectedIds] = useState<Id<'schedules'>[]>([]);
 
   if (schedules === undefined) {
     return <SmallLoader size={30} />;
   }
   const onSelect = (id: Id<'schedules'>) => {
-    setSelectedId(id);
+    setSelectedIds((prev) => {
+      const isInArray = prev.find((item) => item === id);
+      if (isInArray) {
+        return prev.filter((item) => item !== id);
+      }
+      return [...prev, id];
+    });
   };
   const onSend = async () => {
-    if (!selectedId || !nurseId) return;
+    if (!nurseId) return;
     setLoading(true);
     try {
       await sendCaseRequest({
         nurseId,
-        scheduleId: selectedId,
+        scheduleIds: selectedIds,
       });
       showToast({
         title: 'Success',
@@ -77,7 +81,7 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
         data={schedules}
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
-          <Schedule onSelect={onSelect} item={item} selectedId={selectedId} />
+          <Schedule onSelect={onSelect} item={item} selectedIds={selectedIds} />
         )}
         contentContainerStyle={{ gap: 15, flexGrow: 1 }}
         style={{ marginTop: 20 }}
@@ -86,7 +90,7 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
           <Button
             title="Schedule"
             onPress={onSend}
-            disabled={loading || !selectedId}
+            disabled={loading || selectedIds.length === 0}
           />
         }
         ListFooterComponentStyle={{ marginTop: 'auto', marginBottom: 15 }}

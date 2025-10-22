@@ -7,6 +7,7 @@ import { Text } from '@/features/shared/components/text';
 import { Stack } from '@/features/shared/components/v-stack';
 import {
   convertTimeStringToDate,
+  fullName,
   getScheduleStatusAndColor,
   getScheduleStatusText,
 } from '@/features/shared/utils';
@@ -73,7 +74,7 @@ export const ShiftCard = ({
     onRateNurse();
     getScheduleId(shift._id);
   };
-  const name = `${shift.nurse?.firstName} ${shift.nurse?.lastName}`;
+
   return (
     <Card style={styles.card}>
       <CardHeader style={{ gap: 10 }}>
@@ -84,7 +85,8 @@ export const ShiftCard = ({
             </View>
             <View>
               <Text size="normal" isBold>
-                {name || 'No nurse assigned'}
+                {fullName(shift.nurse?.firstName, shift.nurse?.lastName) ||
+                  'No nurse assigned'}
               </Text>
               <Text size="normal" isBold>
                 {format(startDate, 'MM/dd/yy')} - {format(endDate, 'MM/dd/yy')}
