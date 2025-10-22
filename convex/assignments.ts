@@ -31,6 +31,7 @@ export const availableAssignments = query({
           .eq('status', 'available')
           .eq('discipline', args.discipline)
       )
+      .order('desc')
       .paginate(args.paginationOpts);
     // ? getting schedules by assignment id
     const assignments = await Promise.all(
@@ -337,7 +338,21 @@ export const getAssignment = query({
     if (!assignment) {
       return null;
     }
-    return assignment;
+
+    const schedules = await ctx.db
+      .query('schedules')
+      .withIndex('by_assignment_id', (q) =>
+        q.eq('assignmentId', args.assignmentId)
+      )
+      .collect();
+    console.log({ schedules });
+
+    const hasNurses = schedules.some((schedule) => schedule.nurseId);
+
+    return {
+      ...assignment,
+      hasNurses,
+    };
   },
 });
 
@@ -359,6 +374,7 @@ export const updateAssignment = mutation({
     hospiceId: v.id('hospices'),
     careLevel: careLevel,
     assignmentId: v.id('assignments'),
+    shifts: v.array(shifts),
   },
   handler: async (ctx, { assignmentId, ...args }) => {
     const userId = await getAuthUserId(ctx);
@@ -396,6 +412,27 @@ export const updateAssignment = mutation({
       status: 'available',
       careLevel: args.careLevel,
     });
+    // ? deleting old schedules
+    const oldSchedules = await ctx.db
+      .query('schedules')
+      .withIndex('by_assignment_id', (q) => q.eq('assignmentId', assignmentId))
+      .collect();
+    for (const schedule of oldSchedules) {
+      await ctx.db.delete(schedule._id);
+    }
+
+    for (const shift of args.shifts) {
+      await ctx.db.insert('schedules', {
+        assignmentId: assignmentId,
+        endDate: shift.end,
+        endTime: shift.endShift,
+        startDate: shift.start,
+        startTime: shift.startShift,
+        rate: args.rate,
+        status: 'available',
+        isSubmitted: false,
+      });
+    }
   },
 });
 

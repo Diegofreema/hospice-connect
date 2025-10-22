@@ -8,6 +8,7 @@ export const KeyboardAwareScrollViewComponent = ({
     <KeyboardAwareScrollView
       showsVerticalScrollIndicator={false}
       bottomOffset={50}
+      contentContainerStyle={{ paddingBottom: 20 }}
     >
       {children}
     </KeyboardAwareScrollView>

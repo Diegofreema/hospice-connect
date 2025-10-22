@@ -26,11 +26,13 @@ type Props = {
   onSubmit: (data: CreateAssignmentValidator) => void;
   initialValues?: CreateAssignmentValidator;
   btnTitle?: string;
+  disabled?: boolean;
 };
 export const CreateAssignmentForm = ({
   onSubmit,
   initialValues,
   btnTitle = 'Create',
+  disabled = false,
 }: Props) => {
   const {
     handleSubmit,
@@ -196,7 +198,7 @@ export const CreateAssignmentForm = ({
         <Button
           title={btnTitle}
           onPress={handleSubmit(onSubmit)}
-          disabled={isSubmitting}
+          disabled={isSubmitting || disabled}
         />
       </Stack>
     </KeyboardAwareScrollViewComponent>

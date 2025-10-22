@@ -124,7 +124,7 @@ export const RoustSheetComponent = ({
       )}
       {showDebit && (
         <Text size="normal" isBold textAlign="center">
-          By submitting i authorize HospiceConnect to charge 5% of the total pay
+          By submitting I authorize HospiceConnect to charge 5% of the total pay
           on my card
         </Text>
       )}

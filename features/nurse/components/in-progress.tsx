@@ -19,8 +19,8 @@ export const InProgress = ({
   handleMore,
   isLoadingMore,
   onOpenSheet,
-  description = 'Please check in later.',
-  title = 'No available assignments',
+  description = 'Please check available assignments.',
+  title = 'No assignments in progress',
 }: Props) => {
   return (
     <LegendList

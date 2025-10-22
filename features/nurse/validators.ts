@@ -13,6 +13,7 @@ export const createNurseValidator = z.object({
   address: z.string().optional(),
   rate: z.string().optional(),
   email: z.email({ error: 'Please use a valid email' }).optional(),
+  zipCode: z.string().optional(),
 });
 
 export type CreateNurseValidator = z.infer<typeof createNurseValidator>;

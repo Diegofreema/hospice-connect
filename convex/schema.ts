@@ -57,15 +57,10 @@ export const Nurse = {
 const PendingNurse = {
   firstName: v.string(),
   lastName: v.string(),
-
-  phoneNumber: v.string(),
   licenseNumber: v.string(),
   stateOfRegistration: v.string(),
-
   discipline: discipline,
-  rate: v.optional(v.number()),
   isApproved: v.boolean(),
-  address: v.optional(v.string()),
   zipCode: v.optional(v.string()),
   nurseId: v.id('nurses'),
 };

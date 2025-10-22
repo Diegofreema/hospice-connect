@@ -63,7 +63,7 @@ export const cancelSchedule = mutation({
       isRead: false,
       hospiceId: args.hospiceId,
       scheduleId: args.scheduleId,
-      description: `${args.hospiceName} has cancelled your schedule.`,
+      description: `${args.hospiceName} has Canceled your shift for ${schedule.startDate} - ${schedule.endDate}; ${schedule.startTime} - ${schedule.endTime}.`,
       title: 'Schedule cancelled',
       type: 'normal',
     });
@@ -149,7 +149,7 @@ export const sendScheduleNotification = mutation({
         isRead: false,
         hospiceId: args.hospiceId,
         scheduleId: scheduleId,
-        description: `${args.hospiceName} has assigned you a schedule.`,
+        description: `${args.hospiceName} has assigned you a schedule for ${schedule.startDate} - ${schedule.endDate}; ${schedule.startTime} - ${schedule.endTime}.`,
         title: 'Schedule assigned',
         type: 'assignment',
       });
@@ -195,7 +195,7 @@ export const declineSchedule = mutation({
       isRead: false,
       hospiceId: args.hospiceId,
       scheduleId: args.scheduleId,
-      description: `${args.hospiceName} has declined your cancel request.`,
+      description: `${args.hospiceName} has declined your case cancel request for ${schedule.startDate} - ${schedule.endDate}; ${schedule.startTime} - ${schedule.endTime}.`,
       title: 'Cancel request declined',
       type: 'normal',
     });
@@ -242,7 +242,7 @@ export const declineCaseRequest = mutation({
       isRead: false,
       hospiceId: args.hospiceId,
       scheduleId: args.scheduleId,
-      description: `${args.hospiceName} has declined your case request.`,
+      description: `${args.hospiceName} has declined your case request for ${schedule.startDate} - ${schedule.endDate}; ${schedule.startTime} - ${schedule.endTime}.`,
       title: 'Case request declined',
       type: 'normal',
     });
@@ -297,7 +297,9 @@ export const acceptCaseRequest = mutation({
     }
 
     if (schedule.nurseId) {
-      throw new ConvexError({ message: 'Shift already accepted' });
+      throw new ConvexError({
+        message: 'Shift already accepted by another nurse',
+      });
     }
 
     const assignment = await ctx.db.get(schedule.assignmentId);
@@ -306,7 +308,7 @@ export const acceptCaseRequest = mutation({
     }
     if (assignment.hospiceId !== args.hospiceId) {
       throw new ConvexError({
-        message: 'You do not have permission to decline this case request',
+        message: 'You do not have permission to accept this case request',
       });
     }
 
@@ -319,7 +321,8 @@ export const acceptCaseRequest = mutation({
       isRead: false,
       hospiceId: args.hospiceId,
       scheduleId: args.scheduleId,
-      description: `${args.hospiceName} has accepted your case request.`,
+      description: `${args.hospiceName} Hope Hospice has approved your case request for ${schedule.startDate} - ${schedule.endDate}; ${schedule.startTime} - ${schedule.endTime}.
+`,
       title: 'Case request accepted',
       type: 'normal',
     });

@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader } from '@/components/card';
 import { FlexText } from '@/features/shared/components/flex-text';
-import { trimText } from '@/features/shared/utils';
+import { changeFirstLetterToCapital, trimText } from '@/features/shared/utils';
 import React from 'react';
 
 import { useSelectAssignment } from '@/features/hospice/hooks/use-select-assignment';
@@ -47,7 +47,10 @@ export const AssignmentAvailableCard = ({ item: post, onOpenSheet }: Props) => {
           rightText={format(dob, 'MM/dd/yy')}
         />
         <FlexText leftText="Care level" rightText={post.careLevel} />
-        <FlexText leftText="Gender" rightText={post.gender} />
+        <FlexText
+          leftText="Gender"
+          rightText={changeFirstLetterToCapital(post.gender)}
+        />
         <FlexText leftText="Discipline" rightText={post.discipline} />
 
         <FlexText

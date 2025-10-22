@@ -39,6 +39,7 @@ export const EditProfile = () => {
       address: nurse?.address || '',
       rate: nurse?.rate?.toString() || '0',
       email: nurse?.email,
+      zipCode: nurse?.zipCode || '',
     },
     resolver: zodResolver(createNurseValidator),
   });
@@ -76,8 +77,6 @@ export const EditProfile = () => {
       });
     }
   };
-
-  console.log({ errors });
 
   return (
     <KeyboardAwareScrollViewComponent>
@@ -119,6 +118,13 @@ export const EditProfile = () => {
           label="Rate/hr"
           placeholder="10"
           keyboardType="numeric"
+        />
+        <ControlInput
+          control={control}
+          name={'zipCode'}
+          errors={errors}
+          label="Zip Code"
+          placeholder="Enter zip code"
         />
 
         <ControlSelect

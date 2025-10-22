@@ -11,11 +11,13 @@ import { Wrapper } from '@/features/shared/components/wrapper';
 import {
   convertTimeStringToDate,
   generateErrorMessage,
+  generateShifts,
 } from '@/features/shared/utils';
 
+import Banner from '@/features/shared/components/banner';
 import { IconCheck, IconX } from '@tabler/icons-react-native';
 import { useMutation, useQuery } from 'convex/react';
-import { format } from 'date-fns';
+import { format, parse } from 'date-fns';
 import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { useUnistyles } from 'react-native-unistyles';
@@ -32,6 +34,12 @@ const EditScreen = () => {
   const onSubmit = async (data: CreateAssignmentValidator) => {
     if (!hospice) return;
     const { customGender, ...rest } = data;
+    const openShift = format(new Date(rest.openShift), 'H:mm');
+    const shifts = generateShifts({
+      endDate: rest.endDate,
+      startDate: rest.startDate,
+      openShift,
+    });
     try {
       await updateAssignment({
         assignmentId: id,
@@ -45,6 +53,7 @@ const EditScreen = () => {
         dateOfBirth: format(new Date(data.dateOfBirth), 'yyyy-MM-dd'),
         rate: Number(data.rate),
         hospiceId: hospice?._id as Id<'hospices'>,
+        shifts,
       });
       showToast({
         title: 'Success',
@@ -72,19 +81,16 @@ const EditScreen = () => {
   if (assignment === null) {
     return null;
   }
-  console.log({
-    shift: assignment.openShift,
-    openShift: new Date(convertTimeStringToDate(assignment.openShift)),
-    startDate: new Date(assignment.startDate),
-    endDate: new Date(assignment.endDate),
-  });
+  const startDate = parse(assignment.startDate, 'dd-MM-yyyy', new Date());
+  const endDate = parse(assignment.endDate, 'dd-MM-yyyy', new Date());
+  const dateOfBirth = parse(assignment.dateOfBirth, 'dd-MM-yyyy', new Date());
 
   const formattedAssignment = {
     ...assignment,
     openShift: new Date(convertTimeStringToDate(assignment.openShift)),
-    startDate: new Date(assignment.startDate),
-    endDate: new Date(assignment.endDate),
-    dateOfBirth: new Date(assignment.dateOfBirth),
+    startDate,
+    endDate,
+    dateOfBirth,
     rate: String(assignment.rate),
     firstName: assignment.patientFirstName,
     lastName: assignment.patientLastName,
@@ -94,11 +100,15 @@ const EditScreen = () => {
 
   return (
     <Wrapper>
-      <BackButton title="Edit Assignment" />
+      <BackButton title="Edit Assignment" marginTop={0} />
+      {assignment.hasNurses && (
+        <Banner description="Assignments with Healthcare professionals can't be edited" />
+      )}
       <CreateAssignmentForm
         onSubmit={onSubmit}
         initialValues={formattedAssignment}
         btnTitle="Update"
+        disabled={assignment.hasNurses}
       />
     </Wrapper>
   );

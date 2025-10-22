@@ -54,7 +54,6 @@ export const ProfileCard = ({
   state,
 }: Props) => {
   const formattedRate = rate ? `$${rate}/hr` : '';
-  console.log({ nurseState: state });
 
   const [image, setImage] = useState<string | null>(null);
   const { theme } = useUnistyles();
@@ -166,9 +165,7 @@ export const ProfileCard = ({
             {formattedRate && (
               <FlexText leftText="Rate/hr" rightText={formattedRate} />
             )}
-            {zipCode && !nurse && (
-              <FlexText leftText="Zip code" rightText={zipCode} />
-            )}
+            {zipCode && <FlexText leftText="Zip code" rightText={zipCode} />}
             {faxNumber && (
               <FlexText leftText="Fax number" rightText={faxNumber} />
             )}

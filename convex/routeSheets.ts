@@ -255,6 +255,7 @@ export const approveOrDeclineRouteSheet = mutation({
     routeSheetId: v.id('routeSheets'),
     isApproved: v.boolean(),
     hospiceId: v.id('hospices'),
+    reason: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -271,17 +272,24 @@ export const approveOrDeclineRouteSheet = mutation({
     if (!routeSheet) {
       throw new ConvexError({ message: 'Route sheet not found' });
     }
+    const assignment = await ctx.db.get(routeSheet.assignmentId);
+    if (!assignment) {
+      throw new ConvexError({ message: 'Assignment not found' });
+    }
 
     if (routeSheet.hospiceId !== hospice._id) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
+    const text = args.isApproved
+      ? ''
+      : `Reason: ${args.reason || 'N/A'}, Please resubmit shortly.`;
 
     await ctx.db.patch(args.routeSheetId, { isApproved: args.isApproved });
     await ctx.db.insert('nurseNotifications', {
       isRead: false,
       nurseId: routeSheet.nurseId,
       title: args.isApproved ? 'Route sheet approved' : 'Route sheet declined',
-      description: `${hospice.businessName} ${args.isApproved ? 'approved' : 'declined'} your route sheet`,
+      description: `${hospice.businessName} ${args.isApproved ? 'accepted' : 'declined'} your route sheet for ${assignment.patientFirstName} ${assignment.patientLastName}. ${text}`,
       type: 'normal',
       hospiceId: hospice._id,
     });

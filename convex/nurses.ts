@@ -177,6 +177,7 @@ export const editNurse = mutation({
     rate: v.optional(v.number()),
     address: v.optional(v.string()),
     nurseId: v.id('nurses'),
+    zipCode: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -188,17 +189,20 @@ export const editNurse = mutation({
     if (!nurse) {
       throw new ConvexError({ message: 'Nurse not found' });
     }
-    await ctx.db.insert('pendingNurseProfile', {
+
+    await ctx.db.patch(nurse._id, {
+      rate: args.rate,
       address: args.address,
+      phoneNumber: args.phoneNumber,
+      zipCode: args.zipCode,
+    });
+
+    await ctx.db.insert('pendingNurseProfile', {
       firstName: args.firstName,
       lastName: args.lastName,
-
-      phoneNumber: args.phoneNumber,
       licenseNumber: args.licenseNumber,
       stateOfRegistration: args.stateOfRegistration,
-
       discipline: args.discipline,
-      rate: args.rate,
       isApproved: false,
       nurseId: args.nurseId,
     });
