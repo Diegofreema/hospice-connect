@@ -10,6 +10,7 @@ import { generateErrorMessage } from '@/features/shared/utils';
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { useMutation, useQuery } from 'convex/react';
 import React, { useState } from 'react';
+import { Platform } from 'react-native';
 
 type Props = {
   onClose: () => void;
@@ -61,11 +62,14 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
         autodismiss: true,
       });
       onClose();
+      setSelectedIds([]);
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
         'Failed to send case request, please try again'
       );
+      console.log(error);
+
       showToast({
         title: 'Error',
         subtitle: errorMessage,
@@ -83,7 +87,11 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
         renderItem={({ item }) => (
           <Schedule onSelect={onSelect} item={item} selectedIds={selectedIds} />
         )}
-        contentContainerStyle={{ gap: 15, flexGrow: 1 }}
+        contentContainerStyle={{
+          gap: 15,
+          flexGrow: 1,
+          paddingBottom: Platform.OS === 'ios' ? 100 : 50,
+        }}
         style={{ marginTop: 20 }}
         showsVerticalScrollIndicator={false}
         ListFooterComponent={

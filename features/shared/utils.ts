@@ -34,13 +34,10 @@ export const generateErrorMessage = (
   error: unknown,
   message: string
 ): string => {
-  let errorMessage = message;
-
-  if (error instanceof ConvexError) {
-    const { message: errMessage } = error.data;
-    errorMessage = errMessage;
-  }
-  return errorMessage;
+  return error instanceof ConvexError
+    ? // Access data and cast it to the type we expect
+      (error.data as { message: string }).message
+    : message;
 };
 
 export function validateFields(fieldsToValidate: string[], values: any) {

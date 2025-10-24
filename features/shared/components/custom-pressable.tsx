@@ -21,7 +21,7 @@ export const CustomPressable = ({
     <TouchableOpacity
       style={style}
       onPress={onPress}
-      activeOpacity={0.6}
+      activeOpacity={0.8}
       {...props}
     >
       {children}

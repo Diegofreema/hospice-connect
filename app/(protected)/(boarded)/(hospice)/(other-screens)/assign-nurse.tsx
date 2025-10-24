@@ -48,7 +48,7 @@ const AssignNurse = () => {
   return (
     <>
       <Wrapper>
-        <BackButton title="Assign a Nurse" marginTop={0} />
+        <BackButton title="Assign" marginTop={0} />
         <Stack gap={'lg'} mode="flexCentered">
           <SearchComponent
             placeholder="Search for nurses"
@@ -82,6 +82,7 @@ const AssignNurse = () => {
         title="Choose Schedule"
         ref={scheduleBottomSheetRef}
         onClose={onCloseScheduleSheet}
+        customSnapPoints={['70%']}
       >
         <SelectSchedule
           id={id}

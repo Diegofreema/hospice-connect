@@ -58,7 +58,7 @@ export const Assignments = () => {
         ref={bottomSheetRef}
         onClose={onCloseSheet}
         title="View Schedule"
-        customSnapPoints={['25%', '60%']}
+        customSnapPoints={['25%', '80%']}
       >
         {assignmentId ? (
           <SelectSchedule

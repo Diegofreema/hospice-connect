@@ -39,7 +39,8 @@ export const CompletedCard = ({ item: post }: Props) => {
   const onHandleRouteSheet = () => {
     const path = !hasSubmittedRouteSheet
       ? '/complete-route-sheet'
-      : '/view-route-sheet';
+      : '/view-route-sheet-nurse';
+    console.log('Pressed');
 
     router.push(`${path}?assignmentId=${post._id}&nurseId=${nurse?._id}`);
   };

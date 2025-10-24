@@ -5,8 +5,8 @@ import { ControlInput } from '@/features/authentication/components/form/control-
 import { Button } from '@/features/shared/components/button';
 import { CustomPressable } from '@/features/shared/components/custom-pressable';
 import { FlexText } from '@/features/shared/components/flex-text';
+import { KeyboardAwareScrollViewComponent } from '@/features/shared/components/key-board-aware-scroll-view';
 import { RoustSheetComponent } from '@/features/shared/components/route-sheet-component';
-import SignatureComponent from '@/features/shared/components/signature-component';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { Text } from '@/features/shared/components/text';
 import { View } from '@/features/shared/components/view';
@@ -16,17 +16,17 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery } from 'convex/react';
 import { format, parse } from 'date-fns';
 import { router } from 'expo-router';
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Control,
   FieldErrors,
   useForm,
   UseFormSetValue,
 } from 'react-hook-form';
-import { FlatList, ScrollView } from 'react-native';
-import { SignatureViewRef } from 'react-native-signature-canvas';
+import { FlatList } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 import { routeSheetValidator, RouteSheetValidator } from '../validators';
+import { SignatureModal } from './signature-modal';
 
 type Props = {
   nurseId: Id<'nurses'>;
@@ -95,10 +95,7 @@ export const CompleteRouteSheet = ({ assignmentId, nurseId }: Props) => {
   const onHideRouteSheet = () => setShowRouteSheet(false);
   const onShowRouteSheet = () => setShowRouteSheet(true);
   return (
-    <ScrollView
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ paddingBottom: 50 }}
-    >
+    <KeyboardAwareScrollViewComponent>
       {showRouteSheet ? (
         <RoustSheetComponent
           nurse={data.nurse}
@@ -106,6 +103,8 @@ export const CompleteRouteSheet = ({ assignmentId, nurseId }: Props) => {
           comment={comment || ''}
           signature={signature}
           hospiceAddress={data.assignment.hospiceAddress}
+          disabled2={isSubmitting}
+          disabled={isSubmitting}
           rate={data.assignment.rate}
           hospiceName={data.assignment.businessName}
           handleSubmit={handleSubmit(onSubmit)}
@@ -140,7 +139,7 @@ export const CompleteRouteSheet = ({ assignmentId, nurseId }: Props) => {
           />
         </>
       )}
-    </ScrollView>
+    </KeyboardAwareScrollViewComponent>
   );
 };
 
@@ -229,38 +228,27 @@ const Bottom = ({
   onShowRouteSheet,
   signature,
 }: BottomProps) => {
-  const ref = useRef<SignatureViewRef>(null);
+  const [visible, setVisible] = useState(false);
+
   const onOK = (signature: string) => {
     setValue('signature', signature);
   };
   const onClear = () => {
     setValue('signature', '');
   };
+  const onClose = () => {
+    setVisible(false);
+  };
   return (
-    <View gap="xxl">
-      <View>
-        <Text size="normal">Signature</Text>
-        {signature ? (
-          <>
-            <ViewSignature signature={signature} />
-            <CustomPressable onPress={onClear} style={styles.retake}>
-              <Text size="normal" isBold>
-                Retake
-              </Text>
-            </CustomPressable>
-          </>
-        ) : (
-          <>
-            <SignatureComponent ref={ref} onOK={onOK} onClear={onClear} />
-            {errors.signature?.message && (
-              <Text size="small" color={'red'}>
-                {typeof errors['signature']?.message === 'string'
-                  ? errors['signature']?.message
-                  : 'Invalid input'}
-              </Text>
-            )}
-          </>
-        )}
+    <View gap="xl">
+      <View gap="xl">
+        <CustomPressable
+          onPress={() => setVisible(true)}
+          style={styles.signature}
+        >
+          <Text>Please click to take signature</Text>
+        </CustomPressable>
+        {signature && <ViewSignature signature={signature} />}
       </View>
       <ControlInput
         variant="textarea"
@@ -274,6 +262,14 @@ const Bottom = ({
         title="Generate Route Sheet"
         onPress={onShowRouteSheet}
         disabled={isSubmitting || !signature}
+      />
+      <SignatureModal
+        errors={errors}
+        onClear={onClear}
+        onClose={onClose}
+        onOK={onOK}
+        signature={signature}
+        visible={visible}
       />
     </View>
   );
@@ -298,20 +294,11 @@ const styles = StyleSheet.create((theme) => ({
     gap: 10,
   },
   signature: {
-    width: '100%',
-    height: '100%',
-  },
-  signatureContainer: {
+    borderColor: theme.colors.cardGrey,
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 5,
     alignItems: 'center',
     justifyContent: 'center',
-    width: 300,
-    height: 200,
-    backgroundColor: theme.colors.cardGrey,
-    borderRadius: 10,
-    alignSelf: 'center',
-  },
-  retake: {
-    alignSelf: 'center',
-    marginTop: 10,
   },
 }));

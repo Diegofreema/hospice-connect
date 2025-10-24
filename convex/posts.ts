@@ -2,7 +2,12 @@ import { getAuthUserId } from '@convex-dev/auth/server';
 import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { mutation, query } from './_generated/server';
-import { convertTimeStringToDate, stringToDate } from './helper';
+import {
+  convertTimeStringToDate,
+  doIntervalsOverlap,
+  parseDateTime,
+  stringToDate,
+} from './helper';
 import { discipline } from './schema';
 
 export const getOurPosts = query({
@@ -138,6 +143,48 @@ export const acceptAssignment = mutation({
       nurseId: args.nurseId,
       status: 'booked',
     });
+    const shifts = await ctx.db
+      .query('schedules')
+      .withIndex('nurse', (q) =>
+        q.eq('nurseId', args.nurseId).eq('status', 'booked')
+      )
+      .collect();
+
+    // Parse the new shift's start and end datetime
+    const newShiftStart = parseDateTime(schedule.startDate, schedule.startTime);
+    const newShiftEnd = parseDateTime(schedule.endDate, schedule.endTime);
+
+    // Validate that end time is after start time
+    if (newShiftEnd.getTime() <= newShiftStart.getTime()) {
+      throw new ConvexError({
+        message: 'End date/time must be after start date/time',
+      });
+    }
+
+    // Check each existing shift for conflicts
+    for (const shift of shifts) {
+      // Parse existing shift's start and end datetime
+      const existingShiftStart = parseDateTime(
+        shift.startDate,
+        shift.startTime
+      );
+      const existingShiftEnd = parseDateTime(shift.endDate, shift.endTime);
+
+      // Check if the intervals overlap
+      const hasConflict = doIntervalsOverlap(
+        newShiftStart,
+        newShiftEnd,
+        existingShiftStart,
+        existingShiftEnd
+      );
+
+      if (hasConflict) {
+        throw new ConvexError({
+          message: `This nurse already has a shift from ${shift.startDate} ${shift.startTime} to ${shift.endDate} ${shift.endTime}`,
+        });
+      }
+    }
+
     await ctx.db.insert('hospiceNotifications', {
       isRead: false,
       hospiceId: assignment.hospiceId,

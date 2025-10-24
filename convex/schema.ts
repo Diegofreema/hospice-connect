@@ -235,6 +235,8 @@ export default defineSchema({
   routeSheets: defineTable(routeSheet).index('by_assignment_id', [
     'assignmentId',
     'nurseId',
+    'hospiceId',
+    'isApproved',
   ]),
   ratings: defineTable(Rating).index('nurseId', ['nurseId']),
   availabilities: defineTable(Availability).index('nurseId', ['nurseId']),

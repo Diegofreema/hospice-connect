@@ -32,6 +32,7 @@ export const nurseSubmittedRouteSheet = query({
           .eq('nurseId', nurse._id)
       )
       .collect();
+    console.log({ schedules });
 
     return schedules.every((schedule) => schedule.isSubmitted);
   },
@@ -234,19 +235,43 @@ export const submitRouteSheet = mutation({
 
       await ctx.db.patch(scheduleId, { isSubmitted: true });
     }
-    const routeSheetId = await ctx.db.insert('routeSheets', {
-      ...args,
-      isApproved: false,
-    });
-    await ctx.db.insert('hospiceNotifications', {
-      hospiceId: args.hospiceId,
-      isRead: false,
-      nurseId: args.nurseId,
-      title: `${nurse.firstName} ${nurse.lastName}`,
-      description: 'submitted a route sheet, view to accept or decline',
-      type: 'route_sheet',
-      routeSheetId,
-    });
+    /// check if route sheet exists, then update it, if not, create a new one
+    const routeSheetExists = await ctx.db
+      .query('routeSheets')
+      .withIndex('by_assignment_id', (q) =>
+        q
+          .eq('assignmentId', args.assignmentId)
+          .eq('nurseId', args.nurseId)
+          .eq('hospiceId', args.hospiceId)
+          .eq('isApproved', false)
+      )
+      .first();
+
+    if (routeSheetExists) {
+      await ctx.db.insert('hospiceNotifications', {
+        hospiceId: args.hospiceId,
+        isRead: false,
+        nurseId: args.nurseId,
+        title: `${nurse.firstName} ${nurse.lastName}`,
+        description: 'Submitted a route sheet, view to accept or decline',
+        type: 'route_sheet',
+        routeSheetId: routeSheetExists._id,
+      });
+    } else {
+      const routeSheetId = await ctx.db.insert('routeSheets', {
+        ...args,
+        isApproved: false,
+      });
+      await ctx.db.insert('hospiceNotifications', {
+        hospiceId: args.hospiceId,
+        isRead: false,
+        nurseId: args.nurseId,
+        title: `${nurse.firstName} ${nurse.lastName}`,
+        description: 'Submitted a route sheet, view to accept or decline',
+        type: 'route_sheet',
+        routeSheetId,
+      });
+    }
   },
 });
 
@@ -285,13 +310,28 @@ export const approveOrDeclineRouteSheet = mutation({
       : `Reason: ${args.reason || 'N/A'}, Please resubmit shortly.`;
 
     await ctx.db.patch(args.routeSheetId, { isApproved: args.isApproved });
-    await ctx.db.insert('nurseNotifications', {
-      isRead: false,
-      nurseId: routeSheet.nurseId,
-      title: args.isApproved ? 'Route sheet approved' : 'Route sheet declined',
-      description: `${hospice.businessName} ${args.isApproved ? 'accepted' : 'declined'} your route sheet for ${assignment.patientFirstName} ${assignment.patientLastName}. ${text}`,
-      type: 'normal',
-      hospiceId: hospice._id,
-    });
+    if (!args.isApproved) {
+      for (const scheduleId of routeSheet.scheduleIds) {
+        await ctx.db.patch(scheduleId, { isSubmitted: false });
+      }
+
+      await ctx.db.insert('nurseNotifications', {
+        isRead: false,
+        nurseId: routeSheet.nurseId,
+        title: 'Route sheet declined',
+        description: `${hospice.businessName} declined your route sheet for ${assignment.patientFirstName} ${assignment.patientLastName}. ${text}`,
+        type: 'normal',
+        hospiceId: hospice._id,
+      });
+    } else {
+      await ctx.db.insert('nurseNotifications', {
+        isRead: false,
+        nurseId: routeSheet.nurseId,
+        title: 'Route sheet approved',
+        description: `${hospice.businessName} accepted your route sheet for ${assignment.patientFirstName} ${assignment.patientLastName}.`,
+        type: 'normal',
+        hospiceId: hospice._id,
+      });
+    }
   },
 });

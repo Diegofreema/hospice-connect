@@ -32,7 +32,7 @@ export const Availability = () => {
           renderItem={({ item }) => (
             <Day day={item} onPress={() => handlePress(item)} />
           )}
-          keyExtractor={(item) => item.day}
+          keyExtractor={(item, i) => item.day + i}
           contentContainerStyle={{ gap: 10 }}
           showsVerticalScrollIndicator={false}
         />

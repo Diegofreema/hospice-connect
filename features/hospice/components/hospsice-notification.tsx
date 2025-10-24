@@ -21,7 +21,7 @@ type Props = {
 };
 
 export const HospiceNotification = ({ notification }: Props) => {
-  const date = format(notification._creationTime, 'MM/dd/yy');
+  const date = format(notification._creationTime, 'PP; hh:mm a');
   const { hospice } = useHospice();
 
   const [processing, setProcessing] = useState(false);
@@ -29,7 +29,8 @@ export const HospiceNotification = ({ notification }: Props) => {
   const declineRequest = useMutation(api.schedules.declineSchedule);
   const { showToast } = useToast();
   const firstPart = date.split(',')[0];
-  const secondPart = date.split(',')[1];
+  const secondPart = date.split(',')[1].split(';')[0];
+  const thirdPart = date.split(';')[1];
   const onPress = () => {
     if (notification.type === 'route_sheet') {
       router.push(`/view-route-sheet?id=${notification?.routeSheetId}`);
@@ -144,11 +145,14 @@ export const HospiceNotification = ({ notification }: Props) => {
               </View>
             </View>
             <View>
-              <Text size="normal" color="grey">
+              <Text size="normal" color="grey" textAlign="right">
                 {firstPart}
               </Text>
-              <Text size="normal" color="grey">
+              <Text size="normal" color="grey" textAlign="right">
                 {secondPart}
+              </Text>
+              <Text size="small" color="grey" textAlign="right">
+                {thirdPart}
               </Text>
             </View>
           </View>

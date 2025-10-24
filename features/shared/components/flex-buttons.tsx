@@ -40,7 +40,7 @@ export const FlexButtons = ({
         style={[styles.button, styles.assign, { opacity: disabled ? 0.5 : 1 }]}
         disabled={disabled}
       >
-        <Text size={'normal'} color={'white'}>
+        <Text size={'normal'} color={'white'} style={{ textAlign: 'center' }}>
           {buttonText2}
         </Text>
       </CustomPressable>

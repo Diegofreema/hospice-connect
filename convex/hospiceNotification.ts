@@ -2,7 +2,7 @@ import { getAuthUserId } from '@convex-dev/auth/server';
 import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { mutation, query } from './_generated/server';
-import { formatDate } from './helper';
+import { doIntervalsOverlap, formatDate, parseDateTime } from './helper';
 import { getNurseDetails } from './nurses';
 
 export const unreadMessagesCount = query({
@@ -153,6 +153,47 @@ export const sendCaseRequestNotification = mutation({
         throw new ConvexError({ message: 'Hospice not found' });
       }
 
+      const shifts = await ctx.db
+        .query('schedules')
+        .withIndex('nurse', (q) =>
+          q.eq('nurseId', nurse._id).eq('status', 'booked')
+        )
+        .collect();
+
+      // Parse the new shift's start and end datetime
+      const newShiftStart = parseDateTime(shift.startDate, shift.startTime);
+      const newShiftEnd = parseDateTime(shift.endDate, shift.endTime);
+
+      // Validate that end time is after start time
+      if (newShiftEnd.getTime() <= newShiftStart.getTime()) {
+        throw new ConvexError({
+          message: 'End date/time must be after start date/time',
+        });
+      }
+
+      // Check each existing shift for conflicts
+      for (const shift of shifts) {
+        // Parse existing shift's start and end datetime
+        const existingShiftStart = parseDateTime(
+          shift.startDate,
+          shift.startTime
+        );
+        const existingShiftEnd = parseDateTime(shift.endDate, shift.endTime);
+
+        // Check if the intervals overlap
+        const hasConflict = doIntervalsOverlap(
+          newShiftStart,
+          newShiftEnd,
+          existingShiftStart,
+          existingShiftEnd
+        );
+
+        if (hasConflict) {
+          throw new ConvexError({
+            message: `You already has a shift from ${shift.startDate} ${shift.startTime} to ${shift.endDate} ${shift.endTime}`,
+          });
+        }
+      }
       await ctx.db.insert('hospiceNotifications', {
         isRead: false,
         hospiceId: assignment.hospiceId,

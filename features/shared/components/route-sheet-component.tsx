@@ -18,7 +18,7 @@ type Props = {
   comment: string;
   signature: string;
   rate: number;
-  handleSubmit: () => Promise<void>;
+  handleSubmit: () => Promise<void> | void;
   onGoBack: () => void;
   patientName: string;
   careLevel: string;
@@ -42,7 +42,6 @@ const headers = [
 export const RoustSheetComponent = ({
   comment,
   hospiceAddress,
-
   hospiceName,
   nurse,
   shifts,

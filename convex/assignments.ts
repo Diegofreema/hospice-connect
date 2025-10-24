@@ -246,6 +246,7 @@ export const createAssignment = mutation({
           'A new assignment matching your discipline has been posted.',
         title: 'New Assignment Available',
         type: 'normal',
+        hospiceId: args.hospiceId,
       });
     }
   },

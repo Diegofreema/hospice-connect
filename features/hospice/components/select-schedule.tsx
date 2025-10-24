@@ -85,7 +85,7 @@ export const SelectSchedule = ({ id, hospiceId, name, onClose }: Props) => {
       renderItem={({ item }) => (
         <Schedule onSelect={onSelect} item={item} selectedIds={selectedIds} />
       )}
-      contentContainerStyle={{ gap: 15, flexGrow: 1 }}
+      contentContainerStyle={{ gap: 15, flexGrow: 1, paddingBottom: 50 }}
       style={{ flex: 1, marginTop: 20 }}
       showsVerticalScrollIndicator={false}
       ListFooterComponent={

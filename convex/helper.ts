@@ -1,6 +1,6 @@
-import { Infer } from 'convex/values';
+import { ConvexError, Infer } from 'convex/values';
 import { Id } from './_generated/dataModel';
-import { mutation, QueryCtx } from './_generated/server';
+import { mutation, MutationCtx, QueryCtx } from './_generated/server';
 import { day } from './schema';
 
 export const getImage = (ctx: QueryCtx, imageId?: Id<'_storage'>) => {
@@ -206,4 +206,85 @@ export const formatDateString = (date: Date): string => {
   const year = date.getFullYear();
 
   return `${day}-${month}-${year}`;
+};
+
+export const parseDateTime = (dateStr: string, timeStr: string): Date => {
+  // Parse date: "24-10-2025" -> day=24, month=10, year=2025
+  const [day, month, year] = dateStr.split('-').map(Number);
+
+  // Parse time: "8:00 AM" -> hours=8, minutes=0, period="AM"
+  const [time, period] = timeStr.trim().split(/\s+/);
+  const [hoursStr, minutesStr] = time.split(':');
+  let hours = Number(hoursStr);
+  const minutes = Number(minutesStr);
+
+  // Convert to 24-hour format
+  if (period.toUpperCase() === 'PM' && hours !== 12) {
+    hours += 12;
+  } else if (period.toUpperCase() === 'AM' && hours === 12) {
+    hours = 0;
+  }
+
+  // Create Date object (month is 0-indexed in JavaScript)
+  return new Date(year, month - 1, day, hours, minutes, 0, 0);
+};
+
+/**
+ * Checks if two time intervals overlap
+ * Interval 1: [start1, end1]
+ * Interval 2: [start2, end2]
+ * They overlap if: start1 < end2 AND start2 < end1
+ */
+export const doIntervalsOverlap = (
+  start1: Date,
+  end1: Date,
+  start2: Date,
+  end2: Date
+): boolean => {
+  return start1.getTime() < end2.getTime() && start2.getTime() < end1.getTime();
+};
+
+export const checkIfNurseHasAShiftOnDateAndTime = async (
+  ctx: MutationCtx,
+  nurseId: Id<'nurses'>,
+  startDate: string,
+  endDate: string,
+  startTime: string,
+  endTime: string
+) => {
+  // Fetch all booked shifts for the nurse
+  const shifts = await ctx.db
+    .query('schedules')
+    .withIndex('nurse', (q) => q.eq('nurseId', nurseId).eq('status', 'booked'))
+    .collect();
+
+  // Parse the new shift's start and end datetime
+  const newShiftStart = parseDateTime(startDate, startTime);
+  const newShiftEnd = parseDateTime(endDate, endTime);
+
+  // Validate that end time is after start time
+  if (newShiftEnd.getTime() <= newShiftStart.getTime()) {
+    throw new Error('End date/time must be after start date/time');
+  }
+
+  // Check each existing shift for conflicts
+  for (const shift of shifts) {
+    // Parse existing shift's start and end datetime
+    const existingShiftStart = parseDateTime(shift.startDate, shift.startTime);
+    const existingShiftEnd = parseDateTime(shift.endDate, shift.endTime);
+
+    // Check if the intervals overlap
+    const hasConflict = doIntervalsOverlap(
+      newShiftStart,
+      newShiftEnd,
+      existingShiftStart,
+      existingShiftEnd
+    );
+
+    if (hasConflict) {
+      throw new ConvexError({
+        message: `You already has a shift from ${shift.startDate} ${shift.startTime} to ${shift.endDate} ${shift.endTime}`,
+      });
+    }
+  }
 };

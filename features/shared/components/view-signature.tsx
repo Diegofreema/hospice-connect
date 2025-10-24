@@ -27,7 +27,7 @@ const styles = StyleSheet.create((theme) => ({
   signatureContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: 300,
+    width: '90%',
     height: 200,
     backgroundColor: theme.colors.cardGrey,
     borderRadius: 10,
