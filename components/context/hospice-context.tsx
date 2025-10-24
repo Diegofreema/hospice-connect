@@ -1,7 +1,7 @@
 import { api } from '@/convex/_generated/api';
 import { LoadingComponent } from '@/features/shared/components/loading';
 import { UnderReview } from '@/features/shared/components/under-review';
-import { useQuery } from 'convex/react';
+import { useConvexAuth, useQuery } from 'convex/react';
 
 import { FunctionReturnType } from 'convex/server';
 import * as WebBrowser from 'expo-web-browser';
@@ -21,12 +21,12 @@ export const HospiceProvider = ({
   children: React.ReactNode;
 }) => {
   const hospice = useQuery(api.hospices.getHospiceByUserId);
-
+  const { isAuthenticated } = useConvexAuth();
   if (hospice === undefined) {
     return <LoadingComponent />;
   }
 
-  if (!hospice?.approved) {
+  if (isAuthenticated && !hospice?.approved) {
     return <UnderReview />;
   }
   if (hospice === null) {

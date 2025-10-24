@@ -1,15 +1,13 @@
 import { ChatWrapper } from '@/components/chat-wrapper';
 import { useAuth } from '@/components/context/auth';
 import { ChatContext } from '@/components/context/chat-context';
-import { LoadingComponent } from '@/features/shared/components/loading';
 import { Stack } from 'expo-router';
 import React from 'react';
 
 const BoardedLayout = () => {
   const { user } = useAuth();
-  if (!user) return <LoadingComponent />;
 
-  const isNurse = !!user.isNurse;
+  const isNurse = !!user?.isNurse;
   return (
     <ChatWrapper>
       <ChatContext>

@@ -1,10 +1,10 @@
-import { useAuth } from '@/components/context/auth';
 import Provider from '@/components/provider';
 import { ErrorComponent } from '@/features/shared/components/error';
 import { ToastProvider } from '../components/demos/toast';
 
 import { StackedModalProvider } from '@/components/demos/modal/modal-manager';
 import { setupBackgroundUpdates } from '@/updates';
+import { useConvexAuth } from 'convex/react';
 import { useFonts } from 'expo-font';
 import { ErrorBoundaryProps, Stack, usePathname } from 'expo-router';
 import React from 'react';
@@ -46,7 +46,7 @@ export default function RootLayout() {
 
 const InitialRoute = () => {
   const { theme } = useUnistyles();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useConvexAuth();
   const pathname = usePathname();
   console.log({ pathname });
 

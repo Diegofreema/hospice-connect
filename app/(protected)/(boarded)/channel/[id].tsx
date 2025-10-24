@@ -1,14 +1,15 @@
 import { useAppChatContext } from '@/components/context/chat-context';
-import { CustomKeyboardCompatibleView } from '@/components/custom-keyboard-compatible-view';
 import { ChatHeader } from '@/features/shared/components/chat-header';
 import { CustomPressable } from '@/features/shared/components/custom-pressable';
 import { LoadingComponent } from '@/features/shared/components/loading';
 import { Text } from '@/features/shared/components/text';
 import { View } from '@/features/shared/components/view';
 import { Wrapper } from '@/features/shared/components/wrapper';
-import { ChannelMemberResponse } from '@/features/shared/types';
+import { useHeaderHeight } from '@react-navigation/elements';
 import { IconSend } from '@tabler/icons-react-native';
-import React, { useEffect } from 'react';
+import React from 'react';
+import { Platform, StatusBar } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import {
   Channel,
@@ -20,33 +21,21 @@ import {
 
 const ChannelScreen = () => {
   const { channel } = useAppChatContext();
+  const headerHeight = useHeaderHeight();
+  const insets = useSafeAreaInsets();
 
-  const [members, setMembers] = React.useState<ChannelMemberResponse[]>([]);
-  useEffect(() => {
-    if (!channel) return;
-    const getMembers = async () => {
-      const c = await channel?.watch({ presence: true });
-      setMembers(c?.members);
-    };
-    getMembers();
-  }, [channel]);
   if (!channel) {
     return <LoadingComponent />;
   }
-  console.log({ members });
-
+  const keyboardVerticalOffset =
+    Platform.OS === 'ios'
+      ? headerHeight + insets.top
+      : headerHeight + (StatusBar.currentHeight || 0);
   return (
-    <View flex={1} backgroundColor="white">
-      {/* <Stack.Screen
-        options={{
-          title: channel?.data?.name,
-          headerRight: () => ,
-        }}
-      /> */}
-
+    <View backgroundColor="white">
       <Channel
         channel={channel}
-        // keyboardVerticalOffset={headerHeight}
+        keyboardVerticalOffset={keyboardVerticalOffset}
         MessageHeader={() => <Text>Messages</Text>}
         hasCameraPicker={false}
         hasCommands={false}
@@ -57,7 +46,6 @@ const ChannelScreen = () => {
           <Text>Error loading messages for this chat</Text>
         )}
         MessageError={() => <Text>Error loading messages for this chat</Text>}
-        KeyboardCompatibleView={CustomKeyboardCompatibleView}
       >
         <View flex={1}>
           <ChatHeader channel={channel} />

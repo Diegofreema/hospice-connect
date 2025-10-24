@@ -1,6 +1,5 @@
 import { useAuth } from '@/components/context/auth';
 import { ActionComponent } from '@/features/shared/components/action-component';
-import { LoadingComponent } from '@/features/shared/components/loading';
 import { addEventListener } from '@react-native-community/netinfo';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -17,9 +16,6 @@ const ProtectedLayout = () => {
     return () => unsubscribe();
   }, []);
 
-  if (user === undefined) {
-    return <LoadingComponent />;
-  }
   if (!isConnected) {
     return (
       <ActionComponent

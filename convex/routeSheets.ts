@@ -32,7 +32,6 @@ export const nurseSubmittedRouteSheet = query({
           .eq('nurseId', nurse._id)
       )
       .collect();
-    console.log({ schedules });
 
     return schedules.every((schedule) => schedule.isSubmitted);
   },
