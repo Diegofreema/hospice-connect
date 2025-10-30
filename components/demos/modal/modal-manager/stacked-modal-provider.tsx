@@ -83,7 +83,7 @@ export const StackedModalProvider: FC<PropsWithChildren> = ({ children }) => {
         <StackedModal
           stackedSheet={stackedSheet}
           key={stackedSheet.key || stackedSheet.id}
-          index={index}
+          index={Math.random() * 1000 + index}
         />
       );
 

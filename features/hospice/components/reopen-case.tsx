@@ -2,7 +2,10 @@ import { useHospice } from '@/components/context/hospice-context';
 import { useToast } from '@/components/demos/toast';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
-import { generateErrorMessage, generateShifts } from '@/features/shared/utils';
+import {
+  generateErrorMessage,
+  generateShiftsWithDateFns,
+} from '@/features/shared/utils';
 import { useMutation } from 'convex/react';
 import { format } from 'date-fns';
 import React from 'react';
@@ -45,13 +48,13 @@ export const ReopenCase = ({ onClose }: Props) => {
   });
   const onSubmit = async (data: ReopenAssignmentValidator) => {
     if (!hospice) return;
-    const shifts = generateShifts({
-      endDate: data.endDate,
-      startDate: data.startDate,
-      openShift: format(data.openShift, 'H:mm'),
-    });
 
     try {
+      const shifts = generateShiftsWithDateFns({
+        endDate: data.endDate,
+        startDate: data.startDate,
+        openShift: data.openShift,
+      });
       await reopenCase({
         openShift: format(new Date(data.openShift), 'h:mm a'),
         startDate: format(new Date(data.startDate), 'dd-MM-yyyy'),

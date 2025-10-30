@@ -33,7 +33,7 @@ export const HospiceNotification = ({ notification }: Props) => {
   const thirdPart = date.split(';')[1];
   const onPress = () => {
     if (notification.type === 'route_sheet') {
-      router.push(`/view-route-sheet?id=${notification?.routeSheetId}`);
+      router.push(`/view-route-sheet?id=${notification?.routeSheetId}&notificationId=${notification._id}`);
     }
 
     if (notification.type === 'case_request') {
@@ -114,6 +114,7 @@ export const HospiceNotification = ({ notification }: Props) => {
     notification.status !== 'accepted' && notification.status !== 'declined';
   const isDeclined = notification?.status === 'declined';
   const isAccepted = notification?.status === 'accepted';
+  const isRouteSheet = notification.type === 'route_sheet'
   return (
     <CustomPressable onPress={onPress}>
       <Card style={styles.card}>
@@ -137,7 +138,7 @@ export const HospiceNotification = ({ notification }: Props) => {
                   {notification.title}
                 </Text>
                 {notification.description && (
-                  <Text size="normal" style={{ flex: 1, maxWidth: '70%' }}>
+                  <Text size="normal" style={{ flex: 1, maxWidth: '80%' }}>
                     {notification.type === 'cancel_request' && 'Reason: '}{' '}
                     {notification.description}
                   </Text>
@@ -157,9 +158,9 @@ export const HospiceNotification = ({ notification }: Props) => {
             </View>
           </View>
         </CardHeader>
-        {notification.type === 'cancel_request' && (
+        {notification.type === 'cancel_request' || isRouteSheet && (
           <CardFooter>
-            {showButtons && (
+            {showButtons && !isRouteSheet && (
               <FlexButtons
                 onCancel={onDecline}
                 onPress={onAccept}

@@ -136,14 +136,18 @@ export const completedAssignments = query({
 
     const schedulesWithUniqueAssignments = await Promise.all(
       schedules.page.map(async (schedule) => {
-        return (await ctx.db.get(schedule.assignmentId)) as Doc<'assignments'>;
+        const assignment = await ctx.db.get(schedule.assignmentId);
+        if (!assignment) {
+          return null;
+        }
+        return assignment;
       })
     );
 
     const uniqueMap = new Map();
     schedulesWithUniqueAssignments.forEach((assignment) => {
-      if (!uniqueMap.has(assignment._id)) {
-        uniqueMap.set(assignment._id, assignment);
+      if (!uniqueMap.has(assignment?._id)) {
+        uniqueMap.set(assignment?._id, assignment);
       }
     });
 
@@ -184,12 +188,6 @@ export const createAssignment = mutation({
     shifts: v.array(shifts),
   },
   handler: async (ctx, args) => {
-    console.log({
-      startDate: args.startDate,
-      endDate: args.endDate,
-      openShift: args.openShift,
-    });
-
     const userId = await getAuthUserId(ctx);
     if (!userId) {
       throw new ConvexError({ message: 'Unauthorized' });
@@ -321,6 +319,7 @@ export const reopenAssignment = mutation({
           'A new assignment matching your discipline has been posted.',
         title: 'New Assignment Available',
         type: 'normal',
+        hospiceId: args.hospiceId,
       });
     }
   },
@@ -346,7 +345,6 @@ export const getAssignment = query({
         q.eq('assignmentId', args.assignmentId)
       )
       .collect();
-    console.log({ schedules });
 
     const hasNurses = schedules.some((schedule) => schedule.nurseId);
 
@@ -418,9 +416,12 @@ export const updateAssignment = mutation({
       .query('schedules')
       .withIndex('by_assignment_id', (q) => q.eq('assignmentId', assignmentId))
       .collect();
+    let count = 0;
     for (const schedule of oldSchedules) {
       await ctx.db.delete(schedule._id);
+      count++;
     }
+    console.log(count);
 
     for (const shift of args.shifts) {
       await ctx.db.insert('schedules', {
@@ -452,6 +453,7 @@ export const deleteAssignment = mutation({
       throw new ConvexError({ message: 'Hospice not found' });
     }
     const assignment = await ctx.db.get(args.assignmentId);
+
     if (!assignment) {
       throw new ConvexError({ message: 'Assignment not found' });
     }
@@ -463,6 +465,23 @@ export const deleteAssignment = mutation({
       throw new ConvexError({
         message: 'You do not have permission to delete this assignment',
       });
+    }
+
+    const schedules = await ctx.db
+      .query('schedules')
+      .withIndex('by_assignment_id', (q) =>
+        q.eq('assignmentId', args.assignmentId)
+      )
+      .collect();
+    const assignmentHasStarted = schedules.some((schedule) => {
+      return schedule.nurseId;
+    });
+
+    if (assignmentHasStarted) {
+      throw new ConvexError({ message: 'Assignment has already started' });
+    }
+    for (const schedule of schedules) {
+      await ctx.db.delete(schedule._id);
     }
 
     await ctx.db.delete(args.assignmentId);
@@ -488,29 +507,27 @@ export const updateAssignmentStatus = mutation({
         q.eq('assignmentId', assignment._id)
       )
       .collect();
+    const lastSchedule = schedules[schedules.length - 1];
+    console.log({ lastSchedule });
 
-    const isFullyStaffed = schedules.every((schedule) => schedule.nurseId);
+    const isFullyStaffed =
+      schedules.every((schedule) => schedule.nurseId) && schedules.length > 0;
     const endDate = stringToDate(assignment.endDate);
     endDate.setHours(0, 0, 0, 0);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const timeHasPassed = endDate <= today;
-
-    if (isFullyStaffed && !timeHasPassed) {
-      await ctx.db.patch(args.assignmentId, {
-        status: 'booked',
-      });
-    }
-    if (!isFullyStaffed && timeHasPassed) {
-      await ctx.db.patch(args.assignmentId, {
-        status: 'completed',
-      });
-    }
+    const timeHasPassed = endDate < today;
 
     if (timeHasPassed) {
+      // If time has passed, always mark as completed
       await ctx.db.patch(args.assignmentId, {
         status: 'completed',
+      });
+    } else if (isFullyStaffed) {
+      // If not yet ended but fully staffed, mark as booked
+      await ctx.db.patch(args.assignmentId, {
+        status: 'booked',
       });
     }
   },

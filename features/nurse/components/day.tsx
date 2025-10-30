@@ -44,6 +44,7 @@ export const Day = ({ day, onPress }: Props) => {
 
         subtitle: 'Please set start and end shift first',
         autodismiss: true,
+        key: `availability-${day.day} + ${Math.random() * 1000}`,
       });
       return;
     }
@@ -57,6 +58,7 @@ export const Day = ({ day, onPress }: Props) => {
         title: 'Success',
         subtitle: 'Availability updated',
         autodismiss: true,
+        key: `availability-${day.day} + ${Math.random() * 1000}`,
       });
     } catch (error) {
       const errorMessage = generateErrorMessage(
@@ -68,6 +70,7 @@ export const Day = ({ day, onPress }: Props) => {
         title: 'Error',
         subtitle: errorMessage,
         autodismiss: true,
+        key: `availability-${day.day} + ${Math.random() * 1000}`,
       });
     }
   };

@@ -1,4 +1,5 @@
 import { getAuthUserId } from '@convex-dev/auth/server';
+import { filter } from 'convex-helpers/server/filter';
 import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { mutation, query } from './_generated/server';
@@ -139,16 +140,12 @@ export const acceptAssignment = mutation({
       throw new ConvexError({ message: 'Shift already accepted' });
     }
 
-    await ctx.db.patch(args.scheduleId, {
-      nurseId: args.nurseId,
-      status: 'booked',
-    });
-    const shifts = await ctx.db
-      .query('schedules')
-      .withIndex('nurse', (q) =>
-        q.eq('nurseId', args.nurseId).eq('status', 'booked')
-      )
-      .collect();
+    const shifts = await filter(
+      ctx.db.query('schedules'),
+      (schedule) =>
+        schedule.nurseId === args.nurseId && schedule.status === 'booked'
+    ).collect();
+    console.log({ length: shifts.length });
 
     // Parse the new shift's start and end datetime
     const newShiftStart = parseDateTime(schedule.startDate, schedule.startTime);
@@ -184,6 +181,11 @@ export const acceptAssignment = mutation({
         });
       }
     }
+
+    await ctx.db.patch(args.scheduleId, {
+      nurseId: args.nurseId,
+      status: 'booked',
+    });
 
     await ctx.db.insert('hospiceNotifications', {
       isRead: false,

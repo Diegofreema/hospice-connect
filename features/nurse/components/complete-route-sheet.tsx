@@ -163,6 +163,8 @@ const ScheduleCard = ({ schedule }: ScheduleProps) => {
         <Text>-</Text>
         <Text>{schedule.endTime} (12hrs)</Text>
       </View>
+        <Text>Hourly Rate: ${schedule.rate.toString()}</Text>
+
     </View>
   );
 };
@@ -200,10 +202,7 @@ const Header = ({ assignment, nurse }: HeaderProps) => {
         />
         <FlexText leftText="Phone number" rightText={assignment.phoneNumber} />
         <FlexText leftText="Care Level" rightText={assignment.careLevel} />
-        <FlexText
-          leftText="Hourly Rate"
-          rightText={`$${assignment.rate.toString()}`}
-        />
+
       </View>
     </View>
   );

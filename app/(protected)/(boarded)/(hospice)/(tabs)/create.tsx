@@ -5,7 +5,10 @@ import { Id } from '@/convex/_generated/dataModel';
 import { CreateAssignmentForm } from '@/features/hospice/components/create-assignment-form';
 import { CreateAssignmentValidator } from '@/features/hospice/validator';
 import { Wrapper } from '@/features/shared/components/wrapper';
-import { generateErrorMessage, generateShifts } from '@/features/shared/utils';
+import {
+  generateErrorMessage,
+  generateShiftsWithDateFns,
+} from '@/features/shared/utils';
 
 import { useMutation } from 'convex/react';
 import { format } from 'date-fns';
@@ -21,14 +24,16 @@ const CreateScreen = () => {
   const onSubmit = async (data: CreateAssignmentValidator) => {
     if (!hospice) return;
     const openShift = format(new Date(data.openShift), 'H:mm');
-    const shifts = generateShifts({
-      endDate: data.endDate,
-      startDate: data.startDate,
-      openShift,
-    });
+    console.log(openShift);
+
     const { customGender, ...rest } = data;
-    console.log('data', openShift);
+
     try {
+      const shifts = generateShiftsWithDateFns({
+        endDate: data.endDate,
+        startDate: data.startDate,
+        openShift: data.openShift,
+      });
       await createAssignment({
         ...rest,
         firstName: data.firstName.trim(),

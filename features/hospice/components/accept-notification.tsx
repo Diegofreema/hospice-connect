@@ -14,12 +14,13 @@ interface ApproveRouteSheetModalProps {
 
   routeSheetId: Id<'routeSheets'>;
   hospiceId: Id<'hospices'>;
+  notificationId: Id<'hospiceNotifications'>;
 }
 
 export const ApproveRouteSheetModal: React.FC<ApproveRouteSheetModalProps> = ({
   visible,
   onClose,
-
+notificationId,
   hospiceId,
   routeSheetId,
 }) => {
@@ -38,6 +39,7 @@ export const ApproveRouteSheetModal: React.FC<ApproveRouteSheetModalProps> = ({
         routeSheetId,
         isApproved: true,
         hospiceId,
+          notificationId
       });
 
       showToast({
@@ -45,6 +47,7 @@ export const ApproveRouteSheetModal: React.FC<ApproveRouteSheetModalProps> = ({
         subtitle: 'Route sheet approved successfully',
         autodismiss: true,
       });
+      handleClose()
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,

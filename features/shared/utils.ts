@@ -237,27 +237,40 @@ export function generateShifts(
 ): Shift[] {
   // Validate input dates
   if (!(data.startDate instanceof Date) || isNaN(data.startDate.getTime())) {
-    throw new Error('Invalid startDate');
+    throw new ConvexError({ message: 'Invalid startDate' });
   }
   if (!(data.endDate instanceof Date) || isNaN(data.endDate.getTime())) {
-    throw new Error('Invalid endDate');
+    console.log('startDate must be before endDate');
+
+    throw new ConvexError({ message: 'Invalid endDate' });
   }
-  if (data.startDate >= data.endDate) {
-    throw new Error('startDate must be before endDate');
+  const startDate = new Date(data.startDate);
+  const endDate = new Date(data.endDate);
+  startDate.setHours(0, 0, 0, 0);
+  endDate.setHours(0, 0, 0, 0);
+  console.log({ startDate, endDate });
+
+  console.log(startDate.getTime() >= endDate.getTime());
+
+  if (startDate.getTime() > endDate.getTime()) {
+    console.log('startDate must be before endDate');
+    throw new ConvexError({ message: 'start date must be before end date' });
   }
 
   // Validate and parse openShift time (expecting "HH:mm" format)
   const timeMatch = data.openShift.match(/^(\d{1,2}):(\d{2})$/);
   if (!timeMatch) {
-    throw new Error(
-      'Invalid openShift time format. Use HH:mm (e.g., "07:00").'
-    );
+    console.log('Invalid openShift time format. Use HH:mm (e.g., "07:00").');
+
+    throw new ConvexError({
+      message: 'Invalid openShift time format. Use HH:mm (e.g., "07:00").',
+    });
   }
   const [_, hours, minutes] = timeMatch;
   const openShiftHours = parseInt(hours, 10);
   const openShiftMinutes = parseInt(minutes, 10);
   if (openShiftHours > 23 || openShiftMinutes > 59) {
-    throw new Error('Invalid openShift time values.');
+    throw new ConvexError({ message: 'Invalid open shift time.' });
   }
 
   // Set the first shift's start time to openShift time on startDate
@@ -318,4 +331,64 @@ export const fullName = (firstName?: string, lastName?: string) => {
   if (!firstName && !lastName) return '';
 
   return `${firstName} ${lastName}`;
+};
+
+type ShiftWithDateFns = {
+  startDate: Date;
+  endDate: Date;
+  openShift: Date;
+};
+
+export const generateShiftsWithDateFns = ({
+  endDate,
+  openShift,
+  startDate,
+}: ShiftWithDateFns): Shift[] => {
+  const distanceBetweenDates = differenceInHours(endDate, startDate);
+  //check if start time and opening shift has passed
+  const shiftTimeHasStarted =
+    startDate.setHours(openShift.getHours(), openShift.getMinutes(), 0, 0) <=
+    Date.now();
+  if (shiftTimeHasStarted) {
+    throw new ConvexError({
+      message: 'Shift time has already started',
+    });
+  }
+
+  const shifts: Shift[] = [];
+  if (distanceBetweenDates < 1) {
+    const endShift = addHours(openShift, 12);
+    const shift = {
+      start: format(startDate, 'dd-MM-yyyy'),
+      end: format(endDate, 'dd-MM-yyyy'),
+      startShift: format(openShift, 'h:mm a'),
+      endShift: format(endShift, 'h:mm a'),
+    };
+    shifts.push(shift);
+  } else {
+    // a shift is 12 hours per day ,
+    const totalShifts = Math.ceil(distanceBetweenDates / 12);
+
+    for (let i = 0; i < totalShifts; i++) {
+      const shiftStart = addHours(startDate, i * 12);
+      const shiftEnd = addHours(shiftStart, 12);
+
+      // Ensure the last shift doesn't exceed the end date
+      const actualShiftEnd = shiftEnd > endDate ? endDate : shiftEnd;
+
+      const shiftStartTime = addHours(openShift, i * 12);
+      const shiftEndTime = addHours(shiftStartTime, 12);
+
+      const shift = {
+        start: format(shiftStart, 'dd-MM-yyyy'),
+        end: format(actualShiftEnd, 'dd-MM-yyyy'),
+        startShift: format(shiftStartTime, 'h:mm a'),
+        endShift: format(shiftEndTime, 'h:mm a'),
+      };
+
+      shifts.push(shift);
+    }
+  }
+
+  return shifts;
 };

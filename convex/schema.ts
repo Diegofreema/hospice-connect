@@ -143,6 +143,7 @@ export const routeSheet = {
   scheduleIds: v.array(v.id('schedules')),
   assignmentId: v.id('assignments'),
   isApproved: v.boolean(),
+    isSeen: v.optional(v.boolean()),
   signature: v.string(),
   comment: v.optional(v.string()),
 };

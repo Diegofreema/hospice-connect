@@ -17,6 +17,7 @@ interface DeclineRouteSheetModalProps {
 
   routeSheetId: Id<'routeSheets'>;
   hospiceId: Id<'hospices'>;
+    notificationId: Id<'hospiceNotifications'>;
 }
 
 const formValidator = z.object({
@@ -30,6 +31,7 @@ export const DeclineRouteSheetModal: React.FC<DeclineRouteSheetModalProps> = ({
 
   hospiceId,
   routeSheetId,
+    notificationId
 }) => {
   const approveOrDecline = useMutation(
     api.routeSheets.approveOrDeclineRouteSheet
@@ -59,6 +61,7 @@ export const DeclineRouteSheetModal: React.FC<DeclineRouteSheetModalProps> = ({
         isApproved: false,
         hospiceId,
         reason: data.reason,
+          notificationId
       });
 
       showToast({

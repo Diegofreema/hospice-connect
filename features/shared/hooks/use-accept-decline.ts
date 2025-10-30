@@ -42,7 +42,7 @@ export const useAcceptDecline = ({
       showToast({
         title: 'Error',
         subtitle: errorMessage,
-        autodismiss: true,
+        autodismiss: false,
       });
     } finally {
       setProcessing(false);
@@ -70,7 +70,7 @@ export const useAcceptDecline = ({
       showToast({
         title: 'Error',
         subtitle: errorMessage,
-        autodismiss: true,
+        autodismiss: false,
       });
     } finally {
       setProcessing(false);

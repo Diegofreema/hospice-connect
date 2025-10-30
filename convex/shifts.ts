@@ -34,7 +34,7 @@ export const getShifts = query({
       .withIndex('by_assignment_id', (q) =>
         q.eq('assignmentId', args.assignmentId)
       )
-      .order('desc')
+      // .order('desc')
       .collect();
 
     const shifts = schedules.map(async (schedule) => {

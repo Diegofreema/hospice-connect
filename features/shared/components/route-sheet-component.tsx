@@ -67,8 +67,8 @@ export const RoustSheetComponent = ({
       shift.startTime,
       shift.endTime,
       calculateTotalHours([shift]).toFixed(2),
-      rate.toFixed(2),
-      `$${(calculateTotalHours([shift]) * rate).toFixed(2)}`,
+        shift.rate.toFixed(2),
+      `$${(calculateTotalHours([shift]) * shift.rate).toFixed(2)}`,
     ]),
   ];
   return (
@@ -121,6 +121,7 @@ export const RoustSheetComponent = ({
           disabled={disabled}
         />
       )}
+
       {showDebit && (
         <Text size="normal" isBold textAlign="center">
           By submitting I authorize HospiceConnect to charge 5% of the total pay

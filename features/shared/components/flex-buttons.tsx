@@ -54,16 +54,14 @@ const styles = StyleSheet.create((theme) => ({
     gap: 10,
   },
   viewSchedule: {
-    padding: 5,
-    borderRadius: 5,
-    flex: 1,
+
     borderWidth: 1,
     borderColor: theme.colors.cardGrey,
   },
   assign: {
-    padding: 5,
-    borderRadius: 5,
-    flex: 1,
+
+
+
     backgroundColor: theme.colors.blue,
   },
   button: {
@@ -72,6 +70,6 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    height: 45,
+    minHeight: 50,
   },
 }));

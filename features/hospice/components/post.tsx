@@ -16,13 +16,13 @@ import { SFSymbol } from 'expo-symbols';
 
 import { Badge } from '@/components/badge/Badge';
 import { BadgeVariant } from '@/components/badge/types';
-import { useModal } from '@/components/demos/modal/hook/use-modal';
 import { useToast } from '@/components/demos/toast';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 import { Text } from '@/features/shared/components/text';
 import { useMutation } from 'convex/react';
 import { useState } from 'react';
+import { Alert } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { useSelectAssignment } from '../hooks/use-select-assignment';
 import { useUpdatePostStatus } from '../hooks/use-update-post-status';
@@ -57,7 +57,7 @@ export const Post = ({
   onOpenReOpenAssignment,
 }: Props) => {
   const name = post.patientFirstName + ' ' + post.patientLastName;
-  const { showModal, clearModal } = useModal();
+
   const { showToast } = useToast();
   const [deleting, setDeleting] = useState(false);
 
@@ -66,6 +66,7 @@ export const Post = ({
   const onDelete = async () => {
     setDeleting(true);
     try {
+      console.log(post._id);
       await deleteAssignment({ assignmentId: post._id, hospiceId });
       showToast({
         title: 'Success',
@@ -84,7 +85,6 @@ export const Post = ({
       });
     } finally {
       setDeleting(false);
-      clearModal('delete-post');
     }
   };
 
@@ -96,15 +96,21 @@ export const Post = ({
     }
 
     if (value === 'delete') {
-      showModal({
-        title: 'Delete Assignment',
-        message: 'Are you sure you want to delete this assignment?',
-        onConfirm: async () => onDelete(),
-        onDismiss: () => clearModal('delete-post'),
-        iconName: 'alert',
-        trailing: <Text>This can not be undone</Text>,
-        key: 'delete-post',
-      });
+      Alert.alert(
+        'Delete Assignment',
+        'Are you sure you want to delete this assignment?',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: () => onDelete(),
+          },
+        ]
+      );
     }
   };
   const onReOpen = async () => {

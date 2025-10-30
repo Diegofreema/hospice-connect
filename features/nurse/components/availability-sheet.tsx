@@ -65,6 +65,7 @@ export const AvailabilitySheet = forwardRef<BottomSheet, Props>(
           title: 'Success',
           subtitle: 'Availability updated',
           autodismiss: true,
+          key: `availability-${item.day} + ${Math.random() * 1000}`,
         });
         onClose();
       } catch (error) {
@@ -77,6 +78,7 @@ export const AvailabilitySheet = forwardRef<BottomSheet, Props>(
           title: 'Error',
           subtitle: errorMessage,
           autodismiss: true,
+          key: `availability-${item.day} + ${Math.random() * 1000}`,
         });
       } finally {
         setLoading(false);

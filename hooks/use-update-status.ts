@@ -29,10 +29,8 @@ export const useUpdateUpdateStatus = ({
 
       const validateAndUpdateStatus = async () => {
         // Validate inputs
-        const parsedStartDate =
-          typeof startDate === 'string' ? new Date(startDate) : startDate;
-        const parsedEndDate =
-          typeof endDate === 'string' ? new Date(endDate) : endDate;
+        const parsedStartDate = startDate;
+        const parsedEndDate = endDate;
 
         if (
           isNaN(parsedStartDate.getTime()) ||
@@ -50,12 +48,18 @@ export const useUpdateUpdateStatus = ({
           0,
           0
         );
-
+        const shiftEndDateTime = new Date(parsedEndDate);
+        shiftEndDateTime.setHours(
+          closingShift.getHours(),
+          closingShift.getMinutes(),
+          0,
+          0
+        );
         const now = new Date();
 
-        // Check if shift has STARTED (current time is past shift start)
+        // Check if shift has ended (current time is past shift end)
         // AND there's no nurse assigned AND status is not already 'not_covered'
-        if (!nurseId && status !== 'not_covered' && now >= shiftStartDateTime) {
+        if (!nurseId && status !== 'not_covered' && now >= shiftEndDateTime) {
           try {
             if (isMounted) {
               await updateStatus({
@@ -77,13 +81,13 @@ export const useUpdateUpdateStatus = ({
         isMounted = false;
       };
     }, [
-      nurseId,
       status,
       startDate,
       endDate,
       shiftId,
       openingShift,
       updateStatus,
+      nurseId,
     ])
   );
 

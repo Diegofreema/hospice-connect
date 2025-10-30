@@ -78,11 +78,16 @@ export const AssignmentSchedule = ({
   const showCancelButton =
     data.assignment?.status !== 'completed' && !data.assignment?.isCanceled;
 
+  const sortedShift = data.shifts.sort((a, b) => {
+    const dateA = new Date(a._creationTime);
+    const dateB = new Date(b._creationTime);
+    return dateB.getTime() - dateA.getTime();
+  });
   return (
     <View pt="xl" gap="md" mt="lg">
       <BottomSheetFlatList
         showsVerticalScrollIndicator={false}
-        data={data.shifts}
+        data={sortedShift}
         renderItem={({ item }) => (
           <ShiftCard
             shift={item}

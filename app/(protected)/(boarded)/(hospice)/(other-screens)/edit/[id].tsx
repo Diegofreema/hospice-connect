@@ -11,14 +11,14 @@ import { Wrapper } from '@/features/shared/components/wrapper';
 import {
   convertTimeStringToDate,
   generateErrorMessage,
-  generateShifts,
+  generateShiftsWithDateFns,
 } from '@/features/shared/utils';
 
 import Banner from '@/features/shared/components/banner';
 import { IconCheck, IconX } from '@tabler/icons-react-native';
 import { useMutation, useQuery } from 'convex/react';
 import { format, parse } from 'date-fns';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { useUnistyles } from 'react-native-unistyles';
 
@@ -33,14 +33,14 @@ const EditScreen = () => {
   const updateAssignment = useMutation(api.assignments.updateAssignment);
   const onSubmit = async (data: CreateAssignmentValidator) => {
     if (!hospice) return;
-    const { customGender, ...rest } = data;
-    const openShift = format(new Date(rest.openShift), 'H:mm');
-    const shifts = generateShifts({
-      endDate: rest.endDate,
-      startDate: rest.startDate,
-      openShift,
-    });
+
     try {
+      const shifts = generateShiftsWithDateFns({
+        endDate: data.endDate,
+        startDate: data.startDate,
+        openShift: data.openShift,
+      });
+      const { customGender, ...rest } = data;
       await updateAssignment({
         assignmentId: id,
         ...rest,
@@ -48,9 +48,9 @@ const EditScreen = () => {
         lastName: data.lastName.trim(),
         gender: data.gender === 'others' ? customGender || 'Male' : data.gender,
         openShift: format(new Date(data.openShift), 'h:mm a'),
-        startDate: format(new Date(data.startDate), 'yyyy-MM-dd'),
-        endDate: format(new Date(data.endDate), 'yyyy-MM-dd'),
-        dateOfBirth: format(new Date(data.dateOfBirth), 'yyyy-MM-dd'),
+        startDate: format(new Date(data.startDate), 'dd-MM-yyyy'),
+        endDate: format(new Date(data.endDate), 'dd-MM-yyyy'),
+        dateOfBirth: format(new Date(data.dateOfBirth), 'dd-MM-yyyy'),
         rate: Number(data.rate),
         hospiceId: hospice?._id as Id<'hospices'>,
         shifts,
@@ -61,6 +61,7 @@ const EditScreen = () => {
         autodismiss: true,
         leading: () => <IconCheck size={20} color={theme.colors.greenDark} />,
       });
+      router.back();
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
