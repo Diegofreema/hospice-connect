@@ -1,39 +1,40 @@
-import { Badge } from '@/components/badge/Badge';
-import { Card, CardContent, CardHeader } from '@/components/card';
-import { Id } from '@/convex/_generated/dataModel';
-import { CustomPressable } from '@/features/shared/components/custom-pressable';
+import { Badge } from "@/components/badge/Badge";
+import { Card, CardContent, CardHeader } from "@/components/card";
+import { Id } from "@/convex/_generated/dataModel";
+import { CustomPressable } from "@/features/shared/components/custom-pressable";
 
-import { Text } from '@/features/shared/components/text';
-import { View } from '../../shared/components/view';
+import { Text } from "@/features/shared/components/text";
+import { View } from "../../shared/components/view";
 
 import {
   changeFirstLetterToCapital,
   getFontSize,
-} from '@/features/shared/utils';
+} from "@/features/shared/utils";
 
 import {
   IconCircle,
   IconMapPin,
   IconSend,
   IconStarFilled,
-} from '@tabler/icons-react-native';
-import { format } from 'date-fns';
-import { Image } from 'expo-image';
+} from "@tabler/icons-react-native";
+import { format } from "date-fns";
+import { Image } from "expo-image";
 
-import { Button } from '@/features/shared/components/button';
-import { Stack } from '@/features/shared/components/v-stack';
-import { useMessage } from '@/hooks/use-message';
-import { StyleSheet, useUnistyles } from 'react-native-unistyles';
-import { useGetNurseId } from '../hooks/use-get-nurse-id';
+import { Button } from "@/features/shared/components/button";
+import { Stack } from "@/features/shared/components/v-stack";
+import { useMessage } from "@/hooks/use-message";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { useGetNurseId } from "../hooks/use-get-nurse-id";
+import { router } from "expo-router";
 
 type Props = {
   isAssigned?: boolean;
   onAction?: (discipline?: string) => void;
   nurse: {
     image: string | null;
-    _id: Id<'nurses'>;
+    _id: Id<"nurses">;
     _creationTime: number;
-    imageId?: Id<'_storage'> | undefined;
+    imageId?: Id<"_storage"> | undefined;
     rate?: number | undefined;
     address?: string | undefined;
     zipCode?: string | undefined;
@@ -44,22 +45,22 @@ type Props = {
     licenseNumber: string;
     stateOfRegistration: string;
     dateOfBirth: string;
-    discipline: 'RN' | 'LVN' | 'HHA';
+    discipline: "RN" | "LVN" | "HHA";
     isApproved: boolean;
-    userId: Id<'users'>;
+    userId: Id<"users">;
     available:
       | {
           startTime?: number | undefined;
           endTime?: number | undefined;
           available: boolean;
           day:
-            | 'Monday'
-            | 'Tuesday'
-            | 'Wednesday'
-            | 'Thursday'
-            | 'Friday'
-            | 'Saturday'
-            | 'Sunday';
+            | "Monday"
+            | "Tuesday"
+            | "Wednesday"
+            | "Thursday"
+            | "Friday"
+            | "Saturday"
+            | "Sunday";
         }
       | undefined;
     ratings: number;
@@ -70,13 +71,16 @@ export const NurseCard = ({ nurse, isAssigned, onAction }: Props) => {
   const isAvailable = !!nurse.available?.available;
   const { onMessage } = useMessage({ userToChat: nurse.userId });
   const setNurseId = useGetNurseId((state) => state.setId);
-  const badgeText = isAvailable ? 'Available' : 'Unavailable';
-  const name = nurse.firstName + ' ' + nurse.lastName;
+  const badgeText = isAvailable ? "Available" : "Unavailable";
+  const name = nurse.firstName + " " + nurse.lastName;
 
   const { theme } = useUnistyles();
   const onHandleAction = () => {
     onAction && onAction(nurse.discipline);
     setNurseId(nurse._id);
+  };
+  const onPress = () => {
+    router.push(`/view-nurse-profile?id=${nurse._id}`);
   };
 
   return (
@@ -84,30 +88,32 @@ export const NurseCard = ({ nurse, isAssigned, onAction }: Props) => {
       <CardHeader style={styles.header}>
         <View gap="md" flex={1}>
           <View
-            justifyContent={'center'}
+            justifyContent={"center"}
             flexDirection="row"
             alignItems="center"
             maxWidth={70}
             p="lg"
             flex={0}
-            borderRadius={'lg'}
+            borderRadius={"lg"}
             backgroundColor={theme.colors.white}
           >
             <IconStarFilled
               size={getFontSize(20)}
               color={theme.colors.yellowDark}
             />
-            <Text>{nurse.ratings ? nurse.ratings : 'N/A'}</Text>
+            <Text>{nurse.ratings ? nurse.ratings : "N/A"}</Text>
           </View>
           <Text>Discipline: {nurse.discipline}</Text>
-          <Text size={'medium'} isMedium style={{ flex: 1 }}>
-            {name}
-          </Text>
+          <CustomPressable onPress={onPress}>
+            <Text size={"medium"} isMedium style={{ flex: 1 }}>
+              {name}
+            </Text>
+          </CustomPressable>
           <View
-            justifyContent={'flex-start'}
+            justifyContent={"flex-start"}
             flexDirection="row"
             alignItems="center"
-            gap={'lg'}
+            gap={"lg"}
           >
             <IconMapPin
               size={getFontSize(14)}
@@ -116,19 +122,19 @@ export const NurseCard = ({ nurse, isAssigned, onAction }: Props) => {
             />
             <Text>{changeFirstLetterToCapital(nurse.stateOfRegistration)}</Text>
           </View>
-          <View flexDirection={'row'} alignItems={'baseline'}>
+          <View flexDirection={"row"} alignItems={"baseline"}>
             <Text style={styles.rate}>${nurse.rate || 0}</Text>
             <Text>/hr</Text>
           </View>
           <View>
             <Badge
               label={badgeText}
-              variant={'available'}
+              variant={"available"}
               icon={
                 <IconCircle
                   size={12}
-                  fill={isAvailable ? 'lightgreen' : 'red'}
-                  color={isAvailable ? 'lightgreen' : 'red'}
+                  fill={isAvailable ? "lightgreen" : "red"}
+                  color={isAvailable ? "lightgreen" : "red"}
                 />
               }
               size="sm"
@@ -136,13 +142,13 @@ export const NurseCard = ({ nurse, isAssigned, onAction }: Props) => {
             />
           </View>
         </View>
-        <View height={'100%'} flex={1}>
+        <View height={"100%"} flex={1}>
           <Image
             source={{ uri: nurse.image as string }}
             style={styles.image}
             contentFit="cover"
             placeholderContentFit="contain"
-            placeholder={require('@/assets/images/person.jpg')}
+            placeholder={require("@/assets/images/person.jpg")}
           />
           <CustomPressable onPress={onMessage} style={styles.messageBtn}>
             <IconSend
@@ -156,15 +162,15 @@ export const NurseCard = ({ nurse, isAssigned, onAction }: Props) => {
       <CardContent style={styles.content}>
         <Stack mode="flex">
           <View>
-            <Text size={'medium'} isMedium fontSize={getFontSize(16)}>
+            <Text size={"medium"} isMedium fontSize={getFontSize(16)}>
               Available Shift
             </Text>
             {nurse.available?.available &&
               nurse.available.startTime &&
               nurse.available.endTime && (
-                <Text size={'small'}>
-                  {format(nurse.available.startTime, 'h:mm a')} -{' '}
-                  {format(nurse.available.endTime, 'h:mm a')}
+                <Text size={"small"}>
+                  {format(nurse.available.startTime, "h:mm a")} -{" "}
+                  {format(nurse.available.endTime, "h:mm a")}
                 </Text>
               )}
           </View>
@@ -186,9 +192,9 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.cardGrey,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   rate: {
     fontSize: getFontSize(20),
@@ -200,7 +206,7 @@ const styles = StyleSheet.create((theme) => ({
     padding: 12,
   },
   messageBtn: {
-    position: 'absolute',
+    position: "absolute",
     top: 5,
     right: 5,
     backgroundColor: theme.colors.white,
@@ -208,13 +214,13 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: 30,
     height: 50,
     width: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   image: {
     width: 150,
     height: 180,
     borderRadius: 8,
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
   },
 }));

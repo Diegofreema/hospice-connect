@@ -1,21 +1,27 @@
-import {Badge} from "@/components/badge/Badge";
-import {BadgeVariant} from "@/components/badge/types";
-import {Card, CardHeader} from "@/components/card";
-import {PrivacyNoticeLink} from "@/components/privacy-notice/privacy-notice-link";
-import {api} from "@/convex/_generated/api";
-import {Text} from "@/features/shared/components/text";
-import {Stack} from "@/features/shared/components/v-stack";
-import {fullName, getScheduleStatusAndColor, getScheduleStatusText,} from "@/features/shared/utils";
+import { Badge } from "@/components/badge/Badge";
+import { BadgeVariant } from "@/components/badge/types";
+import { Card, CardHeader } from "@/components/card";
+import { PrivacyNoticeLink } from "@/components/privacy-notice/privacy-notice-link";
+import { api } from "@/convex/_generated/api";
+import { Text } from "@/features/shared/components/text";
+import { Stack } from "@/features/shared/components/v-stack";
+import {
+  fullName,
+  getScheduleStatusAndColor,
+  getScheduleStatusText,
+} from "@/features/shared/utils";
 
-import {Id} from "@/convex/_generated/dataModel";
-import {useUpdateUpdateStatus} from "@/hooks/use-update-status";
-import {IconCircle} from "@tabler/icons-react-native";
-import {FunctionReturnType} from "convex/server";
-import {format, parse} from "date-fns";
-import {Image} from "expo-image";
-import {useWindowDimensions, View} from "react-native";
-import {StyleSheet} from "react-native-unistyles";
-import {useGetScheduleId} from "../hooks/use-get-schedule-id";
+import { Id } from "@/convex/_generated/dataModel";
+import { useUpdateUpdateStatus } from "@/hooks/use-update-status";
+import { IconCircle } from "@tabler/icons-react-native";
+import { FunctionReturnType } from "convex/server";
+import { format, parse } from "date-fns";
+import { Image } from "expo-image";
+import { useWindowDimensions, View } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
+import { useGetScheduleId } from "../hooks/use-get-schedule-id";
+import { CustomPressable } from "@/features/shared/components/custom-pressable";
+import { router } from "expo-router";
 
 type Props = {
   shift: FunctionReturnType<typeof api.shifts.getShifts>["shifts"][number];
@@ -49,7 +55,6 @@ export const ShiftCard = ({
 
   const closingShift = parse(closingTimeStr, "hh:mm a", today);
 
-
   useUpdateUpdateStatus({
     nurseId: shift.nurseId!,
     closingShift,
@@ -74,7 +79,12 @@ export const ShiftCard = ({
     onRateNurse();
     getScheduleId(shift._id);
   };
-
+  const onPressName = () => {
+    if (!shift.nurseId) {
+      return;
+    }
+    router.push(`/view-nurse-profile?id=${shift.nurseId}`);
+  };
   return (
     <Card style={styles.card}>
       <CardHeader style={{ gap: 10 }}>
@@ -84,10 +94,12 @@ export const ShiftCard = ({
               <Image style={styles.image} source={shift.nurse?.image} />
             </View>
             <View>
-              <Text size="normal" isBold>
-                {fullName(shift.nurse?.firstName, shift.nurse?.lastName) ||
-                  "No nurse assigned"}
-              </Text>
+              <CustomPressable onPress={onPressName}>
+                <Text size="normal" isBold>
+                  {fullName(shift.nurse?.firstName, shift.nurse?.lastName) ||
+                    "No nurse assigned"}
+                </Text>
+              </CustomPressable>
               <Text size="normal" isBold>
                 {format(startDate, "MM/dd/yy")} - {format(endDate, "MM/dd/yy")}
               </Text>

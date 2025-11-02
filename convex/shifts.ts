@@ -1,9 +1,9 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
-import { paginationOptsValidator, PaginationResult } from "convex/server";
-import { ConvexError, v } from "convex/values";
-import { Doc } from "./_generated/dataModel";
-import { query } from "./_generated/server";
-import { getNurseDetails } from "./nurses";
+import {getAuthUserId} from "@convex-dev/auth/server";
+import {paginationOptsValidator, PaginationResult} from "convex/server";
+import {ConvexError, v} from "convex/values";
+import {Doc} from "./_generated/dataModel";
+import {query} from "./_generated/server";
+import {getNurseDetails} from "./nurses";
 
 export const getShifts = query({
   args: {

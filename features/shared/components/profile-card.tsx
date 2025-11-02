@@ -47,7 +47,6 @@ export const ProfileCard = ({
   phoneNumber,
   zipCode,
   imageUrl,
-
   rate,
   nurseId,
   imageId,

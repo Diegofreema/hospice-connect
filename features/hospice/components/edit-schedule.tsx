@@ -1,22 +1,19 @@
-import { useToast } from '@/components/demos/toast';
-import { ControlledDatePicker } from '@/features/authentication/components/form/control-date-picker';
-import { FlexButtons } from '@/features/shared/components/flex-buttons';
+import {useToast} from '@/components/demos/toast';
+import {ControlledDatePicker} from '@/features/authentication/components/form/control-date-picker';
+import {FlexButtons} from '@/features/shared/components/flex-buttons';
 
-import { useHospice } from '@/components/context/hospice-context';
-import { api } from '@/convex/_generated/api';
-import { ControlInput } from '@/features/authentication/components/form/control-input';
-import {
-  convertTimeStringToDate,
-  generateErrorMessage,
-} from '@/features/shared/utils';
-import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from 'convex/react';
-import { FunctionReturnType } from 'convex/server';
-import { format, parse } from 'date-fns';
-import { useForm } from 'react-hook-form';
-import { useGetScheduleId } from '../hooks/use-get-schedule-id';
-import { editScheduleValidator, EditScheduleValidator } from '../validator';
+import {useHospice} from '@/components/context/hospice-context';
+import {api} from '@/convex/_generated/api';
+import {ControlInput} from '@/features/authentication/components/form/control-input';
+import {convertTimeStringToDate, generateErrorMessage,} from '@/features/shared/utils';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {useMutation} from 'convex/react';
+import {FunctionReturnType} from 'convex/server';
+import {format, parse} from 'date-fns';
+import {useForm} from 'react-hook-form';
+import {useGetScheduleId} from '../hooks/use-get-schedule-id';
+import {editScheduleValidator, EditScheduleValidator} from '../validator';
+import BottomSheetKeyboardAwareScrollView from '@/features/shared/components/bottom-sheet-aware-scroll-view'
 
 type Props = {
   onClose: () => void;
@@ -84,7 +81,7 @@ export const EditSchedule = ({ onClose, initialValues }: Props) => {
     clearId();
   };
   return (
-    <BottomSheetScrollView
+    <BottomSheetKeyboardAwareScrollView
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ gap: 20, paddingBottom: 100 }}
     >
@@ -129,6 +126,6 @@ export const EditSchedule = ({ onClose, initialValues }: Props) => {
         buttonText="Cancel"
         buttonText2="Apply"
       />
-    </BottomSheetScrollView>
+    </BottomSheetKeyboardAwareScrollView>
   );
 };
