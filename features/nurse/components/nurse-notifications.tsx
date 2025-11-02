@@ -1,13 +1,13 @@
-import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
-import { SmallLoader } from '@/features/shared/components/small-loader';
-import { LegendList } from '@legendapp/list';
-import { usePaginatedQuery } from 'convex/react';
-import React from 'react';
-import { NurseNotification } from './nurse-notification';
+import {api} from "@/convex/_generated/api";
+import {Id} from "@/convex/_generated/dataModel";
+import {SmallLoader} from "@/features/shared/components/small-loader";
+import {usePaginatedQuery} from "convex/react";
+import React from "react";
+import {NurseNotification} from "./nurse-notification";
+import {FlatList} from "react-native";
 
 type Props = {
-  nurseId: Id<'nurses'>;
+  nurseId: Id<"nurses">;
 };
 
 export const FetchNurseNotification = ({ nurseId }: Props) => {
@@ -16,23 +16,21 @@ export const FetchNurseNotification = ({ nurseId }: Props) => {
     {
       nurseId,
     },
-    { initialNumItems: 25 }
+    { initialNumItems: 25 },
   );
-  if (status === 'LoadingFirstPage') {
+  if (status === "LoadingFirstPage") {
     return <SmallLoader size={50} />;
   }
   const onLoadMore = () => {
-    if (status === 'CanLoadMore') {
+    if (status === "CanLoadMore") {
       loadMore(25);
     }
   };
   return (
-    <LegendList
+    <FlatList
       data={results}
       renderItem={({ item }) => <NurseNotification notification={item} />}
       onEndReached={onLoadMore}
-      recycleItems
-      columnWrapperStyle={{ gap: 20 }}
       keyExtractor={(item) => item._id}
       onEndReachedThreshold={0.5}
       showsVerticalScrollIndicator={false}

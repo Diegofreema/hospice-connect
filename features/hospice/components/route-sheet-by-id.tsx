@@ -1,87 +1,98 @@
-import {useHospice} from '@/components/context/hospice-context';
-import {api} from '@/convex/_generated/api';
-import {Id} from '@/convex/_generated/dataModel';
-import {RoustSheetComponent} from '@/features/shared/components/route-sheet-component';
-import {SmallLoader} from '@/features/shared/components/small-loader';
-import {useQuery} from 'convex/react';
-import {useLocalSearchParams} from 'expo-router';
-import React, {useState} from 'react';
-import {ScrollView} from 'react-native';
-import {ApproveRouteSheetModal} from './accept-notification';
-import {DeclineRouteSheetModal} from './delcine-route-sheet';
-import {Text} from "@/features/shared/components/text";
+import { useHospice } from "@/components/context/hospice-context";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { RoustSheetComponent } from "@/features/shared/components/route-sheet-component";
+import { SmallLoader } from "@/features/shared/components/small-loader";
+import { useQuery } from "convex/react";
+import { useLocalSearchParams } from "expo-router";
+import React, { useState } from "react";
+import { ScrollView } from "react-native";
+import { ApproveRouteSheetModal } from "./accept-notification";
+import { DeclineRouteSheetModal } from "./delcine-route-sheet";
+import { Text } from "@/features/shared/components/text";
+import { useMarkAsRead } from "@/features/hospice/hooks/use-mark-as-read";
 
 export const RouteSheetById = () => {
-    const {id,notificationId} = useLocalSearchParams<{
-        id: Id<'routeSheets'>;
-        notificationId: Id<'hospiceNotifications'>;
-    }>();
+  const { id, notificationId } = useLocalSearchParams<{
+    id: Id<"routeSheets">;
+    notificationId: Id<"hospiceNotifications">;
+  }>();
 
-    const [declineModalVisible, setDeclineModalVisible] = useState(false);
-    const [approveModalVisible, setApproveModalVisible] = useState(false);
+  const [declineModalVisible, setDeclineModalVisible] = useState(false);
+  const [approveModalVisible, setApproveModalVisible] = useState(false);
 
-    const {hospice} = useHospice();
+  const { hospice } = useHospice();
+  useMarkAsRead({ notificationId });
+  const data = useQuery(
+    api.routeSheets.getRouteSheetById,
+    hospice && hospice._id
+      ? { hospiceId: hospice._id, routeSheetId: id }
+      : "skip",
+  );
 
-    const data = useQuery(
-        api.routeSheets.getRouteSheetById,
-        hospice && hospice._id
-            ? {hospiceId: hospice._id, routeSheetId: id}
-            : 'skip'
-    );
+  if (data === undefined) {
+    return <SmallLoader size={50} />;
+  }
+  const onClose = () => {
+    setDeclineModalVisible(false);
+  };
 
-    if (data === undefined) {
-        return <SmallLoader size={50}/>;
-    }
-    const onClose = () => {
-        setDeclineModalVisible(false);
-    };
+  const { assignment, nurse, routeSheet, schedules } = data;
+  const isApproved = routeSheet.isApproved;
+  const isSeen = !!routeSheet.isSeen;
+  return (
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ paddingBottom: 50 }}
+    >
+      <RoustSheetComponent
+        date={routeSheet._creationTime}
+        nurse={nurse}
+        shifts={schedules}
+        comment={routeSheet.comment!}
+        signature={routeSheet.signature!}
+        hospiceAddress={assignment.hospiceAddress}
+        rate={assignment.rate}
+        hospiceName={assignment.businessName}
+        handleSubmit={() => setApproveModalVisible(true)}
+        onGoBack={() => setDeclineModalVisible(true)}
+        careLevel={data.assignment.careLevel}
+        patientName={
+          data.assignment.patientFirstName +
+          " " +
+          data.assignment.patientLastName
+        }
+        buttonText2="Approve"
+        buttonText="Decline"
+        hideButtons={isSeen}
+        showDebit={false}
+      />
 
-    const {assignment, nurse, routeSheet, schedules} = data;
-    const isApproved =  routeSheet.isApproved;
-    const isSeen = !!routeSheet.isSeen;
-    return (
-        <ScrollView
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{paddingBottom: 50}}
+      {isSeen && (
+        <Text
+          size={"medium"}
+          style={{ marginTop: 10 }}
+          color={isApproved ? "green" : "red"}
+          isBold
+          textAlign={"center"}
         >
-            <RoustSheetComponent
-                nurse={nurse}
-                shifts={schedules}
-                comment={routeSheet.comment!}
-                signature={routeSheet.signature!}
-                hospiceAddress={assignment.hospiceAddress}
-                rate={assignment.rate}
-                hospiceName={assignment.businessName}
-                handleSubmit={() => setApproveModalVisible(true)}
-                onGoBack={() => setDeclineModalVisible(true)}
-                careLevel={data.assignment.careLevel}
-                patientName={
-                    data.assignment.patientFirstName +
-                    ' ' +
-                    data.assignment.patientLastName
-                }
-                buttonText2="Approve"
-                buttonText="Decline"
-                hideButtons={isSeen}
-                showDebit={false}
-            />
-
-            {isSeen &&  <Text size={'medium'} style={{marginTop: 10}} color={isApproved ? 'green': 'red'} isBold textAlign={'center'}>{isApproved ? 'Approved' : "Declined"}</Text>}
-            <DeclineRouteSheetModal
-                hospiceId={hospice?._id!}
-                routeSheetId={data.routeSheet._id}
-                onClose={onClose}
-                visible={declineModalVisible}
-                notificationId={notificationId}
-
-            />
-            <ApproveRouteSheetModal
-                hospiceId={hospice?._id!}
-                routeSheetId={data.routeSheet._id}
-                visible={approveModalVisible}
-                onClose={() => setApproveModalVisible(false)}
-                notificationId={notificationId}
-            />
-        </ScrollView>
-    );
+          {isApproved ? "Approved" : "Declined"}
+        </Text>
+      )}
+      <DeclineRouteSheetModal
+        hospiceId={hospice?._id!}
+        routeSheetId={data.routeSheet._id}
+        onClose={onClose}
+        visible={declineModalVisible}
+        notificationId={notificationId}
+      />
+      <ApproveRouteSheetModal
+        hospiceId={hospice?._id!}
+        routeSheetId={data.routeSheet._id}
+        visible={approveModalVisible}
+        onClose={() => setApproveModalVisible(false)}
+        notificationId={notificationId}
+      />
+    </ScrollView>
+  );
 };

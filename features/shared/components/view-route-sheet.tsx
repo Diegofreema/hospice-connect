@@ -1,18 +1,19 @@
-import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
-import { useQuery } from 'convex/react';
-import { useLocalSearchParams } from 'expo-router';
-import React from 'react';
-import { ScrollView } from 'react-native';
-import { useDownloadOrPrint } from '../hooks/use-download';
-import { calculateTotalHours } from '../utils';
-import { RoustSheetComponent } from './route-sheet-component';
-import { SmallLoader } from './small-loader';
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { useQuery } from "convex/react";
+import { useLocalSearchParams } from "expo-router";
+import React from "react";
+import { ScrollView } from "react-native";
+import { useDownloadOrPrint } from "../hooks/use-download";
+import { calculateTotalHours } from "../utils";
+import { RoustSheetComponent } from "./route-sheet-component";
+import { SmallLoader } from "./small-loader";
+import { format } from "date-fns";
 
 export const ViewRouteSheet = () => {
   const { assignmentId, nurseId } = useLocalSearchParams<{
-    nurseId: Id<'nurses'>;
-    assignmentId: Id<'assignments'>;
+    nurseId: Id<"nurses">;
+    assignmentId: Id<"assignments">;
   }>();
   const data = useQuery(api.routeSheets.getRouteSheet, {
     nurseId,
@@ -137,6 +138,7 @@ export const ViewRouteSheet = () => {
     .signature-image {
       max-width: 200px;
       max-height: 80px;
+      margin-bottom: 20px;
     }
 
     .comment-section {
@@ -194,7 +196,7 @@ export const ViewRouteSheet = () => {
         <tbody>
            ${data?.schedules
              .map(
-               (shift, i) => `
+               (shift) => `
         <tr>
           <td> ${shift?.startDate} - ${shift?.endDate}</td>
           <td>${data?.assignment.patientFirstName} ${data?.assignment.patientLastName}</td>
@@ -205,9 +207,9 @@ export const ViewRouteSheet = () => {
           <td>${data?.assignment.rate.toFixed(2)}</td>
           <td>$${(calculateTotalHours([shift]) * data?.assignment.rate || 0).toFixed(2)}</td>
         </tr>
-      `
+      `,
              )
-             .join('')}
+             .join("")}
         </tbody>
       </table>
     </div>
@@ -226,6 +228,7 @@ export const ViewRouteSheet = () => {
     <!-- Signature Section -->
     <div class="signature-section">
       <img src="${data?.routeSheet.signature}" class="signature-image" alt="Signature">
+       <p class="text-normal"><strong>Date:</strong> ${data?.routeSheet && format(data?.routeSheet._creationTime, "MM/dd/yy HH:mm")}</p>
     </div>
 
     <!-- Comment Section -->
@@ -254,10 +257,11 @@ export const ViewRouteSheet = () => {
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ paddingBottom: 50 }}
+      contentContainerStyle={{ paddingBottom: 100 }}
     >
       <RoustSheetComponent
         nurse={nurse}
+        date={routeSheet._creationTime}
         shifts={schedules}
         comment={routeSheet.comment!}
         signature={routeSheet.signature!}
@@ -269,7 +273,7 @@ export const ViewRouteSheet = () => {
         careLevel={data.assignment.careLevel}
         patientName={
           data.assignment.patientFirstName +
-          ' ' +
+          " " +
           data.assignment.patientLastName
         }
         buttonText2="Print"

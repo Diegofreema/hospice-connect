@@ -59,7 +59,6 @@ export const ReopenCase = ({ onClose }: Props) => {
         openShift: format(new Date(data.openShift), 'h:mm a'),
         startDate: format(new Date(data.startDate), 'dd-MM-yyyy'),
         endDate: format(new Date(data.endDate), 'dd-MM-yyyy'),
-
         hospiceId: hospice._id as Id<'hospices'>,
         assignmentId: id as Id<'assignments'>,
         shifts,

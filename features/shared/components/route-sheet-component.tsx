@@ -1,20 +1,21 @@
-import { Doc } from '@/convex/_generated/dataModel';
-import { Image } from 'expo-image';
-import React from 'react';
-import { StyleSheet } from 'react-native-unistyles';
-import { calculateTotalHours } from '../utils';
-import { FlexButtons } from './flex-buttons';
-import { FlexText } from './flex-text';
-import { Table } from './table';
-import { Text } from './text';
-import { View } from './view';
-import { ViewSignature } from './view-signature';
+import { Doc } from "@/convex/_generated/dataModel";
+import { Image } from "expo-image";
+import React from "react";
+import { StyleSheet } from "react-native-unistyles";
+import { calculateTotalHours } from "../utils";
+import { FlexButtons } from "./flex-buttons";
+import { FlexText } from "./flex-text";
+import { Table } from "./table";
+import { Text } from "./text";
+import { View } from "./view";
+import { ViewSignature } from "./view-signature";
+import { format } from "date-fns";
 
 type Props = {
   hospiceName: string;
   hospiceAddress: string;
-  nurse: Doc<'nurses'>;
-  shifts: Doc<'schedules'>[];
+  nurse: Doc<"nurses">;
+  shifts: Doc<"schedules">[];
   comment: string;
   signature: string;
   rate: number;
@@ -28,16 +29,17 @@ type Props = {
   disabled2?: boolean;
   hideButtons?: boolean;
   showDebit?: boolean;
+  date?: number;
 };
 const headers = [
-  'Date',
-  'Patient Name',
-  'Care level',
-  'Time in',
-  'Time out',
-  'Hours worked',
-  'Rate',
-  'Amount',
+  "Date",
+  "Patient Name",
+  "Care level",
+  "Time in",
+  "Time out",
+  "Hours worked",
+  "Rate",
+  "Amount",
 ];
 export const RoustSheetComponent = ({
   comment,
@@ -51,12 +53,13 @@ export const RoustSheetComponent = ({
   onGoBack,
   careLevel,
   patientName,
-  buttonText2 = 'Submit',
-  buttonText = 'Back',
+  buttonText2 = "Submit",
+  buttonText = "Back",
   disabled2,
   disabled,
   hideButtons,
   showDebit = true,
+  date,
 }: Props) => {
   const totalHours = calculateTotalHours(shifts);
   const data = [
@@ -67,15 +70,15 @@ export const RoustSheetComponent = ({
       shift.startTime,
       shift.endTime,
       calculateTotalHours([shift]).toFixed(2),
-        shift.rate.toFixed(2),
+      shift.rate.toFixed(2),
       `$${(calculateTotalHours([shift]) * shift.rate).toFixed(2)}`,
     ]),
   ];
   return (
-    <View gap={'xxl'}>
+    <View gap={"xxl"}>
       <View gap="xl">
         <Image
-          source={require('@/assets/images/hospice.png')}
+          source={require("@/assets/images/hospice.png")}
           style={styles.image}
           contentFit="contain"
         />
@@ -109,6 +112,10 @@ export const RoustSheetComponent = ({
         services performed
       </Text>
       <ViewSignature signature={signature} />
+
+      {date && (
+        <Text size="normal">Date: {format(date, "MM/dd/yy HH:mm")}</Text>
+      )}
       <Text size="normal">Comment: {comment}</Text>
 
       {!hideButtons && (
@@ -132,10 +139,10 @@ export const RoustSheetComponent = ({
   );
 };
 
-const styles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create(() => ({
   image: {
     width: 100,
     height: 100,
-    alignSelf: 'center',
+    alignSelf: "center",
   },
 }));

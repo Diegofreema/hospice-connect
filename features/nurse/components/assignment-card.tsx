@@ -1,14 +1,15 @@
-import { Card, CardContent, CardHeader } from '@/components/card';
-import { FlexText } from '@/features/shared/components/flex-text';
-import { changeFirstLetterToCapital, trimText } from '@/features/shared/utils';
-import React from 'react';
+import {Card, CardContent, CardHeader} from "@/components/card";
+import {FlexText} from "@/features/shared/components/flex-text";
+import {calculateAge, changeFirstLetterToCapital} from "@/features/shared/utils";
+import React from "react";
 
-import { useSelectAssignment } from '@/features/hospice/hooks/use-select-assignment';
-import { FlexButtons } from '@/features/shared/components/flex-buttons';
-import { useMessage } from '@/hooks/use-message';
-import { format, parse } from 'date-fns';
-import { StyleSheet } from 'react-native-unistyles';
-import { AvailableAssignmentType } from '../types';
+import {useSelectAssignment} from "@/features/hospice/hooks/use-select-assignment";
+import {FlexButtons} from "@/features/shared/components/flex-buttons";
+import {useMessage} from "@/hooks/use-message";
+import {format, parse} from "date-fns";
+import {StyleSheet} from "react-native-unistyles";
+import {AvailableAssignmentType} from "../types";
+import {LongInfo} from "@/features/shared/components/long-info";
 
 type Props = {
   item: AvailableAssignmentType;
@@ -17,35 +18,37 @@ type Props = {
 
 export const AssignmentAvailableCard = ({ item: post, onOpenSheet }: Props) => {
   const setId = useSelectAssignment((state) => state.setId);
-  const name = post.patientFirstName + ' ' + post.patientLastName;
-  const startDate = parse(post.startDate, 'dd-MM-yyyy', new Date());
-  const endDate = parse(post.endDate, 'dd-MM-yyyy', new Date());
-  const dob = parse(post.dateOfBirth, 'dd-MM-yyyy', new Date());
+  const name = post.patientFirstName + " " + post.patientLastName;
+  const startDate = parse(post.startDate, "dd-MM-yyyy", new Date());
+  const endDate = parse(post.endDate, "dd-MM-yyyy", new Date());
+  const dob = parse(post.dateOfBirth, "dd-MM-yyyy", new Date());
   const { onMessage } = useMessage({ userToChat: post.hospice?.userId! });
   const handleAccept = () => {
     setId(post._id);
     onOpenSheet();
   };
+
+
   return (
     <Card style={styles.card}>
       <CardHeader style={styles.header}></CardHeader>
       <CardContent style={styles.content}>
         <FlexText
           leftText="Business name"
-          rightText={post.hospice?.businessName || 'N/A'}
+          rightText={post.hospice?.businessName || "N/A"}
         />
 
         <FlexText leftText="Patient name" rightText={name} />
         <FlexText leftText="Phone number" rightText={post.phoneNumber} />
         <FlexText
           leftText="Start date"
-          rightText={format(startDate, 'MM/dd/yy')}
+          rightText={format(startDate, "MM/dd/yy")}
         />
-        <FlexText leftText="End date" rightText={format(endDate, 'MM/dd/yy')} />
-        <FlexText
-          leftText="Date of birth"
-          rightText={format(dob, 'MM/dd/yy')}
-        />
+        <FlexText leftText="End date" rightText={format(endDate, "MM/dd/yy")} />
+          <FlexText
+              leftText="Date of birth"
+              rightText={`${format(dob, "MM/dd/yy")} (${calculateAge(dob).toString()})`}
+          />
         <FlexText leftText="Care level" rightText={post.careLevel} />
         <FlexText
           leftText="Gender"
@@ -53,10 +56,13 @@ export const AssignmentAvailableCard = ({ item: post, onOpenSheet }: Props) => {
         />
         <FlexText leftText="Discipline" rightText={post.discipline} />
 
-        <FlexText
-          leftText="Location"
-          rightText={trimText(post.patientAddress, 20)}
-        />
+        {post.zipcode && (
+          <FlexText leftText="Zipcode" rightText={post.zipcode} />
+        )}
+        <LongInfo title={"Address"} description={post.patientAddress} />
+        {post.notes && (
+          <LongInfo title={"Additional notes"} description={post.notes} />
+        )}
 
         <FlexButtons
           onPress={handleAccept}
@@ -74,9 +80,9 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.greyLight,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   trigger: {
     padding: 5,
@@ -89,7 +95,7 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: 15,
   },
   footer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 10,
   },
   viewSchedule: {
@@ -109,8 +115,8 @@ const styles = StyleSheet.create((theme) => ({
     padding: 5,
     borderRadius: 5,
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     height: 45,
   },
 }));

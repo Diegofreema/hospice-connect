@@ -1,29 +1,29 @@
-import { useHospice } from '@/components/context/hospice-context';
+import { useHospice } from "@/components/context/hospice-context";
 
-import { useToast } from '../../../../../../components/demos/toast';
+import { useToast } from "@/components/demos/toast";
 
-import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
-import { CreateAssignmentForm } from '@/features/hospice/components/create-assignment-form';
-import { CreateAssignmentValidator } from '@/features/hospice/validator';
-import { BackButton } from '@/features/shared/components/back-button';
-import { Wrapper } from '@/features/shared/components/wrapper';
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { CreateAssignmentForm } from "@/features/hospice/components/create-assignment-form";
+import { CreateAssignmentValidator } from "@/features/hospice/validator";
+import { BackButton } from "@/features/shared/components/back-button";
+import { Wrapper } from "@/features/shared/components/wrapper";
 import {
   convertTimeStringToDate,
   generateErrorMessage,
   generateShiftsWithDateFns,
-} from '@/features/shared/utils';
+} from "@/features/shared/utils";
 
-import Banner from '@/features/shared/components/banner';
-import { IconCheck, IconX } from '@tabler/icons-react-native';
-import { useMutation, useQuery } from 'convex/react';
-import { format, parse } from 'date-fns';
-import { router, useLocalSearchParams } from 'expo-router';
-import React from 'react';
-import { useUnistyles } from 'react-native-unistyles';
+import Banner from "@/features/shared/components/banner";
+import { IconCheck, IconX } from "@tabler/icons-react-native";
+import { useMutation, useQuery } from "convex/react";
+import { format, parse } from "date-fns";
+import { router, useLocalSearchParams } from "expo-router";
+import React from "react";
+import { useUnistyles } from "react-native-unistyles";
 
 const EditScreen = () => {
-  const { id } = useLocalSearchParams<{ id: Id<'assignments'> }>();
+  const { id } = useLocalSearchParams<{ id: Id<"assignments"> }>();
   const { hospice } = useHospice();
   const { theme } = useUnistyles();
   const assignment = useQuery(api.assignments.getAssignment, {
@@ -46,18 +46,18 @@ const EditScreen = () => {
         ...rest,
         firstName: data.firstName.trim(),
         lastName: data.lastName.trim(),
-        gender: data.gender === 'others' ? customGender || 'Male' : data.gender,
-        openShift: format(new Date(data.openShift), 'h:mm a'),
-        startDate: format(new Date(data.startDate), 'dd-MM-yyyy'),
-        endDate: format(new Date(data.endDate), 'dd-MM-yyyy'),
-        dateOfBirth: format(new Date(data.dateOfBirth), 'dd-MM-yyyy'),
+        gender: data.gender === "others" ? customGender || "Male" : data.gender,
+        openShift: format(new Date(data.openShift), "h:mm a"),
+        startDate: format(new Date(data.startDate), "dd-MM-yyyy"),
+        endDate: format(new Date(data.endDate), "dd-MM-yyyy"),
+        dateOfBirth: format(new Date(data.dateOfBirth), "dd-MM-yyyy"),
         rate: Number(data.rate),
-        hospiceId: hospice?._id as Id<'hospices'>,
+        hospiceId: hospice?._id as Id<"hospices">,
         shifts,
       });
       showToast({
-        title: 'Success',
-        subtitle: 'Assignment updated successfully',
+        title: "Success",
+        subtitle: "Assignment updated successfully",
         autodismiss: true,
         leading: () => <IconCheck size={20} color={theme.colors.greenDark} />,
       });
@@ -65,10 +65,10 @@ const EditScreen = () => {
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to update assignment'
+        "Failed to update assignment",
       );
       showToast({
-        title: 'Error',
+        title: "Error",
         subtitle: errorMessage,
         autodismiss: true,
         leading: () => <IconX size={20} color={theme.colors.redDark} />,
@@ -82,9 +82,9 @@ const EditScreen = () => {
   if (assignment === null) {
     return null;
   }
-  const startDate = parse(assignment.startDate, 'dd-MM-yyyy', new Date());
-  const endDate = parse(assignment.endDate, 'dd-MM-yyyy', new Date());
-  const dateOfBirth = parse(assignment.dateOfBirth, 'dd-MM-yyyy', new Date());
+  const startDate = parse(assignment.startDate, "dd-MM-yyyy", new Date());
+  const endDate = parse(assignment.endDate, "dd-MM-yyyy", new Date());
+  const dateOfBirth = parse(assignment.dateOfBirth, "dd-MM-yyyy", new Date());
 
   const formattedAssignment = {
     ...assignment,
@@ -97,6 +97,7 @@ const EditScreen = () => {
     lastName: assignment.patientLastName,
     additionalNotes: assignment.notes,
     address: assignment.patientAddress,
+    zipcode: assignment.zipcode!,
   };
 
   return (

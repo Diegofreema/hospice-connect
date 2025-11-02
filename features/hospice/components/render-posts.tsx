@@ -161,7 +161,7 @@ export const RenderPosts = ({ posts, loadMore, loadingMore }: Props) => {
         title="Edit Schedule"
         customSnapPoints={['25%', '70%']}
       >
-        {initialValues === undefined ? (
+        {initialValues === undefined || initialValues === null ? (
           <SmallLoader />
         ) : (
           <EditSchedule

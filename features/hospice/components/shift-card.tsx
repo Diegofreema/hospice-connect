@@ -1,35 +1,30 @@
-import { Badge } from '@/components/badge/Badge';
-import { BadgeVariant } from '@/components/badge/types';
-import { Card, CardHeader } from '@/components/card';
-import { PrivacyNoticeLink } from '@/components/privacy-notice/privacy-notice-link';
-import { api } from '@/convex/_generated/api';
-import { Text } from '@/features/shared/components/text';
-import { Stack } from '@/features/shared/components/v-stack';
-import {
-  convertTimeStringToDate,
-  fullName,
-  getScheduleStatusAndColor,
-  getScheduleStatusText,
-} from '@/features/shared/utils';
+import {Badge} from "@/components/badge/Badge";
+import {BadgeVariant} from "@/components/badge/types";
+import {Card, CardHeader} from "@/components/card";
+import {PrivacyNoticeLink} from "@/components/privacy-notice/privacy-notice-link";
+import {api} from "@/convex/_generated/api";
+import {Text} from "@/features/shared/components/text";
+import {Stack} from "@/features/shared/components/v-stack";
+import {fullName, getScheduleStatusAndColor, getScheduleStatusText,} from "@/features/shared/utils";
 
-import { Id } from '@/convex/_generated/dataModel';
-import { useUpdateUpdateStatus } from '@/hooks/use-update-status';
-import { IconCircle } from '@tabler/icons-react-native';
-import { FunctionReturnType } from 'convex/server';
-import { format, parse } from 'date-fns';
-import { Image } from 'expo-image';
-import { useWindowDimensions, View } from 'react-native';
-import { StyleSheet } from 'react-native-unistyles';
-import { useGetScheduleId } from '../hooks/use-get-schedule-id';
+import {Id} from "@/convex/_generated/dataModel";
+import {useUpdateUpdateStatus} from "@/hooks/use-update-status";
+import {IconCircle} from "@tabler/icons-react-native";
+import {FunctionReturnType} from "convex/server";
+import {format, parse} from "date-fns";
+import {Image} from "expo-image";
+import {useWindowDimensions, View} from "react-native";
+import {StyleSheet} from "react-native-unistyles";
+import {useGetScheduleId} from "../hooks/use-get-schedule-id";
 
 type Props = {
-  shift: FunctionReturnType<typeof api.shifts.getShifts>['shifts'][number];
+  shift: FunctionReturnType<typeof api.shifts.getShifts>["shifts"][number];
   onCancelSchedule: () => void;
   onEditSchedule: () => void;
   onRateNurse: () => void;
   onViewRouteSheet: (
-    assignmentId: Id<'assignments'>,
-    nurseId: Id<'nurses'>
+    assignmentId: Id<"assignments">,
+    nurseId: Id<"nurses">,
   ) => void;
 };
 
@@ -42,13 +37,18 @@ export const ShiftCard = ({
 }: Props) => {
   const { width } = useWindowDimensions();
   const size = width * 0.13;
+  const today = new Date();
   const statusText = getScheduleStatusText(shift.status);
   const statusInfo = getScheduleStatusAndColor(shift.status);
   const getScheduleId = useGetScheduleId((state) => state.setId);
-  const startDate = parse(shift.startDate, 'dd-MM-yyyy', new Date());
-  const endDate = parse(shift.endDate, 'dd-MM-yyyy', new Date());
-  const openingShift = convertTimeStringToDate(shift.startTime);
-  const closingShift = convertTimeStringToDate(shift.endTime);
+  const startDate = parse(shift.startDate, "dd-MM-yyyy", today);
+  const endDate = parse(shift.endDate, "dd-MM-yyyy", today);
+  const openingShiftStr = shift.startTime.replace(/\s+/, " ");
+  const openingShift = parse(openingShiftStr, "h:mm a", today);
+  const closingTimeStr = shift.endTime.replace(/\s+/, " ");
+
+  const closingShift = parse(closingTimeStr, "hh:mm a", today);
+
 
   useUpdateUpdateStatus({
     nurseId: shift.nurseId!,
@@ -86,10 +86,10 @@ export const ShiftCard = ({
             <View>
               <Text size="normal" isBold>
                 {fullName(shift.nurse?.firstName, shift.nurse?.lastName) ||
-                  'No nurse assigned'}
+                  "No nurse assigned"}
               </Text>
               <Text size="normal" isBold>
-                {format(startDate, 'MM/dd/yy')} - {format(endDate, 'MM/dd/yy')}
+                {format(startDate, "MM/dd/yy")} - {format(endDate, "MM/dd/yy")}
               </Text>
               <Text size="small">
                 {shift.startTime} - {shift.endTime}
@@ -109,13 +109,13 @@ export const ShiftCard = ({
                 />
               }
             />
-            <Text size="large" isBold style={{ alignSelf: 'flex-end' }}>
+            <Text size="large" isBold style={{ alignSelf: "flex-end" }}>
               ${shift.rate}/hr
             </Text>
           </View>
         </View>
         <Stack mode="flex" gap="lg">
-          {shift.status === 'completed' &&
+          {shift.status === "completed" &&
             shift.isSubmitted &&
             shift.nurseId && (
               <PrivacyNoticeLink
@@ -126,7 +126,7 @@ export const ShiftCard = ({
                 View Route Sheet
               </PrivacyNoticeLink>
             )}
-          {shift.status !== 'completed' && shift.nurseId && (
+          {shift.status !== "completed" && shift.nurseId && (
             <PrivacyNoticeLink onPress={handleCancelSchedule}>
               Cancel Schedule
             </PrivacyNoticeLink>
@@ -136,7 +136,7 @@ export const ShiftCard = ({
             Edit Schedule
           </PrivacyNoticeLink>
 
-          {shift.status === 'completed' && (
+          {shift.status === "completed" && (
             <PrivacyNoticeLink onPress={handleRateNurse}>
               Rate nurse
             </PrivacyNoticeLink>
@@ -152,29 +152,29 @@ const styles = StyleSheet.create((theme) => ({
     width: size,
     height: size,
     borderRadius: 10,
-    overflow: 'hidden',
+    overflow: "hidden",
     backgroundColor: theme.colors.grey,
   }),
   image: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   card: {
     backgroundColor: theme.colors.cardGrey,
   },
   header: {
-    flexDirection: 'row',
+    flexDirection: "row",
 
-    alignItems: 'center',
+    alignItems: "center",
     gap: 10,
   },
   innerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     gap: 20,
 
-    width: '100%',
+    width: "100%",
   },
   right: {
     gap: 5,

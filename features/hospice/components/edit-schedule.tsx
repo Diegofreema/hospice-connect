@@ -38,11 +38,11 @@ export const EditSchedule = ({ onClose, initialValues }: Props) => {
   } = useForm<EditScheduleValidator>({
     resolver: zodResolver(editScheduleValidator),
     defaultValues: {
-      startDate: parse(initialValues.startDate, 'dd-MM-yyyy', new Date()),
-      endDate: parse(initialValues.endDate, 'dd-MM-yyyy', new Date()),
-      openShift: convertTimeStringToDate(initialValues.startTime),
-      endShift: convertTimeStringToDate(initialValues.endTime),
-      rate: initialValues.rate.toString(),
+      startDate: parse(initialValues?.startDate!, 'dd-MM-yyyy', new Date()),
+      endDate: parse(initialValues?.endDate!, 'dd-MM-yyyy', new Date()),
+      openShift: convertTimeStringToDate(initialValues?.startTime!),
+      endShift: convertTimeStringToDate(initialValues?.endTime!),
+      rate: initialValues?.rate.toString(),
     },
   });
 
@@ -52,8 +52,8 @@ export const EditSchedule = ({ onClose, initialValues }: Props) => {
       await editSchedule({
         startDate: format(data.startDate, 'dd-MM-yyyy'),
         endDate: format(data.endDate, 'dd-MM-yyyy'),
-        startTime: format(data.openShift, 'HH:mm a'),
-        endTime: format(data.endShift, 'HH:mm a'),
+        startTime: format(data.openShift, 'h:mm a'),
+        endTime: format(data.endShift, 'h:mm a'),
         scheduleId,
         hospiceId: hospice?._id,
         rate: Number(data.rate),

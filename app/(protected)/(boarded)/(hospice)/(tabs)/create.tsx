@@ -23,8 +23,8 @@ const CreateScreen = () => {
   const createAssignment = useMutation(api.assignments.createAssignment);
   const onSubmit = async (data: CreateAssignmentValidator) => {
     if (!hospice) return;
-    const openShift = format(new Date(data.openShift), 'H:mm');
-    console.log(openShift);
+
+
 
     const { customGender, ...rest } = data;
 

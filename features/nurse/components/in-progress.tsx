@@ -1,9 +1,9 @@
-import { ActionComponent } from '@/features/shared/components/action-component';
-import { SmallLoader } from '@/features/shared/components/small-loader';
-import { LegendList } from '@legendapp/list';
-import React from 'react';
-import { AssignmentWithBusiness } from '../types';
-import { InProgressCard } from './in-progress-card';
+import {ActionComponent} from "@/features/shared/components/action-component";
+import {SmallLoader} from "@/features/shared/components/small-loader";
+import React from "react";
+import {AssignmentWithBusiness} from "../types";
+import {InProgressCard} from "./in-progress-card";
+import {FlatList} from "react-native";
 
 type Props = {
   data: AssignmentWithBusiness[];
@@ -19,11 +19,11 @@ export const InProgress = ({
   handleMore,
   isLoadingMore,
   onOpenSheet,
-  description = 'Please check available assignments.',
-  title = 'No assignments in progress',
+  description = "Please check available assignments.",
+  title = "No assignments in progress",
 }: Props) => {
   return (
-    <LegendList
+    <FlatList
       data={data}
       renderItem={({ item }) => (
         <InProgressCard onOpenSheet={onOpenSheet} item={item} />
@@ -32,16 +32,14 @@ export const InProgress = ({
       onEndReached={handleMore}
       onEndReachedThreshold={0.5}
       style={{ paddingHorizontal: 15 }}
-      columnWrapperStyle={{ gap: 20 }}
       contentContainerStyle={{ gap: 20, paddingBottom: 100 }}
       showsVerticalScrollIndicator={false}
-      recycleItems
       ListFooterComponent={isLoadingMore ? <SmallLoader /> : null}
       ListEmptyComponent={
         <ActionComponent
           title={title}
           description={description}
-          imageUrl={require('@/assets/images/review.png')}
+          imageUrl={require("@/assets/images/review.png")}
         />
       }
     />

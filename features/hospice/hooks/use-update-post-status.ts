@@ -23,7 +23,7 @@ export const useUpdatePostStatus = ({ assignmentId }: Props) => {
             console.log(error);
           }
         };
-        onUpdateStatus();
+       void onUpdateStatus();
       }
     }, [updateStatus, assignmentId])
   );

@@ -25,7 +25,7 @@ const HospiceNotification = () => {
           console.log(error);
         }
       };
-      onMark();
+     void onMark();
     }
   }, [hospice, markAsRead]);
   if (!hospice || !hospice._id) {

@@ -29,26 +29,26 @@ export const useUpdateUpdateStatus = ({
 
       const validateAndUpdateStatus = async () => {
         // Validate inputs
-        const parsedStartDate = startDate;
-        const parsedEndDate = endDate;
+
 
         if (
-          isNaN(parsedStartDate.getTime()) ||
-          isNaN(parsedEndDate.getTime())
+          isNaN(startDate.getTime()) ||
+          isNaN(endDate.getTime())
         ) {
           console.error('Invalid startDate or endDate');
           return;
         }
 
         // Combine date and time for shift start
-        const shiftStartDateTime = new Date(parsedStartDate);
+        const shiftStartDateTime = new Date(startDate);
         shiftStartDateTime.setHours(
           openingShift.getHours(),
           openingShift.getMinutes(),
           0,
           0
         );
-        const shiftEndDateTime = new Date(parsedEndDate);
+          console.log({closingShift})
+        const shiftEndDateTime = new Date(endDate);
         shiftEndDateTime.setHours(
           closingShift.getHours(),
           closingShift.getMinutes(),
@@ -56,7 +56,8 @@ export const useUpdateUpdateStatus = ({
           0
         );
         const now = new Date();
-
+          console.log(now > shiftEndDateTime);
+          console.log({now, shiftEndDateTime})
         // Check if shift has ended (current time is past shift end)
         // AND there's no nurse assigned AND status is not already 'not_covered'
         if (!nurseId && status !== 'not_covered' && now >= shiftEndDateTime) {
@@ -75,7 +76,7 @@ export const useUpdateUpdateStatus = ({
         }
       };
 
-      validateAndUpdateStatus();
+    void validateAndUpdateStatus();
 
       return () => {
         isMounted = false;
@@ -88,6 +89,7 @@ export const useUpdateUpdateStatus = ({
       openingShift,
       updateStatus,
       nurseId,
+        closingShift
     ])
   );
 
@@ -96,22 +98,18 @@ export const useUpdateUpdateStatus = ({
       let isMounted = true; // Track component mount status
 
       const validateAndUpdateStatus = async () => {
-        // Validate inputs
-        const parsedStartDate =
-          typeof startDate === 'string' ? new Date(startDate) : startDate;
-        const parsedEndDate =
-          typeof endDate === 'string' ? new Date(endDate) : endDate;
+
 
         if (
-          isNaN(parsedStartDate.getTime()) ||
-          isNaN(parsedEndDate.getTime())
+          isNaN(startDate.getTime()) ||
+          isNaN(endDate.getTime())
         ) {
           console.error('Invalid startDate or endDate');
           return;
         }
 
         // Combine date and time for shift start
-        const shiftStartDateTime = new Date(parsedStartDate);
+        const shiftStartDateTime = new Date(startDate);
         shiftStartDateTime.setHours(
           openingShift.getHours(),
           openingShift.getMinutes(),
@@ -120,7 +118,7 @@ export const useUpdateUpdateStatus = ({
         );
 
         // Combine date and time for shift end
-        const shiftEndDateTime = new Date(parsedEndDate);
+        const shiftEndDateTime = new Date(endDate);
         shiftEndDateTime.setHours(
           closingShift.getHours(),
           closingShift.getMinutes(),
@@ -149,7 +147,7 @@ export const useUpdateUpdateStatus = ({
         }
       };
 
-      validateAndUpdateStatus();
+     void validateAndUpdateStatus();
 
       // Cleanup to prevent updates after unmount
       return () => {

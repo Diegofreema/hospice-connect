@@ -1,26 +1,25 @@
-import { api } from '@/convex/_generated/api';
-import { Doc, Id } from '@/convex/_generated/dataModel';
-import { Button } from '@/features/shared/components/button';
-import { SmallLoader } from '@/features/shared/components/small-loader';
+import { api } from "@/convex/_generated/api";
+import { Doc, Id } from "@/convex/_generated/dataModel";
+import { Button } from "@/features/shared/components/button";
+import { SmallLoader } from "@/features/shared/components/small-loader";
 
-import { useToast } from '@/components/demos/toast';
-import { convertTimeStringToDate } from '@/convex/helper';
-import { CustomPressable } from '@/features/shared/components/custom-pressable';
-import { Text } from '@/features/shared/components/text';
-import { generateErrorMessage } from '@/features/shared/utils';
-import { useUpdateUpdateStatus } from '@/hooks/use-update-status';
-import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
-import { IconCircle, IconCircleCheckFilled } from '@tabler/icons-react-native';
-import { useMutation, useQuery } from 'convex/react';
-import { format, parse } from 'date-fns';
-import { useState } from 'react';
-import { View } from 'react-native';
-import { StyleSheet } from 'react-native-unistyles';
-import { useGetNurseId } from '../hooks/use-get-nurse-id';
+import { useToast } from "@/components/demos/toast";
+import { CustomPressable } from "@/features/shared/components/custom-pressable";
+import { Text } from "@/features/shared/components/text";
+import { generateErrorMessage } from "@/features/shared/utils";
+import { useUpdateUpdateStatus } from "@/hooks/use-update-status";
+import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
+import { IconCircle, IconCircleCheckFilled } from "@tabler/icons-react-native";
+import { useMutation, useQuery } from "convex/react";
+import { format, parse } from "date-fns";
+import { useState } from "react";
+import { View } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
+import { useGetNurseId } from "../hooks/use-get-nurse-id";
 
 type Props = {
-  id: Id<'assignments'>;
-  hospiceId: Id<'hospices'>;
+  id: Id<"assignments">;
+  hospiceId: Id<"hospices">;
   name: string;
   onClose: () => void;
 };
@@ -34,12 +33,12 @@ export const SelectSchedule = ({ id, hospiceId, name, onClose }: Props) => {
     hospiceId,
   });
   const { showToast } = useToast();
-  const [selectedIds, setSelectedIds] = useState<Id<'schedules'>[]>([]);
+  const [selectedIds, setSelectedIds] = useState<Id<"schedules">[]>([]);
 
   if (schedules === undefined) {
     return <SmallLoader size={30} />;
   }
-  const onSelect = (id: Id<'schedules'>) => {
+  const onSelect = (id: Id<"schedules">) => {
     setSelectedIds((prev) => {
       const isInArray = prev.find((item) => item === id);
       if (isInArray) {
@@ -59,18 +58,18 @@ export const SelectSchedule = ({ id, hospiceId, name, onClose }: Props) => {
         hospiceName: name,
       });
       showToast({
-        title: 'Success',
-        subtitle: 'Schedule sent successfully',
+        title: "Success",
+        subtitle: "Schedule sent successfully",
         autodismiss: true,
       });
       onClose();
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to send schedule'
+        "Failed to send schedule",
       );
       showToast({
-        title: 'Error',
+        title: "Error",
         subtitle: errorMessage,
         autodismiss: true,
       });
@@ -91,7 +90,7 @@ export const SelectSchedule = ({ id, hospiceId, name, onClose }: Props) => {
       ListFooterComponent={
         <Button title="Schedule" onPress={onSend} disabled={loading} />
       }
-      ListFooterComponentStyle={{ marginTop: 'auto', marginBottom: 15 }}
+      ListFooterComponentStyle={{ marginTop: "auto", marginBottom: 15 }}
       ListEmptyComponent={
         <Text size="large" isBold textAlign="center">
           No shifts available
@@ -106,14 +105,18 @@ export const Schedule = ({
   selectedIds,
   onSelect,
 }: {
-  item: Doc<'schedules'>;
-  selectedIds: Id<'schedules'>[] | undefined;
-  onSelect: (id: Id<'schedules'>) => void;
+  item: Doc<"schedules">;
+  selectedIds: Id<"schedules">[] | undefined;
+  onSelect: (id: Id<"schedules">) => void;
 }) => {
-  const startDate = parse(item.startDate, 'dd-MM-yyyy', new Date());
-  const endDate = parse(item.endDate, 'dd-MM-yyyy', new Date());
-  const openingShift = convertTimeStringToDate(item.startTime);
-  const closingShift = convertTimeStringToDate(item.endTime);
+  const today = new Date();
+  const startDate = parse(item.startDate, "dd-MM-yyyy", today);
+  const endDate = parse(item.endDate, "dd-MM-yyyy", today);
+  const openingShiftStr = item.startTime.replace(/\s+/, " ");
+  const openingShift = parse(openingShiftStr, "h:mm a", today);
+  const closingTimeStr = item.endTime.replace(/\s+/, " ");
+
+  const closingShift = parse(closingTimeStr, "hh:mm a", today);
   useUpdateUpdateStatus({
     startDate,
     endDate,
@@ -135,7 +138,7 @@ export const Schedule = ({
         )}
         <View>
           <Text size="normal" isBold>
-            {format(startDate, 'MM/dd/yy')} - {format(endDate, 'MM/dd/yy')}
+            {format(startDate, "MM/dd/yy")} - {format(endDate, "MM/dd/yy")}
           </Text>
           <Text size="small">
             {item.startTime} - {item.endTime}
@@ -148,9 +151,9 @@ export const Schedule = ({
 
 const styles = StyleSheet.create((theme) => ({
   card: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 10,
-    alignItems: 'center',
+    alignItems: "center",
     backgroundColor: theme.colors.cardGrey,
     padding: theme.paddings.xxl,
     borderRadius: 10,

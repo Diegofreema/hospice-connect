@@ -1,17 +1,12 @@
 /* eslint-disable @typescript-eslint/no-empty-object-type */
-import { Doc, Id } from '@/convex/_generated/dataModel';
-import { scheduleStatus } from '@/convex/schema';
-import { ReactMutation } from 'convex/react';
-import { FunctionReference } from 'convex/server';
-import { ConvexError, Infer } from 'convex/values';
-import {
-  addHours,
-  differenceInHours,
-  format,
-  setHours,
-  setMinutes,
-} from 'date-fns';
-import { Dimensions } from 'react-native';
+import {Doc, Id} from '@/convex/_generated/dataModel';
+import {scheduleStatus} from '@/convex/schema';
+import {ReactMutation} from 'convex/react';
+import {FunctionReference} from 'convex/server';
+import {ConvexError, Infer} from 'convex/values';
+import {addHours, differenceInHours, differenceInYears, format,} from 'date-fns';
+import {Dimensions} from 'react-native';
+
 const { width } = Dimensions.get('window');
 
 // Device type detection
@@ -98,7 +93,7 @@ export const getScheduleStatusText = (status: Infer<typeof scheduleStatus>) => {
     case 'available':
       return 'Available';
     case 'booked':
-      return 'Booked';
+      return 'Ongoing';
     case 'completed':
       return 'Completed';
     case 'cancelled':
@@ -134,7 +129,7 @@ export const getScheduleStatusAndColor = (
         color: '#00A25C',
       };
     case 'booked':
-      return { status: 'pending', color: '#9747FF' };
+      return { status: 'ongoing', color: '#4C55FF' };
 
     case 'not_covered':
       return { status: 'error', color: '#991B1B' };
@@ -145,7 +140,7 @@ export const getScheduleStatusAndColor = (
   }
 };
 
-export function convertTimeStringToDate(timeString: string) {
+export function convertTimeStringToDate(timeString: string, value?:string) {
   // Get current date to use as base
   const now = new Date();
 
@@ -155,13 +150,14 @@ export function convertTimeStringToDate(timeString: string) {
 
   // Convert to 24-hour format
   let hours24 = hours;
-  if (period.toUpperCase() === 'PM' && hours !== 12) {
+  if (period?.toUpperCase() === 'PM' && hours !== 12) {
     hours24 += 12;
-  } else if (period.toUpperCase() === 'AM' && hours === 12) {
+  } else if (period?.toUpperCase() === 'AM' && hours === 12) {
     hours24 = 0;
   }
 
   // Create new Date object with today's date and parsed time
+    console.log(hours24, value);
   return new Date(
     now.getFullYear(),
     now.getMonth(),
@@ -219,113 +215,9 @@ interface Shift {
   endShift: string;
 }
 
-interface ShiftData {
-  startDate: Date;
-  endDate: Date;
-  openShift: string;
-}
 
-/**
- * Generates an array of 12-hour shifts between startDate and endDate.
- * @param data - Object containing startDate and endDate.
- * @param includePartial - Whether to include a partial shift at the end (default: false).
- * @returns Array of shift objects with formatted dates and times.
- */
-export function generateShifts(
-  data: ShiftData,
-  includePartial: boolean = false
-): Shift[] {
-  // Validate input dates
-  if (!(data.startDate instanceof Date) || isNaN(data.startDate.getTime())) {
-    throw new ConvexError({ message: 'Invalid startDate' });
-  }
-  if (!(data.endDate instanceof Date) || isNaN(data.endDate.getTime())) {
-    console.log('startDate must be before endDate');
 
-    throw new ConvexError({ message: 'Invalid endDate' });
-  }
-  const startDate = new Date(data.startDate);
-  const endDate = new Date(data.endDate);
-  startDate.setHours(0, 0, 0, 0);
-  endDate.setHours(0, 0, 0, 0);
-  console.log({ startDate, endDate });
 
-  console.log(startDate.getTime() >= endDate.getTime());
-
-  if (startDate.getTime() > endDate.getTime()) {
-    console.log('startDate must be before endDate');
-    throw new ConvexError({ message: 'start date must be before end date' });
-  }
-
-  // Validate and parse openShift time (expecting "HH:mm" format)
-  const timeMatch = data.openShift.match(/^(\d{1,2}):(\d{2})$/);
-  if (!timeMatch) {
-    console.log('Invalid openShift time format. Use HH:mm (e.g., "07:00").');
-
-    throw new ConvexError({
-      message: 'Invalid openShift time format. Use HH:mm (e.g., "07:00").',
-    });
-  }
-  const [_, hours, minutes] = timeMatch;
-  const openShiftHours = parseInt(hours, 10);
-  const openShiftMinutes = parseInt(minutes, 10);
-  if (openShiftHours > 23 || openShiftMinutes > 59) {
-    throw new ConvexError({ message: 'Invalid open shift time.' });
-  }
-
-  // Set the first shift's start time to openShift time on startDate
-  const firstShiftStart = setHours(
-    setMinutes(data.startDate, openShiftMinutes),
-    openShiftHours
-  );
-
-  // Calculate number of 12-hour shifts
-  const hoursDifference = differenceInHours(data.endDate, firstShiftStart);
-  const numberOfShifts = includePartial
-    ? Math.ceil(hoursDifference / 12)
-    : Math.floor(hoursDifference / 12);
-
-  const shifts: Shift[] = [];
-
-  for (let index = 0; index < numberOfShifts; index++) {
-    // Calculate shift start by adding 12 hours per index from firstShiftStart
-    const shiftStart = addHours(firstShiftStart, index * 12);
-
-    // Calculate shift end (12 hours after start or capped at endDate)
-    const shiftEnd = addHours(shiftStart, 12);
-    if (shiftEnd > data.endDate && !includePartial) {
-      break; // Skip partial shift if not included
-    }
-
-    // Cap shift end at endDate
-    const cappedShiftEnd = shiftEnd > data.endDate ? data.endDate : shiftEnd;
-
-    // Format dates as dd-MM-yyyy
-    const start = format(shiftStart, 'dd-MM-yyyy');
-    const end = format(cappedShiftEnd, 'dd-MM-yyyy');
-
-    // Format times as h:mm AM/PM
-    const startShift = shiftStart.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    });
-    const endShift = cappedShiftEnd.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    });
-
-    shifts.push({
-      start,
-      end,
-      startShift,
-      endShift,
-    });
-  }
-
-  return shifts;
-}
 
 export const fullName = (firstName?: string, lastName?: string) => {
   if (!firstName && !lastName) return '';
@@ -392,3 +284,9 @@ export const generateShiftsWithDateFns = ({
 
   return shifts;
 };
+
+export const calculateAge = (dob: Date): number => {
+
+    const today = new Date();
+    return differenceInYears(today, dob)
+}

@@ -1,22 +1,22 @@
-import { useNurse } from '@/components/context/nurse-context';
-import React from 'react';
-import { useForm } from 'react-hook-form';
+import { useNurse } from "@/components/context/nurse-context";
+import React from "react";
+import { useForm } from "react-hook-form";
 
-import { ControlInput } from '@/features/authentication/components/form/control-input';
-import { Button } from '@/features/shared/components/button';
+import { ControlInput } from "@/features/authentication/components/form/control-input";
+import { Button } from "@/features/shared/components/button";
 
-import { api } from '@/convex/_generated/api';
-import { ControlSelect } from '@/features/authentication/components/form/control-select';
-import { generateErrorMessage } from '@/features/shared/utils';
+import { api } from "@/convex/_generated/api";
+import { ControlSelect } from "@/features/authentication/components/form/control-select";
+import { generateErrorMessage } from "@/features/shared/utils";
 
-import { useToast } from '@/components/demos/toast';
-import { KeyboardAwareScrollViewComponent } from '@/features/shared/components/key-board-aware-scroll-view';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from 'convex/react';
-import { router } from 'expo-router';
-import { View } from 'react-native';
-import { disciplines, usStates } from '../data';
-import { createNurseValidator, CreateNurseValidator } from '../validators';
+import { useToast } from "@/components/demos/toast";
+import { KeyboardAwareScrollViewComponent } from "@/features/shared/components/key-board-aware-scroll-view";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "convex/react";
+import { router } from "expo-router";
+import { View } from "react-native";
+import { disciplines, usStates } from "../data";
+import { createNurseValidator, CreateNurseValidator } from "../validators";
 
 export const EditProfile = () => {
   const { nurse } = useNurse();
@@ -28,18 +28,18 @@ export const EditProfile = () => {
     handleSubmit,
   } = useForm<CreateNurseValidator>({
     defaultValues: {
-      firstName: nurse?.firstName || '',
-      lastName: nurse?.lastName || '',
-      phoneNumber: nurse?.phoneNumber || '',
-      gender: nurse?.gender || '',
+      firstName: nurse?.firstName || "",
+      lastName: nurse?.lastName || "",
+      phoneNumber: nurse?.phoneNumber || "",
+      gender: nurse?.gender || "",
       dateOfBirth: new Date(),
       discipline: nurse?.discipline,
-      licenseNumber: nurse?.licenseNumber || '',
-      licenseState: nurse?.stateOfRegistration || '',
-      address: nurse?.address || '',
-      rate: nurse?.rate?.toString() || '0',
+      licenseNumber: nurse?.licenseNumber || "",
+      licenseState: nurse?.stateOfRegistration || "",
+      address: nurse?.address || "",
+      rate: nurse?.rate?.toString() || "0",
       email: nurse?.email,
-      zipCode: nurse?.zipCode || '',
+      zipCode: nurse?.zipCode || "",
     },
     resolver: zodResolver(createNurseValidator),
   });
@@ -57,21 +57,22 @@ export const EditProfile = () => {
         lastName: data.lastName.trim(),
         phoneNumber: data.phoneNumber.trim(),
         licenseNumber: data.licenseNumber.trim(),
+        zipCode: data.zipCode,
       });
       showToast({
-        title: 'Success',
-        subtitle: 'Pending admin approval',
+        title: "Success",
+        subtitle: "Pending admin approval",
         autodismiss: true,
       });
       router.back();
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to update information'
+        "Failed to update information",
       );
 
       showToast({
-        title: 'Error',
+        title: "Error",
         subtitle: errorMessage,
         autodismiss: true,
       });
@@ -83,28 +84,28 @@ export const EditProfile = () => {
       <View style={{ marginTop: 10, gap: 20 }}>
         <ControlInput
           control={control}
-          name={'firstName'}
+          name={"firstName"}
           errors={errors}
           label="First name"
           placeholder="John"
         />
         <ControlInput
           control={control}
-          name={'lastName'}
+          name={"lastName"}
           errors={errors}
           label="Last name"
           placeholder="Doe"
         />
         <ControlInput
           control={control}
-          name={'email'}
+          name={"email"}
           errors={errors}
           label="Email"
           placeholder="Doe"
         />
         <ControlInput
           control={control}
-          name={'phoneNumber'}
+          name={"phoneNumber"}
           errors={errors}
           label="Phone number"
           placeholder="+1 (123) 456-7890"
@@ -113,7 +114,7 @@ export const EditProfile = () => {
 
         <ControlInput
           control={control}
-          name={'rate'}
+          name={"rate"}
           errors={errors}
           label="Rate/hr"
           placeholder="10"
@@ -121,7 +122,7 @@ export const EditProfile = () => {
         />
         <ControlInput
           control={control}
-          name={'zipCode'}
+          name={"zipCode"}
           errors={errors}
           label="Zip Code"
           placeholder="Enter zip code"
@@ -145,14 +146,14 @@ export const EditProfile = () => {
         />
         <ControlInput
           control={control}
-          name={'address'}
+          name={"address"}
           errors={errors}
           label="Address"
           placeholder="John doe street, 123"
           variant="textarea"
         />
 
-        <View style={{ marginTop: 'auto' }}>
+        <View style={{ marginTop: "auto" }}>
           <Button
             title="Save changes"
             onPress={handleSubmit(onSubmit)}

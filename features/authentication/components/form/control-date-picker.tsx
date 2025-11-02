@@ -1,17 +1,17 @@
-import { Text } from '@/features/shared/components/text';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { format } from 'date-fns';
-import React, { useState } from 'react';
+import { Text } from "@/features/shared/components/text";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { format } from "date-fns";
+import React, { useState } from "react";
 import {
   Control,
   Controller,
   FieldErrors,
   FieldPath,
   FieldValues,
-} from 'react-hook-form';
-import { TouchableOpacity } from 'react-native';
-import { StyleSheet } from 'react-native-unistyles';
-import { View } from '../../../shared/components/view';
+} from "react-hook-form";
+import { TouchableOpacity } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
+import { View } from "../../../shared/components/view";
 type Props<TFieldValues extends FieldValues> = {
   label?: string;
 
@@ -20,7 +20,8 @@ type Props<TFieldValues extends FieldValues> = {
   name: FieldPath<TFieldValues>;
 
   placeholder?: string;
-  mode?: 'date' | 'time' | 'datetime';
+  mode?: "date" | "time" | "datetime";
+  age?: number;
 };
 
 export const ControlledDatePicker = <TFieldValues extends FieldValues>({
@@ -28,12 +29,14 @@ export const ControlledDatePicker = <TFieldValues extends FieldValues>({
   control,
   errors,
   name,
-  mode = 'date',
+  mode = "date",
+  age,
 }: Props<TFieldValues>) => {
   const [open, setOpen] = useState(false);
   const onShowDatePicker = () => {
     setOpen(true);
   };
+  const showAge = age && age > 0;
   return (
     <View gap="md" flex={1}>
       <Text size="normal">{label}</Text>
@@ -46,14 +49,15 @@ export const ControlledDatePicker = <TFieldValues extends FieldValues>({
               onPress={onShowDatePicker}
               style={styles.container}
             >
-              <Text size="normal" color={value ? 'black' : 'grey'}>
-                {mode === 'time'
-                  ? format(value || new Date(), 'HH:mm')
-                  : format(value || new Date(), 'MM/dd/yyyy')}
+              <Text size="normal" color={value ? "black" : "grey"}>
+                {mode === "time"
+                  ? format(value || new Date(), "HH:mm")
+                  : format(value || new Date(), "MM/dd/yyyy")}{" "}
+                {!!showAge && `(${age}yrs)`}
               </Text>
             </TouchableOpacity>
             {open && (
-              <View style={{ alignSelf: 'center' }}>
+              <View style={{ alignSelf: "center" }}>
                 <DateTimePicker
                   testID="dateTimePicker"
                   value={value}
@@ -62,7 +66,7 @@ export const ControlledDatePicker = <TFieldValues extends FieldValues>({
                   display="spinner"
                   onChange={(event, selectedDate) => {
                     setOpen(false);
-                    if (event.type !== 'dismissed') {
+                    if (event.type !== "dismissed") {
                       onChange(selectedDate);
                     }
                   }}
@@ -73,10 +77,10 @@ export const ControlledDatePicker = <TFieldValues extends FieldValues>({
         )}
       />
       {errors[name]?.message && (
-        <Text size="small" color={'red'}>
-          {typeof errors[name]?.message === 'string'
+        <Text size="small" color={"red"}>
+          {typeof errors[name]?.message === "string"
             ? errors[name]?.message
-            : 'Invalid input'}
+            : "Invalid input"}
         </Text>
       )}
     </View>
@@ -86,11 +90,14 @@ export const ControlledDatePicker = <TFieldValues extends FieldValues>({
 const styles = StyleSheet.create({
   container: {
     borderWidth: 1,
-    borderColor: 'grey',
+    borderColor: "grey",
     paddingHorizontal: 8,
     paddingVertical: 15,
     borderRadius: 8,
     flex: 1,
     minHeight: 50,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 });

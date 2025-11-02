@@ -1,53 +1,53 @@
-import { Card, CardContent, CardHeader } from '@/components/card';
-import { CustomPressable } from '@/features/shared/components/custom-pressable';
-import { FlexText } from '@/features/shared/components/flex-text';
-import { MyMenu } from '@/features/shared/components/menu';
+import { Card, CardContent, CardHeader } from "@/components/card";
+import { CustomPressable } from "@/features/shared/components/custom-pressable";
+import { FlexText } from "@/features/shared/components/flex-text";
+import { MyMenu } from "@/features/shared/components/menu";
 
 import {
   generateErrorMessage,
   getAssignmentStatusText,
   getScheduleStatusAndColor,
-} from '@/features/shared/utils';
-import { View } from '../../shared/components/view';
+} from "@/features/shared/utils";
+import { View } from "../../shared/components/view";
 
-import { IconCircle, IconDots } from '@tabler/icons-react-native';
-import { router } from 'expo-router';
-import { SFSymbol } from 'expo-symbols';
+import { IconCircle, IconDots } from "@tabler/icons-react-native";
+import { router } from "expo-router";
+import { SFSymbol } from "expo-symbols";
 
-import { Badge } from '@/components/badge/Badge';
-import { BadgeVariant } from '@/components/badge/types';
-import { useToast } from '@/components/demos/toast';
-import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
-import { Text } from '@/features/shared/components/text';
-import { useMutation } from 'convex/react';
-import { useState } from 'react';
-import { Alert } from 'react-native';
-import { StyleSheet, useUnistyles } from 'react-native-unistyles';
-import { useSelectAssignment } from '../hooks/use-select-assignment';
-import { useUpdatePostStatus } from '../hooks/use-update-post-status';
-import { PostType } from '../types';
+import { Badge } from "@/components/badge/Badge";
+import { BadgeVariant } from "@/components/badge/types";
+import { useToast } from "@/components/demos/toast";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { Text } from "@/features/shared/components/text";
+import { useMutation } from "convex/react";
+import { useState } from "react";
+import { Alert } from "react-native";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { useSelectAssignment } from "../hooks/use-select-assignment";
+import { useUpdatePostStatus } from "../hooks/use-update-post-status";
+import { PostType } from "../types";
 
 type Props = {
   post: PostType;
   onView: () => void;
-  hospiceId: Id<'hospices'>;
+  hospiceId: Id<"hospices">;
   onOpenReOpenAssignment: () => void;
 };
 
 const data: { label: string; value: string; ios: SFSymbol; android: string }[] =
   [
     {
-      label: 'Edit',
-      value: 'edit',
-      ios: 'pencil',
-      android: 'mode-edit',
+      label: "Edit",
+      value: "edit",
+      ios: "pencil",
+      android: "mode-edit",
     },
     {
-      label: 'Delete',
-      value: 'delete',
-      ios: 'trash',
-      android: 'trash',
+      label: "Delete",
+      value: "delete",
+      ios: "trash",
+      android: "trash",
     },
   ];
 export const Post = ({
@@ -56,7 +56,7 @@ export const Post = ({
   hospiceId,
   onOpenReOpenAssignment,
 }: Props) => {
-  const name = post.patientFirstName + ' ' + post.patientLastName;
+  const name = post.patientFirstName + " " + post.patientLastName;
 
   const { showToast } = useToast();
   const [deleting, setDeleting] = useState(false);
@@ -69,17 +69,17 @@ export const Post = ({
       console.log(post._id);
       await deleteAssignment({ assignmentId: post._id, hospiceId });
       showToast({
-        title: 'Success',
-        subtitle: 'Assignment deleted successfully',
+        title: "Success",
+        subtitle: "Assignment deleted successfully",
         autodismiss: true,
       });
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to delete assignment'
+        "Failed to delete assignment",
       );
       showToast({
-        title: 'Error',
+        title: "Error",
         subtitle: errorMessage,
         autodismiss: true,
       });
@@ -91,25 +91,25 @@ export const Post = ({
   const setId = useSelectAssignment((state) => state.setId);
   const { theme } = useUnistyles();
   const onClick = (value: string) => {
-    if (value === 'edit') {
+    if (value === "edit") {
       router.push(`/edit/${post._id}`);
     }
 
-    if (value === 'delete') {
+    if (value === "delete") {
       Alert.alert(
-        'Delete Assignment',
-        'Are you sure you want to delete this assignment?',
+        "Delete Assignment",
+        "Are you sure you want to delete this assignment?",
         [
           {
-            text: 'Cancel',
-            style: 'cancel',
+            text: "Cancel",
+            style: "cancel",
           },
           {
-            text: 'Delete',
-            style: 'destructive',
+            text: "Delete",
+            style: "destructive",
             onPress: () => onDelete(),
           },
-        ]
+        ],
       );
     }
   };
@@ -120,22 +120,22 @@ export const Post = ({
     router.push(`/assign-nurse?id=${post._id}&discipline=${post.discipline}`);
   };
   const onHandleAction = () => {
-    if (post.status === 'completed' || post.status === 'cancelled') {
-      onReOpen();
+    if (post.status === "completed" || post.status === "cancelled") {
+      void onReOpen();
       setId(post._id);
     } else {
       onAssign();
     }
   };
-  const disabled = post.status === 'booked';
+  const disabled = post.status === "booked";
   const buttonText =
-    post.status === 'completed' || post.status === 'cancelled'
-      ? 'Re-Open'
-      : 'Assign';
+    post.status === "completed" || post.status === "cancelled"
+      ? "Re-Open"
+      : "Assign";
   return (
     <Card style={styles.card}>
       <CardHeader style={styles.header}>
-        <Text size={'medium'} isBold>
+        <Text size={"medium"} isBold>
           {name}
         </Text>
         <MyMenu
@@ -155,7 +155,7 @@ export const Post = ({
           justifyContent="space-between"
           alignItems="center"
         >
-          <Text size={'normal'}>Status</Text>
+          <Text size={"normal"}>Status</Text>
           <Badge
             label={getAssignmentStatusText(post.status)}
             variant={
@@ -183,7 +183,7 @@ export const Post = ({
             }}
             style={[styles.button, styles.viewSchedule]}
           >
-            <Text size={'normal'} color={'blue'}>
+            <Text size={"normal"} color={"blue"}>
               View Schedule
             </Text>
           </CustomPressable>
@@ -197,7 +197,7 @@ export const Post = ({
             ]}
             disabled={disabled}
           >
-            <Text size={'normal'} color={'white'}>
+            <Text size={"normal"} color={"white"}>
               {buttonText}
             </Text>
           </CustomPressable>
@@ -212,9 +212,9 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.cardGrey,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   trigger: {
     padding: 5,
@@ -228,7 +228,7 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: 10,
   },
   footer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 10,
   },
   viewSchedule: {
@@ -248,8 +248,8 @@ const styles = StyleSheet.create((theme) => ({
     padding: 5,
     borderRadius: 5,
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     height: 45,
   },
 }));
