@@ -5,7 +5,6 @@ import { api } from "@/convex/_generated/api";
 import { SmallLoader } from "@/features/shared/components/small-loader";
 import { View } from "react-native";
 import { Avatar } from "@/components/avatar/Avatar";
-import { IconCamera } from "@tabler/icons-react-native";
 import { FlexText } from "@/features/shared/components/flex-text";
 import {
   calculateAge,
@@ -48,9 +47,6 @@ export const FetchNurseInfo = () => {
       <View style={styles.top}>
         <View style={styles.container}>
           <Avatar image={{ uri: image || "", name }} size={120} />
-          <View style={styles.camera} pointerEvents="none">
-            <IconCamera size={25} color={theme.colors.black} />
-          </View>
         </View>
       </View>
       <View

@@ -10,11 +10,11 @@ import * as React from 'react';
 WebBrowser.maybeCompleteAuthSession();
 
 const AuthContext = React.createContext({
-  nurse: null as FunctionReturnType<typeof api.nurses.getNurse> | null,
+  nurse: null as FunctionReturnType<typeof api.nurses.getNurseById> | null,
 });
 
 export const NurseProvider = ({ children }: { children: React.ReactNode }) => {
-  const nurse = useQuery(api.nurses.getNurse);
+  const nurse = useQuery(api.nurses.getNurseById);
   const { isAuthenticated } = useConvexAuth();
   if (nurse === undefined) {
     return <LoadingComponent />;

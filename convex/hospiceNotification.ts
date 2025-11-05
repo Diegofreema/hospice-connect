@@ -64,11 +64,10 @@ export const markNotificationAsRead = mutation({
       .take(100);
 
     for (const notification of notifications) {
-      if (
-        notification.type !== "case_request" &&
-        notification.type !== "route_sheet"
-      ) {
-        await ctx.db.patch(notification._id, { isRead: true });
+      if (notification.type !== "route_sheet") {
+        if (!notification.isRead) {
+          await ctx.db.patch(notification._id, { isRead: true });
+        }
       }
     }
   },

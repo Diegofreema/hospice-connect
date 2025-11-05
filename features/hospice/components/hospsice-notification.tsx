@@ -15,6 +15,7 @@ import {useState} from "react";
 
 import {StyleSheet} from "react-native-unistyles";
 import {HospiceNotificationType} from "../types";
+import {useHandleCaseRequest} from "@/features/shared/hooks/use-handle-case-request";
 
 type Props = {
   notification: HospiceNotificationType;
@@ -42,6 +43,33 @@ export const HospiceNotification = ({ notification }: Props) => {
       router.push(
         `/case-request?nurseId=${notification?.nurseId}&shiftId=${notification?.scheduleId}&notificationId=${notification._id}`,
       );
+    }
+  };
+  const {
+    onDecline: onDeclineCaseRequest,
+    onAcceptCaseRequest,
+    processing: processingCaseRequest,
+  } = useHandleCaseRequest({
+    notificationId: notification._id,
+    nurseId: notification.nurseId,
+    scheduleId: notification.scheduleId,
+    hospiceId: notification.hospiceId,
+    businessName: hospice?.businessName!,
+  });
+
+  const handleDecline = async () => {
+    if (notification.type === "cancel_request") {
+      await onDecline();
+    } else {
+      await onDeclineCaseRequest();
+    }
+  };
+
+  const handleAccept = async () => {
+    if (notification.type === "cancel_request") {
+      await onAccept();
+    } else {
+      await onAcceptCaseRequest();
     }
   };
   const onDecline = async () => {
@@ -119,7 +147,7 @@ export const HospiceNotification = ({ notification }: Props) => {
   return (
     <CustomPressable
       onPress={onPress}
-      style={{ opacity: notification.isRead ? 0.7 : 1 }}
+      style={{ opacity: notification.isRead ? 1 : 0.7 }}
     >
       <Card style={styles.card}>
         <CardHeader>
@@ -163,16 +191,17 @@ export const HospiceNotification = ({ notification }: Props) => {
           </View>
         </CardHeader>
         {notification.type === "cancel_request" ||
-          (notification.type === "route_sheet" && (
+          notification.type === "route_sheet" ||
+          (notification.type === "case_request" && (
             <CardFooter>
               {showButtons && !isRouteSheet && (
                 <FlexButtons
-                  onCancel={onDecline}
-                  onPress={onAccept}
+                  onCancel={handleDecline}
+                  onPress={handleAccept}
                   buttonText="Decline"
                   buttonText2="Accept"
-                  disabled2={processing}
-                  disabled={processing}
+                  disabled2={processing || processingCaseRequest}
+                  disabled={processing || processingCaseRequest}
                 />
               )}
               {isDeclined && (
