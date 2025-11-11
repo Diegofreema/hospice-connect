@@ -33,7 +33,7 @@ export const AccountBrief = ({
   const fontSize = isHome ? 14 : 11;
   const fontColor = isHome ? 'black' : 'textGrey';
   return (
-    <TouchableOpacity onPress={onPress} disabled={isHome}>
+    <TouchableOpacity onPress={onPress}>
       <View
         flexDirection={'row'}
         justifyContent={'space-between'}

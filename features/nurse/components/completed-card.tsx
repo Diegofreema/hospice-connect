@@ -1,75 +1,72 @@
-import {Card, CardContent, CardHeader} from "@/components/card";
-import {FlexText} from "@/features/shared/components/flex-text";
-import {calculateAge, changeFirstLetterToCapital,} from "@/features/shared/utils";
-import React from "react";
+import { Card, CardContent, CardHeader } from '@/components/card';
+import { FlexText } from '@/features/shared/components/flex-text';
+import {
+  calculateAge,
+  changeFirstLetterToCapital,
+} from '@/features/shared/utils';
+import React from 'react';
 
-import {useNurse} from "@/components/context/nurse-context";
-import {api} from "@/convex/_generated/api";
-import {FlexButtons} from "@/features/shared/components/flex-buttons";
-import {useMessage} from "@/hooks/use-message";
-import {useQuery} from "convex/react";
-import {format, parse} from "date-fns";
-import {router} from "expo-router";
-import {StyleSheet} from "react-native-unistyles";
-import {AssignmentsWithHospicesType} from "../types";
-import {LongInfo} from "@/features/shared/components/long-info";
-import {useUpdateToNotCompleted} from "@/features/nurse/hooks/use-update-to-not-completed";
+import { useNurse } from '@/components/context/nurse-context';
+import { api } from '@/convex/_generated/api';
+import { useUpdateToNotCompleted } from '@/features/nurse/hooks/use-update-to-not-completed';
+import { FlexButtons } from '@/features/shared/components/flex-buttons';
+import { LongInfo } from '@/features/shared/components/long-info';
+import { useMessage } from '@/hooks/use-message';
+import { useQuery } from 'convex/react';
+import { FunctionReturnType } from 'convex/server';
+import { format, parse } from 'date-fns';
+import { router } from 'expo-router';
+import { StyleSheet } from 'react-native-unistyles';
 
 type Props = {
-  item: AssignmentsWithHospicesType;
+  item: FunctionReturnType<
+    typeof api.assignments.completedAssignments
+  >['page'][number];
 };
 
 export const CompletedCard = ({ item: post }: Props) => {
   const { nurse } = useNurse();
-  const name = post.patientFirstName + " " + post.patientLastName;
-  const startDate = parse(post.startDate, "dd-MM-yyyy", new Date());
-  const endDate = parse(post.endDate, "dd-MM-yyyy", new Date());
-  const dob = parse(post.dateOfBirth, "dd-MM-yyyy", new Date());
+  const name = post.patientFirstName + ' ' + post.patientLastName;
+  const startDate = parse(post.startDate, 'dd-MM-yyyy', new Date());
+  const endDate = parse(post.endDate, 'dd-MM-yyyy', new Date());
+  const dob = parse(post.dateOfBirth, 'dd-MM-yyyy', new Date());
   useUpdateToNotCompleted({ assignmentId: post._id, nurseId: nurse?._id! });
-  const hasSubmittedRouteSheet = useQuery(
-    api.routeSheets.nurseSubmittedRouteSheet,
-    {
-      assignmentId: post._id,
-      nurseId: nurse?._id!,
-    },
-  );
+  const hasSubmitted = useQuery(api.routeSheets.nurseSubmittedRouteSheet, {
+    nurseId: nurse?._id!,
+    assignmentId: post._id,
+  });
   const { onMessage } = useMessage({ userToChat: post.hospice?.userId! });
 
-  if (hasSubmittedRouteSheet === undefined) {
-    return null;
-  }
-
   const onHandleRouteSheet = () => {
-    const path = !hasSubmittedRouteSheet
-      ? "/complete-route-sheet"
-      : "/view-route-sheet-nurse";
-    console.log("Pressed");
+    const path = !hasSubmitted
+      ? '/complete-route-sheet'
+      : '/view-route-sheet-nurse';
 
     router.push(`${path}?assignmentId=${post._id}&nurseId=${nurse?._id}`);
   };
+  console.log(post.isSubmitted, post.patientFirstName);
 
-  const buttonText = hasSubmittedRouteSheet
-    ? "View route sheet"
-    : "Complete route sheet";
+  const buttonText = hasSubmitted ? 'View route sheet' : 'Complete route sheet';
+  const disableButton = post.isSubmitted && !post.isApproved;
   return (
     <Card style={styles.card}>
       <CardHeader style={styles.header}></CardHeader>
       <CardContent style={styles.content}>
         <FlexText
           leftText="Business name"
-          rightText={post?.hospice?.businessName || "N/A"}
+          rightText={post?.hospice?.businessName || 'N/A'}
         />
 
         <FlexText leftText="Patient name" rightText={name} />
         <FlexText leftText="Phone number" rightText={post.phoneNumber} />
         <FlexText
           leftText="Start date"
-          rightText={format(startDate, "MM/dd/yy")}
+          rightText={format(startDate, 'MM/dd/yy')}
         />
-        <FlexText leftText="End date" rightText={format(endDate, "MM/dd/yy")} />
+        <FlexText leftText="End date" rightText={format(endDate, 'MM/dd/yy')} />
         <FlexText
           leftText="Date of birth"
-          rightText={`${format(dob, "MM/dd/yy")} (${calculateAge(dob).toString()})`}
+          rightText={`${format(dob, 'MM/dd/yy')} (${calculateAge(dob).toString()})`}
         />
         <FlexText leftText="Care level" rightText={post.careLevel} />
         <FlexText
@@ -79,12 +76,12 @@ export const CompletedCard = ({ item: post }: Props) => {
         <FlexText leftText="Discipline" rightText={post.discipline} />
 
         {/*<FlexText leftText="Location" rightText={post.patientAddress} />*/}
-        <LongInfo title={"Address"} description={post.patientAddress} />
+        <LongInfo title={'Address'} description={post.patientAddress} />
         {post.zipcode && (
           <FlexText leftText="Zipcode" rightText={post.zipcode} />
         )}
         {post.notes && (
-          <LongInfo title={"Additional notes"} description={post.notes} />
+          <LongInfo title={'Additional notes'} description={post.notes} />
         )}
 
         <FlexButtons
@@ -92,6 +89,7 @@ export const CompletedCard = ({ item: post }: Props) => {
           onCancel={onMessage}
           buttonText2={buttonText}
           buttonText="Message"
+          disabled={disableButton}
         />
       </CardContent>
     </Card>
@@ -103,9 +101,9 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.greyLight,
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   trigger: {
     padding: 5,
@@ -117,7 +115,7 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: 15,
   },
   footer: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: 10,
   },
   viewSchedule: {
@@ -137,8 +135,8 @@ const styles = StyleSheet.create((theme) => ({
     padding: 5,
     borderRadius: 5,
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     height: 45,
   },
 }));

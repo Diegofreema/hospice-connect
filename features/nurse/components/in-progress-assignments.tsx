@@ -5,6 +5,7 @@ import { SmallLoader } from '@/features/shared/components/small-loader';
 import { Stack } from '@/features/shared/components/v-stack';
 import { usePaginatedQuery } from 'convex/react';
 import { InProgress } from './in-progress';
+import {sortedArray} from "@/features/shared/utils";
 type Props = {
   nurseId: Id<'nurses'>;
   onOpenSheet: () => void;
@@ -25,11 +26,12 @@ export const InProgressAssignments = ({ nurseId, onOpenSheet }: Props) => {
     }
   };
   const isLoadingMore = status === 'LoadingMore';
+const sortedResults = sortedArray(results)
   return (
     <Stack flex={1}>
       <InProgress
         // @ts-ignore
-        data={results}
+        data={sortedResults}
         handleMore={handleFetchMore}
         isLoadingMore={isLoadingMore}
         onOpenSheet={onOpenSheet}

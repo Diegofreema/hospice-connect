@@ -8,7 +8,13 @@ type Props = {
   openingShift: Date;
   nurseId: Id<'nurses'>;
   shiftId: Id<'schedules'>;
-  status: 'not_covered' | 'booked' | 'completed' | 'available' | 'cancelled';
+  status:
+    | 'not_covered'
+    | 'booked'
+    | 'completed'
+    | 'available'
+    | 'cancelled'
+    | 'on_going';
   endDate: Date;
   closingShift: Date;
 };
@@ -30,11 +36,7 @@ export const useUpdateUpdateStatus = ({
       const validateAndUpdateStatus = async () => {
         // Validate inputs
 
-
-        if (
-          isNaN(startDate.getTime()) ||
-          isNaN(endDate.getTime())
-        ) {
+        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
           console.error('Invalid startDate or endDate');
           return;
         }
@@ -47,7 +49,8 @@ export const useUpdateUpdateStatus = ({
           0,
           0
         );
-          console.log({closingShift})
+        console.log({ closingShift: closingShift.getHours() });
+
         const shiftEndDateTime = new Date(endDate);
         shiftEndDateTime.setHours(
           closingShift.getHours(),
@@ -56,8 +59,7 @@ export const useUpdateUpdateStatus = ({
           0
         );
         const now = new Date();
-          console.log(now > shiftEndDateTime);
-          console.log({now, shiftEndDateTime})
+
         // Check if shift has ended (current time is past shift end)
         // AND there's no nurse assigned AND status is not already 'not_covered'
         if (!nurseId && status !== 'not_covered' && now >= shiftEndDateTime) {
@@ -76,7 +78,7 @@ export const useUpdateUpdateStatus = ({
         }
       };
 
-    void validateAndUpdateStatus();
+      void validateAndUpdateStatus();
 
       return () => {
         isMounted = false;
@@ -89,7 +91,83 @@ export const useUpdateUpdateStatus = ({
       openingShift,
       updateStatus,
       nurseId,
-        closingShift
+      closingShift,
+    ])
+  );
+  useFocusEffect(
+    useCallback(() => {
+      let isMounted = true;
+
+      const validateAndUpdateStatus = async () => {
+        // Validate dates
+        if (
+          isNaN(startDate.getTime()) ||
+          isNaN(endDate.getTime()) ||
+          isNaN(openingShift.getTime()) ||
+          isNaN(closingShift.getTime())
+        ) {
+          console.error('Invalid date or time values');
+          return;
+        }
+
+        const now = new Date();
+
+        // Build full datetime for shift start/end
+        const shiftStartDateTime = new Date(startDate);
+        shiftStartDateTime.setHours(
+          openingShift.getHours(),
+          openingShift.getMinutes(),
+          0,
+          0
+        );
+
+        const shiftEndDateTime = new Date(endDate);
+        shiftEndDateTime.setHours(
+          closingShift.getHours(),
+          closingShift.getMinutes(),
+          0,
+          0
+        );
+
+        // 1. Shift has STARTED → mark as 'ongoing' (if nurse assigned)
+        if (
+          nurseId &&
+          status !== 'on_going' &&
+          status !== 'completed' &&
+          status !== 'not_covered' &&
+          now >= shiftStartDateTime &&
+          now < shiftEndDateTime
+        ) {
+          try {
+            if (isMounted) {
+              await updateStatus({
+                scheduleId: shiftId,
+                status: 'on_going',
+              });
+            }
+          } catch (err) {
+            if (isMounted) console.error('Failed to set ongoing:', err);
+          }
+          return;
+        }
+
+        // 2. Shift has ENDED + no nurse → mark as 'not_covered'
+      };
+
+      void validateAndUpdateStatus();
+
+      return () => {
+        isMounted = false;
+      };
+    }, [
+      status,
+      startDate,
+      endDate,
+      shiftId,
+      openingShift,
+      closingShift,
+      nurseId,
+      updateStatus,
     ])
   );
 
@@ -98,12 +176,7 @@ export const useUpdateUpdateStatus = ({
       let isMounted = true; // Track component mount status
 
       const validateAndUpdateStatus = async () => {
-
-
-        if (
-          isNaN(startDate.getTime()) ||
-          isNaN(endDate.getTime())
-        ) {
+        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
           console.error('Invalid startDate or endDate');
           return;
         }
@@ -147,7 +220,7 @@ export const useUpdateUpdateStatus = ({
         }
       };
 
-     void validateAndUpdateStatus();
+      void validateAndUpdateStatus();
 
       // Cleanup to prevent updates after unmount
       return () => {

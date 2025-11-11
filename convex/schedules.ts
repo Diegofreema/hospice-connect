@@ -1,6 +1,6 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import {mutation, MutationCtx, query, QueryCtx} from "./_generated/server";
 import {
   convertTimeStringToDate,
   doIntervalsOverlap,
@@ -9,6 +9,7 @@ import {
   stringToDate,
 } from "./helper";
 import { scheduleStatus } from "./schema";
+import {Id} from "./_generated/dataModel";
 
 export const cancelSchedule = mutation({
   args: {
@@ -84,7 +85,7 @@ export const cancelSchedule = mutation({
         isRead: false,
         hospiceId: args.hospiceId,
         scheduleId: args.scheduleId,
-        description: `${hospice.businessName} has accepted your shift cancel request for ${schedule.startDate} - ${schedule.endDate}; ${schedule.startTime} - ${schedule.endTime}.`,
+        description: `${hospice.businessName} has accepted your shift cancel request for ${schedule.startDate} to ${schedule.endDate}; ${schedule.startTime} - ${schedule.endTime}.`,
         title: "Schedule cancelled",
         type: "normal",
       });
@@ -215,7 +216,7 @@ export const sendScheduleNotification = mutation({
         isRead: false,
         hospiceId: args.hospiceId,
         scheduleId: scheduleId,
-        description: `${args.hospiceName} has assigned you a schedule for ${schedule.startDate} - ${schedule.endDate}; ${schedule.startTime} - ${schedule.endTime}.`,
+        description: `${args.hospiceName} has assigned you a schedule for ${schedule.startDate} to ${schedule.endDate}; ${schedule.startTime} - ${schedule.endTime}.`,
         title: "Schedule assigned",
         type: "assignment",
       });
@@ -261,7 +262,7 @@ export const declineSchedule = mutation({
       isRead: false,
       hospiceId: args.hospiceId,
       scheduleId: args.scheduleId,
-      description: `${args.hospiceName} has declined your shift cancel request for ${schedule.startDate} - ${schedule.endDate}; ${schedule.startTime} - ${schedule.endTime}.`,
+      description: `${args.hospiceName} has declined your shift cancel request for ${schedule.startDate} to ${schedule.endDate}; ${schedule.startTime} - ${schedule.endTime}.`,
       title: "Cancel request declined",
       type: "normal",
     });
@@ -308,7 +309,7 @@ export const declineCaseRequest = mutation({
       isRead: false,
       hospiceId: args.hospiceId,
       scheduleId: args.scheduleId,
-      description: `${args.hospiceName} has declined your case request for ${schedule.startDate} - ${schedule.endDate}; ${schedule.startTime} - ${schedule.endTime}.`,
+      description: `${args.hospiceName} has declined your case request for ${schedule.startDate} to ${schedule.endDate}; ${schedule.startTime} - ${schedule.endTime}.`,
       title: "Case request declined",
       type: "normal",
     });
@@ -399,7 +400,7 @@ export const acceptCaseRequest = mutation({
       isRead: false,
       hospiceId: args.hospiceId,
       scheduleId: args.scheduleId,
-      description: `${args.hospiceName} Hope Hospice has approved your case request for ${schedule.startDate} - ${schedule.endDate}; ${schedule.startTime} - ${schedule.endTime}.
+      description: `${args.hospiceName} Hope Hospice has approved your case request for ${schedule.startDate} to ${schedule.endDate}; ${schedule.startTime} - ${schedule.endTime}.
 `,
       title: "Case request accepted",
       type: "normal",
@@ -555,3 +556,13 @@ export const getCaseRequest = query({
     };
   },
 });
+
+
+// helper
+
+export const getSchedulesByAssignmentIdHelper = async (ctx: QueryCtx | MutationCtx, assignmentId:Id<'assignments'>) => {
+    return  await ctx.db
+        .query("schedules")
+        .filter(q => q.eq(q.field('assignmentId'),assignmentId)).order('asc')
+        .collect();
+}

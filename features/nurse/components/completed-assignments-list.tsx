@@ -1,12 +1,13 @@
+import { api } from '@/convex/_generated/api';
 import { ActionComponent } from '@/features/shared/components/action-component';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { LegendList } from '@legendapp/list';
+import { FunctionReturnType } from 'convex/server';
 import React from 'react';
-import { AssignmentsWithHospicesType } from '../types';
 import { CompletedCard } from './completed-card';
 
 type Props = {
-  data: AssignmentsWithHospicesType[];
+  data: FunctionReturnType<typeof api.assignments.completedAssignments>['page'];
   handleMore: () => void;
   isLoadingMore: boolean;
   title?: string;
@@ -17,7 +18,6 @@ export const CompletedAssignmentsList = ({
   data,
   handleMore,
   isLoadingMore,
-
   description = 'Please check in later.',
   title = 'No available assignments',
 }: Props) => {

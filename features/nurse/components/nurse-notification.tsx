@@ -15,11 +15,11 @@ type Props = {
 };
 
 export const NurseNotification = ({ notification }: Props) => {
-  const date = format(notification._creationTime, "PP; hh:mm a");
-  const firstPart = date.split(",")[0];
-  const secondPart = date.split(",")[1].split(";")[0];
-  const thirdPart = date.split(";")[1];
-  console.log(notification.type);
+  const date = format(notification._creationTime, "MM/dd/yy; hh:mm a");
+  const firstPart = date.split(" ")[0];
+  const secondPart = date.split(" ")[1] + " " + date.split(" ")[2];
+
+
   const { onAccept, onDecline, processing } = useAcceptDecline({
     scheduleId: notification.scheduleId!,
     nurseId: notification.nurseId!,
@@ -65,15 +65,13 @@ export const NurseNotification = ({ notification }: Props) => {
             </View>
           </View>
           <View>
-            <Text size="normal" color="grey" textAlign="right">
+            <Text size="small" color="grey" textAlign="right">
               {firstPart}
             </Text>
-            <Text size="normal" color="grey" textAlign="right">
+            <Text size="small" color="grey" textAlign="right">
               {secondPart}
             </Text>
-            <Text size="small" color="grey" textAlign="right">
-              {thirdPart}
-            </Text>
+
           </View>
         </View>
       </CardHeader>

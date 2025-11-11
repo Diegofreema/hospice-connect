@@ -19,22 +19,28 @@ export const ChatWrapper = ({ children }: PropsWithChildren) => {
     userData,
     tokenOrProvider: user?.streamToken,
   });
+  useEffect(() => {
+    if (chatClient && user?._id) {
+      const onFetchUnreadCount = async () => {
+        const response = await chatClient.getUnreadCount(user?._id);
+        setUnreadCount(response.total_unread_count);
+      };
+      void onFetchUnreadCount();
+    }
+  }, [chatClient, user?._id, setUnreadCount]);
+  useEffect(() => {
+    const listener = chatClient?.on((e) => {
+      if (e.total_unread_count !== undefined) {
+        setUnreadCount(e.total_unread_count);
+      }
+    });
 
-
-    useEffect(() => {
-        const listener = chatClient?.on((e) => {
-            if (e.total_unread_count !== undefined) {
-                setUnreadCount(e.total_unread_count);
-                console.log(e.total_unread_count);
-            }
-        });
-
-        return () => {
-            if (listener) {
-                listener.unsubscribe();
-            }
-        };
-    }, [chatClient, setUnreadCount]);
+    return () => {
+      if (listener) {
+        listener.unsubscribe();
+      }
+    };
+  }, [chatClient, setUnreadCount]);
 
   if (!chatClient) {
     return <LoadingComponent />;

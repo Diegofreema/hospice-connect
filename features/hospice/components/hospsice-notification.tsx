@@ -22,16 +22,16 @@ type Props = {
 };
 
 export const HospiceNotification = ({ notification }: Props) => {
-  const date = format(notification._creationTime, "PP; hh:mm a");
+  const date = format(notification._creationTime, "MM/dd/yy hh:mm a");
   const { hospice } = useHospice();
 
   const [processing, setProcessing] = useState(false);
   const cancelRequest = useMutation(api.schedules.cancelSchedule);
   const declineRequest = useMutation(api.schedules.declineSchedule);
   const { showToast } = useToast();
-  const firstPart = date.split(",")[0];
-  const secondPart = date.split(",")[1].split(";")[0];
-  const thirdPart = date.split(";")[1];
+  const firstPart = date.split(" ")[0];
+
+  const secondPart = date.split(" ")[1] + ' ' + date.split(" ")[2];
   const onPress = () => {
     if (notification.type === "route_sheet") {
       router.push(
@@ -143,7 +143,7 @@ export const HospiceNotification = ({ notification }: Props) => {
   const isDeclined = notification?.status === "declined";
   const isAccepted = notification?.status === "accepted";
   const isRouteSheet = notification.type === "route_sheet";
-
+    const showFooter = notification.type === 'cancel_request' || notification.type === "case_request" || notification.type === "route_sheet";
   return (
     <CustomPressable
       onPress={onPress}
@@ -178,21 +178,17 @@ export const HospiceNotification = ({ notification }: Props) => {
               </View>
             </View>
             <View>
-              <Text size="normal" color="grey" textAlign="right">
+              <Text size="small" color="grey" textAlign="right">
                 {firstPart}
               </Text>
-              <Text size="normal" color="grey" textAlign="right">
+              <Text size="small" color="grey" textAlign="right">
                 {secondPart}
               </Text>
-              <Text size="small" color="grey" textAlign="right">
-                {thirdPart}
-              </Text>
+
             </View>
           </View>
         </CardHeader>
-        {notification.type === "cancel_request" ||
-          notification.type === "route_sheet" ||
-          (notification.type === "case_request" && (
+        {showFooter && (
             <CardFooter>
               {showButtons && !isRouteSheet && (
                 <FlexButtons
@@ -215,7 +211,7 @@ export const HospiceNotification = ({ notification }: Props) => {
                 </Text>
               )}
             </CardFooter>
-          ))}
+          )}
       </Card>
     </CustomPressable>
   );

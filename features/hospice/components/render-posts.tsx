@@ -162,7 +162,7 @@ export const RenderPosts = ({ posts, loadMore, loadingMore }: Props) => {
         customSnapPoints={['25%', '70%']}
       >
         {initialValues === undefined || initialValues === null ? (
-          <SmallLoader />
+          <SmallLoader size={50} />
         ) : (
           <EditSchedule
             onClose={onCloseSheetEditSchedule}

@@ -88,4 +88,6 @@ export type AssignmentWithBusiness = {
 
 export type AssignmentsWithHospicesType = Doc<'assignments'> & {
   hospice: Doc<'hospices'> | null;
+  isSubmitted: boolean;
+  isApproved: boolean;
 };

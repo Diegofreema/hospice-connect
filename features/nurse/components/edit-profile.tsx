@@ -46,6 +46,7 @@ export const EditProfile = () => {
 
   const onSubmit = async (data: CreateNurseValidator) => {
     if (!nurse) return;
+
     try {
       await updateNurse({
         nurseId: nurse?._id,
@@ -59,11 +60,21 @@ export const EditProfile = () => {
         licenseNumber: data.licenseNumber.trim(),
         zipCode: data.zipCode,
       });
+      const fieldsChanged =
+        data.firstName !== nurse?.firstName ||
+        data.lastName !== nurse?.lastName ||
+        data.discipline !== nurse?.discipline ||
+        data.email !== nurse.email ||
+        data.licenseState !== nurse.stateOfRegistration;
+
       showToast({
         title: "Success",
-        subtitle: "Pending admin approval",
+        subtitle: fieldsChanged
+          ? "Pending admin approval"
+          : "Profile updated successfully",
         autodismiss: true,
       });
+
       router.back();
     } catch (error) {
       const errorMessage = generateErrorMessage(

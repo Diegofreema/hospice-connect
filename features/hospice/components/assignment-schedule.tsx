@@ -1,26 +1,26 @@
-import { useHospice } from "@/components/context/hospice-context";
-import { api } from "@/convex/_generated/api";
-import { useMutation, useQuery } from "convex/react";
+import { useHospice } from '@/components/context/hospice-context';
+import { api } from '@/convex/_generated/api';
+import { useMutation, useQuery } from 'convex/react';
 
-import { useToast } from "@/components/demos/toast";
-import { Id } from "@/convex/_generated/dataModel";
-import { Button } from "@/features/shared/components/button";
-import CancelAssignmentModal from "@/features/shared/components/cancel-modal";
-import { SmallLoader } from "@/features/shared/components/small-loader";
-import { generateErrorMessage } from "@/features/shared/utils";
-import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
-import { useState } from "react";
-import { View } from "../../shared/components/view";
-import { useSelectAssignment } from "../hooks/use-select-assignment";
-import { ShiftCard } from "./shift-card";
+import { useToast } from '@/components/demos/toast';
+import { Id } from '@/convex/_generated/dataModel';
+import { Button } from '@/features/shared/components/button';
+import CancelAssignmentModal from '@/features/shared/components/cancel-modal';
+import { SmallLoader } from '@/features/shared/components/small-loader';
+import { generateErrorMessage } from '@/features/shared/utils';
+import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
+import { useState } from 'react';
+import { View } from '../../shared/components/view';
+import { useSelectAssignment } from '../hooks/use-select-assignment';
+import { ShiftCard } from './shift-card';
 
 type Props = {
   onCancelSchedule: () => void;
   onEditSchedule: () => void;
   onRateNurse: () => void;
   onViewRouteSheet: (
-    assignmentId: Id<"assignments">,
-    nurseId: Id<"nurses">,
+    assignmentId: Id<'assignments'>,
+    nurseId: Id<'nurses'>
   ) => void;
 };
 
@@ -40,7 +40,7 @@ export const AssignmentSchedule = ({
     api.shifts.getShifts,
     assignmentId && hospice && hospice._id
       ? { assignmentId, hospiceId: hospice._id }
-      : "skip",
+      : 'skip'
   );
   const onCancel = async (reason: string) => {
     if (!assignmentId || !hospice?._id) return;
@@ -52,17 +52,17 @@ export const AssignmentSchedule = ({
         reason,
       });
       showToast({
-        title: "Success",
-        subtitle: "Assignment cancelled successfully",
+        title: 'Success',
+        subtitle: 'Assignment cancelled successfully',
         autodismiss: true,
       });
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        "Failed to cancel assignment",
+        'Failed to cancel assignment'
       );
       showToast({
-        title: "Error",
+        title: 'Error',
         subtitle: errorMessage,
         autodismiss: true,
       });
@@ -72,20 +72,15 @@ export const AssignmentSchedule = ({
   };
 
   if (data === undefined) {
-    return <SmallLoader />;
+    return <SmallLoader size={50} />;
   }
   if (data === null) return null;
 
   const shiftsHasNurse = data.shifts.some((shift) => shift.nurseId);
   const showCancelButton =
-    data.assignment?.status !== "completed" &&
-    !data.assignment?.isCanceled;
+    data.assignment?.status !== 'completed' && !data.assignment?.isCanceled;
 
-  const sortedShift = data.shifts.sort((a, b) => {
-    const dateA = new Date(a._creationTime);
-    const dateB = new Date(b._creationTime);
-    return dateB.getTime() - dateA.getTime();
-  });
+  const sortedShift = data.shifts;
   return (
     <View pt="xl" gap="md" mt="lg">
       <BottomSheetFlatList

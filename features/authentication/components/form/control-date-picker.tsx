@@ -22,6 +22,7 @@ type Props<TFieldValues extends FieldValues> = {
   placeholder?: string;
   mode?: "date" | "time" | "datetime";
   age?: number;
+  disabled?: boolean;
 };
 
 export const ControlledDatePicker = <TFieldValues extends FieldValues>({
@@ -31,6 +32,7 @@ export const ControlledDatePicker = <TFieldValues extends FieldValues>({
   name,
   mode = "date",
   age,
+    disabled
 }: Props<TFieldValues>) => {
   const [open, setOpen] = useState(false);
   const onShowDatePicker = () => {
@@ -48,6 +50,7 @@ export const ControlledDatePicker = <TFieldValues extends FieldValues>({
             <TouchableOpacity
               onPress={onShowDatePicker}
               style={styles.container}
+              disabled={disabled}
             >
               <Text size="normal" color={value ? "black" : "grey"}>
                 {mode === "time"

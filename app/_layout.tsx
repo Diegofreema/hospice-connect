@@ -1,6 +1,6 @@
 import Provider from '@/components/provider';
 import { ErrorComponent } from '@/features/shared/components/error';
-import { ToastProvider } from '../components/demos/toast';
+import { ToastProvider } from '@/components/demos/toast';
 
 import { StackedModalProvider } from '@/components/demos/modal/modal-manager';
 import { setupBackgroundUpdates } from '@/updates';
@@ -14,7 +14,7 @@ import { KeyboardProvider } from 'react-native-keyboard-controller';
 import 'react-native-reanimated';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
-setupBackgroundUpdates();
+void setupBackgroundUpdates();
 export function ErrorBoundary({ retry, error }: ErrorBoundaryProps) {
   return <ErrorComponent refetch={retry} text={error.message} />;
 }

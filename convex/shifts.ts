@@ -4,6 +4,7 @@ import {ConvexError, v} from "convex/values";
 import {Doc} from "./_generated/dataModel";
 import {query} from "./_generated/server";
 import {getNurseDetails} from "./nurses";
+import {getSchedulesByAssignmentIdHelper} from "./schedules";
 
 export const getShifts = query({
   args: {
@@ -29,13 +30,7 @@ export const getShifts = query({
       return emptyData;
     }
 
-    const schedules = await ctx.db
-      .query("schedules")
-      .withIndex("by_assignment_id", (q) =>
-        q.eq("assignmentId", args.assignmentId),
-      )
-      // .order('desc')
-      .collect();
+    const schedules = await getSchedulesByAssignmentIdHelper(ctx, args.assignmentId)
 
     const shifts = schedules.map(async (schedule) => {
       const nurse = await getNurseDetails(ctx, schedule.nurseId);
@@ -67,13 +62,7 @@ export const getShiftsByOnlyAssignmentId = query({
       return [];
     }
 
-    const schedules = await ctx.db
-      .query("schedules")
-      .withIndex("by_assignment_id", (q) =>
-        q.eq("assignmentId", args.assignmentId),
-      )
-      .order("asc")
-      .collect();
+    const schedules = await getSchedulesByAssignmentIdHelper(ctx, args.assignmentId);
 
     const shifts = schedules.map(async (schedule) => {
       const nurse = await getNurseDetails(ctx, schedule.nurseId);

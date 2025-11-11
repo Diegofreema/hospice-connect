@@ -1,6 +1,9 @@
 import { Doc } from './_generated/dataModel';
 
-type AssignmentType = Doc<'assignments'>;
+type AssignmentType = Doc<'assignments'> & {
+  isApproved: boolean;
+  isSubmitted: boolean;
+};
 
 export type AvailableAssignmentType = AssignmentType & {
   hospice: Doc<'hospices'> | null;

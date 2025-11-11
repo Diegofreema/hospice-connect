@@ -14,7 +14,7 @@ import {
   createAssignmentValidator,
   CreateAssignmentValidator,
 } from "../validator";
-import {calculateAge} from "@/features/shared/utils";
+import { calculateAge } from "@/features/shared/utils";
 const careLevel = [
   "Initial Evaluation",
   "Follow Up",
@@ -61,8 +61,8 @@ export const CreateAssignmentForm = ({
     },
     resolver: zodResolver(createAssignmentValidator),
   });
-    const dob =  watch('dateOfBirth');
-    const age = calculateAge(dob);
+  const dob = watch("dateOfBirth");
+  const age = calculateAge(dob);
   useEffect(() => {
     if (isSubmitSuccessful) {
       reset();
@@ -160,13 +160,14 @@ export const CreateAssignmentForm = ({
           errors={errors}
           name="startDate"
           label="Start date"
+          disabled={disabled}
         />
         <ControlledDatePicker
           control={control}
           errors={errors}
           name="endDate"
           label="End date"
-
+          disabled={disabled}
         />
         <ControlledDatePicker
           control={control}
@@ -174,6 +175,7 @@ export const CreateAssignmentForm = ({
           name="openShift"
           label="Open shift"
           mode="time"
+          disabled={disabled}
         />
         <ControlInput
           control={control}
@@ -197,7 +199,6 @@ export const CreateAssignmentForm = ({
           name="zipcode"
           label="Zipcode"
           placeholder="Enter zipcode"
-
         />
 
         <ControlInput
@@ -211,7 +212,7 @@ export const CreateAssignmentForm = ({
         <Button
           title={btnTitle}
           onPress={handleSubmit(onSubmit)}
-          disabled={isSubmitting || disabled}
+          disabled={isSubmitting}
         />
       </Stack>
     </KeyboardAwareScrollViewComponent>

@@ -1,21 +1,21 @@
-import { useHospice } from "@/components/context/hospice-context";
-import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
-import { RoustSheetComponent } from "@/features/shared/components/route-sheet-component";
-import { SmallLoader } from "@/features/shared/components/small-loader";
-import { useQuery } from "convex/react";
-import { useLocalSearchParams } from "expo-router";
-import React, { useState } from "react";
-import { ScrollView } from "react-native";
-import { ApproveRouteSheetModal } from "./accept-notification";
-import { DeclineRouteSheetModal } from "./delcine-route-sheet";
-import { Text } from "@/features/shared/components/text";
-import { useMarkAsRead } from "@/features/hospice/hooks/use-mark-as-read";
+import { useHospice } from '@/components/context/hospice-context';
+import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
+import { useMarkAsRead } from '@/features/hospice/hooks/use-mark-as-read';
+import { RoustSheetComponent } from '@/features/shared/components/route-sheet-component';
+import { SmallLoader } from '@/features/shared/components/small-loader';
+import { Text } from '@/features/shared/components/text';
+import { useQuery } from 'convex/react';
+import { useLocalSearchParams } from 'expo-router';
+import React, { useState } from 'react';
+import { ScrollView } from 'react-native';
+import { ApproveRouteSheetModal } from './accept-notification';
+import { DeclineRouteSheetModal } from './delcine-route-sheet';
 
 export const RouteSheetById = () => {
   const { id, notificationId } = useLocalSearchParams<{
-    id: Id<"routeSheets">;
-    notificationId: Id<"hospiceNotifications">;
+    id: Id<'routeSheets'>;
+    notificationId: Id<'hospiceNotifications'>;
   }>();
 
   const [declineModalVisible, setDeclineModalVisible] = useState(false);
@@ -27,7 +27,7 @@ export const RouteSheetById = () => {
     api.routeSheets.getRouteSheetById,
     hospice && hospice._id
       ? { hospiceId: hospice._id, routeSheetId: id }
-      : "skip",
+      : 'skip'
   );
 
   if (data === undefined) {
@@ -40,6 +40,7 @@ export const RouteSheetById = () => {
   const { assignment, nurse, routeSheet, schedules } = data;
   const isApproved = routeSheet.isApproved;
   const isSeen = !!routeSheet.isSeen;
+
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
@@ -59,7 +60,7 @@ export const RouteSheetById = () => {
         careLevel={data.assignment.careLevel}
         patientName={
           data.assignment.patientFirstName +
-          " " +
+          ' ' +
           data.assignment.patientLastName
         }
         buttonText2="Approve"
@@ -70,13 +71,13 @@ export const RouteSheetById = () => {
 
       {isSeen && (
         <Text
-          size={"medium"}
+          size={'medium'}
           style={{ marginTop: 10 }}
-          color={isApproved ? "green" : "red"}
+          color={isApproved ? 'green' : 'red'}
           isBold
-          textAlign={"center"}
+          textAlign={'center'}
         >
-          {isApproved ? "Approved" : "Declined"}
+          {isApproved ? 'Approved' : 'Declined'}
         </Text>
       )}
       <DeclineRouteSheetModal

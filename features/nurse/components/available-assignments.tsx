@@ -5,6 +5,7 @@ import { SmallLoader } from '@/features/shared/components/small-loader';
 import { Stack } from '@/features/shared/components/v-stack';
 import { usePaginatedQuery } from 'convex/react';
 import { AssignmentsForNurses } from './assignments';
+import {sortedArray} from "@/features/shared/utils";
 
 type Props = {
   nurseId: Id<'nurses'>;
@@ -32,11 +33,11 @@ export const AvailableAssignments = ({
   };
   const isLoadingMore = status === 'LoadingMore';
   // const isExhausted = status === 'Exhausted';
-
+   const sortedResults = sortedArray(results)
   return (
     <Stack flex={1}>
       <AssignmentsForNurses
-        data={results}
+        data={sortedResults}
         handleMore={handleFetchMore}
         isLoadingMore={isLoadingMore}
         onOpenSheet={onOpenSheet}

@@ -1,11 +1,16 @@
 /* eslint-disable @typescript-eslint/no-empty-object-type */
-import {Doc, Id} from '@/convex/_generated/dataModel';
-import {scheduleStatus} from '@/convex/schema';
-import {ReactMutation} from 'convex/react';
-import {FunctionReference} from 'convex/server';
-import {ConvexError, Infer} from 'convex/values';
-import {addHours, differenceInHours, differenceInYears, format,} from 'date-fns';
-import {Dimensions} from 'react-native';
+import { Doc, Id } from '@/convex/_generated/dataModel';
+import { scheduleStatus } from '@/convex/schema';
+import { ReactMutation } from 'convex/react';
+import { FunctionReference } from 'convex/server';
+import { ConvexError, Infer } from 'convex/values';
+import {
+  addHours,
+  differenceInHours,
+  differenceInYears,
+  format,
+} from 'date-fns';
+import { Dimensions } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -93,6 +98,8 @@ export const getScheduleStatusText = (status: Infer<typeof scheduleStatus>) => {
     case 'available':
       return 'Available';
     case 'booked':
+      return 'Booked';
+    case 'on_going':
       return 'Ongoing';
     case 'completed':
       return 'Completed';
@@ -129,8 +136,9 @@ export const getScheduleStatusAndColor = (
         color: '#00A25C',
       };
     case 'booked':
+      return { status: 'pending', color: '#9747FF' };
+    case 'on_going':
       return { status: 'ongoing', color: '#4C55FF' };
-
     case 'not_covered':
       return { status: 'error', color: '#991B1B' };
     case 'cancelled':
@@ -140,7 +148,7 @@ export const getScheduleStatusAndColor = (
   }
 };
 
-export function convertTimeStringToDate(timeString: string, value?:string) {
+export function convertTimeStringToDate(timeString: string, value?: string) {
   // Get current date to use as base
   const now = new Date();
 
@@ -157,7 +165,7 @@ export function convertTimeStringToDate(timeString: string, value?:string) {
   }
 
   // Create new Date object with today's date and parsed time
-    console.log(hours24, value);
+  console.log(hours24, value);
   return new Date(
     now.getFullYear(),
     now.getMonth(),
@@ -215,10 +223,6 @@ interface Shift {
   endShift: string;
 }
 
-
-
-
-
 export const fullName = (firstName?: string, lastName?: string) => {
   if (!firstName && !lastName) return '';
 
@@ -238,14 +242,14 @@ export const generateShiftsWithDateFns = ({
 }: ShiftWithDateFns): Shift[] => {
   const distanceBetweenDates = differenceInHours(endDate, startDate);
   //check if start time and opening shift has passed
-  const shiftTimeHasStarted =
-    startDate.setHours(openShift.getHours(), openShift.getMinutes(), 0, 0) <=
-    Date.now();
-  if (shiftTimeHasStarted) {
-    throw new ConvexError({
-      message: 'Shift time has already started',
-    });
-  }
+  // const shiftTimeHasStarted =
+  //   startDate.setHours(openShift.getHours(), openShift.getMinutes(), 0, 0) <=
+  //   Date.now();
+  // if (shiftTimeHasStarted) {
+  //   throw new ConvexError({
+  //     message: 'Shift time has already started',
+  //   });
+  // }
 
   const shifts: Shift[] = [];
   if (distanceBetweenDates < 1) {
@@ -286,7 +290,16 @@ export const generateShiftsWithDateFns = ({
 };
 
 export const calculateAge = (dob: Date): number => {
+  const today = new Date();
+  return differenceInYears(today, dob);
+};
 
-    const today = new Date();
-    return differenceInYears(today, dob)
-}
+export const sortedArray = <T extends { _creationTime: number }>(
+  array: T[]
+): T[] => {
+  return [...array].sort((a, b) => {
+    const dateA = new Date(a._creationTime);
+    const dateB = new Date(b._creationTime);
+    return dateB.getTime() - dateA.getTime();
+  });
+};

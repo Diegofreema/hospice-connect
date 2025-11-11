@@ -33,7 +33,6 @@ export const TabBarIcon = ({
   icon: Icon,
   unreadCount,
 }: Props) => {
-
   const isMany = (unreadCount || 0) > 99;
   const isSmall = (unreadCount || 0) < 10;
   return (
