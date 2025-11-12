@@ -303,3 +303,12 @@ export const sortedArray = <T extends { _creationTime: number }>(
     return dateB.getTime() - dateA.getTime();
   });
 };
+export const sortedArrayByAvailability = <
+  T extends { available?: { available: boolean } },
+>(
+  array: T[]
+): T[] => {
+  return [...array].sort(
+    (a, b) => +!!b.available?.available - +!!a.available?.available
+  );
+};

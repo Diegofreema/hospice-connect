@@ -6,6 +6,7 @@ import { mutation, query } from './_generated/server';
 import {
   convertTimeStringToDate,
   doIntervalsOverlap,
+  formatDate,
   parseDateTime,
   stringToDate,
 } from './helper';
@@ -203,7 +204,7 @@ export const acceptAssignment = mutation({
       type: 'assignment',
       title: 'Shift accepted',
       scheduleId: args.scheduleId,
-      description: `${user.name} has accepted your case request for ${schedule.startDate} to ${schedule.endDate}; ${schedule.startTime} - ${schedule.endTime}.`,
+      description: `${user.name} has accepted your case request for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
       nurseId: args.nurseId,
     });
     if (args.nurseNotificationId) {
@@ -256,7 +257,7 @@ export const declineAssignment = mutation({
       type: 'assignment',
       title: 'Assignment Declined',
       scheduleId: args.scheduleId,
-      description: `${user.name} has declined your case request for ${schedule.startDate} to ${schedule.endDate}; ${schedule.startTime} - ${schedule.endTime}.`,
+      description: `${user.name} has declined your case request for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
       nurseId: notification.nurseId,
     });
   },

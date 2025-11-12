@@ -35,6 +35,12 @@
     "plugins": [
       "expo-router",
       [
+        "expo-navigation-bar",
+        {
+          "position": "absolute" // Nav bar floats over content (avoids drawing under it)
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "image": "./assets/images/icon.png",

@@ -1,6 +1,7 @@
 import { Title } from '@/components/title/Title';
 import { api } from '@/convex/_generated/api';
 import { SmallLoader } from '@/features/shared/components/small-loader';
+import { sortedArrayByAvailability } from '@/features/shared/utils';
 import { LegendList } from '@legendapp/list';
 import { useQuery } from 'convex/react';
 import { format } from 'date-fns';
@@ -28,10 +29,11 @@ export const SearchNurses = ({ query }: Props) => {
   const onAction = (discipline?: string) => {
     router.push(`/assign?discipline=${discipline}`);
   };
+  const sortedNurses = sortedArrayByAvailability(nurses);
   return (
     <View style={{ flex: 1 }}>
       <LegendList
-        data={nurses}
+        data={sortedNurses}
         recycleItems
         renderItem={({ item }) => (
           <NurseCard nurse={item} isAssigned onAction={onAction} />

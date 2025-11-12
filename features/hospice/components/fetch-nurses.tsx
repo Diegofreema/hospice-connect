@@ -5,6 +5,7 @@ import { usePaginatedQuery } from 'convex/react';
 import { Title } from '@/components/title/Title';
 
 import { Stack } from '@/features/shared/components/v-stack';
+import { sortedArrayByAvailability } from '@/features/shared/utils';
 import { LegendList } from '@legendapp/list';
 import { format } from 'date-fns';
 import { NurseType } from '../types';
@@ -41,12 +42,13 @@ export const FetchNurses = ({
   if (status === 'LoadingFirstPage') {
     return <SmallLoader size={50} />;
   }
+  const sortedResults = sortedArrayByAvailability(results);
 
   return (
     <Stack flex={1}>
       <LegendList
         ListHeaderComponent={<Title size={20}>Healthcare Professionals</Title>}
-        data={results}
+        data={sortedResults}
         recycleItems
         onEndReached={onLoadMore}
         onEndReachedThreshold={0.5}

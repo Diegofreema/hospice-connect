@@ -1,25 +1,25 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
-import { paginationOptsValidator } from "convex/server";
-import { ConvexError, v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { getAuthUserId } from '@convex-dev/auth/server';
+import { paginationOptsValidator } from 'convex/server';
+import { ConvexError, v } from 'convex/values';
+import { mutation, query } from './_generated/server';
 import {
   convertTimeStringToDate,
   doIntervalsOverlap,
   formatDate,
   parseDateTime,
   stringToDate,
-} from "./helper";
-import { getNurseDetails } from "./nurses";
+} from './helper';
+import { getNurseDetails } from './nurses';
 
 export const unreadMessagesCount = query({
   args: {
-    hospiceId: v.id("hospices"),
+    hospiceId: v.id('hospices'),
   },
   handler: async (ctx, { hospiceId }) => {
     const notifications = await ctx.db
-      .query("hospiceNotifications")
-      .withIndex("by_hospice_id", (q) =>
-        q.eq("hospiceId", hospiceId).eq("isRead", false),
+      .query('hospiceNotifications')
+      .withIndex('by_hospice_id', (q) =>
+        q.eq('hospiceId', hospiceId).eq('isRead', false)
       )
       .collect();
 
@@ -29,14 +29,14 @@ export const unreadMessagesCount = query({
 
 export const getNotifications = query({
   args: {
-    hospiceId: v.id("hospices"),
+    hospiceId: v.id('hospices'),
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
     const notifications = await ctx.db
-      .query("hospiceNotifications")
-      .withIndex("by_hospice_id", (q) => q.eq("hospiceId", args.hospiceId))
-      .order("desc")
+      .query('hospiceNotifications')
+      .withIndex('by_hospice_id', (q) => q.eq('hospiceId', args.hospiceId))
+      .order('desc')
       .paginate(args.paginationOpts);
     const page = await Promise.all(
       notifications.page.map(async (notification) => {
@@ -47,7 +47,7 @@ export const getNotifications = query({
           ...notification,
           nurse,
         };
-      }),
+      })
     );
     return {
       ...notifications,
@@ -59,18 +59,18 @@ export const getNotifications = query({
 // ? mutations
 export const markNotificationAsRead = mutation({
   args: {
-    hospiceId: v.id("hospices"),
+    hospiceId: v.id('hospices'),
   },
   handler: async (ctx, args) => {
     const notifications = await ctx.db
-      .query("hospiceNotifications")
-      .withIndex("by_hospice_id", (q) =>
-        q.eq("hospiceId", args.hospiceId).eq("isRead", false),
+      .query('hospiceNotifications')
+      .withIndex('by_hospice_id', (q) =>
+        q.eq('hospiceId', args.hospiceId).eq('isRead', false)
       )
       .take(100);
 
     for (const notification of notifications) {
-      if (notification.type !== "route_sheet") {
+      if (notification.type !== 'route_sheet') {
         if (!notification.isRead) {
           await ctx.db.patch(notification._id, { isRead: true });
         }
@@ -80,7 +80,7 @@ export const markNotificationAsRead = mutation({
 });
 export const markSingleNotificationAsRead = mutation({
   args: {
-    notificationId: v.id("hospiceNotifications"),
+    notificationId: v.id('hospiceNotifications'),
   },
   handler: async (ctx, args) => {
     const notification = await ctx.db.get(args.notificationId);
@@ -98,74 +98,73 @@ export const markSingleNotificationAsRead = mutation({
 
 export const cancelShiftNotification = mutation({
   args: {
-    nurseId: v.id("nurses"),
-    shiftId: v.id("schedules"),
+    nurseId: v.id('nurses'),
+    shiftId: v.id('schedules'),
     reason: v.string(),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) {
-      throw new ConvexError({ message: "Unauthorized" });
+      throw new ConvexError({ message: 'Unauthorized' });
     }
 
     const nurse = await ctx.db.get(args.nurseId);
     if (!nurse) {
-      throw new ConvexError({ message: "Nurse not found" });
+      throw new ConvexError({ message: 'Nurse not found' });
     }
 
     const shift = await ctx.db.get(args.shiftId);
     if (!shift) {
-      throw new ConvexError({ message: "Shift not found" });
+      throw new ConvexError({ message: 'Shift not found' });
     }
 
-    if (shift.status !== "booked") {
-      throw new ConvexError({ message: "Shift is not booked" });
+    if (shift.status !== 'booked' && shift.status !== 'on_going') {
+      throw new ConvexError({ message: 'Shift is not booked' });
     }
 
     const assignment = await ctx.db.get(shift.assignmentId);
     if (!assignment) {
-      throw new ConvexError({ message: "Assignment not found" });
+      throw new ConvexError({ message: 'Assignment not found' });
     }
 
     const hospice = await ctx.db.get(assignment.hospiceId);
     if (!hospice) {
-      throw new ConvexError({ message: "Hospice not found" });
+      throw new ConvexError({ message: 'Hospice not found' });
     }
 
-    await ctx.db.insert("hospiceNotifications", {
+    await ctx.db.insert('hospiceNotifications', {
       isRead: false,
       hospiceId: assignment.hospiceId,
       nurseId: nurse._id,
-      type: "cancel_request",
+      type: 'cancel_request',
       description: args.reason,
       scheduleId: shift._id,
-      title: `${nurse.firstName} ${nurse.lastName} submitted cancel request for ${shift.startDate} to ${shift.endDate}: ${shift.startTime}-${shift.endTime}`,
+      title: `${nurse.firstName} ${nurse.lastName} submitted cancel request for ${formatDate(shift.startDate)} to ${formatDate(shift.endDate)}: ${shift.startTime}-${shift.endTime}`,
     });
   },
 });
 
 export const sendCaseRequestNotification = mutation({
   args: {
-    nurseId: v.id("nurses"),
-    scheduleIds: v.array(v.id("schedules")),
+    nurseId: v.id('nurses'),
+    scheduleIds: v.array(v.id('schedules')),
     startTime: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) {
-      throw new ConvexError({ message: "Unauthorized" });
+      throw new ConvexError({ message: 'Unauthorized' });
     }
-
 
     const nurse = await ctx.db.get(args.nurseId);
     if (!nurse) {
-      throw new ConvexError({ message: "Nurse not found" });
+      throw new ConvexError({ message: 'Nurse not found' });
     }
 
     for (const scheduleId of args.scheduleIds) {
       const shift = await ctx.db.get(scheduleId);
       if (!shift) {
-        throw new ConvexError({ message: "Shift not found" });
+        throw new ConvexError({ message: 'Shift not found' });
       }
       const openingShift = convertTimeStringToDate(shift.startTime);
       const startDate = stringToDate(shift.startDate);
@@ -174,7 +173,7 @@ export const sendCaseRequestNotification = mutation({
         openingShift.getHours(),
         openingShift.getMinutes(),
         0,
-        0,
+        0
       );
       // console.log({
       //   shiftStartDateTime,
@@ -185,27 +184,27 @@ export const sendCaseRequestNotification = mutation({
       // });
       const now = new Date();
       if (shiftStartDateTime < now) {
-        throw new ConvexError({ message: "Shift has already passed" });
+        throw new ConvexError({ message: 'Shift has already passed' });
       }
 
-      if (shift.status !== "available") {
-        throw new ConvexError({ message: "Shift is not available" });
+      if (shift.status !== 'available') {
+        throw new ConvexError({ message: 'Shift is not available' });
       }
 
       const assignment = await ctx.db.get(shift.assignmentId);
       if (!assignment) {
-        throw new ConvexError({ message: "Assignment not found" });
+        throw new ConvexError({ message: 'Assignment not found' });
       }
 
       const hospice = await ctx.db.get(assignment.hospiceId);
       if (!hospice) {
-        throw new ConvexError({ message: "Hospice not found" });
+        throw new ConvexError({ message: 'Hospice not found' });
       }
 
       const shifts = await ctx.db
-        .query("schedules")
-        .withIndex("nurse", (q) =>
-          q.eq("nurseId", nurse._id).eq("status", "booked"),
+        .query('schedules')
+        .withIndex('nurse', (q) =>
+          q.eq('nurseId', nurse._id).eq('status', 'booked')
         )
         .collect();
 
@@ -216,7 +215,7 @@ export const sendCaseRequestNotification = mutation({
       // Validate that end time is after start time
       if (newShiftEnd.getTime() <= newShiftStart.getTime()) {
         throw new ConvexError({
-          message: "End date/time must be after start date/time",
+          message: 'End date/time must be after start date/time',
         });
       }
 
@@ -225,7 +224,7 @@ export const sendCaseRequestNotification = mutation({
         // Parse existing shift's start and end datetime
         const existingShiftStart = parseDateTime(
           shift.startDate,
-          shift.startTime,
+          shift.startTime
         );
         const existingShiftEnd = parseDateTime(shift.endDate, shift.endTime);
 
@@ -234,7 +233,7 @@ export const sendCaseRequestNotification = mutation({
           newShiftStart,
           newShiftEnd,
           existingShiftStart,
-          existingShiftEnd,
+          existingShiftEnd
         );
 
         if (hasConflict) {
@@ -243,14 +242,14 @@ export const sendCaseRequestNotification = mutation({
           });
         }
       }
-      await ctx.db.insert("hospiceNotifications", {
+      await ctx.db.insert('hospiceNotifications', {
         isRead: false,
         hospiceId: assignment.hospiceId,
         nurseId: nurse._id,
-        type: "case_request",
-        description: "",
+        type: 'case_request',
+        description: '',
         scheduleId: scheduleId,
-        title: `${nurse.firstName} ${nurse.lastName} has submitted a case request for ${shift.startDate} to ${shift.endDate}: ${shift.startTime}-${shift.endTime}`,
+        title: `${nurse.firstName} ${nurse.lastName} has submitted a case request for ${formatDate(shift.startDate)} to ${formatDate(shift.endDate)}: ${shift.startTime}-${shift.endTime}`,
       });
     }
   },
