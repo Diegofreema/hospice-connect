@@ -18,11 +18,28 @@ export const getOurPosts = query({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const posts = await ctx.db
       .query('assignments')
       .withIndex('hospiceId', (q) => q.eq('hospiceId', args.hospiceId))
       .order('desc')
       .paginate(args.paginationOpts);
+
+    // check if each post has shifts with nurses
+    const postsWithShifts = posts.page.map(async (post) => {
+      const schedules = await ctx.db
+        .query('schedules')
+        .withIndex('by_assignment_id', (q) => q.eq('assignmentId', post._id))
+        .collect();
+      const hasNurses = schedules.some((schedule) => schedule.nurseId);
+      return {
+        ...post,
+        hasNurses,
+      };
+    });
+    return {
+      ...posts,
+      page: await Promise.all(postsWithShifts),
+    };
   },
 });
 export const getOurAvailablePosts = query({
@@ -113,23 +130,28 @@ export const acceptAssignment = mutation({
     // logic to check if schedule time has passed
     const openingShift = convertTimeStringToDate(schedule.startTime);
     const startDate = stringToDate(schedule.startDate);
-    const shiftStartDateTime = new Date(startDate as Date);
-    shiftStartDateTime.setHours(
-      openingShift.getHours(),
-      openingShift.getMinutes(),
-      0,
-      0
+    const shiftStartDateTime = new Date(
+      Date.UTC(
+        startDate.getUTCFullYear(),
+        startDate.getUTCMonth(),
+        startDate.getUTCDate(),
+        openingShift.getHours(),
+        openingShift.getMinutes(),
+        0,
+        0
+      )
     );
+    console.log({ shiftStartDateTime, startDate, openingShift });
 
-    const now = new Date();
-    if (shiftStartDateTime < now) {
+    const nowUTC = Date.now();
+    if (shiftStartDateTime.getTime() < nowUTC) {
       throw new ConvexError({ message: 'Shift has already passed' });
     }
     if (schedule.status === 'not_covered') {
       throw new ConvexError({ message: 'Shift has already passed' });
     }
 
-    if (schedule.status === 'booked') {
+    if (schedule.status === 'booked' || schedule.status === 'on_going') {
       throw new ConvexError({ message: 'Shift already booked' });
     }
 
@@ -178,7 +200,7 @@ export const acceptAssignment = mutation({
 
       if (hasConflict) {
         throw new ConvexError({
-          message: `You already have a shift from ${shift.startDate} ${shift.startTime} to ${shift.endDate} ${shift.endTime}`,
+          message: `You already have a shift from ${formatDate(shift.startDate)} ${shift.startTime} to ${formatDate(shift.endDate)} ${shift.endTime}`,
         });
       }
     }

@@ -1,60 +1,42 @@
 import { Badge } from '@/components/badge/Badge';
 import { BadgeVariant } from '@/components/badge/types';
 import { Card, CardHeader } from '@/components/card';
-import { PrivacyNoticeLink } from '@/components/privacy-notice/privacy-notice-link';
 import { api } from '@/convex/_generated/api';
+import { CustomPressable } from '@/features/shared/components/custom-pressable';
 import { Text } from '@/features/shared/components/text';
-import { Stack } from '@/features/shared/components/v-stack';
 import {
   fullName,
   getScheduleStatusAndColor,
   getScheduleStatusText,
 } from '@/features/shared/utils';
-
-import { Id } from '@/convex/_generated/dataModel';
-import { CustomPressable } from '@/features/shared/components/custom-pressable';
 import { useUpdateUpdateStatus } from '@/hooks/use-update-status';
 import { IconCircle } from '@tabler/icons-react-native';
 import { FunctionReturnType } from 'convex/server';
 import { format, parse } from 'date-fns';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
+import React from 'react';
 import { useWindowDimensions, View } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
-import { useGetScheduleId } from '../hooks/use-get-schedule-id';
 
 type Props = {
   shift: FunctionReturnType<typeof api.shifts.getShifts>['shifts'][number];
-  onCancelSchedule: () => void;
-  onEditSchedule: () => void;
-  onRateNurse: () => void;
-  onViewRouteSheet: (
-    assignmentId: Id<'assignments'>,
-    nurseId: Id<'nurses'>
-  ) => void;
 };
 
-export const ShiftCard = ({
-  shift,
-  onCancelSchedule,
-  onEditSchedule,
-  onRateNurse,
-  onViewRouteSheet,
-}: Props) => {
+export const LatestShiftCard = ({ shift }: Props) => {
   const { width } = useWindowDimensions();
   const size = width * 0.13;
   const today = new Date();
-  const statusText = getScheduleStatusText(shift.status);
-  const statusInfo = getScheduleStatusAndColor(shift.status);
-  const getScheduleId = useGetScheduleId((state) => state.setId);
-  const startDate = parse(shift.startDate, 'dd-MM-yyyy', today);
-  const endDate = parse(shift.endDate, 'dd-MM-yyyy', today);
+  const statusText = getScheduleStatusText(shift.status!);
+  const statusInfo = getScheduleStatusAndColor(shift.status!);
+
+  const startDate = parse(shift.startDate!, 'dd-MM-yyyy', today);
+  const endDate = parse(shift.endDate!, 'dd-MM-yyyy', today);
   const openingShiftStr = shift.startTime.replace(/\s+/, ' ');
   const openingShift = parse(openingShiftStr, 'h:mm a', today);
   const closingTimeStr = shift.endTime.replace(/\s+/, ' ');
 
   const closingShift = parse(closingTimeStr, 'hh:mm a', today);
-
   useUpdateUpdateStatus({
     nurseId: shift.nurseId!,
     closingShift,
@@ -64,21 +46,6 @@ export const ShiftCard = ({
     endDate,
     openingShift,
   });
-  const handleCancelSchedule = () => {
-    onCancelSchedule();
-    getScheduleId(shift._id);
-  };
-
-  const handleEditSchedule = () => {
-    onEditSchedule();
-    getScheduleId(shift._id);
-  };
-
-  const handleRateNurse = () => {
-    // if (!shift.nurse) return;
-    onRateNurse();
-    getScheduleId(shift._id);
-  };
   const onPressName = () => {
     if (!shift.nurseId) {
       return;
@@ -126,36 +93,6 @@ export const ShiftCard = ({
             </Text>
           </View>
         </View>
-        <Stack mode="flex" gap="lg">
-          {shift.status === 'completed' &&
-            shift.isSubmitted &&
-            shift.nurseId && (
-              <PrivacyNoticeLink
-                onPress={() =>
-                  onViewRouteSheet(shift.assignmentId, shift.nurseId!)
-                }
-              >
-                View Route Sheet
-              </PrivacyNoticeLink>
-            )}
-          {shift.status !== 'completed' &&
-            shift.nurseId &&
-            shift.status !== 'cancelled' && (
-              <PrivacyNoticeLink onPress={handleCancelSchedule}>
-                Cancel Schedule
-              </PrivacyNoticeLink>
-            )}
-
-          <PrivacyNoticeLink onPress={handleEditSchedule}>
-            Edit Schedule
-          </PrivacyNoticeLink>
-
-          {shift.status === 'completed' && (
-            <PrivacyNoticeLink onPress={handleRateNurse}>
-              Rate nurse
-            </PrivacyNoticeLink>
-          )}
-        </Stack>
       </CardHeader>
     </Card>
   );

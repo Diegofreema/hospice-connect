@@ -150,6 +150,7 @@ export const getScheduleStatusAndColor = (
 
 export function convertTimeStringToDate(timeString: string, value?: string) {
   // Get current date to use as base
+  if (!timeString) return new Date();
   const now = new Date();
 
   // Parse the time string (e.g., "3:59 AM")
@@ -165,7 +166,7 @@ export function convertTimeStringToDate(timeString: string, value?: string) {
   }
 
   // Create new Date object with today's date and parsed time
-  console.log(hours24, value);
+
   return new Date(
     now.getFullYear(),
     now.getMonth(),
@@ -311,4 +312,9 @@ export const sortedArrayByAvailability = <
   return [...array].sort(
     (a, b) => +!!b.available?.available - +!!a.available?.available
   );
+};
+
+export const reverseDateString = (dateString: string) => {
+  const [year, month, day] = dateString.split('-');
+  return `${day}-${month}-${year}`;
 };

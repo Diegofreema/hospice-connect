@@ -1,15 +1,16 @@
-import {getAuthUserId} from "@convex-dev/auth/server";
-import {paginationOptsValidator, PaginationResult} from "convex/server";
-import {ConvexError, v} from "convex/values";
-import {Doc} from "./_generated/dataModel";
-import {query} from "./_generated/server";
-import {getNurseDetails} from "./nurses";
-import {getSchedulesByAssignmentIdHelper} from "./schedules";
+import { getAuthUserId } from '@convex-dev/auth/server';
+import { paginationOptsValidator, PaginationResult } from 'convex/server';
+import { ConvexError, v } from 'convex/values';
+import { Doc } from './_generated/dataModel';
+import { mutation, query } from './_generated/server';
+import { getNurseDetails } from './nurses';
+import { getSchedulesByAssignmentIdHelper } from './schedules';
+import { shifts } from './schema';
 
 export const getShifts = query({
   args: {
-    assignmentId: v.id("assignments"),
-    hospiceId: v.id("hospices"),
+    assignmentId: v.id('assignments'),
+    hospiceId: v.id('hospices'),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -30,7 +31,10 @@ export const getShifts = query({
       return emptyData;
     }
 
-    const schedules = await getSchedulesByAssignmentIdHelper(ctx, args.assignmentId)
+    const schedules = await getSchedulesByAssignmentIdHelper(
+      ctx,
+      args.assignmentId
+    );
 
     const shifts = schedules.map(async (schedule) => {
       const nurse = await getNurseDetails(ctx, schedule.nurseId);
@@ -49,7 +53,7 @@ export const getShifts = query({
 
 export const getShiftsByOnlyAssignmentId = query({
   args: {
-    assignmentId: v.id("assignments"),
+    assignmentId: v.id('assignments'),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -62,7 +66,10 @@ export const getShiftsByOnlyAssignmentId = query({
       return [];
     }
 
-    const schedules = await getSchedulesByAssignmentIdHelper(ctx, args.assignmentId);
+    const schedules = await getSchedulesByAssignmentIdHelper(
+      ctx,
+      args.assignmentId
+    );
 
     const shifts = schedules.map(async (schedule) => {
       const nurse = await getNurseDetails(ctx, schedule.nurseId);
@@ -76,7 +83,7 @@ export const getShiftsByOnlyAssignmentId = query({
 });
 export const getShift = query({
   args: {
-    scheduleId: v.id("schedules"),
+    scheduleId: v.id('schedules'),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -101,18 +108,18 @@ export const getShift = query({
 
 export const getInProgressShifts = query({
   args: {
-    nurseId: v.id("nurses"),
+    nurseId: v.id('nurses'),
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) {
-      return {} as PaginationResult<Doc<"assignments">>;
+      return {} as PaginationResult<Doc<'assignments'>>;
     }
     const nursesNotCompletedAssignments = await ctx.db
-      .query("nurseAssignments")
-      .withIndex("nurse_id", (q) =>
-        q.eq("nurseId", args.nurseId).eq("isCompleted", false),
+      .query('nurseAssignments')
+      .withIndex('nurse_id', (q) =>
+        q.eq('nurseId', args.nurseId).eq('isCompleted', false)
       )
       .paginate(args.paginationOpts);
 
@@ -120,7 +127,7 @@ export const getInProgressShifts = query({
       nursesNotCompletedAssignments.page.map(async (nurseAssignment) => {
         const assignment = await ctx.db.get(nurseAssignment.assignmentId);
         if (!assignment) {
-          throw new ConvexError({ message: "Assignment not found" });
+          throw new ConvexError({ message: 'Assignment not found' });
         }
         const hospice = await ctx.db.get(assignment?.hospiceId);
 
@@ -129,7 +136,7 @@ export const getInProgressShifts = query({
           businessName: hospice?.businessName,
           hospiceUserId: hospice?.userId!,
         };
-      }),
+      })
     );
 
     return {
@@ -140,3 +147,49 @@ export const getInProgressShifts = query({
 });
 
 // ? mutations
+export const extendAssignment = mutation({
+  args: {
+    assignmentId: v.id('assignments'),
+    hospiceId: v.id('hospices'),
+    shifts: v.array(shifts),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new ConvexError({ message: 'Unauthorized' });
+    }
+
+    const hospice = await ctx.db.get(args.hospiceId);
+    if (!hospice) {
+      throw new ConvexError({ message: 'Hospice not found' });
+    }
+
+    const assignment = await ctx.db.get(args.assignmentId);
+    if (!assignment) {
+      throw new ConvexError({ message: 'Assignment not found' });
+    }
+
+    if (assignment.hospiceId !== args.hospiceId) {
+      throw new ConvexError({
+        message: 'You do not have permission to extend this assignment',
+      });
+    }
+
+    for (const shift of args.shifts) {
+      await ctx.db.insert('schedules', {
+        assignmentId: assignment._id,
+        endDate: shift.end,
+        endTime: shift.endShift,
+        startDate: shift.start,
+        startTime: shift.startShift,
+        rate: assignment.rate,
+        status: 'available',
+        isSubmitted: false,
+      });
+    }
+    await ctx.db.patch(assignment._id, {
+      endDate: args.shifts[args.shifts.length - 1].end,
+      status: 'available',
+    });
+  },
+});

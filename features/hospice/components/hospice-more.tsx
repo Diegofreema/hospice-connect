@@ -8,6 +8,7 @@ import { Stack } from '@/features/shared/components/v-stack';
 import {
   IconCreditCardPay,
   IconHeadset,
+  IconShieldBolt,
   IconShieldCheck,
 } from '@tabler/icons-react-native';
 
@@ -49,5 +50,10 @@ const links: LinkType[] = [
     label: 'Privacy Policy',
     icon: IconShieldCheck,
     link: 'https://hospice-connect-web.vercel.app/privacy-policy',
+  },
+  {
+    label: 'Terms of Service',
+    icon: IconShieldBolt,
+    link: 'https://hospice-connect-web.vercel.app/terms',
   },
 ];

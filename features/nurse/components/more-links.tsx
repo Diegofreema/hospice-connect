@@ -27,10 +27,12 @@ export const MoreLinks = ({ links }: Props) => {
     <FlatList
       data={links}
       renderItem={({ item }) => {
-        const type =
-          item.label === 'Support' || item.label === 'Privacy Policy'
-            ? 'external'
-            : 'internal';
+        const isExternal = [
+          'Support',
+          'Privacy Policy',
+          'Terms of Service',
+        ].includes(item.label);
+        const type = isExternal ? 'external' : 'internal';
         return (
           <TouchableOpacity onPress={() => onPress(item.link, type)}>
             <View

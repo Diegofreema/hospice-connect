@@ -22,35 +22,20 @@ import { Id } from '@/convex/_generated/dataModel';
 import { LongInfo } from '@/features/shared/components/long-info';
 import { Text } from '@/features/shared/components/text';
 import { useMutation } from 'convex/react';
+import { FunctionReturnType } from 'convex/server';
 import { useState } from 'react';
 import { Alert } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { useSelectAssignment } from '../hooks/use-select-assignment';
 import { useUpdatePostStatus } from '../hooks/use-update-post-status';
-import { PostType } from '../types';
 
 type Props = {
-  post: PostType;
+  post: FunctionReturnType<typeof api.posts.getOurPosts>['page'][number];
   onView: () => void;
   hospiceId: Id<'hospices'>;
   onOpenReOpenAssignment: () => void;
 };
 
-const data: { label: string; value: string; ios: SFSymbol; android: string }[] =
-  [
-    {
-      label: 'Edit',
-      value: 'edit',
-      ios: 'pencil',
-      android: 'mode-edit',
-    },
-    {
-      label: 'Delete',
-      value: 'delete',
-      ios: 'trash',
-      android: 'trash',
-    },
-  ];
 export const Post = ({
   post,
   onView,
@@ -58,10 +43,39 @@ export const Post = ({
   onOpenReOpenAssignment,
 }: Props) => {
   const name = post.patientFirstName + ' ' + post.patientLastName;
-
+  const isCanceled = post.status === 'cancelled';
+  const hasNurses = post.hasNurses;
   const { showToast } = useToast();
   const [deleting, setDeleting] = useState(false);
-
+  const data: {
+    label: string;
+    value: string;
+    ios: SFSymbol;
+    android: string;
+  }[] = [
+    {
+      label: 'Edit',
+      value: 'edit',
+      ios: 'pencil' as SFSymbol,
+      android: 'mode-edit',
+    },
+    {
+      label: 'Extend assignment',
+      value: 'extend',
+      ios: 'timer.circle' as SFSymbol,
+      android: '',
+    },
+    ...(!hasNurses
+      ? [
+          {
+            label: 'Delete',
+            value: 'delete',
+            ios: 'trash' as SFSymbol,
+            android: 'trash',
+          },
+        ]
+      : []),
+  ];
   const deleteAssignment = useMutation(api.assignments.deleteAssignment);
   useUpdatePostStatus({ assignmentId: post._id });
   const onDelete = async () => {
@@ -113,6 +127,9 @@ export const Post = ({
         ]
       );
     }
+    if (value === 'extend') {
+      router.push(`/extend/${post._id}`);
+    }
   };
   const onReOpen = async () => {
     onOpenReOpenAssignment();
@@ -139,16 +156,18 @@ export const Post = ({
         <Text size={'medium'} isBold>
           {name}
         </Text>
-        <MyMenu
-          disabled={deleting}
-          trigger={
-            <View style={styles.trigger}>
-              <IconDots color={theme.colors.black} size={20} />
-            </View>
-          }
-          menuItems={data}
-          onClick={onClick}
-        />
+        {!isCanceled && (
+          <MyMenu
+            disabled={deleting}
+            trigger={
+              <View style={styles.trigger}>
+                <IconDots color={theme.colors.black} size={20} />
+              </View>
+            }
+            menuItems={data}
+            onClick={onClick}
+          />
+        )}
       </CardHeader>
       <CardContent style={styles.content}>
         <View

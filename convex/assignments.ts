@@ -635,11 +635,10 @@ export const cancelAssignment = mutation({
           title: 'Assignment Cancelled',
           type: 'normal',
         });
-
-        if (
-          schedule.status !== 'completed' &&
-          schedule.status !== 'not_covered'
-        ) {
+        const scheduleToCancel = ['on_going', 'available', 'booked'].includes(
+          schedule.status
+        );
+        if (scheduleToCancel) {
           await ctx.db.patch(schedule._id, {
             status: 'cancelled',
             canceledAt: Date.now(),
@@ -647,12 +646,6 @@ export const cancelAssignment = mutation({
             endDate: formatDateString(new Date()),
           });
         }
-      }
-
-      if (schedule.status === 'available') {
-        await ctx.db.patch(schedule._id, {
-          status: 'cancelled',
-        });
       }
     }
     await ctx.db.patch(assignment._id, {

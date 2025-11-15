@@ -24,8 +24,6 @@ const CreateScreen = () => {
   const onSubmit = async (data: CreateAssignmentValidator) => {
     if (!hospice) return;
 
-
-
     const { customGender, ...rest } = data;
 
     try {
@@ -46,6 +44,7 @@ const CreateScreen = () => {
         hospiceId: hospice._id as Id<'hospices'>,
         rate: Number(data.rate),
         shifts,
+        zipcode: rest.zipcode || 'N/A',
       });
       showToast({
         title: 'Success',

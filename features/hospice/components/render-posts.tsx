@@ -8,12 +8,12 @@ import { CustomSheet } from '@/features/shared/components/custom-bottom-sheet';
 import { Wrapper } from '@/features/shared/components/wrapper';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useQuery } from 'convex/react';
+import { FunctionReturnType } from 'convex/server';
 import { router } from 'expo-router';
 import { Fragment, useCallback, useRef } from 'react';
 import { FlatList } from 'react-native';
 import { useGetScheduleId } from '../hooks/use-get-schedule-id';
 import { useSelectAssignment } from '../hooks/use-select-assignment';
-import { PostType } from '../types';
 import { AssignmentSchedule } from './assignment-schedule';
 import { CancelSchedule } from './cancel-schedule';
 import { EditSchedule } from './edit-schedule';
@@ -22,7 +22,7 @@ import { RateNurse } from './rate-nurse';
 import { ReopenCase } from './reopen-case';
 
 type Props = {
-  posts: PostType[];
+  posts: FunctionReturnType<typeof api.posts.getOurPosts>['page'];
   loadMore: () => void;
   loadingMore: boolean;
 };

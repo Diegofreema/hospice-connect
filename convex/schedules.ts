@@ -122,8 +122,16 @@ export const editSchedule = mutation({
     }
 
     const assignment = await ctx.db.get(schedule.assignmentId);
+
     if (!assignment) {
       throw new ConvexError({ message: 'Assignment not found' });
+    }
+    const shifts = await getSchedulesByAssignmentIdHelper(ctx, assignment._id);
+    const lastShift = shifts[shifts.length - 1];
+    if (lastShift._id === args.scheduleId) {
+      await ctx.db.patch(assignment._id, {
+        endDate: args.endDate,
+      });
     }
     if (assignment.hospiceId !== args.hospiceId) {
       throw new ConvexError({
@@ -207,7 +215,7 @@ export const sendScheduleNotification = mutation({
 
         if (hasConflict) {
           throw new ConvexError({
-            message: `This nurse already has a shift from ${shift.startDate} ${shift.startTime} to ${shift.endDate} ${shift.endTime}`,
+            message: `This nurse already has a shift from ${formatDate(shift.startDate)} ${shift.startTime} to ${formatDate(shift.endDate)} ${shift.endTime}`,
           });
         }
       }
