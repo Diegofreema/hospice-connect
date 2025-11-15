@@ -6,12 +6,15 @@ import { SmallLoader } from '@/features/shared/components/small-loader';
 import { useToast } from '@/components/demos/toast';
 import { CustomPressable } from '@/features/shared/components/custom-pressable';
 import { Text } from '@/features/shared/components/text';
-import { generateErrorMessage } from '@/features/shared/utils';
+import {
+  convertTimeStringToDate2,
+  generateErrorMessage,
+} from '@/features/shared/utils';
 import { useUpdateUpdateStatus } from '@/hooks/use-update-status';
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { IconCircle, IconCircleCheckFilled } from '@tabler/icons-react-native';
 import { useMutation, useQuery } from 'convex/react';
-import { format, parse } from 'date-fns';
+import { format, isPast, parse, set } from 'date-fns';
 import { useState } from 'react';
 import { View } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
@@ -47,8 +50,32 @@ export const SelectSchedule = ({ id, hospiceId, name, onClose }: Props) => {
       return [...prev, id];
     });
   };
+  const selectedSchedules = selectedIds.map((selectedId) => {
+    return schedules.find((schedule) => schedule._id === selectedId)!;
+  });
   const onSend = async () => {
     if (!nurseId) return;
+    for (const selectedSchedule of selectedSchedules) {
+      const startDate = selectedSchedule.startDate;
+      const { hours, minutes } = convertTimeStringToDate2(
+        selectedSchedule.startTime
+      );
+      const date = parse(startDate, 'dd-MM-yyyy', new Date());
+      const fullDateTime = set(date, {
+        hours: hours,
+        minutes: minutes,
+        seconds: 0,
+        milliseconds: 0,
+      });
+      if (isPast(fullDateTime)) {
+        showToast({
+          title: 'Error',
+          subtitle: 'Shift has already passed',
+          autodismiss: true,
+        });
+        return;
+      }
+    }
     setLoading(true);
     try {
       await onSchedule({

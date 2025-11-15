@@ -1,9 +1,10 @@
 import { useToast } from '@/components/demos/toast';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
-import { useMutation } from 'convex/react';
+import { useMutation, useQuery } from 'convex/react';
+import { isPast, parse, set } from 'date-fns';
 import { useState } from 'react';
-import { generateErrorMessage } from '../utils';
+import { convertTimeStringToDate2, generateErrorMessage } from '../utils';
 
 type Props = {
   nurseId: Id<'nurses'>;
@@ -17,11 +18,34 @@ export const useAcceptDecline = ({
 }: Props) => {
   const acceptAssignment = useMutation(api.posts.acceptAssignment);
   const declineAssignment = useMutation(api.posts.declineAssignment);
+  const schedule = useQuery(
+    api.posts.getShift,
+    scheduleId ? { scheduleId } : 'skip'
+  );
   const [processing, setProcessing] = useState(false);
   const { showToast } = useToast();
 
   const onAccept = async () => {
-    if (!scheduleId || !nurseId || !nurseNotificationId) return;
+    if (!scheduleId || !nurseId || !nurseNotificationId || !schedule) return;
+
+    const startDate = schedule.startDate;
+    const { hours, minutes } = convertTimeStringToDate2(schedule.startTime);
+    const date = parse(startDate, 'dd-MM-yyyy', new Date());
+    const fullDateTime = set(date, {
+      hours: hours,
+      minutes: minutes,
+      seconds: 0,
+      milliseconds: 0,
+    });
+    if (isPast(fullDateTime)) {
+      showToast({
+        title: 'Error',
+        subtitle: 'Shift has already passed',
+        autodismiss: true,
+      });
+      return;
+    }
+
     setProcessing(true);
     try {
       await acceptAssignment({

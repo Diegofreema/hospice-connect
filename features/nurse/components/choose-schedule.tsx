@@ -1,20 +1,24 @@
-import { useToast } from "@/components/demos/toast";
-import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
-import { Schedule } from "@/features/hospice/components/select-schedule";
-import { useSelectAssignment } from "@/features/hospice/hooks/use-select-assignment";
-import { Button } from "@/features/shared/components/button";
-import { SmallLoader } from "@/features/shared/components/small-loader";
-import { View } from "@/features/shared/components/view";
-import { generateErrorMessage } from "@/features/shared/utils";
-import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
-import { useMutation, useQuery } from "convex/react";
-import React, { useState } from "react";
-import { Platform } from "react-native";
+import { useToast } from '@/components/demos/toast';
+import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
+import { Schedule } from '@/features/hospice/components/select-schedule';
+import { useSelectAssignment } from '@/features/hospice/hooks/use-select-assignment';
+import { Button } from '@/features/shared/components/button';
+import { SmallLoader } from '@/features/shared/components/small-loader';
+import { View } from '@/features/shared/components/view';
+import {
+  convertTimeStringToDate2,
+  generateErrorMessage,
+} from '@/features/shared/utils';
+import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
+import { useMutation, useQuery } from 'convex/react';
+import { isPast, parse, set } from 'date-fns';
+import React, { useState } from 'react';
+import { Platform } from 'react-native';
 
 type Props = {
   onClose: () => void;
-  nurseId: Id<"nurses">;
+  nurseId: Id<'nurses'>;
 };
 export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
   const assignmentId = useSelectAssignment((state) => state.id);
@@ -22,7 +26,7 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
   const [loading, setLoading] = useState(false);
 
   const sendCaseRequest = useMutation(
-    api.hospiceNotification.sendCaseRequestNotification,
+    api.hospiceNotification.sendCaseRequestNotification
   );
   const { showToast } = useToast();
 
@@ -32,14 +36,14 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
       ? {
           assignmentId,
         }
-      : "skip",
+      : 'skip'
   );
-  const [selectedIds, setSelectedIds] = useState<Id<"schedules">[]>([]);
+  const [selectedIds, setSelectedIds] = useState<Id<'schedules'>[]>([]);
 
   if (schedules === undefined) {
     return <SmallLoader size={30} />;
   }
-  const onSelect = (id: Id<"schedules">) => {
+  const onSelect = (id: Id<'schedules'>) => {
     setSelectedIds((prev) => {
       const isInArray = prev.find((item) => item === id);
       if (isInArray) {
@@ -48,10 +52,31 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
       return [...prev, id];
     });
   };
+  const selectedSchedules = selectedIds.map((selectedId) => {
+    return schedules.find((schedule) => schedule._id === selectedId)!;
+  });
   const onSend = async () => {
-    console.log({
-      startDate: schedules.find((s) => s._id === selectedIds[0])?.startDate!,
-    }, selectedIds);
+    for (const selectedSchedule of selectedSchedules) {
+      const startDate = selectedSchedule.startDate;
+      const { hours, minutes } = convertTimeStringToDate2(
+        selectedSchedule.startTime
+      );
+      const date = parse(startDate, 'dd-MM-yyyy', new Date());
+      const fullDateTime = set(date, {
+        hours: hours,
+        minutes: minutes,
+        seconds: 0,
+        milliseconds: 0,
+      });
+      if (isPast(fullDateTime)) {
+        showToast({
+          title: 'Error',
+          subtitle: 'Shift has already passed',
+          autodismiss: true,
+        });
+        return;
+      }
+    }
     if (!nurseId) return;
     setLoading(true);
     try {
@@ -60,8 +85,8 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
         scheduleIds: selectedIds,
       });
       showToast({
-        title: "Success",
-        subtitle: "You have sent a case request successfully",
+        title: 'Success',
+        subtitle: 'You have sent a case request successfully',
         autodismiss: true,
       });
       onClose();
@@ -69,12 +94,12 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        "Failed to send case request, please try again",
+        'Failed to send case request, please try again'
       );
       console.log(error);
 
       showToast({
-        title: "Error",
+        title: 'Error',
         subtitle: errorMessage,
         autodismiss: true,
       });
@@ -93,7 +118,7 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
         contentContainerStyle={{
           gap: 15,
           flexGrow: 1,
-          paddingBottom: Platform.OS === "ios" ? 100 : 50,
+          paddingBottom: Platform.OS === 'ios' ? 100 : 50,
         }}
         style={{ marginTop: 20 }}
         showsVerticalScrollIndicator={false}
@@ -104,7 +129,7 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
             disabled={loading || selectedIds.length === 0}
           />
         }
-        ListFooterComponentStyle={{ marginTop: "auto", marginBottom: 15 }}
+        ListFooterComponentStyle={{ marginTop: 'auto', marginBottom: 15 }}
       />
     </View>
   );

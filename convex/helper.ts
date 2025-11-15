@@ -131,6 +131,15 @@ export function stringToDate(dateString: string): Date {
 
   return date;
 }
+export function stringToDate2(dateString: string): Date {
+  const dateRegex = /^(\d{2})-(\d{2})-(\d{4})$/;
+  if (!dateRegex.test(dateString)) {
+    throw new Error(`Invalid date format: "${dateString}"`);
+  }
+
+  const [day, month, year] = dateString.split('-').map(Number);
+  return new Date(Date.UTC(year, month - 1, day));
+}
 export function convertTimeStringToDate(timeString: string) {
   // Get current date to use as base
   const now = new Date();
@@ -156,7 +165,22 @@ export function convertTimeStringToDate(timeString: string) {
     minutes
   );
 }
+export function parseTimeString(timeString: string): {
+  hours: number;
+  minutes: number;
+} {
+  const match = timeString.match(/(\d+):?(\d*)?\s*(AM|PM)?/i);
+  if (!match) throw new Error('Invalid time format');
 
+  let hours = parseInt(match[1], 10);
+  const minutes = match[2] ? parseInt(match[2], 10) : 0;
+  const period = match[3]?.toUpperCase();
+
+  if (period === 'PM' && hours !== 12) hours += 12;
+  if (period === 'AM' && hours === 12) hours = 0;
+
+  return { hours, minutes };
+}
 export function formatDate(dateString: string): string {
   // Parse the input date string in DD-MM-YYYY format
   const [day, month, year] = dateString.split('-').map(Number);

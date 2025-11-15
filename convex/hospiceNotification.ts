@@ -2,13 +2,7 @@ import { getAuthUserId } from '@convex-dev/auth/server';
 import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { mutation, query } from './_generated/server';
-import {
-  convertTimeStringToDate,
-  doIntervalsOverlap,
-  formatDate,
-  parseDateTime,
-  stringToDate,
-} from './helper';
+import { doIntervalsOverlap, formatDate, parseDateTime } from './helper';
 import { getNurseDetails } from './nurses';
 
 export const unreadMessagesCount = query({
@@ -165,26 +159,6 @@ export const sendCaseRequestNotification = mutation({
       const shift = await ctx.db.get(scheduleId);
       if (!shift) {
         throw new ConvexError({ message: 'Shift not found' });
-      }
-      const openingShift = convertTimeStringToDate(shift.startTime);
-      const startDate = stringToDate(shift.startDate);
-      const shiftStartDateTime = new Date(startDate as Date);
-      shiftStartDateTime.setHours(
-        openingShift.getHours(),
-        openingShift.getMinutes(),
-        0,
-        0
-      );
-      // console.log({
-      //   shiftStartDateTime,
-      //   openingShift,
-      //   startDate,
-      //   local: shiftStartDateTime.toLocaleDateString(),
-      //   shift: shift.startDate,
-      // });
-      const now = new Date();
-      if (shiftStartDateTime < now) {
-        throw new ConvexError({ message: 'Shift has already passed' });
       }
 
       if (shift.status !== 'available') {

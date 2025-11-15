@@ -175,6 +175,26 @@ export function convertTimeStringToDate(timeString: string, value?: string) {
     minutes
   );
 }
+export function convertTimeStringToDate2(timeString: string, value?: string) {
+  // Get current date to use as base
+  if (!timeString) return { hours: 0, minutes: 0 };
+
+  // Parse the time string (e.g., "3:59 AM")
+  const [time, period] = timeString.split(/\s+/);
+  const [hours, minutes] = time.split(':').map(Number);
+
+  // Convert to 24-hour format
+  let hours24 = hours;
+  if (period?.toUpperCase() === 'PM' && hours !== 12) {
+    hours24 += 12;
+  } else if (period?.toUpperCase() === 'AM' && hours === 12) {
+    hours24 = 0;
+  }
+
+  // Create new Date object with today's date and parsed time
+
+  return { hours: hours24, minutes: minutes };
+}
 
 function timeToHours(timeStr: string) {
   const [time, period] = timeStr.split(/\s+/);

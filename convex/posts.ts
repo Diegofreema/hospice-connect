@@ -3,13 +3,7 @@ import { filter } from 'convex-helpers/server/filter';
 import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { mutation, query } from './_generated/server';
-import {
-  convertTimeStringToDate,
-  doIntervalsOverlap,
-  formatDate,
-  parseDateTime,
-  stringToDate,
-} from './helper';
+import { doIntervalsOverlap, formatDate, parseDateTime } from './helper';
 import { discipline } from './schema';
 
 export const getOurPosts = query({
@@ -100,6 +94,16 @@ export const getPost = query({
     };
   },
 });
+export const getShift = query({
+  args: {
+    scheduleId: v.id('schedules'),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+    return await ctx.db.get(args.scheduleId);
+  },
+});
 
 // ? mutations
 
@@ -127,28 +131,8 @@ export const acceptAssignment = mutation({
       throw new ConvexError({ message: 'Assignment not found' });
     }
 
-    // logic to check if schedule time has passed
-    const openingShift = convertTimeStringToDate(schedule.startTime);
-    const startDate = stringToDate(schedule.startDate);
-    const shiftStartDateTime = new Date(
-      Date.UTC(
-        startDate.getUTCFullYear(),
-        startDate.getUTCMonth(),
-        startDate.getUTCDate(),
-        openingShift.getHours(),
-        openingShift.getMinutes(),
-        0,
-        0
-      )
-    );
-    console.log({ shiftStartDateTime, startDate, openingShift });
-
-    const nowUTC = Date.now();
-    if (shiftStartDateTime.getTime() < nowUTC) {
-      throw new ConvexError({ message: 'Shift has already passed' });
-    }
     if (schedule.status === 'not_covered') {
-      throw new ConvexError({ message: 'Shift has already passed' });
+      throw new ConvexError({ message: 'Shift was not covered' });
     }
 
     if (schedule.status === 'booked' || schedule.status === 'on_going') {

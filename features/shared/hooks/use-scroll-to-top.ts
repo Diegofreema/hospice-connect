@@ -8,9 +8,9 @@ type Props<T> = {
 export const useScrollToTop = <T>({ results }: Props<T>) => {
   const ref = useRef<LegendListRef>(null);
   useEffect(() => {
-    if (ref.current) {
+    if (ref.current && results.length > 0) {
       ref.current.scrollToIndex({ index: 0 });
     }
-  }, []);
+  }, [results]);
   return ref;
 };
