@@ -116,6 +116,7 @@ export const getRouteSheet = query({
       .withIndex('by_assignment_id', (q) =>
         q.eq('assignmentId', assignment._id).eq('nurseId', nurse._id)
       )
+      .filter((q) => q.eq(q.field('isApproved'), true))
       .first();
     if (!routeSheet) {
       throw new ConvexError({ message: 'Route sheet not found' });
@@ -294,7 +295,7 @@ export const approveOrDeclineRouteSheet = mutation({
     await ctx.db.patch(args.routeSheetId, {
       isApproved: args.isApproved,
       isSeen: true,
-      isDeclined: true,
+      isDeclined: !args.isApproved,
     });
     if (!args.isApproved) {
       for (const scheduleId of routeSheet.scheduleIds) {

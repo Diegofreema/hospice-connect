@@ -52,15 +52,24 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
       return [...prev, id];
     });
   };
-  const selectedSchedules = selectedIds.map((selectedId) => {
-    return schedules.find((schedule) => schedule._id === selectedId)!;
-  });
+  const selectedSchedules = selectedIds
+    .map((selectedId) => {
+      return schedules.find((schedule) => schedule._id === selectedId)!;
+    })
+    .filter((schedule) => schedule !== undefined);
   const onSend = async () => {
+    console.log('Pressed 1');
+    console.log({ selectedSchedules });
+
     for (const selectedSchedule of selectedSchedules) {
       const startDate = selectedSchedule.startDate;
+      console.log('Pressed 2');
+
       const { hours, minutes } = convertTimeStringToDate2(
         selectedSchedule.startTime
       );
+      console.log('Pressed 3');
+
       const date = parse(startDate, 'dd-MM-yyyy', new Date());
       const fullDateTime = set(date, {
         hours: hours,
@@ -68,6 +77,8 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
         seconds: 0,
         milliseconds: 0,
       });
+      console.log(isPast(fullDateTime));
+
       if (isPast(fullDateTime)) {
         showToast({
           title: 'Error',
@@ -77,6 +88,8 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
         return;
       }
     }
+    console.log('Pressed 4');
+
     if (!nurseId) return;
     setLoading(true);
     try {

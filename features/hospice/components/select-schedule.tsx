@@ -50,9 +50,11 @@ export const SelectSchedule = ({ id, hospiceId, name, onClose }: Props) => {
       return [...prev, id];
     });
   };
-  const selectedSchedules = selectedIds.map((selectedId) => {
-    return schedules.find((schedule) => schedule._id === selectedId)!;
-  });
+  const selectedSchedules = selectedIds
+    .map((selectedId) => {
+      return schedules.find((schedule) => schedule._id === selectedId)!;
+    })
+    .filter((schedule) => schedule !== undefined);
   const onSend = async () => {
     if (!nurseId) return;
     for (const selectedSchedule of selectedSchedules) {

@@ -1,47 +1,47 @@
-import {Avatar} from "@/components/avatar/Avatar";
-import {Card, CardFooter, CardHeader} from "@/components/card";
-import {useHospice} from "@/components/context/hospice-context";
-import {useToast} from "@/components/demos/toast";
-import {api} from "@/convex/_generated/api";
-import {CustomPressable} from "@/features/shared/components/custom-pressable";
-import {FlexButtons} from "@/features/shared/components/flex-buttons";
-import {Text} from "@/features/shared/components/text";
-import {View} from "@/features/shared/components/view";
-import {generateErrorMessage} from "@/features/shared/utils";
-import {useMutation} from "convex/react";
-import {format} from "date-fns";
-import {router} from "expo-router";
-import {useState} from "react";
+import { Avatar } from '@/components/avatar/Avatar';
+import { Card, CardFooter, CardHeader } from '@/components/card';
+import { useHospice } from '@/components/context/hospice-context';
+import { useToast } from '@/components/demos/toast';
+import { api } from '@/convex/_generated/api';
+import { CustomPressable } from '@/features/shared/components/custom-pressable';
+import { FlexButtons } from '@/features/shared/components/flex-buttons';
+import { Text } from '@/features/shared/components/text';
+import { View } from '@/features/shared/components/view';
+import { generateErrorMessage } from '@/features/shared/utils';
+import { useMutation } from 'convex/react';
+import { format } from 'date-fns';
+import { router } from 'expo-router';
+import { useState } from 'react';
 
-import {StyleSheet} from "react-native-unistyles";
-import {HospiceNotificationType} from "../types";
-import {useHandleCaseRequest} from "@/features/shared/hooks/use-handle-case-request";
+import { useHandleCaseRequest } from '@/features/shared/hooks/use-handle-case-request';
+import { StyleSheet } from 'react-native-unistyles';
+import { HospiceNotificationType } from '../types';
 
 type Props = {
   notification: HospiceNotificationType;
 };
 
 export const HospiceNotification = ({ notification }: Props) => {
-  const date = format(notification._creationTime, "MM/dd/yy hh:mm a");
+  const date = format(notification._creationTime, 'MM/dd/yy hh:mm a');
   const { hospice } = useHospice();
 
   const [processing, setProcessing] = useState(false);
   const cancelRequest = useMutation(api.schedules.cancelSchedule);
   const declineRequest = useMutation(api.schedules.declineSchedule);
   const { showToast } = useToast();
-  const firstPart = date.split(" ")[0];
+  const firstPart = date.split(' ')[0];
 
-  const secondPart = date.split(" ")[1] + ' ' + date.split(" ")[2];
+  const secondPart = date.split(' ')[1] + ' ' + date.split(' ')[2];
   const onPress = () => {
-    if (notification.type === "route_sheet") {
+    if (notification.type === 'route_sheet') {
       router.push(
-        `/view-route-sheet?id=${notification?.routeSheetId}&notificationId=${notification._id}`,
+        `/view-route-sheet?id=${notification?.routeSheetId}&notificationId=${notification._id}`
       );
     }
 
-    if (notification.type === "case_request") {
+    if (notification.type === 'case_request') {
       router.push(
-        `/case-request?nurseId=${notification?.nurseId}&shiftId=${notification?.scheduleId}&notificationId=${notification._id}`,
+        `/case-request?nurseId=${notification?.nurseId}&shiftId=${notification?.scheduleId}&notificationId=${notification._id}`
       );
     }
   };
@@ -58,7 +58,7 @@ export const HospiceNotification = ({ notification }: Props) => {
   });
 
   const handleDecline = async () => {
-    if (notification.type === "cancel_request") {
+    if (notification.type === 'cancel_request') {
       await onDecline();
     } else {
       await onDeclineCaseRequest();
@@ -66,7 +66,7 @@ export const HospiceNotification = ({ notification }: Props) => {
   };
 
   const handleAccept = async () => {
-    if (notification.type === "cancel_request") {
+    if (notification.type === 'cancel_request') {
       await onAccept();
     } else {
       await onAcceptCaseRequest();
@@ -90,17 +90,17 @@ export const HospiceNotification = ({ notification }: Props) => {
         notificationId: notification._id,
       });
       showToast({
-        title: "Success",
-        subtitle: "Case request declined successfully",
+        title: 'Success',
+        subtitle: 'Case request declined successfully',
         autodismiss: true,
       });
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        "Failed to decline case request",
+        'Failed to decline case request'
       );
       showToast({
-        title: "Error",
+        title: 'Error',
         subtitle: errorMessage,
         autodismiss: true,
       });
@@ -123,14 +123,15 @@ export const HospiceNotification = ({ notification }: Props) => {
         scheduleId: notification.scheduleId,
         hospiceId: hospice._id,
         notificationId: notification._id,
+        isCancelRequest: true,
       });
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        "Failed to accept case request",
+        'Failed to accept case request'
       );
       showToast({
-        title: "Error",
+        title: 'Error',
         subtitle: errorMessage,
         autodismiss: true,
       });
@@ -139,11 +140,14 @@ export const HospiceNotification = ({ notification }: Props) => {
     }
   };
   const showButtons =
-    notification.status !== "accepted" && notification.status !== "declined";
-  const isDeclined = notification?.status === "declined";
-  const isAccepted = notification?.status === "accepted";
-  const isRouteSheet = notification.type === "route_sheet";
-    const showFooter = notification.type === 'cancel_request' || notification.type === "case_request" || notification.type === "route_sheet";
+    notification.status !== 'accepted' && notification.status !== 'declined';
+  const isDeclined = notification?.status === 'declined';
+  const isAccepted = notification?.status === 'accepted';
+  const isRouteSheet = notification.type === 'route_sheet';
+  const showFooter =
+    notification.type === 'cancel_request' ||
+    notification.type === 'case_request' ||
+    notification.type === 'route_sheet';
   return (
     <CustomPressable
       onPress={onPress}
@@ -160,8 +164,8 @@ export const HospiceNotification = ({ notification }: Props) => {
             <View flexDirection="row" gap="md" alignItems="center" flex={1}>
               <Avatar
                 image={{
-                  uri: notification.nurse?.image || "",
-                  name: notification.nurse?.nurseUser?.name || "UNKNOWN",
+                  uri: notification.nurse?.image || '',
+                  name: notification.nurse?.nurseUser?.name || 'UNKNOWN',
                 }}
                 size={60}
               />
@@ -170,8 +174,8 @@ export const HospiceNotification = ({ notification }: Props) => {
                   {notification.title}
                 </Text>
                 {notification.description && (
-                  <Text size="normal" style={{ flex: 1, maxWidth: "80%" }}>
-                    {notification.type === "cancel_request" && "Reason: "}{" "}
+                  <Text size="normal" style={{ flex: 1, maxWidth: '80%' }}>
+                    {notification.type === 'cancel_request' && 'Reason: '}{' '}
                     {notification.description}
                   </Text>
                 )}
@@ -184,34 +188,33 @@ export const HospiceNotification = ({ notification }: Props) => {
               <Text size="small" color="grey" textAlign="right">
                 {secondPart}
               </Text>
-
             </View>
           </View>
         </CardHeader>
         {showFooter && (
-            <CardFooter>
-              {showButtons && !isRouteSheet && (
-                <FlexButtons
-                  onCancel={handleDecline}
-                  onPress={handleAccept}
-                  buttonText="Decline"
-                  buttonText2="Accept"
-                  disabled2={processing || processingCaseRequest}
-                  disabled={processing || processingCaseRequest}
-                />
-              )}
-              {isDeclined && (
-                <Text size="medium" color="red" isBold textAlign="center">
-                  Declined
-                </Text>
-              )}
-              {isAccepted && (
-                <Text size="medium" color="green" isBold textAlign="center">
-                  Accepted
-                </Text>
-              )}
-            </CardFooter>
-          )}
+          <CardFooter>
+            {showButtons && !isRouteSheet && (
+              <FlexButtons
+                onCancel={handleDecline}
+                onPress={handleAccept}
+                buttonText="Decline"
+                buttonText2="Accept"
+                disabled2={processing || processingCaseRequest}
+                disabled={processing || processingCaseRequest}
+              />
+            )}
+            {isDeclined && (
+              <Text size="medium" color="red" isBold textAlign="center">
+                Declined
+              </Text>
+            )}
+            {isAccepted && (
+              <Text size="medium" color="green" isBold textAlign="center">
+                Accepted
+              </Text>
+            )}
+          </CardFooter>
+        )}
       </Card>
     </CustomPressable>
   );

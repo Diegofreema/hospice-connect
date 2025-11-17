@@ -14,7 +14,7 @@ export const getOurPosts = query({
   handler: async (ctx, args) => {
     const posts = await ctx.db
       .query('assignments')
-      .withIndex('hospiceId', (q) => q.eq('hospiceId', args.hospiceId))
+      .filter((q) => q.eq(q.field('hospiceId'), args.hospiceId))
       .order('desc')
       .paginate(args.paginationOpts);
 
@@ -152,7 +152,6 @@ export const acceptAssignment = mutation({
       (schedule) =>
         schedule.nurseId === args.nurseId && schedule.status === 'booked'
     ).collect();
-    console.log({ length: shifts.length });
 
     // Parse the new shift's start and end datetime
     const newShiftStart = parseDateTime(schedule.startDate, schedule.startTime);
@@ -186,10 +185,14 @@ export const acceptAssignment = mutation({
       .withIndex('assignmentId', (q) => q.eq('assignmentId', assignment._id))
       .first();
     if (!nurseAssignmentExists) {
+      const [day, month, year] = assignment.endDate.split('-').map(Number);
+      const time = new Date(year, month - 1, day, 0, 0, 0, 0);
+
       await ctx.db.insert('nurseAssignments', {
         isCompleted: false,
         nurseId: args.nurseId,
         assignmentId: assignment._id,
+        endDate: time.getTime(),
       });
     }
     await ctx.db.patch(args.scheduleId, {

@@ -27,7 +27,7 @@ export const routeSheetValidator = z.object({
   signature: z.string().min(1, 'Signature is required'),
   comment: z
     .string()
-    .max(50, 'Comment must be at most 50 characters')
+    .max(200, 'Comment must be at most 50 characters')
     .optional(),
 });
 

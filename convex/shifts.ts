@@ -116,13 +116,19 @@ export const getInProgressShifts = query({
     if (!userId) {
       return {} as PaginationResult<Doc<'assignments'>>;
     }
+    // Get all assignments that are not completed
     const nursesNotCompletedAssignments = await ctx.db
       .query('nurseAssignments')
-      .withIndex('nurse_id', (q) =>
-        q.eq('nurseId', args.nurseId).eq('isCompleted', false)
+      .filter((q) =>
+        q.and(
+          q.eq(q.field('nurseId'), args.nurseId),
+          q.eq(q.field('isCompleted'), false)
+        )
       )
+      .order('desc')
       .paginate(args.paginationOpts);
 
+    // Get the assignment details
     const assignments = await Promise.all(
       nursesNotCompletedAssignments.page.map(async (nurseAssignment) => {
         const assignment = await ctx.db.get(nurseAssignment.assignmentId);

@@ -15,6 +15,7 @@ export const cancelSchedule = mutation({
     scheduleId: v.id('schedules'),
     hospiceId: v.id('hospices'),
     notificationId: v.optional(v.id('hospiceNotifications')),
+    isCancelRequest: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -78,13 +79,15 @@ export const cancelSchedule = mutation({
         nurseId: undefined,
         canceledAt: Date.now(),
       });
-
+      const text = args.isCancelRequest
+        ? 'accepted your shift cancel request'
+        : 'cancelled your shift';
       await ctx.db.insert('nurseNotifications', {
         nurseId: schedule.nurseId,
         isRead: false,
         hospiceId: args.hospiceId,
         scheduleId: args.scheduleId,
-        description: `${hospice.businessName} has cancelled your shift for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
+        description: `${hospice.businessName} has ${text} for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
         title: 'Schedule cancelled',
         type: 'normal',
       });
@@ -371,31 +374,35 @@ export const acceptCaseRequest = mutation({
     if (!nurse) {
       throw new ConvexError({ message: 'Nurse not found' });
     }
-
+    // Check if the nurse is already assigned to the assignment
     const nurseAssignmentExists = await ctx.db
       .query('nurseAssignments')
       .withIndex('assignmentId', (q) => q.eq('assignmentId', assignment._id))
       .first();
+    // If not, create a new nurseAssignment
     if (!nurseAssignmentExists) {
       await ctx.db.insert('nurseAssignments', {
         isCompleted: false,
         nurseId: args.nurseId,
         assignmentId: assignment._id,
+        endDate: assignment.endDate,
       });
     }
+    // sends notification to nurse, that the case request has been accepted
     await ctx.db.insert('nurseNotifications', {
       nurseId: args.nurseId,
       isRead: false,
       hospiceId: args.hospiceId,
       scheduleId: args.scheduleId,
-      description: `${args.hospiceName} has approved your case request for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.
-`,
+      description: `${args.hospiceName} has approved your case request for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
       title: 'Case request accepted',
       type: 'normal',
     });
+    // updates the notification status to accepted
     await ctx.db.patch(args.notificationId, {
       status: 'accepted',
     });
+    // update the schedule status to booked
     await ctx.db.patch(args.scheduleId, {
       status: 'booked',
       nurseId: args.nurseId,

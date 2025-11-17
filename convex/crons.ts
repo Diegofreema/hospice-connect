@@ -25,5 +25,10 @@ export const cleanupResend = internalMutation({
     );
   },
 });
+// crons.interval(
+//   'update nurses assignment',
+//   { minutes: 2 }, // every minute
+//   internal.assignments.updateNursesAssignment
+// );
 
 export default crons;

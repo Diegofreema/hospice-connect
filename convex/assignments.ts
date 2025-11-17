@@ -3,7 +3,7 @@ import { filter } from 'convex-helpers/server/filter';
 import { paginationOptsValidator, PaginationResult } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { Doc } from './_generated/dataModel';
-import { mutation, query } from './_generated/server';
+import { internalMutation, mutation, query } from './_generated/server';
 import { formatDateString, formatTimeString, stringToDate } from './helper';
 import { getSchedulesByAssignmentIdHelper } from './schedules';
 import { careLevel, discipline, shifts } from './schema';
@@ -133,6 +133,7 @@ export const completedAssignments = query({
       .withIndex('nurse_id', (q) =>
         q.eq('nurseId', nurse._id).eq('isCompleted', true)
       )
+      // .filter((q) => q.eq(q.field('endDate'), nurse.stateOfRegistration))
       .paginate(args.paginationOpts);
     const sortedCompletedNurseAssignments = completedNurseAssignments.page.sort(
       (a, b) => {
@@ -554,7 +555,9 @@ export const updateAssignmentStatus = mutation({
     );
 
     const lastSchedule = schedules[schedules.length - 1];
-
+    const lastScheduleIsCompletedOrIsNotCovered =
+      lastSchedule.status === 'not_covered' ||
+      lastSchedule.status === 'completed';
     const endDate = stringToDate(lastSchedule.endDate);
     endDate.setHours(0, 0, 0, 0);
     const today = new Date();
@@ -570,9 +573,12 @@ export const updateAssignmentStatus = mutation({
       const hasSchedules = schedules.length > 0;
       const isFullyStaffed = hasSchedules && schedules.every((s) => s.nurseId);
 
-      if (isFullyStaffed) {
+      if (isFullyStaffed && !lastScheduleIsCompletedOrIsNotCovered) {
         newStatus = 'booked';
-      } else if (!someScheduleIsStillAvailable) {
+      } else if (
+        !someScheduleIsStillAvailable ||
+        lastScheduleIsCompletedOrIsNotCovered
+      ) {
         newStatus = 'completed';
       } else {
         newStatus = 'available';
@@ -652,5 +658,20 @@ export const cancelAssignment = mutation({
       isCanceled: true,
       status: 'cancelled',
     });
+  },
+});
+
+export const updateNursesAssignment = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const nursesAssignment = await ctx.db.query('nurseAssignments').collect();
+    for (const nurseAssignment of nursesAssignment) {
+      const assignment = await ctx.db.get(nurseAssignment.assignmentId);
+      if (assignment) {
+        await ctx.db.patch(nurseAssignment._id, {
+          endDate: undefined,
+        });
+      }
+    }
   },
 });

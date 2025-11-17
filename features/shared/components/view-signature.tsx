@@ -28,7 +28,7 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: 'center',
     justifyContent: 'center',
     width: '90%',
-    height: 200,
+    height: 150,
     backgroundColor: theme.colors.cardGrey,
     borderRadius: 10,
     alignSelf: 'center',

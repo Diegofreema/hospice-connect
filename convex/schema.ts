@@ -70,6 +70,7 @@ const NurseAssignments = {
   isCompleted: v.boolean(),
   assignmentId: v.id('assignments'),
   completedAt: v.optional(v.number()),
+  endDate: v.optional(v.number()),
 };
 
 export const Hospice = {

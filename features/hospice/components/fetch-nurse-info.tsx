@@ -1,22 +1,22 @@
-import { useLocalSearchParams } from "expo-router";
-import { Id } from "@/convex/_generated/dataModel";
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import { SmallLoader } from "@/features/shared/components/small-loader";
-import { View } from "react-native";
-import { Avatar } from "@/components/avatar/Avatar";
-import { FlexText } from "@/features/shared/components/flex-text";
+import { Avatar } from '@/components/avatar/Avatar';
+import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
+import { FlexText } from '@/features/shared/components/flex-text';
+import { LongInfo } from '@/features/shared/components/long-info';
+import { SmallLoader } from '@/features/shared/components/small-loader';
 import {
   calculateAge,
   changeFirstLetterToCapital,
-} from "@/features/shared/utils";
-import { LongInfo } from "@/features/shared/components/long-info";
-import { StyleSheet } from "react-native-unistyles";
-import { useTheme } from "stream-chat-expo";
-import { parse } from "date-fns";
+} from '@/features/shared/utils';
+import { useQuery } from 'convex/react';
+import { parse } from 'date-fns';
+import { useLocalSearchParams } from 'expo-router';
+import { View } from 'react-native';
+import { StyleSheet } from 'react-native-unistyles';
+import { useTheme } from 'stream-chat-expo';
 
 export const FetchNurseInfo = () => {
-  const { id } = useLocalSearchParams<{ id: Id<"nurses"> }>();
+  const { id } = useLocalSearchParams<{ id: Id<'nurses'> }>();
   const { theme } = useTheme();
   const nurseInfo = useQuery(api.nurses.getNurseByNurseId, { nurseId: id });
   if (nurseInfo === undefined) {
@@ -38,15 +38,17 @@ export const FetchNurseInfo = () => {
     stateOfRegistration,
     email,
   } = nurseInfo;
-  const name = firstName + " " + lastName;
+  const name = firstName + ' ' + lastName;
   const formatedRate = `$${rate}/hr`;
-  const formatedDateOfBirth = parse(dateOfBirth, "MM/dd/yy", new Date());
-  const age = calculateAge(formatedDateOfBirth);
+
+  const cleanedDate = dateOfBirth?.replace(/(\d+)(st|nd|rd|th)/, '$1');
+  const date1 = parse(cleanedDate, 'MMMM d, yyyy', new Date());
+  const age = calculateAge(date1);
   return (
     <View style={{ gap: 10, minHeight: 450 }}>
       <View style={styles.top}>
         <View style={styles.container}>
-          <Avatar image={{ uri: image || "", name }} size={120} />
+          <Avatar image={{ uri: image || '', name }} size={120} />
         </View>
       </View>
       <View
@@ -58,7 +60,12 @@ export const FetchNurseInfo = () => {
             <FlexText leftText="Email" rightText={email} />
             <FlexText leftText="Mobile number" rightText={phoneNumber} />
             <FlexText leftText="Gender" rightText={gender} />
-            <FlexText leftText="Age" rightText={`${age}yrs`} />
+            {!isNaN(age) && (
+              <FlexText
+                leftText="Date of birth"
+                rightText={`${dateOfBirth} (${age}yrs)`}
+              />
+            )}
             {licenseNumber && (
               <FlexText leftText="License number" rightText={licenseNumber} />
             )}
@@ -75,7 +82,7 @@ export const FetchNurseInfo = () => {
             <FlexText leftText="Rate/hr" rightText={formatedRate} />
             {zipCode && <FlexText leftText="Zip code" rightText={zipCode} />}
 
-            {address && <LongInfo title={"Address"} description={address} />}
+            {address && <LongInfo title={'Address'} description={address} />}
           </View>
         </View>
       </View>
@@ -85,12 +92,12 @@ export const FetchNurseInfo = () => {
 
 const styles = StyleSheet.create((theme) => ({
   camera: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 5,
     right: 5,
     backgroundColor: theme.colors.white,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 50,
     width: 50,
     height: 50,
@@ -105,10 +112,10 @@ const styles = StyleSheet.create((theme) => ({
     width: 120,
     height: 120,
     borderRadius: 80,
-    alignSelf: "center",
+    alignSelf: 'center',
   },
   card: {
-    backgroundColor: "white",
+    backgroundColor: 'white',
     padding: theme.paddings.xl,
     borderRadius: theme.borderRadius.md,
     marginTop: theme.margins.md,
