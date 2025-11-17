@@ -1,21 +1,21 @@
-import { Doc } from "@/convex/_generated/dataModel";
-import { Image } from "expo-image";
-import React from "react";
-import { StyleSheet } from "react-native-unistyles";
-import { calculateTotalHours } from "../utils";
-import { FlexButtons } from "./flex-buttons";
-import { FlexText } from "./flex-text";
-import { Table } from "./table";
-import { Text } from "./text";
-import { View } from "./view";
-import { ViewSignature } from "./view-signature";
-import { format } from "date-fns";
+import { Doc } from '@/convex/_generated/dataModel';
+import { format } from 'date-fns';
+import { Image } from 'expo-image';
+import React from 'react';
+import { StyleSheet } from 'react-native-unistyles';
+import { calculateTotalHours, reverseDateStringToMDY } from '../utils';
+import { FlexButtons } from './flex-buttons';
+import { FlexText } from './flex-text';
+import { Table } from './table';
+import { Text } from './text';
+import { View } from './view';
+import { ViewSignature } from './view-signature';
 
 type Props = {
   hospiceName: string;
   hospiceAddress: string;
-  nurse: Doc<"nurses">;
-  shifts: Doc<"schedules">[];
+  nurse: Doc<'nurses'>;
+  shifts: Doc<'schedules'>[];
   comment: string;
   signature: string;
   rate: number;
@@ -32,14 +32,14 @@ type Props = {
   date?: number;
 };
 const headers = [
-  "Date",
-  "Patient Name",
-  "Care level",
-  "Time in",
-  "Time out",
-  "Hours worked",
-  "Rate",
-  "Amount",
+  'Date',
+  'Patient Name',
+  'Care level',
+  'Time in',
+  'Time out',
+  'Hours worked',
+  'Rate',
+  'Amount',
 ];
 export const RoustSheetComponent = ({
   comment,
@@ -53,8 +53,8 @@ export const RoustSheetComponent = ({
   onGoBack,
   careLevel,
   patientName,
-  buttonText2 = "Submit",
-  buttonText = "Back",
+  buttonText2 = 'Submit',
+  buttonText = 'Back',
   disabled2,
   disabled,
   hideButtons,
@@ -64,7 +64,7 @@ export const RoustSheetComponent = ({
   const totalHours = calculateTotalHours(shifts);
   const data = [
     ...shifts.map((shift) => [
-      ` ${shift.startDate} - ${shift.endDate}`,
+      ` ${reverseDateStringToMDY(shift.startDate)} - ${reverseDateStringToMDY(shift.endDate)}`,
       patientName,
       careLevel,
       shift.startTime,
@@ -75,10 +75,10 @@ export const RoustSheetComponent = ({
     ]),
   ];
   return (
-    <View gap={"xxl"}>
+    <View gap={'xxl'}>
       <View gap="xl">
         <Image
-          source={require("@/assets/images/hospice.png")}
+          source={require('@/assets/images/hospice.png')}
           style={styles.image}
           contentFit="contain"
         />
@@ -104,7 +104,7 @@ export const RoustSheetComponent = ({
           Total hours: {totalHours.toFixed(2)}
         </Text>
         <Text size="medium" isBold>
-          Total pay : ${Number(totalHours.toFixed(2)) * rate}
+          Total pay : ${(Number(totalHours.toFixed(2)) * rate).toFixed(2)}
         </Text>
       </View>
       <Text size="normal" textAlign="center">
@@ -114,7 +114,7 @@ export const RoustSheetComponent = ({
       <ViewSignature signature={signature} />
 
       {date && (
-        <Text size="normal">Date: {format(date, "MM/dd/yy HH:mm")}</Text>
+        <Text size="normal">Date: {format(date, 'MM/dd/yy HH:mm')}</Text>
       )}
       <Text size="normal">Comment: {comment}</Text>
 
@@ -143,6 +143,6 @@ const styles = StyleSheet.create(() => ({
   image: {
     width: 100,
     height: 100,
-    alignSelf: "center",
+    alignSelf: 'center',
   },
 }));

@@ -66,7 +66,7 @@ export const useAcceptDecline = ({
       showToast({
         title: 'Error',
         subtitle: errorMessage,
-        autodismiss: false,
+        autodismiss: true,
       });
     } finally {
       setProcessing(false);

@@ -11,15 +11,14 @@ import { SmallLoader } from '@/features/shared/components/small-loader';
 import { Text } from '@/features/shared/components/text';
 import { View } from '@/features/shared/components/view';
 import { ViewSignature } from '@/features/shared/components/view-signature';
-import { generateErrorMessage, trimText } from '@/features/shared/utils';
+import {
+  calculateTotalHours,
+  generateErrorMessage,
+  trimText,
+} from '@/features/shared/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery } from 'convex/react';
-import {
-  differenceInHours,
-  format,
-  formatDistanceStrict,
-  parse,
-} from 'date-fns';
+import { format, parse } from 'date-fns';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -157,15 +156,7 @@ type ScheduleProps = {
 const ScheduleCard = ({ schedule }: ScheduleProps) => {
   const startDate = parse(schedule.startDate, 'dd-MM-yyyy', new Date());
   const endDate = parse(schedule.endDate, 'dd-MM-yyyy', new Date());
-  const time1 = parse(schedule.startTime, 'hh:mm a', new Date());
-  const time2 = parse(schedule.endTime, 'hh:mm a', new Date());
 
-  const durationInHours = differenceInHours(time2, time1);
-
-  const time = durationInHours > 0 ? 'hour' : 'minute';
-  const formatDistance = formatDistanceStrict(time1, time2, {
-    unit: time,
-  });
   return (
     <View gap="md" style={styles.container}>
       <View>
@@ -177,7 +168,7 @@ const ScheduleCard = ({ schedule }: ScheduleProps) => {
         <Text>{schedule.startTime}</Text>
         <Text>-</Text>
         <Text>
-          {schedule.endTime} {formatDistance}
+          {schedule.endTime} ({calculateTotalHours([schedule]).toFixed(2)}hrs)
         </Text>
       </View>
       <Text>Hourly Rate: ${schedule.rate.toString()}</Text>

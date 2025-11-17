@@ -3,12 +3,10 @@ import { ConvexError, v } from 'convex/values';
 import { Id } from './_generated/dataModel';
 import { mutation, MutationCtx, query, QueryCtx } from './_generated/server';
 import {
-  convertTimeStringToDate,
   doIntervalsOverlap,
   formatDate,
   getRatings,
   parseDateTime,
-  stringToDate,
 } from './helper';
 import { scheduleStatus } from './schema';
 
@@ -86,7 +84,7 @@ export const cancelSchedule = mutation({
         isRead: false,
         hospiceId: args.hospiceId,
         scheduleId: args.scheduleId,
-        description: `${hospice.businessName} has accepted your shift cancel request for ${schedule.startDate} to ${schedule.endDate}; ${schedule.startTime} - ${schedule.endTime}.`,
+        description: `${hospice.businessName} has cancelled your shift for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
         title: 'Schedule cancelled',
         type: 'normal',
       });
@@ -190,11 +188,6 @@ export const sendScheduleNotification = mutation({
       const newShiftEnd = parseDateTime(schedule.endDate, schedule.endTime);
 
       // Validate that end time is after start time
-      if (newShiftEnd.getTime() <= newShiftStart.getTime()) {
-        throw new ConvexError({
-          message: 'End date/time must be after start date/time',
-        });
-      }
 
       // Check each existing shift for conflicts
       for (const shift of shifts) {
@@ -345,21 +338,7 @@ export const acceptCaseRequest = mutation({
     if (!schedule) {
       throw new ConvexError({ message: 'Shift not found' });
     }
-    // logic to check if schedule time has passed
-    const openingShift = convertTimeStringToDate(schedule.startTime);
-    const startDate = stringToDate(schedule.startDate);
-    const shiftStartDateTime = new Date(startDate as Date);
-    shiftStartDateTime.setHours(
-      openingShift.getHours(),
-      openingShift.getMinutes(),
-      0,
-      0
-    );
 
-    const now = new Date();
-    if (shiftStartDateTime < now) {
-      throw new ConvexError({ message: 'Shift has already passed' });
-    }
     if (schedule.status === 'not_covered') {
       throw new ConvexError({ message: 'Shift has already passed' });
     }
@@ -409,7 +388,7 @@ export const acceptCaseRequest = mutation({
       isRead: false,
       hospiceId: args.hospiceId,
       scheduleId: args.scheduleId,
-      description: `${args.hospiceName} Hope Hospice has approved your case request for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.
+      description: `${args.hospiceName} has approved your case request for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.
 `,
       title: 'Case request accepted',
       type: 'normal',

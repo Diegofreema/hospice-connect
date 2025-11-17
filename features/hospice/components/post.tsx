@@ -44,6 +44,7 @@ export const Post = ({
 }: Props) => {
   const name = post.patientFirstName + ' ' + post.patientLastName;
   const isCanceled = post.status === 'cancelled';
+  const isCompleted = post.status === 'completed';
   const hasNurses = post.hasNurses;
   const { showToast } = useToast();
   const [deleting, setDeleting] = useState(false);
@@ -59,12 +60,16 @@ export const Post = ({
       ios: 'pencil' as SFSymbol,
       android: 'mode-edit',
     },
-    {
-      label: 'Extend assignment',
-      value: 'extend',
-      ios: 'timer.circle' as SFSymbol,
-      android: '',
-    },
+    ...(!isCompleted
+      ? [
+          {
+            label: 'Extend assignment',
+            value: 'extend',
+            ios: 'timer.circle' as SFSymbol,
+            android: '',
+          },
+        ]
+      : []),
     ...(!hasNurses
       ? [
           {

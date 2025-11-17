@@ -13,7 +13,7 @@ import {
 } from '@/features/shared/utils';
 import { useMutation, useQuery } from 'convex/react';
 import { FunctionReturnType } from 'convex/server';
-import { format } from 'date-fns';
+import { addHours, format } from 'date-fns';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { FlatList, ScrollView, TouchableOpacity } from 'react-native';
@@ -123,18 +123,30 @@ const RenderShifts = ({
     ?.split('-')
     ?.reverse()
     ?.join('-') as string;
+  console.log(lastShift?.endDate);
+
   const extraShifts: Shift[] = useMemo(() => {
-    const initialStart = new Date(
-      `${lastShiftEndDate} ${lastShiftEndTime.getHours()}:${lastShiftEndTime.getMinutes()}:00`
+    const [year, month, day] = lastShiftEndDate.split('-').map(Number);
+    console.log({ day, month, year });
+
+    const baseDate = new Date(year, month - 1, day);
+    baseDate.setHours(
+      lastShiftEndTime.getHours(),
+      lastShiftEndTime.getMinutes(),
+      0,
+      0
     );
+
     const list: Shift[] = [];
-    let cursor = new Date(initialStart); // clone
+    let cursor = new Date(baseDate);
+    console.log(baseDate);
+    // clone
 
     for (let i = 0; i < count; i++) {
-      const end = new Date(cursor);
-      end.setHours(end.getHours() + 12);
+      const end = addHours(cursor, 12); // 12-hour shift
 
       list.push(splitShift(cursor, end));
+
       cursor = end; // next shift starts where this one ends
     }
     return list;

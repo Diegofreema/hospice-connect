@@ -41,6 +41,10 @@ const NurseCreate = () => {
       licenseNumber: '',
       licenseState: '',
       phoneNumber: '',
+      address: '',
+      rate: '',
+
+      zipCode: '',
     },
     resolver: zodResolver(createNurseValidator),
   });
@@ -54,6 +58,9 @@ const NurseCreate = () => {
           'lastName',
           'gender',
           'dateOfBirth',
+          'rate',
+          'address',
+          'zipCode',
         ];
       case 2:
         return ['discipline', 'licenseNumber', 'licenseState'];

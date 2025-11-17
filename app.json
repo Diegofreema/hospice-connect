@@ -24,6 +24,11 @@
         "android.permission.MODIFY_AUDIO_SETTINGS",
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.ACCESS_MEDIA_LOCATION",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.ACCESS_MEDIA_LOCATION"
       ]
     },
@@ -37,7 +42,7 @@
       [
         "expo-navigation-bar",
         {
-          "position": "absolute" // Nav bar floats over content (avoids drawing under it)
+          "position": "absolute"
         }
       ],
       [
@@ -79,7 +84,9 @@
           "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
         }
       ],
-      ["expo-build-properties"],
+      [
+        "expo-build-properties"
+      ],
       "expo-background-task"
     ],
     "experiments": {
@@ -91,6 +98,9 @@
         "projectId": "0358faee-7a79-428c-9427-bf188a3c4035"
       }
     },
-    "runtimeVersion": "1.0.0"
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/0358faee-7a79-428c-9427-bf188a3c4035"
+    }
   }
 }

@@ -338,3 +338,7 @@ export const reverseDateString = (dateString: string) => {
   const [year, month, day] = dateString.split('-');
   return `${day}-${month}-${year}`;
 };
+export const reverseDateStringToMDY = (dateString: string) => {
+  const [day, month, year] = dateString.split('-');
+  return `${month}-${day}-${year}`;
+};

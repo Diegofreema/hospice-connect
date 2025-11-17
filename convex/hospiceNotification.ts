@@ -30,7 +30,6 @@ export const getNotifications = query({
     const notifications = await ctx.db
       .query('hospiceNotifications')
       .withIndex('by_hospice_id', (q) => q.eq('hospiceId', args.hospiceId))
-      .order('desc')
       .paginate(args.paginationOpts);
     const page = await Promise.all(
       notifications.page.map(async (notification) => {
@@ -185,13 +184,6 @@ export const sendCaseRequestNotification = mutation({
       // Parse the new shift's start and end datetime
       const newShiftStart = parseDateTime(shift.startDate, shift.startTime);
       const newShiftEnd = parseDateTime(shift.endDate, shift.endTime);
-
-      // Validate that end time is after start time
-      if (newShiftEnd.getTime() <= newShiftStart.getTime()) {
-        throw new ConvexError({
-          message: 'End date/time must be after start date/time',
-        });
-      }
 
       // Check each existing shift for conflicts
       for (const shift of shifts) {

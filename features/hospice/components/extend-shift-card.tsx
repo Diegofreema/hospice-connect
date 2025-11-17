@@ -13,7 +13,7 @@ import { format } from 'date-fns';
 import { Image } from 'expo-image';
 import React from 'react';
 import { useWindowDimensions, View } from 'react-native';
-import Animated, { SlideInLeft, SlideOutLeft } from 'react-native-reanimated';
+import Animated, { SlideInLeft } from 'react-native-reanimated';
 import { StyleSheet } from 'react-native-unistyles';
 
 const AnimatedCard = Animated.createAnimatedComponent(Card);
@@ -52,7 +52,6 @@ export const ExtendShiftCard = ({ shift }: Props) => {
         .duration(1000)
         .damping(80)
         .stiffness(200)}
-      exiting={SlideOutLeft.duration(1000)}
     >
       <CardHeader style={{ gap: 10 }}>
         <View style={styles.innerContainer}>

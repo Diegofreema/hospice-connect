@@ -158,13 +158,6 @@ export const acceptAssignment = mutation({
     const newShiftStart = parseDateTime(schedule.startDate, schedule.startTime);
     const newShiftEnd = parseDateTime(schedule.endDate, schedule.endTime);
 
-    // Validate that end time is after start time
-    if (newShiftEnd.getTime() <= newShiftStart.getTime()) {
-      throw new ConvexError({
-        message: 'End date/time must be after start date/time',
-      });
-    }
-
     // Check each existing shift for conflicts
     for (const shift of shifts) {
       // Parse existing shift's start and end datetime

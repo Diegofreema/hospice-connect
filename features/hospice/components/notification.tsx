@@ -24,9 +24,10 @@ export const Notifications = ({ hospiceId }: Props) => {
       loadMore(25);
     }
   };
-  const sortedNotifications = results.sort(
+  const sortedNotifications = [...results].sort(
     (a, b) => b._creationTime - a._creationTime
   );
+
   return (
     <LegendList
       data={sortedNotifications}

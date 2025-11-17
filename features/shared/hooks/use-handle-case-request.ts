@@ -1,16 +1,20 @@
-import { api } from "@/convex/_generated/api";
-import { useMutation } from "convex/react";
-import { generateErrorMessage } from "@/features/shared/utils";
-import { useState } from "react";
-import { useToast } from "@/components/demos/toast";
-import { Id } from "@/convex/_generated/dataModel";
+import { useToast } from '@/components/demos/toast';
+import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
+import {
+  convertTimeStringToDate2,
+  generateErrorMessage,
+} from '@/features/shared/utils';
+import { useMutation, useQuery } from 'convex/react';
+import { isPast, parse, set } from 'date-fns';
+import { useState } from 'react';
 
 type Props = {
   businessName: string;
-  nurseId?: Id<"nurses">;
-  notificationId: Id<"hospiceNotifications">;
-  hospiceId: Id<"hospices">;
-  scheduleId?: Id<"schedules">;
+  nurseId?: Id<'nurses'>;
+  notificationId: Id<'hospiceNotifications'>;
+  hospiceId: Id<'hospices'>;
+  scheduleId?: Id<'schedules'>;
 };
 
 export const useHandleCaseRequest = ({
@@ -23,9 +27,30 @@ export const useHandleCaseRequest = ({
   const [processing, setProcessing] = useState(false);
   const { showToast } = useToast();
   const declineCaseRequest = useMutation(api.schedules.declineCaseRequest);
+  const schedule = useQuery(
+    api.posts.getShift,
+    scheduleId ? { scheduleId } : 'skip'
+  );
   const acceptCaseRequest = useMutation(api.schedules.acceptCaseRequest);
   const onDecline = async () => {
-      if(!nurseId || !scheduleId) return;
+    if (!nurseId || !scheduleId || !schedule) return;
+    const startDate = schedule.startDate;
+    const { hours, minutes } = convertTimeStringToDate2(schedule.startTime);
+    const date = parse(startDate, 'dd-MM-yyyy', new Date());
+    const fullDateTime = set(date, {
+      hours: hours,
+      minutes: minutes,
+      seconds: 0,
+      milliseconds: 0,
+    });
+    if (isPast(fullDateTime)) {
+      showToast({
+        title: 'Error',
+        subtitle: 'Shift has already passed',
+        autodismiss: true,
+      });
+      return;
+    }
     setProcessing(true);
 
     try {
@@ -37,17 +62,17 @@ export const useHandleCaseRequest = ({
         hospiceName: businessName,
       });
       showToast({
-        title: "Success",
-        subtitle: "Case request declined successfully",
+        title: 'Success',
+        subtitle: 'Case request declined successfully',
         autodismiss: true,
       });
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        "Failed to decline case request",
+        'Failed to decline case request'
       );
       showToast({
-        title: "Error",
+        title: 'Error',
         subtitle: errorMessage,
         autodismiss: true,
       });
@@ -56,7 +81,7 @@ export const useHandleCaseRequest = ({
     }
   };
   const onAcceptCaseRequest = async () => {
-      if(!nurseId || !scheduleId) return;
+    if (!nurseId || !scheduleId) return;
     setProcessing(true);
     try {
       await acceptCaseRequest({
@@ -67,17 +92,17 @@ export const useHandleCaseRequest = ({
         hospiceName: businessName,
       });
       showToast({
-        title: "Success",
-        subtitle: "Case request accepted successfully",
+        title: 'Success',
+        subtitle: 'Case request accepted successfully',
         autodismiss: true,
       });
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        "Failed to accept case request",
+        'Failed to accept case request'
       );
       showToast({
-        title: "Error",
+        title: 'Error',
         subtitle: errorMessage,
         autodismiss: true,
       });

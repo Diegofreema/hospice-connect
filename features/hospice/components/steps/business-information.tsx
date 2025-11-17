@@ -31,7 +31,13 @@ export const BusinessInformation = () => {
   const createHospice = useMutation(api.hospices.createHospice);
   const onSubmit = async (data: CreateHospiceValidator) => {
     try {
-      await createHospice(data);
+      await createHospice({
+        businessName: data.businessName.trim(),
+        address: data.address.trim(),
+        licenseNumber: data.licenseNumber.trim(),
+        phoneNumber: data.phoneNumber.trim(),
+        state: data.state.trim(),
+      });
       showToast({
         title: 'Success',
         subtitle: 'Nurse account created successfully',
