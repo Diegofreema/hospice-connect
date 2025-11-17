@@ -43,7 +43,6 @@ const NurseCreate = () => {
       phoneNumber: '',
       address: '',
       rate: '',
-
       zipCode: '',
     },
     resolver: zodResolver(createNurseValidator),

@@ -14,7 +14,7 @@ export const Notifications = ({ hospiceId }: Props) => {
     { hospiceId },
     { initialNumItems: 25 }
   );
-  const ref = useScrollToTop({ results });
+  const ref = useScrollToTop();
   if (status === 'LoadingFirstPage') {
     return <SmallLoader size={50} />;
   }
@@ -24,13 +24,10 @@ export const Notifications = ({ hospiceId }: Props) => {
       loadMore(25);
     }
   };
-  const sortedNotifications = [...results].sort(
-    (a, b) => b._creationTime - a._creationTime
-  );
 
   return (
     <LegendList
-      data={sortedNotifications}
+      data={results}
       scrollEventThrottle={16}
       ref={ref}
       renderItem={({ item }) => <HospiceNotification notification={item} />}

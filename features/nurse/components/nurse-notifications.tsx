@@ -19,7 +19,7 @@ export const FetchNurseNotification = ({ nurseId }: Props) => {
     },
     { initialNumItems: 25 }
   );
-  const ref = useScrollToTop({ results });
+  const ref = useScrollToTop();
   if (status === 'LoadingFirstPage') {
     return <SmallLoader size={50} />;
   }

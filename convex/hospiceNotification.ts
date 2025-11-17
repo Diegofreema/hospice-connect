@@ -29,7 +29,8 @@ export const getNotifications = query({
   handler: async (ctx, args) => {
     const notifications = await ctx.db
       .query('hospiceNotifications')
-      .withIndex('by_hospice_id', (q) => q.eq('hospiceId', args.hospiceId))
+      .filter((q) => q.eq(q.field('hospiceId'), args.hospiceId))
+      .order('desc')
       .paginate(args.paginationOpts);
     const page = await Promise.all(
       notifications.page.map(async (notification) => {
