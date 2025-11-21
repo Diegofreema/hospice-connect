@@ -1,38 +1,37 @@
-import { Card, CardContent, CardHeader } from "@/components/card";
-import { Doc, Id } from "@/convex/_generated/dataModel";
-import { FlexText } from "@/features/shared/components/flex-text";
+import { Card, CardContent, CardHeader } from '@/components/card';
+import { Doc, Id } from '@/convex/_generated/dataModel';
+import { FlexText } from '@/features/shared/components/flex-text';
 import {
   calculateAge,
   changeFirstLetterToCapital,
-} from "@/features/shared/utils";
-import React from "react";
+} from '@/features/shared/utils';
+import React from 'react';
 
-import { useSelectAssignment } from "@/features/hospice/hooks/use-select-assignment";
-import { FlexButtons } from "@/features/shared/components/flex-buttons";
-import { useMessage } from "@/hooks/use-message";
-import { format, parse } from "date-fns";
-import { StyleSheet } from "react-native-unistyles";
-import { LongInfo } from "@/features/shared/components/long-info";
-import { useNurse } from "@/components/context/nurse-context";
-import { useUpdateToCompleted } from "@/features/nurse/hooks/use-update-to-completed";
+import { useSelectAssignment } from '@/features/hospice/hooks/use-select-assignment';
+import { useUpdatePostStatus } from '@/features/hospice/hooks/use-update-post-status';
+import { FlexButtons } from '@/features/shared/components/flex-buttons';
+import { LongInfo } from '@/features/shared/components/long-info';
+import { useMessage } from '@/hooks/use-message';
+import { format, parse } from 'date-fns';
+import { StyleSheet } from 'react-native-unistyles';
 
 type Props = {
-  item: Doc<"assignments"> & {
+  item: Doc<'assignments'> & {
     businessName?: string;
-    hospiceUserId: Id<"users">;
+    hospiceUserId: Id<'users'>;
   };
   onOpenSheet: () => void;
 };
 
 export const InProgressCard = ({ item: post, onOpenSheet }: Props) => {
   const setId = useSelectAssignment((state) => state.setId);
-  const { nurse } = useNurse();
 
-  const name = post.patientFirstName + " " + post.patientLastName;
-  const startDate = parse(post.startDate, "dd-MM-yyyy", new Date());
-  const endDate = parse(post.endDate, "dd-MM-yyyy", new Date());
-  const dob = parse(post.dateOfBirth, "dd-MM-yyyy", new Date());
-  useUpdateToCompleted({ nurseId: nurse?._id!, assignmentId: post._id });
+  const name = post.patientFirstName + ' ' + post.patientLastName;
+  const startDate = parse(post.startDate, 'dd-MM-yyyy', new Date());
+  const endDate = parse(post.endDate, 'dd-MM-yyyy', new Date());
+  const dob = parse(post.dateOfBirth, 'dd-MM-yyyy', new Date());
+
+  useUpdatePostStatus({ assignmentId: post._id });
   const { onMessage } = useMessage({ userToChat: post.hospiceUserId });
   const handleAccept = () => {
     setId(post._id);
@@ -45,19 +44,19 @@ export const InProgressCard = ({ item: post, onOpenSheet }: Props) => {
       <CardContent style={styles.content}>
         <FlexText
           leftText="Business name"
-          rightText={post?.businessName || "N/A"}
+          rightText={post?.businessName || 'N/A'}
         />
 
         <FlexText leftText="Patient name" rightText={name} />
         <FlexText leftText="Phone number" rightText={post.phoneNumber} />
         <FlexText
           leftText="Start date"
-          rightText={format(startDate, "MM/dd/yy")}
+          rightText={format(startDate, 'MM/dd/yy')}
         />
-        <FlexText leftText="End date" rightText={format(endDate, "MM/dd/yy")} />
+        <FlexText leftText="End date" rightText={format(endDate, 'MM/dd/yy')} />
         <FlexText
           leftText="Date of birth"
-          rightText={`${format(dob, "MM/dd/yy")} (${calculateAge(dob).toString()})`}
+          rightText={`${format(dob, 'MM/dd/yy')} (${calculateAge(dob).toString()})`}
         />
         <FlexText leftText="Care level" rightText={post.careLevel} />
         <FlexText
@@ -66,12 +65,12 @@ export const InProgressCard = ({ item: post, onOpenSheet }: Props) => {
         />
         <FlexText leftText="Discipline" rightText={post.discipline} />
 
-        <LongInfo title={"Address"} description={post.patientAddress} />
+        <LongInfo title={'Address'} description={post.patientAddress} />
         {post.zipcode && (
           <FlexText leftText="Zipcode" rightText={post.zipcode} />
         )}
         {post.notes && (
-          <LongInfo title={"Additional notes"} description={post.notes} />
+          <LongInfo title={'Additional notes'} description={post.notes} />
         )}
 
         <FlexButtons
@@ -90,9 +89,9 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.greyLight,
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   trigger: {
     padding: 5,
@@ -104,7 +103,7 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: 15,
   },
   footer: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: 10,
   },
   viewSchedule: {
@@ -124,8 +123,8 @@ const styles = StyleSheet.create((theme) => ({
     padding: 5,
     borderRadius: 5,
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     height: 45,
   },
 }));

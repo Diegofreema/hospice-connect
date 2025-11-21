@@ -377,7 +377,9 @@ export const acceptCaseRequest = mutation({
     // Check if the nurse is already assigned to the assignment
     const nurseAssignmentExists = await ctx.db
       .query('nurseAssignments')
-      .withIndex('assignmentId', (q) => q.eq('assignmentId', assignment._id))
+      .withIndex('assignmentId', (q) =>
+        q.eq('assignmentId', assignment._id).eq('nurseId', args.nurseId)
+      )
       .first();
     // If not, create a new nurseAssignment
     if (!nurseAssignmentExists) {
@@ -385,7 +387,6 @@ export const acceptCaseRequest = mutation({
         isCompleted: false,
         nurseId: args.nurseId,
         assignmentId: assignment._id,
-        endDate: assignment.endDate,
       });
     }
     // sends notification to nurse, that the case request has been accepted
@@ -442,6 +443,23 @@ export const updateScheduleStatus = mutation({
     const schedule = await ctx.db.get(args.scheduleId);
     if (!schedule) {
       throw new ConvexError({ message: 'Schedule not found' });
+    }
+    const assignment = await ctx.db.get(schedule.assignmentId);
+    if (!assignment) {
+      throw new ConvexError({ message: 'Assignment not found' });
+    }
+    const schedules = await getSchedulesByAssignmentIdHelper(
+      ctx,
+      assignment._id
+    );
+
+    const lastSchedule = schedules[schedules.length - 1];
+    if (lastSchedule._id === schedule._id) {
+      if (args.status === 'not_covered') {
+        await ctx.db.patch(assignment._id, {
+          status: 'completed',
+        });
+      }
     }
     await ctx.db.patch(args.scheduleId, {
       status: args.status,

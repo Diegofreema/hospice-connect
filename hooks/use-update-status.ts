@@ -31,17 +31,21 @@ export const useUpdateUpdateStatus = ({
 
   useFocusEffect(
     useCallback(() => {
+      if (status === 'cancelled') return;
       let isMounted = true;
 
       const validateAndUpdateStatus = async () => {
         // Validate inputs
-
-        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        if (
+          isNaN(startDate.getTime()) ||
+          isNaN(endDate.getTime()) ||
+          isNaN(openingShift.getTime()) ||
+          isNaN(closingShift.getTime())
+        ) {
           console.error('Invalid startDate or endDate');
           return;
         }
 
-        // Combine date and time for shift start
         const shiftStartDateTime = new Date(startDate);
         shiftStartDateTime.setHours(
           openingShift.getHours(),
@@ -49,7 +53,6 @@ export const useUpdateUpdateStatus = ({
           0,
           0
         );
-        console.log({ closingShift: closingShift.getHours() });
 
         const shiftEndDateTime = new Date(endDate);
         shiftEndDateTime.setHours(
@@ -62,7 +65,12 @@ export const useUpdateUpdateStatus = ({
 
         // Check if shift has ended (current time is past shift end)
         // AND there's no nurse assigned AND status is not already 'not_covered'
-        if (!nurseId && status !== 'not_covered' && now >= shiftEndDateTime) {
+        if (
+          !nurseId &&
+          status !== 'not_covered' &&
+          now >= shiftStartDateTime &&
+          now > shiftEndDateTime
+        ) {
           try {
             if (isMounted) {
               await updateStatus({
@@ -88,14 +96,15 @@ export const useUpdateUpdateStatus = ({
       startDate,
       endDate,
       shiftId,
-      openingShift,
       updateStatus,
       nurseId,
+      openingShift,
       closingShift,
     ])
   );
   useFocusEffect(
     useCallback(() => {
+      if (status === 'cancelled') return;
       let isMounted = true;
 
       const validateAndUpdateStatus = async () => {
@@ -173,6 +182,7 @@ export const useUpdateUpdateStatus = ({
 
   useFocusEffect(
     useCallback(() => {
+      if (status === 'cancelled') return;
       let isMounted = true; // Track component mount status
 
       const validateAndUpdateStatus = async () => {

@@ -168,11 +168,9 @@ export const editNurse = mutation({
   args: {
     firstName: v.string(),
     lastName: v.string(),
-
     phoneNumber: v.string(),
     licenseNumber: v.string(),
     stateOfRegistration: v.string(),
-
     discipline: discipline,
     rate: v.optional(v.number()),
     address: v.optional(v.string()),

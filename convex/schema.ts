@@ -46,7 +46,7 @@ export const Nurse = {
   phoneNumber: v.string(),
   licenseNumber: v.string(),
   stateOfRegistration: v.string(),
-  dateOfBirth: v.string(),
+  dateOfBirth: v.optional(v.string()),
   discipline: discipline,
   rate: v.optional(v.number()),
   imageId: v.optional(v.id('_storage')),
@@ -70,7 +70,6 @@ const NurseAssignments = {
   isCompleted: v.boolean(),
   assignmentId: v.id('assignments'),
   completedAt: v.optional(v.number()),
-  endDate: v.optional(v.number()),
 };
 
 export const Hospice = {
@@ -144,6 +143,7 @@ export const assignment = {
   rate: v.number(),
   careLevel,
   isCanceled: v.optional(v.boolean()),
+  canceledAt: v.optional(v.number()),
 };
 export const routeSheet = {
   nurseId: v.id('nurses'),

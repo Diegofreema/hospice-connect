@@ -2,8 +2,8 @@ import { getAuthUserId } from '@convex-dev/auth/server';
 import { filter } from 'convex-helpers/server/filter';
 import { paginationOptsValidator, PaginationResult } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
-import { Doc } from './_generated/dataModel';
-import { internalMutation, mutation, query } from './_generated/server';
+import { Doc, Id } from './_generated/dataModel';
+import { mutation, query } from './_generated/server';
 import { formatDateString, formatTimeString, stringToDate } from './helper';
 import { getSchedulesByAssignmentIdHelper } from './schedules';
 import { careLevel, discipline, shifts } from './schema';
@@ -558,6 +558,7 @@ export const updateAssignmentStatus = mutation({
     const lastScheduleIsCompletedOrIsNotCovered =
       lastSchedule.status === 'not_covered' ||
       lastSchedule.status === 'completed';
+
     const endDate = stringToDate(lastSchedule.endDate);
     endDate.setHours(0, 0, 0, 0);
     const today = new Date();
@@ -588,6 +589,20 @@ export const updateAssignmentStatus = mutation({
     if (newStatus !== assignment.status) {
       await ctx.db.patch(args.assignmentId, { status: newStatus });
     }
+    if (newStatus === 'completed' || newStatus === 'cancelled') {
+      const nursesAssignments = await ctx.db
+        .query('nurseAssignments')
+        .withIndex('assignmentId', (q) =>
+          q.eq('assignmentId', args.assignmentId)
+        )
+        .collect();
+      for (const nurseAssignment of nursesAssignments) {
+        await ctx.db.patch(nurseAssignment._id, {
+          isCompleted: true,
+          completedAt: Date.now(),
+        });
+      }
+    }
   },
 });
 
@@ -599,21 +614,15 @@ export const cancelAssignment = mutation({
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      throw new ConvexError({ message: 'Unauthorized' });
-    }
+    if (!userId) throw new ConvexError({ message: 'Unauthorized' });
+
     const hospice = await ctx.db.get(args.hospiceId);
-    if (!hospice) {
-      throw new ConvexError({ message: 'Hospice not found' });
-    }
+    if (!hospice) throw new ConvexError({ message: 'Hospice not found' });
+
     const assignment = await ctx.db.get(args.assignmentId);
-    if (!assignment) {
-      throw new ConvexError({ message: 'Assignment not found' });
-    }
+    if (!assignment) throw new ConvexError({ message: 'Assignment not found' });
     if (assignment.hospiceId !== args.hospiceId) {
-      throw new ConvexError({
-        message: 'You do not have permission to cancel this assignment',
-      });
+      throw new ConvexError({ message: 'Permission denied' });
     }
 
     const schedules = await ctx.db
@@ -623,55 +632,56 @@ export const cancelAssignment = mutation({
       )
       .collect();
 
-    const array: Doc<'schedules'>[] = [];
-    for (const s of schedules) {
-      const isInArray = array.find((a) => a.nurseId === s.nurseId);
-      if (!isInArray) {
-        array.push(s);
-      }
+    if (schedules.length === 0) {
+      // Maybe just mark assignment as cancelled
+      await ctx.db.patch(assignment._id, {
+        isCanceled: true,
+        status: 'cancelled',
+        canceledAt: Date.now(),
+      });
+      return;
     }
-    for (const schedule of array) {
-      if (schedule.nurseId) {
+
+    const text = `${hospice.businessName} has cancelled the assignment for ${assignment.patientFirstName} ${assignment.patientLastName}. Reason: ${args.reason || 'No reason provided'}`;
+
+    // === Step 1: Send ONE notification per nurse ===
+    const notifiedNurses = new Set<string>();
+
+    for (const schedule of schedules) {
+      if (schedule.nurseId && !notifiedNurses.has(schedule.nurseId)) {
+        notifiedNurses.add(schedule.nurseId);
+
         await ctx.db.insert('nurseNotifications', {
-          nurseId: schedule.nurseId,
+          nurseId: schedule.nurseId as Id<'nurses'>,
           isRead: false,
           hospiceId: args.hospiceId,
           scheduleId: schedule._id,
-          description: args.reason,
+          description: text,
           title: 'Assignment Cancelled',
           type: 'normal',
         });
-        const scheduleToCancel = ['on_going', 'available', 'booked'].includes(
-          schedule.status
-        );
-        if (scheduleToCancel) {
-          await ctx.db.patch(schedule._id, {
-            status: 'cancelled',
-            canceledAt: Date.now(),
-            endTime: formatTimeString(new Date()),
-            endDate: formatDateString(new Date()),
-          });
-        }
       }
     }
-    await ctx.db.patch(assignment._id, {
-      isCanceled: true,
-      status: 'cancelled',
-    });
-  },
-});
 
-export const updateNursesAssignment = internalMutation({
-  args: {},
-  handler: async (ctx) => {
-    const nursesAssignment = await ctx.db.query('nurseAssignments').collect();
-    for (const nurseAssignment of nursesAssignment) {
-      const assignment = await ctx.db.get(nurseAssignment.assignmentId);
-      if (assignment) {
-        await ctx.db.patch(nurseAssignment._id, {
-          endDate: undefined,
+    // === Step 2: Cancel ALL schedules (including 'on_going') ===
+    const cancellableStatuses = new Set(['available', 'on_going', 'booked']);
+
+    for (const schedule of schedules) {
+      if (cancellableStatuses.has(schedule.status)) {
+        await ctx.db.patch(schedule._id, {
+          status: 'cancelled',
+          canceledAt: Date.now(),
+          endTime: formatTimeString(new Date()),
+          endDate: formatDateString(new Date()),
         });
       }
     }
+
+    // === Step 3: Update assignment ===
+    await ctx.db.patch(assignment._id, {
+      isCanceled: true,
+      status: 'cancelled',
+      canceledAt: Date.now(),
+    });
   },
 });

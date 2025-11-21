@@ -91,7 +91,7 @@ const Toast: React.FC<ToastProps> = ({ toast, index, onDismiss }) => {
     if (!toast.autodismiss || !isActiveToast) return;
     const timeout = setTimeout(() => {
       dismissItem();
-    }, 3000);
+    }, 5000);
     return () => {
       clearTimeout(timeout);
     };

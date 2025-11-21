@@ -44,7 +44,6 @@ export const CompletedCard = ({ item: post }: Props) => {
 
     router.push(`${path}?assignmentId=${post._id}&nurseId=${nurse?._id}`);
   };
-  console.log(post.isSubmitted, post.patientFirstName);
 
   const buttonText = hasSubmitted ? 'View route sheet' : 'Complete route sheet';
   const disableButton = post.isSubmitted && !post.isApproved;

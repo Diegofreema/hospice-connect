@@ -14,11 +14,13 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 
 import { useHandleCaseRequest } from '@/features/shared/hooks/use-handle-case-request';
+import { FunctionReturnType } from 'convex/server';
 import { StyleSheet } from 'react-native-unistyles';
-import { HospiceNotificationType } from '../types';
 
 type Props = {
-  notification: HospiceNotificationType;
+  notification: FunctionReturnType<
+    typeof api.hospiceNotification.getNotifications
+  >['page'][number];
 };
 
 export const HospiceNotification = ({ notification }: Props) => {

@@ -182,17 +182,15 @@ export const acceptAssignment = mutation({
     }
     const nurseAssignmentExists = await ctx.db
       .query('nurseAssignments')
-      .withIndex('assignmentId', (q) => q.eq('assignmentId', assignment._id))
+      .withIndex('assignmentId', (q) =>
+        q.eq('assignmentId', assignment._id).eq('nurseId', args.nurseId)
+      )
       .first();
     if (!nurseAssignmentExists) {
-      const [day, month, year] = assignment.endDate.split('-').map(Number);
-      const time = new Date(year, month - 1, day, 0, 0, 0, 0);
-
       await ctx.db.insert('nurseAssignments', {
         isCompleted: false,
         nurseId: args.nurseId,
         assignmentId: assignment._id,
-        endDate: time.getTime(),
       });
     }
     await ctx.db.patch(args.scheduleId, {
@@ -265,41 +263,41 @@ export const declineAssignment = mutation({
   },
 });
 
-export const updateAssignmentToCompleted = mutation({
-  args: {
-    nurseId: v.id('nurses'),
-    assignmentId: v.id('assignments'),
-  },
-  handler: async (ctx, args) => {
-    const nurseAssignments = await ctx.db
-      .query('nurseAssignments')
-      .withIndex('nurse_id', (q) =>
-        q
-          .eq('nurseId', args.nurseId)
-          .eq('isCompleted', false)
-          .eq('assignmentId', args.assignmentId)
-      )
-      .first();
-    if (nurseAssignments) {
-      const schedules = await ctx.db
-        .query('schedules')
-        .withIndex('nurse_id', (q) =>
-          q.eq('nurseId', args.nurseId).eq('assignmentId', args.assignmentId)
-        )
-        .collect();
+// export const updateAssignmentToCompleted = mutation({
+//   args: {
+//     nurseId: v.id('nurses'),
+//     assignmentId: v.id('assignments'),
+//   },
+//   handler: async (ctx, args) => {
+//     const nurseAssignments = await ctx.db
+//       .query('nurseAssignments')
+//       .withIndex('nurse_id', (q) =>
+//         q
+//           .eq('nurseId', args.nurseId)
+//           .eq('isCompleted', false)
+//           .eq('assignmentId', args.assignmentId)
+//       )
+//       .first();
+//     if (nurseAssignments) {
+//       const schedules = await ctx.db
+//         .query('schedules')
+//         .withIndex('nurse_id', (q) =>
+//           q.eq('nurseId', args.nurseId).eq('assignmentId', args.assignmentId)
+//         )
+//         .collect();
 
-      const allScheduleIsComplete = schedules.every(
-        (s) => s.status === 'completed'
-      );
-      if (allScheduleIsComplete) {
-        await ctx.db.patch(nurseAssignments._id, {
-          isCompleted: true,
-          completedAt: new Date().getTime(),
-        });
-      }
-    }
-  },
-});
+//       const allScheduleIsComplete = schedules.every(
+//         (s) => s.status === 'completed'
+//       );
+//       if (allScheduleIsComplete) {
+//         await ctx.db.patch(nurseAssignments._id, {
+//           isCompleted: true,
+//           completedAt: new Date().getTime(),
+//         });
+//       }
+//     }
+//   },
+// });
 export const updateAssignmentToNotCompleted = mutation({
   args: {
     nurseId: v.id('nurses'),
