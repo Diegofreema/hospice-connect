@@ -74,6 +74,10 @@ export const RoustSheetComponent = ({
       `$${(calculateTotalHours([shift]) * shift.rate).toFixed(2)}`,
     ]),
   ];
+  const totalPay = shifts.reduce(
+    (acc, shift) => acc + calculateTotalHours([shift]) * shift.rate,
+    0
+  );
   return (
     <View gap={'xxl'}>
       <View gap="xl">
@@ -104,7 +108,7 @@ export const RoustSheetComponent = ({
           Total hours: {totalHours.toFixed(2)}
         </Text>
         <Text size="medium" isBold>
-          Total pay : ${(Number(totalHours.toFixed(2)) * rate).toFixed(2)}
+          Total pay : ${totalPay.toFixed(2)}
         </Text>
       </View>
       <Text size="normal" textAlign="center">

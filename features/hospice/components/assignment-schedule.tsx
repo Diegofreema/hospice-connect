@@ -45,11 +45,14 @@ export const AssignmentSchedule = ({
   const onCancel = async (reason: string) => {
     if (!assignmentId || !hospice?._id) return;
     setLoading(true);
+
+    const cancelledAt = Date.now();
     try {
       await cancelAssignment({
         assignmentId,
         hospiceId: hospice._id,
         reason,
+        cancelledAt,
       });
       showToast({
         title: 'Success',

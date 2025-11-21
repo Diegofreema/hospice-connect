@@ -4,7 +4,7 @@ import { paginationOptsValidator, PaginationResult } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { Doc, Id } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
-import { formatDateString, formatTimeString, stringToDate } from './helper';
+import { stringToDate } from './helper';
 import { getSchedulesByAssignmentIdHelper } from './schedules';
 import { careLevel, discipline, shifts } from './schema';
 import { AssignmentsWithHospicesType, AvailableAssignmentType } from './types';
@@ -611,6 +611,8 @@ export const cancelAssignment = mutation({
     assignmentId: v.id('assignments'),
     hospiceId: v.id('hospices'),
     reason: v.string(),
+
+    cancelledAt: v.number(),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -637,7 +639,7 @@ export const cancelAssignment = mutation({
       await ctx.db.patch(assignment._id, {
         isCanceled: true,
         status: 'cancelled',
-        canceledAt: Date.now(),
+        canceledAt: args.cancelledAt,
       });
       return;
     }
@@ -670,18 +672,25 @@ export const cancelAssignment = mutation({
       if (cancellableStatuses.has(schedule.status)) {
         await ctx.db.patch(schedule._id, {
           status: 'cancelled',
-          canceledAt: Date.now(),
-          endTime: formatTimeString(new Date()),
-          endDate: formatDateString(new Date()),
+          canceledAt: args.cancelledAt,
         });
       }
     }
-
+    const allNursesAssignment = await ctx.db
+      .query('nurseAssignments')
+      .withIndex('assignmentId', (q) => q.eq('assignmentId', args.assignmentId))
+      .collect();
+    for (const nurseAssignment of allNursesAssignment) {
+      await ctx.db.patch(nurseAssignment._id, {
+        isCompleted: true,
+        completedAt: args.cancelledAt,
+      });
+    }
     // === Step 3: Update assignment ===
     await ctx.db.patch(assignment._id, {
       isCanceled: true,
       status: 'cancelled',
-      canceledAt: Date.now(),
+      canceledAt: args.cancelledAt,
     });
   },
 });

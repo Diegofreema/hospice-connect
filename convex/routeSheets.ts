@@ -25,11 +25,14 @@ export const nurseSubmittedRouteSheet = query({
 
     const schedules = await ctx.db
       .query('schedules')
-      .withIndex('by_assignment_id', (q) =>
-        q
-          .eq('assignmentId', assignment._id)
-          .eq('status', 'completed')
-          .eq('nurseId', nurse._id)
+      .withIndex('nurse_id', (q) =>
+        q.eq('nurseId', nurse._id).eq('assignmentId', assignment._id)
+      )
+      .filter((q) =>
+        q.or(
+          q.eq(q.field('status'), 'cancelled'),
+          q.eq(q.field('status'), 'completed')
+        )
       )
       .collect();
 
@@ -65,12 +68,20 @@ export const getDetailsForRouteSheet = query({
 
     const schedules = await ctx.db
       .query('schedules')
-      .withIndex('by_assignment_id', (q) =>
-        q
-          .eq('assignmentId', assignment._id)
-          .eq('status', 'completed')
-          .eq('nurseId', nurse._id)
-          .eq('isSubmitted', false)
+      .withIndex(
+        'nurse_id',
+        (q) => q.eq('nurseId', nurse._id).eq('assignmentId', assignment._id)
+        // .eq('status', 'completed')
+        // .eq('isSubmitted', false)
+      )
+      .filter((q) =>
+        q.and(
+          q.eq(q.field('isSubmitted'), false),
+          q.or(
+            q.eq(q.field('status'), 'cancelled'),
+            q.eq(q.field('status'), 'completed')
+          )
+        )
       )
       .collect();
 

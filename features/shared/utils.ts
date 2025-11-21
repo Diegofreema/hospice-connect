@@ -9,6 +9,7 @@ import {
   differenceInHours,
   differenceInYears,
   format,
+  parse,
 } from 'date-fns';
 import { Dimensions } from 'react-native';
 
@@ -211,14 +212,20 @@ function timeToHours(timeStr: string) {
 
 // Function to calculate hours for a single shift
 function calculateShiftHours(shift: Doc<'schedules'>) {
+  if (shift.canceledAt) {
+    const startDateObj = parse(shift.startDate, 'dd-MM-yyyy', new Date());
+    const startTime = convertTimeStringToDate2(shift.startTime);
+    startDateObj.setHours(startTime.hours, startTime.minutes, 0, 0);
+    const canceledDate = new Date(shift.canceledAt);
+    const diff = (canceledDate.getTime() - startDateObj.getTime()) / 3600000;
+    return diff < 0 ? 0 : diff;
+  }
+
   let startHours = timeToHours(shift.startTime);
   let endHours = timeToHours(shift.endTime);
-
-  // Handle overnight shifts (end time is before start time)
   if (endHours < startHours) {
     endHours += 24;
   }
-
   return endHours - startHours;
 }
 
@@ -228,9 +235,7 @@ export function calculateTotalHours(shifts: Doc<'schedules'>[]) {
 
   shifts.forEach((shift) => {
     const hours = calculateShiftHours(shift);
-    console.log(
-      `Shift ${shift.startTime} - ${shift.endTime}: ${hours.toFixed(2)} hours`
-    );
+
     totalHours += hours;
   });
 

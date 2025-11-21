@@ -42,7 +42,6 @@ export const CompleteRouteSheet = ({ assignmentId, nurseId }: Props) => {
     nurseId,
     assignmentId,
   });
-  console.log(data?.schedules);
 
   const submitRouteSheet = useMutation(api.routeSheets.submitRouteSheet);
   const { showToast } = useToast();
@@ -171,6 +170,11 @@ const ScheduleCard = ({ schedule }: ScheduleProps) => {
           {schedule.endTime} ({calculateTotalHours([schedule]).toFixed(2)}hrs)
         </Text>
       </View>
+      {schedule.canceledAt && (
+        <Text>
+          Canceled At: {format(schedule.canceledAt!, 'MM/dd/yy h:mm a')}
+        </Text>
+      )}
       <Text>Hourly Rate: ${schedule.rate.toString()}</Text>
     </View>
   );
