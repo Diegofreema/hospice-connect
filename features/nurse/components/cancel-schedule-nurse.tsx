@@ -33,6 +33,7 @@ const CancelScheduleNurse = ({ onClose, nurseId }: Props) => {
   const handleSubmit = async () => {
     if (!id) return;
     setSubmitting(true);
+
     try {
       await cancelRequest({
         nurseId,
@@ -99,7 +100,7 @@ const CancelScheduleNurse = ({ onClose, nurseId }: Props) => {
 export default CancelScheduleNurse;
 
 const data = [
-  { id: 1, value: 'Patient died', label: 'Patient died' },
+  { id: 1, value: 'Patient expired', label: 'Patient expired' },
   { id: 2, value: 'Illness', label: 'Illness' },
   { id: 3, value: 'Family emergency', label: 'Family emergency' },
   { id: 4, value: 'other', label: 'Other' },

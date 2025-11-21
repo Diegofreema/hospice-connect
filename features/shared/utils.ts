@@ -6,10 +6,11 @@ import { FunctionReference } from 'convex/server';
 import { ConvexError, Infer } from 'convex/values';
 import {
   addHours,
-  differenceInHours,
   differenceInYears,
+  eachDayOfInterval,
   format,
   parse,
+  set,
 } from 'date-fns';
 import { Dimensions } from 'react-native';
 
@@ -266,53 +267,26 @@ export const generateShiftsWithDateFns = ({
   openShift,
   startDate,
 }: ShiftWithDateFns): Shift[] => {
-  const distanceBetweenDates = differenceInHours(endDate, startDate);
-  //check if start time and opening shift has passed
-  // const shiftTimeHasStarted =
-  //   startDate.setHours(openShift.getHours(), openShift.getMinutes(), 0, 0) <=
-  //   Date.now();
-  // if (shiftTimeHasStarted) {
-  //   throw new ConvexError({
-  //     message: 'Shift time has already started',
-  //   });
-  // }
+  const days = eachDayOfInterval({ start: startDate, end: endDate });
 
-  const shifts: Shift[] = [];
-  if (distanceBetweenDates < 1) {
-    const endShift = addHours(openShift, 12);
-    const shift = {
-      start: format(startDate, 'dd-MM-yyyy'),
-      end: format(endDate, 'dd-MM-yyyy'),
-      startShift: format(openShift, 'h:mm a'),
-      endShift: format(endShift, 'h:mm a'),
+  return days.map((day) => {
+    const shiftStart = set(day, {
+      hours: openShift.getHours(),
+      minutes: openShift.getMinutes(),
+      seconds: 0,
+      milliseconds: 0,
+    });
+
+    const shiftEnd = addHours(shiftStart, 12);
+    const actualEnd = shiftEnd > endDate ? endDate : shiftEnd;
+
+    return {
+      start: format(shiftStart, 'dd-MM-yyyy'),
+      end: format(actualEnd, 'dd-MM-yyyy'),
+      startShift: format(shiftStart, 'h:mm a'),
+      endShift: format(shiftEnd, 'h:mm a'),
     };
-    shifts.push(shift);
-  } else {
-    // a shift is 12 hours per day ,
-    const totalShifts = Math.ceil(distanceBetweenDates / 12);
-
-    for (let i = 0; i < totalShifts; i++) {
-      const shiftStart = addHours(startDate, i * 12);
-      const shiftEnd = addHours(shiftStart, 12);
-
-      // Ensure the last shift doesn't exceed the end date
-      const actualShiftEnd = shiftEnd > endDate ? endDate : shiftEnd;
-
-      const shiftStartTime = addHours(openShift, i * 12);
-      const shiftEndTime = addHours(shiftStartTime, 12);
-
-      const shift = {
-        start: format(shiftStart, 'dd-MM-yyyy'),
-        end: format(actualShiftEnd, 'dd-MM-yyyy'),
-        startShift: format(shiftStartTime, 'h:mm a'),
-        endShift: format(shiftEndTime, 'h:mm a'),
-      };
-
-      shifts.push(shift);
-    }
-  }
-
-  return shifts;
+  });
 };
 
 export const calculateAge = (dob: Date): number => {

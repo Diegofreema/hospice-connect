@@ -58,9 +58,6 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
     })
     .filter((schedule) => schedule !== undefined);
   const onSend = async () => {
-    console.log('Pressed 1');
-    console.log({ selectedSchedules });
-
     for (const selectedSchedule of selectedSchedules) {
       const startDate = selectedSchedule.startDate;
       console.log('Pressed 2');
@@ -77,7 +74,6 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
         seconds: 0,
         milliseconds: 0,
       });
-      console.log(isPast(fullDateTime));
 
       if (isPast(fullDateTime)) {
         showToast({
@@ -88,7 +84,6 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
         return;
       }
     }
-    console.log('Pressed 4');
 
     if (!nurseId) return;
     setLoading(true);

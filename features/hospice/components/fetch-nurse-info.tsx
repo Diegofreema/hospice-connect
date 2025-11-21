@@ -40,10 +40,13 @@ export const FetchNurseInfo = () => {
   } = nurseInfo;
   const name = firstName + ' ' + lastName;
   const formatedRate = `$${rate}/hr`;
+  let age: number | undefined;
+  if (dateOfBirth) {
+    const cleanedDate = dateOfBirth.replace(/(\d+)(st|nd|rd|th)/, '$1');
+    const parsed = parse(cleanedDate, 'MMMM d, yyyy', new Date());
+    age = calculateAge(parsed);
+  }
 
-  const cleanedDate = dateOfBirth?.replace(/(\d+)(st|nd|rd|th)/, '$1');
-  const date1 = parse(cleanedDate, 'MMMM d, yyyy', new Date());
-  const age = calculateAge(date1);
   return (
     <View style={{ gap: 10, minHeight: 450 }}>
       <View style={styles.top}>
@@ -59,8 +62,11 @@ export const FetchNurseInfo = () => {
             <FlexText leftText="Name" rightText={name} />
             <FlexText leftText="Email" rightText={email} />
             <FlexText leftText="Mobile number" rightText={phoneNumber} />
-            <FlexText leftText="Gender" rightText={gender} />
-            {!isNaN(age) && (
+            <FlexText
+              leftText="Gender"
+              rightText={changeFirstLetterToCapital(gender)}
+            />
+            {age !== undefined && !isNaN(age) && dateOfBirth && (
               <FlexText
                 leftText="Date of birth"
                 rightText={`${dateOfBirth} (${age}yrs)`}

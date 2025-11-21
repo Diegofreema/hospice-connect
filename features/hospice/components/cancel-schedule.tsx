@@ -22,8 +22,13 @@ export const CancelSchedule = ({ onClose }: Props) => {
   const onCancelSchedule = async () => {
     if (!id || !hospice || !hospice._id) return;
     setCanceling(true);
+    const cancelledAt = Date.now();
     try {
-      await cancelSchedule({ scheduleId: id, hospiceId: hospice._id });
+      await cancelSchedule({
+        scheduleId: id,
+        hospiceId: hospice._id,
+        cancelledAt,
+      });
       showToast({
         title: 'Success',
         subtitle: 'Schedule cancelled successfully',
@@ -51,7 +56,7 @@ export const CancelSchedule = ({ onClose }: Props) => {
   return (
     <View gap="md">
       <Text isMedium>
-        Once schedule is cancelled, it becomes vacant for reassignment
+        Once schedule is cancelled, it can no longer be reassigned.
       </Text>
       <FlexButtons
         onPress={onCancelSchedule}

@@ -16,6 +16,7 @@ export const cancelSchedule = mutation({
     hospiceId: v.id('hospices'),
     notificationId: v.optional(v.id('hospiceNotifications')),
     isCancelRequest: v.optional(v.boolean()),
+    cancelledAt: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -75,9 +76,8 @@ export const cancelSchedule = mutation({
         }
       }
       await ctx.db.patch(args.scheduleId, {
-        status: 'available',
-        nurseId: undefined,
-        canceledAt: Date.now(),
+        status: 'cancelled',
+        canceledAt: args.cancelledAt,
       });
       const text = args.isCancelRequest
         ? 'accepted your shift cancel request'

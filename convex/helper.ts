@@ -31,7 +31,7 @@ export const getRatings = async (ctx: QueryCtx, nurseId: Id<'nurses'>) => {
     .query('ratings')
     .withIndex('nurseId', (q) => q.eq('nurseId', nurseId))
     .collect();
-  return ratings.reduce((acc, rating) => acc + rating.rate, 0);
+  return ratings.reduce((acc, rating) => acc + rating.rate, 0) / ratings.length;
 };
 interface Shift {
   status: string;

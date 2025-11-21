@@ -209,6 +209,23 @@ export const sendCaseRequestNotification = mutation({
           });
         }
       }
+      const notificationExists = await ctx.db
+        .query('hospiceNotifications')
+        .filter((q) =>
+          q.and(
+            q.eq(q.field('nurseId'), nurse._id),
+            q.eq(q.field('type'), 'case_request'),
+            q.eq(q.field('scheduleId'), scheduleId),
+
+            q.neq(q.field('status'), 'declined')
+          )
+        )
+        .first();
+
+      if (notificationExists) {
+        await ctx.db.delete(notificationExists._id);
+      }
+
       await ctx.db.insert('hospiceNotifications', {
         isRead: false,
         hospiceId: assignment.hospiceId,
