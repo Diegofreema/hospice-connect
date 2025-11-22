@@ -53,22 +53,22 @@ export const getNotifications = query({
 // ? mutations
 export const markNotificationAsRead = mutation({
   args: {
-    hospiceId: v.id('hospices'),
+    notificationId: v.id('hospiceNotifications'),
   },
   handler: async (ctx, args) => {
-    const notifications = await ctx.db
-      .query('hospiceNotifications')
-      .withIndex('by_hospice_id', (q) =>
-        q.eq('hospiceId', args.hospiceId).eq('isRead', false)
-      )
-      .take(100);
-
-    for (const notification of notifications) {
-      if (notification.type !== 'route_sheet') {
-        if (!notification.isRead) {
-          await ctx.db.patch(notification._id, { isRead: true });
-        }
+    try {
+      const notification = await ctx.db.get(args.notificationId);
+      if (!notification) {
+        return;
       }
+
+      if (notification.isRead) {
+        return;
+      }
+
+      await ctx.db.patch(notification._id, { isRead: true });
+    } catch (error) {
+      console.log(error);
     }
   },
 });

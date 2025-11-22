@@ -557,7 +557,8 @@ export const updateAssignmentStatus = mutation({
     const lastSchedule = schedules[schedules.length - 1];
     const lastScheduleIsCompletedOrIsNotCovered =
       lastSchedule.status === 'not_covered' ||
-      lastSchedule.status === 'completed';
+      lastSchedule.status === 'completed' ||
+      lastSchedule.status === 'cancelled';
 
     const endDate = stringToDate(lastSchedule.endDate);
     endDate.setHours(0, 0, 0, 0);

@@ -41,6 +41,11 @@ export const SelectSchedule = ({ id, hospiceId, name, onClose }: Props) => {
   if (schedules === undefined) {
     return <SmallLoader size={30} />;
   }
+  const availableSchedules = schedules.filter(
+    (schedule) =>
+      schedule.nurseId === nurseId &&
+      (schedule.status === 'booked' || schedule.status === 'on_going')
+  );
   const onSelect = (id: Id<'schedules'>) => {
     setSelectedIds((prev) => {
       const isInArray = prev.find((item) => item === id);
@@ -52,7 +57,9 @@ export const SelectSchedule = ({ id, hospiceId, name, onClose }: Props) => {
   };
   const selectedSchedules = selectedIds
     .map((selectedId) => {
-      return schedules.find((schedule) => schedule._id === selectedId)!;
+      return availableSchedules.find(
+        (schedule) => schedule._id === selectedId
+      )!;
     })
     .filter((schedule) => schedule !== undefined);
   const onSend = async () => {

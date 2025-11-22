@@ -43,6 +43,11 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
   if (schedules === undefined) {
     return <SmallLoader size={30} />;
   }
+  const availableSchedules = schedules.filter(
+    (schedule) =>
+      schedule.nurseId === nurseId &&
+      (schedule.status === 'booked' || schedule.status === 'on_going')
+  );
   const onSelect = (id: Id<'schedules'>) => {
     setSelectedIds((prev) => {
       const isInArray = prev.find((item) => item === id);
@@ -54,18 +59,18 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
   };
   const selectedSchedules = selectedIds
     .map((selectedId) => {
-      return schedules.find((schedule) => schedule._id === selectedId)!;
+      return availableSchedules.find(
+        (schedule) => schedule._id === selectedId
+      )!;
     })
     .filter((schedule) => schedule !== undefined);
   const onSend = async () => {
     for (const selectedSchedule of selectedSchedules) {
       const startDate = selectedSchedule.startDate;
-      console.log('Pressed 2');
 
       const { hours, minutes } = convertTimeStringToDate2(
         selectedSchedule.startTime
       );
-      console.log('Pressed 3');
 
       const date = parse(startDate, 'dd-MM-yyyy', new Date());
       const fullDateTime = set(date, {

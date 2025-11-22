@@ -11,7 +11,7 @@ import { generateErrorMessage } from '@/features/shared/utils';
 import { useMutation } from 'convex/react';
 import { format } from 'date-fns';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useHandleCaseRequest } from '@/features/shared/hooks/use-handle-case-request';
 import { FunctionReturnType } from 'convex/server';
@@ -34,6 +34,22 @@ export const HospiceNotification = ({ notification }: Props) => {
   const firstPart = date.split(' ')[0];
 
   const secondPart = date.split(' ')[1] + ' ' + date.split(' ')[2];
+  const markAsRead = useMutation(
+    api.hospiceNotification.markNotificationAsRead
+  );
+
+  useEffect(() => {
+    const onMark = async () => {
+      try {
+        await markAsRead({
+          notificationId: notification._id,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    void onMark();
+  }, [markAsRead, notification._id]);
   const onPress = () => {
     if (notification.type === 'route_sheet') {
       router.push(
@@ -151,11 +167,8 @@ export const HospiceNotification = ({ notification }: Props) => {
     notification.type === 'case_request' ||
     notification.type === 'route_sheet';
   return (
-    <CustomPressable
-      onPress={onPress}
-      style={{ opacity: notification.isRead ? 1 : 0.7 }}
-    >
-      <Card style={styles.card}>
+    <CustomPressable onPress={onPress}>
+      <Card style={styles.card(notification.isRead)}>
         <CardHeader>
           <View
             flex={1}
@@ -223,7 +236,9 @@ export const HospiceNotification = ({ notification }: Props) => {
 };
 
 const styles = StyleSheet.create((theme) => ({
-  card: {
+  card: (isRead: boolean) => ({
     backgroundColor: theme.colors.greyLight,
-  },
+    borderWidth: 1,
+    borderColor: isRead ? 'transparent' : theme.colors.grey,
+  }),
 }));

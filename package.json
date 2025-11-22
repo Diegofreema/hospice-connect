@@ -81,6 +81,7 @@
     "expo-updates": "~0.28.17",
     "expo-video": "~2.2.2",
     "expo-web-browser": "~14.2.0",
+    "lottie-react-native": "^7.3.4",
     "moment": "^2.30.1",
     "pressto": "^0.2.1",
     "react": "19.0.0",

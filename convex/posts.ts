@@ -150,7 +150,8 @@ export const acceptAssignment = mutation({
     const shifts = await filter(
       ctx.db.query('schedules'),
       (schedule) =>
-        schedule.nurseId === args.nurseId && schedule.status === 'booked'
+        (schedule.nurseId === args.nurseId && schedule.status === 'booked') ||
+        (schedule.nurseId === args.nurseId && schedule.status === 'on_going')
     ).collect();
 
     // Parse the new shift's start and end datetime

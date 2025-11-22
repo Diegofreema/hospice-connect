@@ -49,18 +49,21 @@ export const unreadMessagesCount = query({
 // ? mutations
 export const markNotificationAsRead = mutation({
   args: {
-    nurseId: v.id('nurses'),
+    notificationId: v.id('nurseNotifications'),
   },
   handler: async (ctx, args) => {
-    const notifications = await ctx.db
-      .query('nurseNotifications')
-      .withIndex('by_nurseId', (q) =>
-        q.eq('nurseId', args.nurseId).eq('isRead', false)
-      )
-      .take(100);
+    try {
+      const notification = await ctx.db.get(args.notificationId);
+      if (!notification) {
+        return;
+      }
+      if (notification.isRead) {
+        return;
+      }
 
-    for (const notification of notifications) {
-      await ctx.db.patch(notification._id, { isRead: true });
+      await ctx.db.patch(args.notificationId, { isRead: true });
+    } catch (error) {
+      console.log(error);
     }
   },
 });
