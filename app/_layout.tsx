@@ -1,8 +1,9 @@
+import { ToastProvider } from '@/components/demos/toast';
 import Provider from '@/components/provider';
 import { ErrorComponent } from '@/features/shared/components/error';
-import { ToastProvider } from '@/components/demos/toast';
 
 import { StackedModalProvider } from '@/components/demos/modal/modal-manager';
+import { useAnimationStore } from '@/hooks/use-animation';
 import { setupBackgroundUpdates } from '@/updates';
 import { useConvexAuth } from 'convex/react';
 import { useFonts } from 'expo-font';
@@ -47,6 +48,7 @@ export default function RootLayout() {
 const InitialRoute = () => {
   const { theme } = useUnistyles();
   const { isAuthenticated } = useConvexAuth();
+  const isFinished = useAnimationStore((state) => state.isFinished);
   const pathname = usePathname();
   console.log({ pathname });
 
@@ -66,11 +68,16 @@ const InitialRoute = () => {
               headerShown: false,
             }}
           >
-            <Stack.Protected guard={isAuthenticated}>
-              <Stack.Screen name="(protected)" />
+            <Stack.Protected guard={isFinished}>
+              <Stack.Protected guard={isAuthenticated}>
+                <Stack.Screen name="(protected)" />
+              </Stack.Protected>
+              <Stack.Protected guard={!isAuthenticated}>
+                <Stack.Screen name="(public)" />
+              </Stack.Protected>
             </Stack.Protected>
-            <Stack.Protected guard={!isAuthenticated}>
-              <Stack.Screen name="(public)" />
+            <Stack.Protected guard={!isFinished}>
+              <Stack.Screen name="(animation)" />
             </Stack.Protected>
           </Stack>
         </StackedModalProvider>
