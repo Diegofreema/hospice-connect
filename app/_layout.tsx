@@ -2,6 +2,7 @@ import { ToastProvider } from '@/components/demos/toast';
 import Provider from '@/components/provider';
 import { ErrorComponent } from '@/features/shared/components/error';
 
+import { AnimatedView } from '@/components/animated-view';
 import { StackedModalProvider } from '@/components/demos/modal/modal-manager';
 import { useAnimationStore } from '@/hooks/use-animation';
 import { setupBackgroundUpdates } from '@/updates';
@@ -20,6 +21,7 @@ export function ErrorBoundary({ retry, error }: ErrorBoundaryProps) {
   return <ErrorComponent refetch={retry} text={error.message} />;
 }
 export default function RootLayout() {
+  const isFinished = useAnimationStore((state) => state.isFinished);
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     PublicSansBold: require('@/assets/fonts/PublicSans-Bold.ttf'),
@@ -32,6 +34,9 @@ export default function RootLayout() {
   if (!loaded) {
     // Async font loading only occurs in development.
     return null;
+  }
+  if (!isFinished) {
+    return <AnimatedView />;
   }
 
   return (
@@ -48,7 +53,7 @@ export default function RootLayout() {
 const InitialRoute = () => {
   const { theme } = useUnistyles();
   const { isAuthenticated } = useConvexAuth();
-  const isFinished = useAnimationStore((state) => state.isFinished);
+
   const pathname = usePathname();
   console.log({ pathname });
 
@@ -68,17 +73,14 @@ const InitialRoute = () => {
               headerShown: false,
             }}
           >
-            <Stack.Protected guard={isFinished}>
-              <Stack.Protected guard={isAuthenticated}>
-                <Stack.Screen name="(protected)" />
-              </Stack.Protected>
-              <Stack.Protected guard={!isAuthenticated}>
-                <Stack.Screen name="(public)" />
-              </Stack.Protected>
+            <Stack.Protected guard={isAuthenticated}>
+              <Stack.Screen name="(protected)" />
             </Stack.Protected>
-            <Stack.Protected guard={!isFinished}>
-              <Stack.Screen name="(animation)" />
+            <Stack.Protected guard={!isAuthenticated}>
+              <Stack.Screen name="(public)" />
             </Stack.Protected>
+
+            <Stack.Screen name="(animation)" />
           </Stack>
         </StackedModalProvider>
       </ToastProvider>
