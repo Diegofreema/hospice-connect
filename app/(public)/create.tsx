@@ -2,7 +2,6 @@ import { PrivacyNoticeLink } from '@/components/privacy-notice/privacy-notice-li
 import { Subtitle } from '@/components/subtitle/Subtitle';
 import { DividerWithText } from '@/features/authentication/components/divider-with-text';
 import { RegisterForm } from '@/features/authentication/components/form/register-form';
-import { GoogleButton } from '@/features/authentication/components/google-button';
 import { PrivacyTermsLink } from '@/features/authentication/components/privacy-term';
 import { BackButton } from '@/features/shared/components/back-button';
 import { MyTitle } from '@/features/shared/components/my-title';
@@ -32,7 +31,7 @@ const CreateAccountScreen = () => {
         <Spacer height={30} />
         <RegisterForm />
         <DividerWithText />
-        <GoogleButton />
+        {/* <GoogleButton /> */}
         <PrivacyTermsLink />
       </KeyboardAwareScrollView>
     </Wrapper>

@@ -256,7 +256,7 @@ export const submitRouteSheet = mutation({
       hospiceId: args.hospiceId,
       isRead: false,
       nurseId: args.nurseId,
-      title: `${nurse.firstName} ${nurse.lastName}`,
+      title: `${nurse.name}`,
       description: 'Submitted a route sheet, Click to view to accept/decline',
       type: 'route_sheet',
       routeSheetId,

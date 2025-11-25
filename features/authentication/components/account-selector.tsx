@@ -16,7 +16,7 @@ type Props = {
 };
 export const AccountSelector = ({ selected, setSelected }: Props) => {
   return (
-    <View mt={'lg'} gap="md">
+    <View mt={'xl'} gap="md">
       {accountTypes.map((accountType) => (
         <TouchableOpacity
           key={accountType.type}

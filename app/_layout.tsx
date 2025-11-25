@@ -55,7 +55,7 @@ const InitialRoute = () => {
   const { isAuthenticated } = useConvexAuth();
 
   const pathname = usePathname();
-  console.log({ pathname });
+  console.log({ pathname, isAuthenticated });
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -79,8 +79,6 @@ const InitialRoute = () => {
             <Stack.Protected guard={!isAuthenticated}>
               <Stack.Screen name="(public)" />
             </Stack.Protected>
-
-            <Stack.Screen name="(animation)" />
           </Stack>
         </StackedModalProvider>
       </ToastProvider>

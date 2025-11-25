@@ -14,7 +14,7 @@ const ForgotPassword = () => {
       <Spacer height={30} />
       <MyTitle title="Forgot Password" />
       <SubTitle isBlack>Enter your email to reset your password</SubTitle>
-      <Spacer height={50} />
+
       <ForgotForm />
     </Wrapper>
   );

@@ -37,8 +37,7 @@ export const generateErrorMessage = (
   message: string
 ): string => {
   return error instanceof ConvexError
-    ? // Access data and cast it to the type we expect
-      (error.data as { message: string }).message
+    ? error.data?.message || message
     : message;
 };
 

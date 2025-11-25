@@ -5,7 +5,6 @@ import { Spacer } from '@/features/shared/components/spacer';
 import { Text } from '@/features/shared/components/text';
 import { View } from '../../../shared/components/view';
 
-import { useAuthActions } from '@convex-dev/auth/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   IconCheck,
@@ -17,7 +16,8 @@ import {
 } from '@tabler/icons-react-native';
 
 import { useToast } from '@/components/demos/toast';
-import { router } from 'expo-router';
+import { authClient } from '@/lib/auth-client';
+import axios from 'axios';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { TouchableOpacity } from 'react-native';
@@ -26,7 +26,7 @@ import { RegisterSchema, registerSchema } from '../../validators';
 import { ControlInput } from './control-input';
 export const RegisterForm = () => {
   const [secured, setSecured] = useState(true);
-  const { signIn } = useAuthActions();
+
   const { theme } = useUnistyles();
   const { showToast } = useToast();
   const {
@@ -44,32 +44,46 @@ export const RegisterForm = () => {
   });
   const { password } = watch();
   const onSubmit = async (data: RegisterSchema) => {
-    void signIn('password-custom', {
-      email: data.email,
-      password: data.password,
-      flow: 'signUp',
-    })
-      .then(() => {
-        router.push(`/verify?email=${data.email}&password=${data.password}`);
-        reset();
-        showToast({
-          title: 'Success',
-          subtitle: 'Account created successfully. Please verify your email.',
-        });
-      })
-      .catch((e) => {
-        console.log({ e });
-        let errorMessage;
-        if (e.message.includes('already exists')) {
-          errorMessage = 'Email already exists, please try a different email';
-        } else {
-          errorMessage = 'Failed to create account. Please try again.';
-        }
-        showToast({
-          title: 'An error occurred',
-          subtitle: errorMessage,
-        });
+    try {
+      await authClient.signUp.email({
+        email: data.email.trim(),
+        password: data.password.trim(),
+        name: data.name.trim(),
+        isBoarded: false,
+        role: 'nurse',
+        fetchOptions: {
+          onError: ({ error }) => {
+            showToast({
+              title: 'Error',
+              subtitle: error.message,
+            });
+          },
+          onSuccess: async ({ data }) => {
+            const user = data.user;
+            const { data: response } = await axios.post(
+              `https://hospice-connect-web.vercel.app/api/token`,
+              {
+                name: user?.name,
+                email: user?.email,
+                id: user?.id,
+              }
+            );
+
+            await authClient.updateUser({
+              streamToken: response.streamToken,
+            });
+            reset();
+          },
+        },
       });
+    } catch (error) {
+      console.log(error);
+
+      showToast({
+        title: 'Error',
+        subtitle: 'An unexpected error occurred. Please try again.',
+      });
+    }
   };
   const toggleSecure = () => {
     setSecured(!secured);
@@ -107,7 +121,16 @@ export const RegisterForm = () => {
   const hasNumber = /[0-9]/.test(password || '');
   const progress = (passwordStrength.strength / 5) * 100;
   return (
-    <View gap={'md'}>
+    <View gap={'xl'}>
+      <ControlInput
+        control={control}
+        errors={errors}
+        name="name"
+        label="Full name"
+        placeholder="Johndoe@gmail.com"
+        leftIcon={<IconMail color={theme.colors.iconGrey} />}
+        autoCapitalize="none"
+      />
       <ControlInput
         control={control}
         errors={errors}
@@ -116,6 +139,7 @@ export const RegisterForm = () => {
         placeholder="Johndoe@gmail.com"
         leftIcon={<IconMail color={theme.colors.iconGrey} />}
         autoCapitalize="none"
+        keyboardType="email-address"
       />
       <ControlInput
         control={control}

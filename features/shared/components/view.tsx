@@ -15,6 +15,8 @@ type Props = {
   mb?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
   ml?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
   mr?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
+  my?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
+  mx?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
   pb?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
   pl?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
   pr?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
@@ -64,6 +66,8 @@ export const View = ({
   maxWidth,
   width,
   style,
+  my = 'none',
+  mx = 'none',
 }: PropsWithChildren<Props>) => {
   styles.useVariants({
     gap,
@@ -79,6 +83,8 @@ export const View = ({
     pt,
     px,
     py,
+    my,
+    mx,
   });
   return (
     <RNView
@@ -412,6 +418,46 @@ const styles = StyleSheet.create((theme) => ({
         },
         xxl: {
           marginRight: theme.margins.xxl,
+        },
+      },
+      mx: {
+        none: {
+          paddingHorizontal: 0,
+        },
+        sm: {
+          paddingHorizontal: theme.paddings.sm,
+        },
+        md: {
+          paddingHorizontal: theme.paddings.md,
+        },
+        lg: {
+          paddingHorizontal: theme.paddings.lg,
+        },
+        xl: {
+          paddingHorizontal: theme.paddings.xl,
+        },
+        xxl: {
+          paddingHorizontal: theme.paddings.xxl,
+        },
+      },
+      my: {
+        none: {
+          paddingVertical: 0,
+        },
+        sm: {
+          paddingVertical: theme.paddings.sm,
+        },
+        md: {
+          paddingVertical: theme.paddings.md,
+        },
+        lg: {
+          paddingVertical: theme.paddings.lg,
+        },
+        xl: {
+          paddingVertical: theme.paddings.xl,
+        },
+        xxl: {
+          paddingVertical: theme.paddings.xxl,
         },
       },
       borderRadius: {

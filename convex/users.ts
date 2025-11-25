@@ -1,14 +1,23 @@
-import { getAuthUserId } from '@convex-dev/auth/server';
 import { v } from 'convex/values';
-import { mutation, MutationCtx, query } from './_generated/server';
+import {
+  internalMutation,
+  MutationCtx,
+  query,
+  QueryCtx,
+} from './_generated/server';
+import { authComponent } from './auth';
+import { Id } from './betterAuth/_generated/dataModel';
 
 export const getUser = query({
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       return null;
     }
-    const user = await ctx.db.get(userId);
+    const user = await ctx.db
+      .query('users')
+      .withIndex('email', (q) => q.eq('email', identity.email))
+      .first();
     if (!user) {
       return null;
     }
@@ -22,21 +31,49 @@ export const findUserByEmail = async (ctx: MutationCtx, email: string) => {
     .first();
 };
 
-export const updateStreamToken = mutation({
+export const getCurrentUser = query({
+  args: {},
+  handler: async (ctx) => {
+    return authComponent.getAuthUser(ctx);
+  },
+});
+// export const getForCurrentUser = query({
+//   args: {},
+//   handler: async (ctx) => {
+//     const identity = await ctx.auth.getUserIdentity();
+//     if (identity === null) {
+//       throw new Error("Not authenticated");
+//     }
+//     return await ctx.db
+//       .query("messages")
+//       .filter((q) => q.eq(q.field("author"), identity.email))
+//       .collect();
+//   },
+// });
+
+export const createUser = internalMutation({
   args: {
     streamToken: v.string(),
+    user: v.object({
+      name: v.string(),
+      email: v.string(),
+      _id: v.string(),
+    }),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      return null;
-    }
-    const user = await ctx.db.get(userId);
-    if (!user) {
-      return null;
-    }
-    return await ctx.db.patch(user._id, {
+    await ctx.db.insert('users', {
+      role: 'nurse',
       streamToken: args.streamToken,
+      name: args.user.name,
+      email: args.user.email,
+      isBoarded: false,
+      userId: args.user._id,
     });
   },
 });
+
+// helper functions
+
+export const getUserHelper = async (ctx: QueryCtx, id: Id<'user'>) => {
+  return await authComponent.getAnyUserById(ctx, id);
+};

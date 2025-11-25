@@ -1,6 +1,6 @@
 /* eslint-disable */
 /**
- * Generated `api` utility.
+ * Generated `ComponentApi` utility.
  *
  * THIS CODE IS AUTOMATICALLY GENERATED.
  *
@@ -8,94 +8,21 @@
  * @module
  */
 
-import type * as ResendOTP from "../ResendOTP.js";
-import type * as ResendOTPPassword from "../ResendOTPPassword.js";
-import type * as actions from "../actions.js";
-import type * as assignments from "../assignments.js";
-import type * as auth from "../auth.js";
-import type * as crons from "../crons.js";
-import type * as emails_ResetPasswordEmail from "../emails/ResetPasswordEmail.js";
-import type * as emails_VerifyEmail from "../emails/VerifyEmail.js";
-import type * as errors from "../errors.js";
-import type * as handleEvent from "../handleEvent.js";
-import type * as helper from "../helper.js";
-import type * as hospiceNotification from "../hospiceNotification.js";
-import type * as hospices from "../hospices.js";
-import type * as http from "../http.js";
-import type * as nurseNotifications from "../nurseNotifications.js";
-import type * as nurses from "../nurses.js";
-import type * as passwordReset_PasswordResetemail from "../passwordReset/PasswordResetemail.js";
-import type * as posts from "../posts.js";
-import type * as routeSheets from "../routeSheets.js";
-import type * as schedules from "../schedules.js";
-import type * as sendEmail from "../sendEmail.js";
-import type * as shifts from "../shifts.js";
-import type * as streamToken from "../streamToken.js";
-import type * as types from "../types.js";
-import type * as users from "../users.js";
-
-import type {
-  ApiFromModules,
-  FilterApi,
-  FunctionReference,
-} from "convex/server";
-
-declare const fullApi: ApiFromModules<{
-  ResendOTP: typeof ResendOTP;
-  ResendOTPPassword: typeof ResendOTPPassword;
-  actions: typeof actions;
-  assignments: typeof assignments;
-  auth: typeof auth;
-  crons: typeof crons;
-  "emails/ResetPasswordEmail": typeof emails_ResetPasswordEmail;
-  "emails/VerifyEmail": typeof emails_VerifyEmail;
-  errors: typeof errors;
-  handleEvent: typeof handleEvent;
-  helper: typeof helper;
-  hospiceNotification: typeof hospiceNotification;
-  hospices: typeof hospices;
-  http: typeof http;
-  nurseNotifications: typeof nurseNotifications;
-  nurses: typeof nurses;
-  "passwordReset/PasswordResetemail": typeof passwordReset_PasswordResetemail;
-  posts: typeof posts;
-  routeSheets: typeof routeSheets;
-  schedules: typeof schedules;
-  sendEmail: typeof sendEmail;
-  shifts: typeof shifts;
-  streamToken: typeof streamToken;
-  types: typeof types;
-  users: typeof users;
-}>;
+import type { FunctionReference } from "convex/server";
 
 /**
- * A utility for referencing Convex functions in your app's public API.
+ * A utility for referencing a Convex component's exposed API.
  *
+ * Useful when expecting a parameter like `components.myComponent`.
  * Usage:
- * ```js
- * const myFunctionReference = api.myModule.myFunction;
+ * ```ts
+ * async function myFunction(ctx: QueryCtx, component: ComponentApi) {
+ *   return ctx.runQuery(component.someFile.someQuery, { ...args });
+ * }
  * ```
  */
-export declare const api: FilterApi<
-  typeof fullApi,
-  FunctionReference<any, "public">
->;
-
-/**
- * A utility for referencing Convex functions in your app's internal API.
- *
- * Usage:
- * ```js
- * const myFunctionReference = internal.myModule.myFunction;
- * ```
- */
-export declare const internal: FilterApi<
-  typeof fullApi,
-  FunctionReference<any, "internal">
->;
-
-export declare const components: {
-  betterAuth: {
+export type ComponentApi<Name extends string | undefined = string | undefined> =
+  {
     adapter: {
       create: FunctionReference<
         "mutation",
@@ -167,7 +94,8 @@ export declare const components: {
           onCreateHandle?: string;
           select?: Array<string>;
         },
-        any
+        any,
+        Name
       >;
       deleteMany: FunctionReference<
         "mutation",
@@ -352,7 +280,8 @@ export declare const components: {
             numItems: number;
           };
         },
-        any
+        any,
+        Name
       >;
       deleteOne: FunctionReference<
         "mutation",
@@ -529,7 +458,8 @@ export declare const components: {
               };
           onDeleteHandle?: string;
         },
-        any
+        any,
+        Name
       >;
       findMany: FunctionReference<
         "query",
@@ -571,7 +501,8 @@ export declare const components: {
               | null;
           }>;
         },
-        any
+        any,
+        Name
       >;
       findOne: FunctionReference<
         "query",
@@ -603,7 +534,8 @@ export declare const components: {
               | null;
           }>;
         },
-        any
+        any,
+        Name
       >;
       updateMany: FunctionReference<
         "mutation",
@@ -835,7 +767,8 @@ export declare const components: {
             numItems: number;
           };
         },
-        any
+        any,
+        Name
       >;
       updateOne: FunctionReference<
         "mutation",
@@ -1059,137 +992,8 @@ export declare const components: {
               };
           onUpdateHandle?: string;
         },
-        any
+        any,
+        Name
       >;
     };
   };
-  resend: {
-    lib: {
-      cancelEmail: FunctionReference<
-        "mutation",
-        "internal",
-        { emailId: string },
-        null
-      >;
-      cleanupAbandonedEmails: FunctionReference<
-        "mutation",
-        "internal",
-        { olderThan?: number },
-        null
-      >;
-      cleanupOldEmails: FunctionReference<
-        "mutation",
-        "internal",
-        { olderThan?: number },
-        null
-      >;
-      createManualEmail: FunctionReference<
-        "mutation",
-        "internal",
-        {
-          from: string;
-          headers?: Array<{ name: string; value: string }>;
-          replyTo?: Array<string>;
-          subject: string;
-          to: string;
-        },
-        string
-      >;
-      get: FunctionReference<
-        "query",
-        "internal",
-        { emailId: string },
-        {
-          complained: boolean;
-          createdAt: number;
-          errorMessage?: string;
-          finalizedAt: number;
-          from: string;
-          headers?: Array<{ name: string; value: string }>;
-          html?: string;
-          opened: boolean;
-          replyTo: Array<string>;
-          resendId?: string;
-          segment: number;
-          status:
-            | "waiting"
-            | "queued"
-            | "cancelled"
-            | "sent"
-            | "delivered"
-            | "delivery_delayed"
-            | "bounced"
-            | "failed";
-          subject: string;
-          text?: string;
-          to: string;
-        } | null
-      >;
-      getStatus: FunctionReference<
-        "query",
-        "internal",
-        { emailId: string },
-        {
-          complained: boolean;
-          errorMessage: string | null;
-          opened: boolean;
-          status:
-            | "waiting"
-            | "queued"
-            | "cancelled"
-            | "sent"
-            | "delivered"
-            | "delivery_delayed"
-            | "bounced"
-            | "failed";
-        } | null
-      >;
-      handleEmailEvent: FunctionReference<
-        "mutation",
-        "internal",
-        { event: any },
-        null
-      >;
-      sendEmail: FunctionReference<
-        "mutation",
-        "internal",
-        {
-          from: string;
-          headers?: Array<{ name: string; value: string }>;
-          html?: string;
-          options: {
-            apiKey: string;
-            initialBackoffMs: number;
-            onEmailEvent?: { fnHandle: string };
-            retryAttempts: number;
-            testMode: boolean;
-          };
-          replyTo?: Array<string>;
-          subject: string;
-          text?: string;
-          to: string;
-        },
-        string
-      >;
-      updateManualEmail: FunctionReference<
-        "mutation",
-        "internal",
-        {
-          emailId: string;
-          errorMessage?: string;
-          resendId?: string;
-          status:
-            | "waiting"
-            | "queued"
-            | "cancelled"
-            | "sent"
-            | "delivered"
-            | "delivery_delayed"
-            | "bounced"
-            | "failed";
-        },
-        null
-      >;
-    };
-  };
-};

@@ -40,8 +40,8 @@ export const hospiceSubscription = {
   stripeCurrentPeriodEnd: v.number(),
 };
 export const Nurse = {
-  firstName: v.string(),
-  lastName: v.string(),
+  name: v.string(),
+
   gender: v.string(),
   phoneNumber: v.string(),
   licenseNumber: v.string(),
@@ -51,7 +51,7 @@ export const Nurse = {
   rate: v.optional(v.number()),
   imageId: v.optional(v.id('_storage')),
   isApproved: v.boolean(),
-  userId: v.id('users'),
+  userId: v.id('user'),
   address: v.optional(v.string()),
   zipCode: v.optional(v.string()),
 };
@@ -78,11 +78,12 @@ export const Hospice = {
   licenseNumber: v.string(),
   state: v.string(),
   approved: v.boolean(),
-  userId: v.id('users'),
+  userId: v.id('user'),
   faxNumber: v.optional(v.string()),
   phoneNumber: v.string(),
   email: v.string(),
   isApproved: v.optional(v.boolean()),
+  imageId: v.optional(v.id('_storage')),
 };
 const PendingHospice = {
   address: v.string(),
@@ -171,7 +172,8 @@ export const User = {
   phoneVerificationTime: v.optional(v.number()),
   isAnonymous: v.optional(v.boolean()),
   isBoarded: v.boolean(),
-  isNurse: v.optional(v.boolean()),
+  role: v.union(v.literal('nurse'), v.literal('hospice'), v.literal('admin')),
+  userId: v.string(),
 };
 export const day = v.object({
   day: v.union(

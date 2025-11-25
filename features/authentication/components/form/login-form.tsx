@@ -5,7 +5,7 @@ import { Spacer } from '@/features/shared/components/spacer';
 import { View } from '../../../shared/components/view';
 
 import { useToast } from '@/components/demos/toast';
-import { useAuthActions } from '@convex-dev/auth/react';
+import { authClient } from '@/lib/auth-client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   IconEye,
@@ -22,7 +22,7 @@ import { loginSchema, LoginSchema } from '../../validators';
 import { ControlInput } from './control-input';
 export const LoginForm = () => {
   const [secured, setSecured] = useState(true);
-  const { signIn } = useAuthActions();
+
   const { showToast } = useToast();
   const { theme } = useUnistyles();
   const {
@@ -38,39 +38,30 @@ export const LoginForm = () => {
     resolver: zodResolver(loginSchema),
   });
   const onSubmit = async (data: LoginSchema) => {
-    void signIn('password-custom', {
-      password: data.password,
-      flow: 'signIn',
+    const res = await authClient.signIn.email({
       email: data.email,
-    })
-      .then(() => {
-        showToast({
-          title: 'Login Success',
-          subtitle: 'You have successfully logged in',
-        });
-        reset();
-      })
-      .catch((error) => {
-        let errorMessage = 'Failed to login';
-        if (
-          error.message.includes('InvalidAccountId') ||
-          error.message.includes('InvalidSecret')
-        ) {
-          errorMessage = 'Invalid email or password, please try again.';
-        }
-        showToast({
-          title: 'Login Failed',
-          subtitle: errorMessage,
-        });
-        console.error('Login error:', error.message);
-        // Optionally, display an error message to the user here
+      password: data.password,
+    });
+    if (res.error) {
+      showToast({
+        title: 'Error',
+        subtitle: res.error.message,
+        autodismiss: true,
       });
+    }
+    if (res.data) {
+      showToast({
+        title: 'Success',
+        subtitle: `Welcome back ${res.data.user.name}`,
+        autodismiss: true,
+      });
+    }
   };
   const toggleSecure = () => {
     setSecured(!secured);
   };
   return (
-    <View gap={'md'}>
+    <View gap={'xl'}>
       <ControlInput
         control={control}
         errors={errors}

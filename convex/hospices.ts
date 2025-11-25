@@ -2,6 +2,8 @@ import { getAuthUserId } from '@convex-dev/auth/server';
 import { ConvexError, v } from 'convex/values';
 import { Id } from './_generated/dataModel';
 import { mutation, query, QueryCtx } from './_generated/server';
+import { auth } from './betterAuth/auth';
+import { getUserHelper } from './users';
 
 export const createHospice = mutation({
   args: {
@@ -11,55 +13,58 @@ export const createHospice = mutation({
     state: v.string(),
 
     phoneNumber: v.string(),
+    id: v.id('user'),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
+    const user = await getUserHelper(ctx, args.id);
 
-    const user = await ctx.db.get(userId);
     if (!user) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
 
-    await ctx.db.patch(user._id, {
-      name: args.businessName,
-      isBoarded: true,
-    });
-
-    return await ctx.db.insert('hospices', {
+    await ctx.db.insert('hospices', {
       address: args.address,
       businessName: args.businessName,
       licenseNumber: args.licenseNumber,
       state: args.state,
       approved: false,
-      userId: userId,
+      userId: user._id,
       phoneNumber: args.phoneNumber,
       email: user.email as string,
+    });
+    await auth.api.updateUser({
+      body: {
+        role: 'hospice',
+      },
     });
   },
 });
 
 export const getHospiceByUserId = query({
-  args: {},
-  handler: async (ctx) => {
+  args: {
+    userId: v.id('user'),
+  },
+  handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) {
       return null;
     }
 
-    const user = await ctx.db.get(userId);
+    const user = await getUserHelper(ctx, args.userId);
     if (!user) {
       return null;
     }
     const hospice = await ctx.db
       .query('hospices')
-      .withIndex('userId', (q) => q.eq('userId', userId))
+      .withIndex('userId', (q) => q.eq('userId', user._id))
       .first();
     let image;
-    if (user.imageId) {
-      image = await ctx.storage.getUrl(user.imageId);
+    if (hospice?.imageId) {
+      image = await ctx.storage.getUrl(hospice.imageId);
     }
 
     return {
@@ -75,15 +80,19 @@ export const updateHospiceImage = mutation({
     hospiceId: v.id('hospices'),
     imageId: v.id('_storage'),
     oldImageId: v.optional(v.id('_storage')),
+    userId: v.id('user'),
   },
   handler: async (ctx, args) => {
     try {
       const hospice = await ctx.db.get(args.hospiceId);
       if (!hospice) {
-        throw new ConvexError({ message: 'Nurse not found' });
+        throw new ConvexError({ message: 'Hospice not found' });
       }
-
-      await ctx.db.patch(hospice.userId, {
+      const user = await getUserHelper(ctx, args.userId);
+      if (!user) {
+        throw new ConvexError({ message: 'User not found' });
+      }
+      await ctx.db.patch(hospice._id, {
         imageId: args.imageId,
       });
       if (args.oldImageId) {
@@ -106,13 +115,18 @@ export const updateHospiceProfile = mutation({
     phoneNumber: v.string(),
     hospiceId: v.id('hospices'),
     email: v.string(),
+    userId: v.id('user'),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
+    const userId = args.userId;
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError({ message: 'Unauthorized' });
+    }
     if (!userId) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
-    const user = await ctx.db.get(userId);
+    const user = await getUserHelper(ctx, userId);
     if (!user) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
@@ -150,13 +164,13 @@ export const getHospiceAndImage = async (
   if (!hospice) {
     return null;
   }
-  const user = await ctx.db.get(hospice.userId);
+  const user = await getUserHelper(ctx, hospice.userId);
   if (!user) {
     return null;
   }
   let image;
-  if (user.imageId) {
-    image = await ctx.storage.getUrl(user.imageId);
+  if (hospice.imageId) {
+    image = await ctx.storage.getUrl(hospice.imageId);
   }
   return {
     ...hospice,

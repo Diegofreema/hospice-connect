@@ -10,7 +10,9 @@ import { Stack } from '@/features/shared/components/v-stack';
 
 import { generateErrorMessage } from '@/features/shared/utils';
 
+import { useAuth } from '@/components/context/auth';
 import { useToast } from '@/components/demos/toast';
+import { Id } from '@/convex/betterAuth/_generated/dataModel';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from 'convex/react';
 import {
@@ -20,6 +22,7 @@ import {
 
 export const BusinessInformation = () => {
   const { showToast } = useToast();
+  const { user } = useAuth();
   const {
     handleSubmit,
     formState: { errors, isSubmitting },
@@ -30,6 +33,7 @@ export const BusinessInformation = () => {
   });
   const createHospice = useMutation(api.hospices.createHospice);
   const onSubmit = async (data: CreateHospiceValidator) => {
+    if (!user) return;
     try {
       await createHospice({
         businessName: data.businessName.trim(),
@@ -37,20 +41,22 @@ export const BusinessInformation = () => {
         licenseNumber: data.licenseNumber.trim(),
         phoneNumber: data.phoneNumber.trim(),
         state: data.state.trim(),
+        id: user.id as Id<'user'>,
       });
       showToast({
         title: 'Success',
-        subtitle: 'Nurse account created successfully',
+        subtitle: 'Hospice account created successfully',
       });
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to create nurse'
+        'Failed to create hospice account'
       );
 
       showToast({
         title: 'Error',
         subtitle: errorMessage,
+        autodismiss: true,
       });
     }
   };

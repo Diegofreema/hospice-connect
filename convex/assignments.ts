@@ -8,6 +8,7 @@ import { stringToDate } from './helper';
 import { getSchedulesByAssignmentIdHelper } from './schedules';
 import { careLevel, discipline, shifts } from './schema';
 import { AssignmentsWithHospicesType, AvailableAssignmentType } from './types';
+import { getUserHelper } from './users';
 
 export const availableAssignments = query({
   args: {
@@ -72,15 +73,16 @@ export const inProgressAssignments = query({
       v.literal('available')
     ),
     paginationOpts: paginationOptsValidator,
+    userId: v.id('user'),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const user = await getUserHelper(ctx, args.userId);
+    if (!user) {
       return {} as PaginationResult<Doc<'assignments'>>;
     }
     const nurse = await ctx.db
       .query('nurses')
-      .withIndex('userId', (q) => q.eq('userId', userId))
+      .withIndex('userId', (q) => q.eq('userId', user._id))
       .first();
     if (!nurse) {
       return {} as PaginationResult<Doc<'assignments'>>;

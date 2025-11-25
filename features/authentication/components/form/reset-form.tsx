@@ -7,7 +7,6 @@ import { Text } from '@/features/shared/components/text';
 import { View } from '../../../../features/shared/components/view';
 
 import { useToast } from '@/components/demos/toast';
-import { useAuthActions } from '@convex-dev/auth/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   IconCheck,
@@ -16,7 +15,7 @@ import {
   IconLock,
   IconX,
 } from '@tabler/icons-react-native';
-import { router, usePathname } from 'expo-router';
+import { usePathname } from 'expo-router';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { TouchableOpacity, useWindowDimensions } from 'react-native';
@@ -28,7 +27,7 @@ export const ResetForm = ({ email }: { email: string }) => {
   const pathname = usePathname();
   const { theme } = useUnistyles();
   const isResetPassword = pathname.includes('new-password');
-  const { signIn } = useAuthActions();
+
   const { width } = useWindowDimensions();
   const { showToast } = useToast();
   const otpInputWidth = (width - 50) / 6;
@@ -46,39 +45,7 @@ export const ResetForm = ({ email }: { email: string }) => {
     resolver: zodResolver(resetPasswordSchema),
   });
   const { password } = watch();
-  const onSubmit = async (data: ResetPasswordSchema) => {
-    void signIn('password-custom', {
-      code: data.code,
-      newPassword: data.password,
-      flow: 'reset-verification',
-      email,
-    })
-      .then(() => {
-        if (isResetPassword) {
-          router.back();
-        } else {
-          router.push(`/`);
-        }
-        reset();
-        showToast({
-          title: 'Success',
-          subtitle: 'Password reset successfully. Please sign in.',
-        });
-      })
-      .catch((e) => {
-        console.log({ e });
-        let errorMessage;
-        if (e.message.includes('already exists')) {
-          errorMessage = 'Email already exists, please try a different email';
-        } else {
-          errorMessage = 'Failed to reset password. Please try again.';
-        }
-        showToast({
-          title: 'An error occurred',
-          subtitle: errorMessage,
-        });
-      });
-  };
+  const onSubmit = async (data: ResetPasswordSchema) => {};
   const toggleSecure = () => {
     setSecured(!secured);
   };
@@ -226,7 +193,9 @@ const styles = StyleSheet.create((theme) => ({
     gap: 12,
   },
   otpInputStyle: {
-    backgroundColor: theme.colors.greenLight,
+    backgroundColor: theme.colors.white,
+    borderWidth: 1,
+    borderColor: theme.colors.blue,
     color: theme.colors.black,
     fontSize: 24,
     fontWeight: '600',

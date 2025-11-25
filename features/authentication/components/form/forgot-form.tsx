@@ -2,7 +2,7 @@ import { Button } from '@/features/shared/components/button';
 import { View } from '../../../shared/components/view';
 
 import { useToast } from '@/components/demos/toast';
-import { useAuthActions } from '@convex-dev/auth/react';
+import { authClient } from '@/lib/auth-client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { IconMail } from '@tabler/icons-react-native';
 import { Href, router } from 'expo-router';
@@ -16,12 +16,11 @@ type Props = {
   link?: Href;
 };
 export const ForgotForm = ({ link = '/reset-password' }: Props) => {
-  const { signIn } = useAuthActions();
   const { theme } = useUnistyles();
   const {
     handleSubmit,
     control,
-
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<ForgotPasswordSchema>({
     defaultValues: {
@@ -30,26 +29,28 @@ export const ForgotForm = ({ link = '/reset-password' }: Props) => {
     resolver: zodResolver(forgotPasswordSchema),
   });
   const { showToast } = useToast();
-  const onSubmit = (data: ForgotPasswordSchema) => {
-    console.log({ data });
+  const onSubmit = async (values: ForgotPasswordSchema) => {
+    const { data, error } = await authClient.requestPasswordReset({
+      email: values.email,
+    });
 
-    void signIn('password-custom', { email: data.email, flow: 'reset' })
-      .then(() => {
-        showToast({
-          title: 'Success',
-          subtitle: 'Reset code sent',
-        });
-
-        router.push(`${link}?email=${data.email}` as Href);
-      })
-      .catch((e) => {
-        console.log('RESEND ERROR', { e });
-
-        showToast({
-          title: 'Error',
-          subtitle: 'Failed to send reset code',
-        });
+    if (error) {
+      showToast({
+        title: 'Error',
+        subtitle: error.message,
+        autodismiss: true,
       });
+    }
+
+    if (data) {
+      showToast({
+        title: 'Success',
+        subtitle: data.message,
+        autodismiss: true,
+      });
+      router.push(link);
+      reset();
+    }
   };
   return (
     <View gap="xl">

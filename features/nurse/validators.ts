@@ -2,18 +2,16 @@ import { UseFormReturn } from 'react-hook-form';
 import { z } from 'zod';
 
 export const createNurseValidator = z.object({
-  firstName: z.string().min(1, 'First name is required'),
-  lastName: z.string().min(1, 'Last name is required'),
   phoneNumber: z.string().min(1, 'Phone number is required'),
   gender: z.string().min(1, 'Gender is required'),
   dateOfBirth: z.date().optional(),
   discipline: z.enum(['RN', 'LVN', 'HHA']),
   licenseNumber: z.string().min(1, 'License number is required'),
   licenseState: z.string().min(1, 'License state is required'),
-  address: z.string().optional(),
-  rate: z.string().optional(),
+  address: z.string().min(1, 'Address is required'),
+  rate: z.string().min(1, 'Rate is required'),
   email: z.email({ error: 'Please use a valid email' }).optional(),
-  zipCode: z.string().optional(),
+  zipCode: z.string().min(1, 'Zip code is required'),
 });
 
 export type CreateNurseValidator = z.infer<typeof createNurseValidator>;

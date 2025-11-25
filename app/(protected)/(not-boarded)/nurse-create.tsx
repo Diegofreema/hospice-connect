@@ -1,5 +1,7 @@
+import { useAuth } from '@/components/context/auth';
 import { useToast } from '@/components/demos/toast';
 import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/betterAuth/_generated/dataModel';
 import { License } from '@/features/nurse/components/step/license';
 import { PersonalInfo } from '@/features/nurse/components/step/personal-info';
 import {
@@ -30,17 +32,16 @@ const STEPS = [
 const NurseCreate = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const { showToast } = useToast();
+  const { user } = useAuth();
   const createNurse = useMutation(api.nurses.createNurse);
   const form = useForm<CreateNurseValidator>({
     defaultValues: {
       dateOfBirth: new Date(1598051730000),
       discipline: 'RN',
-      firstName: '',
       gender: '',
-      lastName: '',
+      phoneNumber: '',
       licenseNumber: '',
       licenseState: '',
-      phoneNumber: '',
       address: '',
       rate: '',
       zipCode: '',
@@ -53,8 +54,7 @@ const NurseCreate = () => {
       case 1:
         return [
           'phoneNumber',
-          'firstName',
-          'lastName',
+
           'gender',
           'dateOfBirth',
           'rate',
@@ -86,7 +86,9 @@ const NurseCreate = () => {
 
   const onSubmit = async (data: CreateNurseValidator) => {
     const { licenseState, ...rest } = data;
-
+    if (!user) {
+      return;
+    }
     try {
       await createNurse({
         ...rest,
@@ -94,12 +96,13 @@ const NurseCreate = () => {
         stateOfRegistration: licenseState,
         licenseNumber: data.licenseNumber.trim(),
         phoneNumber: data.phoneNumber.trim(),
-        firstName: data.firstName.trim(),
-        lastName: data.lastName.trim(),
+        rate: Number(data.rate),
+        userId: user.id as Id<'user'>,
       });
       showToast({
         title: 'Success',
         subtitle: 'Nurse account created successfully',
+        autodismiss: true,
       });
     } catch (error) {
       const errorMessage = generateErrorMessage(
@@ -110,6 +113,7 @@ const NurseCreate = () => {
       showToast({
         title: 'Error',
         subtitle: errorMessage,
+        autodismiss: true,
       });
     }
   };

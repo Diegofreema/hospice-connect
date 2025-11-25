@@ -133,7 +133,7 @@ export const cancelShiftNotification = mutation({
       type: 'cancel_request',
       description: args.reason,
       scheduleId: shift._id,
-      title: `${nurse.firstName} ${nurse.lastName} submitted cancel request for ${formatDate(shift.startDate)} to ${formatDate(shift.endDate)}: ${shift.startTime}-${shift.endTime}`,
+      title: `${nurse.name} submitted cancel request for ${formatDate(shift.startDate)} to ${formatDate(shift.endDate)}: ${shift.startTime}-${shift.endTime}`,
     });
   },
 });
@@ -233,7 +233,7 @@ export const sendCaseRequestNotification = mutation({
         type: 'case_request',
         description: '',
         scheduleId: scheduleId,
-        title: `${nurse.firstName} ${nurse.lastName} has submitted a case request for ${formatDate(shift.startDate)} to ${formatDate(shift.endDate)}: ${shift.startTime}-${shift.endTime}`,
+        title: `${nurse.name} has submitted a case request for ${formatDate(shift.startDate)} to ${formatDate(shift.endDate)}: ${shift.startTime}-${shift.endTime}`,
       });
     }
   },

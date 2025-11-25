@@ -5,6 +5,7 @@ import { ConvexError, v } from 'convex/values';
 import { mutation, query } from './_generated/server';
 import { doIntervalsOverlap, formatDate, parseDateTime } from './helper';
 import { discipline } from './schema';
+import { getUserHelper } from './users';
 
 export const getOurPosts = query({
   args: {
@@ -81,7 +82,7 @@ export const getPost = query({
     if (!hospice) {
       return null;
     }
-    const user = await ctx.db.get(hospice.userId);
+    const user = await getUserHelper(ctx, hospice.userId);
     if (!user) {
       return null;
     }

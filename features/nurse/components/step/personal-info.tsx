@@ -36,22 +36,6 @@ export const PersonalInfo = ({ form }: StepProps) => {
           keyboardType="phone-pad"
         />
 
-        <ControlInput
-          control={control}
-          errors={errors}
-          name="firstName"
-          placeholder="John"
-          label="First name"
-        />
-
-        <ControlInput
-          control={control}
-          errors={errors}
-          name="lastName"
-          placeholder="Doe"
-          label="Last name"
-        />
-
         <ControlSelect
           control={control}
           name="gender"
@@ -86,6 +70,7 @@ export const PersonalInfo = ({ form }: StepProps) => {
           errors={errors}
           label="Zip Code"
           placeholder="Enter zip code"
+          keyboardType="numeric"
         />
         <ControlInput
           control={control}

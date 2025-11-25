@@ -4,34 +4,43 @@ import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { Id } from './_generated/dataModel';
 import { mutation, query, QueryCtx } from './_generated/server';
+import { auth } from './betterAuth/auth';
 import { getAvailability, getImage, getRatings } from './helper';
 import { discipline } from './schema';
+import { getUserHelper } from './users';
 
 export const createNurse = mutation({
   args: {
-    firstName: v.string(),
-    lastName: v.string(),
     gender: v.string(),
     phoneNumber: v.string(),
     licenseNumber: v.string(),
     stateOfRegistration: v.string(),
     dateOfBirth: v.string(),
     discipline: discipline,
+    rate: v.number(),
+    address: v.string(),
+    zipCode: v.string(),
+    userId: v.id('user'),
   },
   handler: async (ctx, args) => {
     try {
-      const userId = await getAuthUserId(ctx);
-      if (!userId) {
+      const identity = await ctx.auth.getUserIdentity();
+
+      if (!identity) {
         throw new ConvexError({ message: 'Unauthorized' });
       }
+      const user = await getUserHelper(ctx, args.userId);
+      if (!user) {
+        throw new ConvexError({ message: 'User not found' });
+      }
+      const userId = user._id;
       const nurseId = await ctx.db.insert('nurses', {
         ...args,
         isApproved: false,
-        userId,
+        userId: user._id,
+        name: user.name || '',
       });
-      await ctx.db.patch(userId, {
-        name: args.firstName + ' ' + args.lastName,
-      });
+
       const days = [
         'Monday',
         'Tuesday',
@@ -49,9 +58,10 @@ export const createNurse = mutation({
         nurseId,
         days: formattedDays,
       });
-      await ctx.db.patch(userId, {
-        isBoarded: true,
-        isNurse: true,
+      await auth.api.updateUser({
+        body: {
+          isBoarded: true,
+        },
       });
     } catch (error: any) {
       throw new ConvexError({ message: error.message });
@@ -60,12 +70,15 @@ export const createNurse = mutation({
 });
 
 export const getNurseById = query({
-  args: {},
-  handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+  args: {
+    userId: v.id('user'),
+  },
+  handler: async (ctx, args) => {
+    const user = await getUserHelper(ctx, args.userId);
+    if (!user) {
       return null;
     }
+    const userId = user._id;
     const nurse = await ctx.db
       .query('nurses')
       .withIndex('userId', (q) => q.eq('userId', userId))
@@ -79,7 +92,7 @@ export const getNurseById = query({
       .withIndex('nurseId', (q) => q.eq('nurseId', nurse._id))
       .first();
     const image = nurse.imageId ? await getImage(ctx, nurse.imageId) : null;
-    const user = await ctx.db.get(userId);
+
     return {
       ...nurse,
       email: user?.email as string,
@@ -224,7 +237,7 @@ export const updateNurseProfilePicture = mutation({
       await ctx.db.patch(nurse._id, {
         imageId: args.imageId,
       });
-      await ctx.db.patch(nurse.userId, {
+      await ctx.db.patch(nurse._id, {
         imageId: args.imageId,
       });
       if (args.oldImageId) {
@@ -323,7 +336,7 @@ export const getNurseByNurseId = query({
     if (!nurse) {
       throw new ConvexError({ message: 'Nurse not found' });
     }
-    const user = await ctx.db.get(nurse.userId);
+    const user = await getUserHelper(ctx, nurse.userId);
     if (!user) {
       throw new ConvexError({ message: 'User not found' });
     }
@@ -349,15 +362,11 @@ export const searchNursesByFirstNameAndLastName = query({
       if (!args.name) return false;
       if (args.discipline) {
         return (
-          (nurse.firstName.toLowerCase().includes(args.name.toLowerCase()) ||
-            nurse.lastName.toLowerCase().includes(args.name.toLowerCase())) &&
+          nurse.name.toLowerCase().includes(args.name.toLowerCase()) &&
           nurse.discipline === args.discipline
         );
       }
-      return (
-        nurse.firstName.toLowerCase().includes(args.name.toLowerCase()) ||
-        nurse.lastName.toLowerCase().includes(args.name.toLowerCase())
-      );
+      return nurse.name.toLowerCase().includes(args.name.toLowerCase());
     }).take(30);
     const nursesImage = await Promise.all(
       nurses.map(async (nurse) => {
@@ -394,7 +403,10 @@ export const getNurseDetails = async (
   if (!nurse) {
     return null;
   }
-  const nurseUser = await ctx.db.get(nurse.userId);
+  const nurseUser = await getUserHelper(ctx, nurse.userId);
+  if (!nurseUser) {
+    return null;
+  }
   const image = nurse.imageId ? await getImage(ctx, nurse.imageId) : null;
   return {
     ...nurse,

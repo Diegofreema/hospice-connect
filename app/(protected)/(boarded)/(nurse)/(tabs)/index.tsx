@@ -53,7 +53,7 @@ export default function HomeScreen() {
     bottomSheetCancelRef.current?.expand();
   };
   if (nurse === null) return null;
-  const name = nurse.firstName + ' ' + nurse.lastName;
+  const name = nurse.name;
 
   return (
     <View flex={1} backgroundColor="white" gap="md">

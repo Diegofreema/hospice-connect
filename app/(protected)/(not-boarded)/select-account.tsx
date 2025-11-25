@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 
 const AccountType = () => {
   const [selected, setSelected] = useState<'nurse' | 'hospice'>('nurse');
-  const handleNavigation = () => {
+  const handleNavigation = async () => {
     if (selected === 'nurse') {
       router.push('/nurse-create');
     } else {
