@@ -2,6 +2,7 @@ import { Subtitle } from '@/components/subtitle/Subtitle';
 import { BusinessInformation } from '@/features/hospice/components/steps/business-information';
 import { BackButton } from '@/features/shared/components/back-button';
 import { MyTitle } from '@/features/shared/components/my-title';
+import { Spacer } from '@/features/shared/components/spacer';
 import { Wrapper } from '@/features/shared/components/wrapper';
 import React from 'react';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
@@ -15,6 +16,7 @@ const HospiceCreateScreen = () => {
         <Subtitle style={{ color: 'black' }}>
           Please ensure the accuracy of all Information
         </Subtitle>
+        <Spacer height={20} />
         <BusinessInformation />
       </KeyboardAwareScrollView>
     </Wrapper>

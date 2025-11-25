@@ -10,9 +10,8 @@ import { Stack } from '@/features/shared/components/v-stack';
 
 import { generateErrorMessage } from '@/features/shared/utils';
 
-import { useAuth } from '@/components/context/auth';
 import { useToast } from '@/components/demos/toast';
-import { Id } from '@/convex/betterAuth/_generated/dataModel';
+import { authClient } from '@/lib/auth-client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from 'convex/react';
 import {
@@ -22,7 +21,7 @@ import {
 
 export const BusinessInformation = () => {
   const { showToast } = useToast();
-  const { user } = useAuth();
+
   const {
     handleSubmit,
     formState: { errors, isSubmitting },
@@ -33,7 +32,6 @@ export const BusinessInformation = () => {
   });
   const createHospice = useMutation(api.hospices.createHospice);
   const onSubmit = async (data: CreateHospiceValidator) => {
-    if (!user) return;
     try {
       await createHospice({
         businessName: data.businessName.trim(),
@@ -41,7 +39,10 @@ export const BusinessInformation = () => {
         licenseNumber: data.licenseNumber.trim(),
         phoneNumber: data.phoneNumber.trim(),
         state: data.state.trim(),
-        id: user.id as Id<'user'>,
+      });
+      authClient.updateUser({
+        isBoarded: true,
+        role: 'hospice',
       });
       showToast({
         title: 'Success',
@@ -61,7 +62,7 @@ export const BusinessInformation = () => {
     }
   };
   return (
-    <Stack gap="md">
+    <Stack gap="xl">
       <ControlInput
         control={control}
         errors={errors}

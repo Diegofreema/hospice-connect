@@ -1,26 +1,37 @@
+import { useToast } from '@/components/demos/toast';
 import { Button } from '@/features/shared/components/button';
-import { useAuthActions } from '@convex-dev/auth/react';
-import { makeRedirectUri } from 'expo-auth-session';
+import { generateErrorMessage } from '@/features/shared/utils';
+import { authClient } from '@/lib/auth-client';
 import { Image } from 'expo-image';
-import { openAuthSessionAsync } from 'expo-web-browser';
 import React from 'react';
-import { Platform } from 'react-native';
-
-const redirectTo = makeRedirectUri();
 
 export const GoogleButton = () => {
-  const { signIn } = useAuthActions();
-
+  const { showToast } = useToast();
   const handleSignIn = async () => {
-    const { redirect } = await signIn('google', { redirectTo });
-    if (Platform.OS === 'web') {
-      return;
-    }
-    const result = await openAuthSessionAsync(redirect!.toString(), redirectTo);
-    if (result.type === 'success') {
-      const { url } = result;
-      const code = new URL(url).searchParams.get('code')!;
-      await signIn('google', { code });
+    try {
+      const { data, error } = await authClient.signIn.social({
+        provider: 'google',
+      });
+      if (error) {
+        showToast({
+          title: 'Error',
+          subtitle: error.message,
+          autodismiss: true,
+        });
+      }
+      if (data) {
+        showToast({
+          title: 'Success',
+          subtitle: 'Signed in with Google successfully',
+          autodismiss: true,
+        });
+      }
+    } catch (error) {
+      showToast({
+        title: 'Error',
+        subtitle: generateErrorMessage(error, 'Failed to sign in with Google'),
+        autodismiss: true,
+      });
     }
   };
   return (

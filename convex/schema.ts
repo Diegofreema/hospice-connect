@@ -78,7 +78,7 @@ export const Hospice = {
   licenseNumber: v.string(),
   state: v.string(),
   approved: v.boolean(),
-  userId: v.id('user'),
+  userId: v.string(),
   faxNumber: v.optional(v.string()),
   phoneNumber: v.string(),
   email: v.string(),

@@ -6,7 +6,6 @@ import {
   QueryCtx,
 } from './_generated/server';
 import { authComponent } from './auth';
-import { Id } from './betterAuth/_generated/dataModel';
 
 export const getUser = query({
   handler: async (ctx, args) => {
@@ -74,6 +73,6 @@ export const createUser = internalMutation({
 
 // helper functions
 
-export const getUserHelper = async (ctx: QueryCtx, id: Id<'user'>) => {
+export const getUserHelper = async (ctx: QueryCtx, id: string) => {
   return await authComponent.getAnyUserById(ctx, id);
 };

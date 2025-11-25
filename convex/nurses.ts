@@ -33,7 +33,7 @@ export const createNurse = mutation({
       if (!user) {
         throw new ConvexError({ message: 'User not found' });
       }
-      const userId = user._id;
+
       const nurseId = await ctx.db.insert('nurses', {
         ...args,
         isApproved: false,

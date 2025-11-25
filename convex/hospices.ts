@@ -2,7 +2,6 @@ import { getAuthUserId } from '@convex-dev/auth/server';
 import { ConvexError, v } from 'convex/values';
 import { Id } from './_generated/dataModel';
 import { mutation, query, QueryCtx } from './_generated/server';
-import { auth } from './betterAuth/auth';
 import { getUserHelper } from './users';
 
 export const createHospice = mutation({
@@ -11,35 +10,24 @@ export const createHospice = mutation({
     businessName: v.string(),
     licenseNumber: v.string(),
     state: v.string(),
-
     phoneNumber: v.string(),
-    id: v.id('user'),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
+
     if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
-    const user = await getUserHelper(ctx, args.id);
 
-    if (!user) {
-      throw new ConvexError({ message: 'Unauthorized' });
-    }
-
-    await ctx.db.insert('hospices', {
+    return await ctx.db.insert('hospices', {
       address: args.address,
       businessName: args.businessName,
       licenseNumber: args.licenseNumber,
       state: args.state,
       approved: false,
-      userId: user._id,
+      userId: identity.subject,
       phoneNumber: args.phoneNumber,
-      email: user.email as string,
-    });
-    await auth.api.updateUser({
-      body: {
-        role: 'hospice',
-      },
+      email: identity.email as string,
     });
   },
 });
@@ -148,6 +136,22 @@ export const updateHospiceProfile = mutation({
       hospiceId: args.hospiceId,
       isApproved: false,
     });
+  },
+});
+
+export const deleteHospice = mutation({
+  args: {
+    hospiceId: v.id('hospices'),
+  },
+  handler: async (ctx, args) => {
+    const hospice = await ctx.db.get(args.hospiceId);
+    if (!hospice) {
+      return;
+    }
+    if (hospice.imageId) {
+      await ctx.storage.delete(hospice.imageId);
+    }
+    await ctx.db.delete(args.hospiceId);
   },
 });
 
