@@ -1,4 +1,4 @@
-export const chatApiKey = '2bav8j7nwqgj';
+export const chatApiKey = 'jeagup93jged';
 export const chatUserId = 'blue-breeze-4';
 export const chatUserName = 'blue';
 export const chatUserToken =

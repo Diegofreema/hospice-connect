@@ -23,6 +23,8 @@ export const ChatWrapper = ({ children }: PropsWithChildren) => {
     tokenOrProvider: user?.streamToken,
   });
   const { showToast } = useToast();
+  console.log({ userData, token: user?.streamToken, chatApiKey });
+
   useEffect(() => {
     if (chatClient && user?.id) {
       const onFetchUnreadCount = async () => {
@@ -57,10 +59,11 @@ export const ChatWrapper = ({ children }: PropsWithChildren) => {
       onLogout();
     }
   }, [user?.streamToken, showToast]);
-
+  console.log({ chatClient }, 'before return');
   if (!chatClient) {
     return <LoadingComponent />;
   }
+  console.log({ chatClient }, 'after return');
 
   const chatTheme = {
     channelPreview: {

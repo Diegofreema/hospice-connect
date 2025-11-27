@@ -3,7 +3,6 @@ import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { Id } from './_generated/dataModel';
 import { mutation, query, QueryCtx } from './_generated/server';
-import { auth } from './betterAuth/auth';
 import { getAvailability, getImage, getRatings } from './helper';
 import { discipline } from './schema';
 import { getUserHelper } from './users';
@@ -27,16 +26,12 @@ export const createNurse = mutation({
       if (!identity) {
         throw new ConvexError({ message: 'Unauthorized' });
       }
-      const user = await getUserHelper(ctx, identity.subject);
-      if (!user) {
-        throw new ConvexError({ message: 'User not found' });
-      }
 
       const nurseId = await ctx.db.insert('nurses', {
         ...args,
         isApproved: false,
-        userId: user._id,
-        name: user.name || '',
+        userId: identity.subject,
+        name: identity.name || '',
       });
 
       const days = [
@@ -55,11 +50,6 @@ export const createNurse = mutation({
       await ctx.db.insert('availabilities', {
         nurseId,
         days: formattedDays,
-      });
-      await auth.api.updateUser({
-        body: {
-          isBoarded: true,
-        },
       });
     } catch (error: any) {
       throw new ConvexError({ message: error.message });

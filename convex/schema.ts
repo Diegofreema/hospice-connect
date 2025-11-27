@@ -51,7 +51,7 @@ export const Nurse = {
   rate: v.optional(v.number()),
   imageId: v.optional(v.id('_storage')),
   isApproved: v.boolean(),
-  userId: v.id('user'),
+  userId: v.string(),
   address: v.optional(v.string()),
   zipCode: v.optional(v.string()),
 };

@@ -16,7 +16,7 @@ import { MoreLinks } from './more-links';
 export const More = () => {
   const { nurse } = useNurse();
   if (nurse === null) return null;
-  const name = nurse.firstName + ' ' + nurse.lastName;
+  const name = nurse.name;
   return (
     <View>
       <Spacer height={30} />

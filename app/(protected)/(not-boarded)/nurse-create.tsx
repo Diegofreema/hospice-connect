@@ -1,7 +1,6 @@
 import { useAuth } from '@/components/context/auth';
 import { useToast } from '@/components/demos/toast';
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/betterAuth/_generated/dataModel';
 import { License } from '@/features/nurse/components/step/license';
 import { PersonalInfo } from '@/features/nurse/components/step/personal-info';
 import {
@@ -16,6 +15,7 @@ import { Stack } from '@/features/shared/components/v-stack';
 
 import { Wrapper } from '@/features/shared/components/wrapper';
 import { generateErrorMessage, validateFields } from '@/features/shared/utils';
+import { authClient } from '@/lib/auth-client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from 'convex/react';
@@ -97,7 +97,9 @@ const NurseCreate = () => {
         licenseNumber: data.licenseNumber.trim(),
         phoneNumber: data.phoneNumber.trim(),
         rate: Number(data.rate),
-        userId: user.id as Id<'user'>,
+      });
+      await authClient.updateUser({
+        isBoarded: true,
       });
       showToast({
         title: 'Success',

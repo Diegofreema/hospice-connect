@@ -1,19 +1,18 @@
 import { useToast } from '@/components/demos/toast';
-import { useAuthActions } from '@convex-dev/auth/react';
+import { authClient } from '@/lib/auth-client';
 import { IconLogout2 } from '@tabler/icons-react-native';
 import { useState } from 'react';
 import { useUnistyles } from 'react-native-unistyles';
 import { Button } from './button';
 
 export const LogOut = () => {
-  const { signOut } = useAuthActions();
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
   const { theme } = useUnistyles();
   const onPress = async () => {
     setLoading(true);
     try {
-      await signOut();
+      await authClient.signOut();
       showToast({
         title: 'Success',
         subtitle: 'You have successfully logged out',
