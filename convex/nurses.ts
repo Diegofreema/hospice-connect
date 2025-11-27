@@ -1,4 +1,3 @@
-import { getAuthUserId } from '@convex-dev/auth/server';
 import { filter } from 'convex-helpers/server/filter';
 import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
@@ -20,7 +19,6 @@ export const createNurse = mutation({
     rate: v.number(),
     address: v.string(),
     zipCode: v.string(),
-    userId: v.id('user'),
   },
   handler: async (ctx, args) => {
     try {
@@ -29,7 +27,7 @@ export const createNurse = mutation({
       if (!identity) {
         throw new ConvexError({ message: 'Unauthorized' });
       }
-      const user = await getUserHelper(ctx, args.userId);
+      const user = await getUserHelper(ctx, identity.subject);
       if (!user) {
         throw new ConvexError({ message: 'User not found' });
       }
@@ -230,6 +228,10 @@ export const updateNurseProfilePicture = mutation({
   },
   handler: async (ctx, args) => {
     try {
+      const identity = await ctx.auth.getUserIdentity();
+      if (!identity) {
+        throw new ConvexError({ message: 'Unauthorized' });
+      }
       const nurse = await ctx.db.get(args.nurseId);
       if (!nurse) {
         throw new ConvexError({ message: 'Nurse not found' });
@@ -327,9 +329,9 @@ export const getNurseByNurseId = query({
     nurseId: v.id('nurses'),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      throw new ConvexError({ message: 'Nurse not found' });
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError({ message: 'Unauthorized' });
     }
 
     const nurse = await ctx.db.get(args.nurseId);

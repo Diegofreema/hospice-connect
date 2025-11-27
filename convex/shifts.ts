@@ -1,4 +1,3 @@
-import { getAuthUserId } from '@convex-dev/auth/server';
 import { paginationOptsValidator, PaginationResult } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { Doc } from './_generated/dataModel';
@@ -13,12 +12,12 @@ export const getShifts = query({
     hospiceId: v.id('hospices'),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
+    const identity = await ctx.auth.getUserIdentity();
     const emptyData = {
       shifts: [],
       assignment: null,
     };
-    if (!userId) {
+    if (!identity) {
       return emptyData;
     }
 
@@ -56,8 +55,8 @@ export const getShiftsByOnlyAssignmentId = query({
     assignmentId: v.id('assignments'),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       return [];
     }
 
@@ -112,8 +111,8 @@ export const getInProgressShifts = query({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       return {} as PaginationResult<Doc<'assignments'>>;
     }
     // Get all assignments that are not completed

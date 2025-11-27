@@ -1,4 +1,3 @@
-import { getAuthUserId } from '@convex-dev/auth/server';
 import { ConvexError, v } from 'convex/values';
 import { mutation, query } from './_generated/server';
 
@@ -8,8 +7,8 @@ export const nurseSubmittedRouteSheet = query({
     assignmentId: v.id('assignments'),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       return false;
     }
 

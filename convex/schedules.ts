@@ -1,4 +1,3 @@
-import { getAuthUserId } from '@convex-dev/auth/server';
 import { ConvexError, v } from 'convex/values';
 import { Id } from './_generated/dataModel';
 import { mutation, MutationCtx, query, QueryCtx } from './_generated/server';
@@ -19,9 +18,8 @@ export const cancelSchedule = mutation({
     cancelledAt: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
     const hospice = await ctx.db.get(args.hospiceId);
@@ -111,9 +109,8 @@ export const editSchedule = mutation({
     rate: v.number(),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
 
@@ -420,13 +417,10 @@ export const getSchedule = query({
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
-      throw new ConvexError({ message: 'Unauthorized' });
-    }
-    const schedule = await ctx.db.get(args.scheduleId);
-    if (!schedule) {
       return null;
     }
-    return schedule;
+
+    return await ctx.db.get(args.scheduleId);
   },
 });
 
@@ -473,8 +467,8 @@ export const fetchAvailableSchedules = query({
     hospiceId: v.id('hospices'),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       return [];
     }
     const assignment = await ctx.db.get(args.assignmentId);
@@ -499,8 +493,8 @@ export const getSchedulesByAssignmentId = query({
     assignmentId: v.id('assignments'),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       return [];
     }
     return await ctx.db
@@ -520,8 +514,8 @@ export const getCaseRequest = query({
     notificationId: v.id('hospiceNotifications'),
   },
   handler: async (ctx, args) => {
-    const userId = getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
 

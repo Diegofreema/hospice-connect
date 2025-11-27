@@ -101,18 +101,14 @@ export const updateHospiceProfile = mutation({
     phoneNumber: v.string(),
     hospiceId: v.id('hospices'),
     email: v.string(),
-    userId: v.id('user'),
   },
   handler: async (ctx, args) => {
-    const userId = args.userId;
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
-    if (!userId) {
-      throw new ConvexError({ message: 'Unauthorized' });
-    }
-    const user = await getUserHelper(ctx, userId);
+
+    const user = await getUserHelper(ctx, identity.subject);
     if (!user) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
@@ -120,7 +116,7 @@ export const updateHospiceProfile = mutation({
     if (!hospice) {
       throw new ConvexError({ message: 'Hospice not found' });
     }
-    if (hospice.userId !== userId) {
+    if (hospice.userId !== user._id) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
 

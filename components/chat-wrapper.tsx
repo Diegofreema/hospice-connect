@@ -5,6 +5,7 @@ import { authClient } from '@/lib/auth-client';
 import { PropsWithChildren, useEffect } from 'react';
 import { Chat, OverlayProvider, useCreateChatClient } from 'stream-chat-expo';
 import { useAuth } from './context/auth';
+import { useToast } from './demos/toast';
 // const client = StreamChat.getInstance(chatApiKey as string);
 export const ChatWrapper = ({ children }: PropsWithChildren) => {
   const { user } = useAuth();
@@ -13,7 +14,6 @@ export const ChatWrapper = ({ children }: PropsWithChildren) => {
     name: user?.name!,
     image: user?.image!,
   };
-  console.log('userData', userData, user?.streamToken, user?.email);
 
   const setUnreadCount = useUnread((state) => state.setUnread);
   // const [isReady, setIsReady] = useState(false);
@@ -22,6 +22,7 @@ export const ChatWrapper = ({ children }: PropsWithChildren) => {
     userData,
     tokenOrProvider: user?.streamToken,
   });
+  const { showToast } = useToast();
   useEffect(() => {
     if (chatClient && user?.id) {
       const onFetchUnreadCount = async () => {
@@ -48,16 +49,18 @@ export const ChatWrapper = ({ children }: PropsWithChildren) => {
     if (!user?.streamToken) {
       const onLogout = async () => {
         await authClient.signOut();
+        showToast({
+          title: 'You have been signed out',
+          subtitle: 'Credentials not valid',
+        });
       };
       onLogout();
     }
-  }, [user?.streamToken]);
-  console.log('before chat client', chatClient);
+  }, [user?.streamToken, showToast]);
 
   if (!chatClient) {
     return <LoadingComponent />;
   }
-  console.log('after chat client', chatClient);
 
   const chatTheme = {
     channelPreview: {
