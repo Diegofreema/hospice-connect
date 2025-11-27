@@ -46,8 +46,8 @@ export const getDetailsForRouteSheet = query({
     assignmentId: v.id('assignments'),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
 
@@ -102,8 +102,8 @@ export const getRouteSheet = query({
     assignmentId: v.id('assignments'),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
 
@@ -154,8 +154,8 @@ export const getRouteSheetById = query({
     hospiceId: v.id('hospices'),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
 
@@ -208,8 +208,8 @@ export const submitRouteSheet = mutation({
     comment: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
 
@@ -273,8 +273,8 @@ export const approveOrDeclineRouteSheet = mutation({
     notificationId: v.id('hospiceNotifications'),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
 

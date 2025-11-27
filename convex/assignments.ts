@@ -17,10 +17,11 @@ export const availableAssignments = query({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       return {} as PaginationResult<AvailableAssignmentType>;
     }
+
     const nurse = await ctx.db.get(args.nurseId);
     if (!nurse) {
       return {} as PaginationResult<AvailableAssignmentType>;
@@ -73,10 +74,14 @@ export const inProgressAssignments = query({
       v.literal('available')
     ),
     paginationOpts: paginationOptsValidator,
-    userId: v.id('user'),
+    userId: v.string(),
   },
   handler: async (ctx, args) => {
     const user = await getUserHelper(ctx, args.userId);
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      return {} as PaginationResult<Doc<'assignments'>>;
+    }
     if (!user) {
       return {} as PaginationResult<Doc<'assignments'>>;
     }
@@ -206,8 +211,8 @@ export const createAssignment = mutation({
     zipcode: v.string(),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
     const hospice = await ctx.db.get(args.hospiceId);
@@ -278,8 +283,8 @@ export const reopenAssignment = mutation({
     assignmentId: v.id('assignments'),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
     const hospice = await ctx.db.get(args.hospiceId);
@@ -347,8 +352,8 @@ export const getAssignment = query({
     assignmentId: v.id('assignments'),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       return null;
     }
     const assignment = await ctx.db.get(args.assignmentId);
@@ -394,8 +399,8 @@ export const updateAssignment = mutation({
     zipcode: v.string(),
   },
   handler: async (ctx, { assignmentId, ...args }) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
     const hospice = await ctx.db.get(args.hospiceId);
@@ -486,8 +491,8 @@ export const deleteAssignment = mutation({
     hospiceId: v.id('hospices'),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
     const hospice = await ctx.db.get(args.hospiceId);
@@ -535,8 +540,8 @@ export const updateAssignmentStatus = mutation({
     assignmentId: v.id('assignments'),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       return;
     }
     const assignment = await ctx.db.get(args.assignmentId);
@@ -618,8 +623,10 @@ export const cancelAssignment = mutation({
     cancelledAt: v.number(),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new ConvexError({ message: 'Unauthorized' });
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError({ message: 'Unauthorized' });
+    }
 
     const hospice = await ctx.db.get(args.hospiceId);
     if (!hospice) throw new ConvexError({ message: 'Hospice not found' });

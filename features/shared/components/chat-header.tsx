@@ -14,7 +14,7 @@ export const ChatHeader = ({ channel }: Props) => {
   const { user } = useAuth();
   const { theme } = useUnistyles();
   const otherMember = Object.values(channel.state.members).find(
-    (member) => member.user?.id !== user?._id
+    (member) => member.user?.id !== user?.id
   );
   const image = otherMember?.user?.image;
   return (

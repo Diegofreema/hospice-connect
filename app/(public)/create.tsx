@@ -6,7 +6,6 @@ import { GoogleButton } from '@/features/authentication/components/google-button
 import { PrivacyTermsLink } from '@/features/authentication/components/privacy-term';
 import { BackButton } from '@/features/shared/components/back-button';
 import { MyTitle } from '@/features/shared/components/my-title';
-import { Spacer } from '@/features/shared/components/spacer';
 import { Wrapper } from '@/features/shared/components/wrapper';
 
 import { router } from 'expo-router';
@@ -18,10 +17,9 @@ const CreateAccountScreen = () => {
     <Wrapper>
       <BackButton />
       <KeyboardAwareScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={{ flexGrow: 1, gap: 20 }}
         showsVerticalScrollIndicator={false}
       >
-        <Spacer height={20} />
         <MyTitle title="Create an account" />
         <Subtitle isBlack>
           Already have an account?{' '}
@@ -29,7 +27,7 @@ const CreateAccountScreen = () => {
             Log in
           </PrivacyNoticeLink>
         </Subtitle>
-        <Spacer height={30} />
+
         <RegisterForm />
         <DividerWithText />
         <GoogleButton />

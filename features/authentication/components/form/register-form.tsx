@@ -43,39 +43,40 @@ export const RegisterForm = () => {
     resolver: zodResolver(registerSchema),
   });
   const { password } = watch();
-  const onSubmit = async (data: RegisterSchema) => {
+  const onSubmit = async (values: RegisterSchema) => {
     try {
-      await authClient.signUp.email({
-        email: data.email.trim(),
-        password: data.password.trim(),
-        name: data.name.trim(),
+      const { data, error } = await authClient.signUp.email({
+        email: values.email.trim(),
+        password: values.password.trim(),
+        name: values.name.trim(),
         isBoarded: false,
         role: 'nurse',
-        fetchOptions: {
-          onError: ({ error }) => {
-            showToast({
-              title: 'Error',
-              subtitle: error.message,
-            });
-          },
-          onSuccess: async ({ data }) => {
-            const user = data.user;
-            const { data: response } = await axios.post(
-              `https://hospice-connect-web.vercel.app/api/token`,
-              {
-                name: user?.name,
-                email: user?.email,
-                id: user?.id,
-              }
-            );
-
-            await authClient.updateUser({
-              streamToken: response.streamToken,
-            });
-            reset();
-          },
-        },
       });
+
+      if (error) {
+        showToast({
+          title: 'Error',
+          subtitle: error.message,
+        });
+        return;
+      }
+
+      if (data) {
+        const { user } = data;
+        const { data: response } = await axios.post(
+          `https://hospice-connect-web.vercel.app/api/token`,
+          {
+            name: user?.name,
+            email: user?.email,
+            id: user?.id,
+          }
+        );
+
+        await authClient.updateUser({
+          streamToken: response.token,
+        });
+        reset();
+      }
     } catch (error) {
       console.log(error);
 

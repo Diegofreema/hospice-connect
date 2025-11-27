@@ -4,6 +4,7 @@ import React from 'react';
 import { Platform } from 'react-native';
 
 const HospiceLayout = () => {
+  console.log('HospiceLayout');
   return (
     <HospiceProvider>
       <Stack screenOptions={{ headerShown: false }} initialRouteName="(tabs)">

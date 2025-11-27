@@ -13,7 +13,7 @@ export const useMessage = ({ userToChat }: Props) => {
   const onMessage = async () => {
     if (!user) return;
     const channel = client.channel('messaging', {
-      members: [user?._id, userToChat],
+      members: [user?.id, userToChat],
     });
 
     await channel.watch({ presence: true });

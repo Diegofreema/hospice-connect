@@ -82,7 +82,7 @@ export const Hospice = {
   faxNumber: v.optional(v.string()),
   phoneNumber: v.string(),
   email: v.string(),
-  isApproved: v.optional(v.boolean()),
+  isApproved: v.boolean(),
   imageId: v.optional(v.id('_storage')),
 };
 const PendingHospice = {

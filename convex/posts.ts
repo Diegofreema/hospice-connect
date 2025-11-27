@@ -62,8 +62,8 @@ export const getPost = query({
     nurseNotificationId: v.optional(v.id('nurseNotifications')),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       return null;
     }
     const schedule = await ctx.db.get(args.scheduleId);
@@ -115,11 +115,11 @@ export const acceptAssignment = mutation({
     nurseNotificationId: v.optional(v.id('nurseNotifications')),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
-    const user = await ctx.db.get(userId);
+    const user = await getUserHelper(ctx, identity.subject);
     if (!user) {
       throw new ConvexError({ message: 'User not found' });
     }
@@ -227,11 +227,11 @@ export const declineAssignment = mutation({
     nurseNotificationId: v.id('nurseNotifications'),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
-    const user = await ctx.db.get(userId);
+    const user = await getUserHelper(ctx, identity.subject);
     if (!user) {
       throw new ConvexError({ message: 'User not found' });
     }

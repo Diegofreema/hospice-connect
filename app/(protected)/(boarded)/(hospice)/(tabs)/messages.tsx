@@ -12,7 +12,7 @@ const MessageScreen = () => {
   const { user } = useAuth();
   const router = useRouter();
   const { setChannel } = useAppChatContext();
-  const id = user?._id!;
+  const id = user?.id!;
   const filters = useMemo(
     () => ({
       members: { $in: [id] },

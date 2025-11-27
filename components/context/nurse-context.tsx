@@ -1,11 +1,11 @@
 import { api } from '@/convex/_generated/api';
 import { LoadingComponent } from '@/features/shared/components/loading';
-import { UnderReview } from '@/features/shared/components/under-review';
 import { useConvexAuth, useQuery } from 'convex/react';
 
 import { FunctionReturnType } from 'convex/server';
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
+import { useAuth } from './auth';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -14,15 +14,18 @@ const AuthContext = React.createContext({
 });
 
 export const NurseProvider = ({ children }: { children: React.ReactNode }) => {
-  const nurse = useQuery(api.nurses.getNurseById);
+  const { user } = useAuth();
+  const nurse = useQuery(api.nurses.getNurseById, {
+    userId: user?.id as string,
+  });
   const { isAuthenticated } = useConvexAuth();
   if (nurse === undefined) {
     return <LoadingComponent />;
   }
 
-  if (isAuthenticated && !nurse?.isApproved) {
-    return <UnderReview />;
-  }
+  // if (isAuthenticated && !nurse?.isApproved) {
+  //   return <UnderReview />;
+  // }
   if (nurse === null) {
     return;
   }

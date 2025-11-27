@@ -8,7 +8,12 @@ import { useAnimationStore } from '@/hooks/use-animation';
 import { setupBackgroundUpdates } from '@/updates';
 import { useConvexAuth } from 'convex/react';
 import { useFonts } from 'expo-font';
-import { ErrorBoundaryProps, Stack, usePathname } from 'expo-router';
+import {
+  ErrorBoundaryProps,
+  Stack,
+  usePathname,
+  useSegments,
+} from 'expo-router';
 import React from 'react';
 import { View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -53,9 +58,9 @@ export default function RootLayout() {
 const InitialRoute = () => {
   const { theme } = useUnistyles();
   const { isAuthenticated } = useConvexAuth();
-
+  const segment = useSegments();
   const pathname = usePathname();
-  console.log({ pathname, isAuthenticated });
+  console.log({ pathname, isAuthenticated, segment });
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

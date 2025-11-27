@@ -17,6 +17,7 @@ type User = {
   userId?: string | null | undefined;
   isBoarded: boolean;
   role: string;
+  streamToken?: string;
 };
 const AuthContext = React.createContext({
   user: null as User | null,
@@ -30,34 +31,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     isRefetching,
     refetch,
   } = authClient.useSession();
-  // const person = useQuery(api.users.getCurrentUser, {});
-  // console.log({ person });
 
-  // React.useEffect(() => {
-  //   if (!user) return;
-  //   setLoading(true);
-  //   const tokenProvider = async () => {
-  //     try {
-  //       const { data } = await axios.post(
-  //         `https://hospice-connect-web.vercel.app/api/token`,
-  //         {
-  //           name: user?.name,
-  //           email: user?.email,
-  //           image: user?.image || '',
-  //           id: user?._id,
-  //         }
-  //       );
-
-  //       await updateStreamToken({ streamToken: data.token });
-  //     } catch (error) {
-  //       console.error('error', error);
-  //       throw new Error('Failed to fetch user data');
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-  //   tokenProvider();
-  // }, [updateStreamToken, user]);
   if (error) {
     return <ErrorComponent text={error.message} refetch={refetch} />;
   }

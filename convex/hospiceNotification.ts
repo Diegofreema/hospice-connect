@@ -1,4 +1,3 @@
-import { getAuthUserId } from '@convex-dev/auth/server';
 import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { mutation, query } from './_generated/server';
@@ -97,8 +96,8 @@ export const cancelShiftNotification = mutation({
     reason: v.string(),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
 
@@ -145,8 +144,8 @@ export const sendCaseRequestNotification = mutation({
     startTime: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
 

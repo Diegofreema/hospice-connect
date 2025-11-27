@@ -86,8 +86,8 @@ export const getShift = query({
     scheduleId: v.id('schedules'),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       return null;
     }
 
@@ -160,8 +160,8 @@ export const extendAssignment = mutation({
     shifts: v.array(shifts),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
 

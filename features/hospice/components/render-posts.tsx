@@ -113,7 +113,7 @@ export const RenderPosts = ({ posts, loadMore, loadingMore }: Props) => {
           style={{ flex: 1 }}
           ListEmptyComponent={
             <Title size={30} textAlign="center" style={{ marginTop: 100 }}>
-              No assignments
+              No assignments yet
             </Title>
           }
         />

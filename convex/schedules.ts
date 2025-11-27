@@ -158,8 +158,8 @@ export const sendScheduleNotification = mutation({
     hospiceName: v.string(),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
     for (const scheduleId of args.scheduleIds) {
@@ -238,8 +238,8 @@ export const declineSchedule = mutation({
     notificationId: v.id('hospiceNotifications'),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
 
@@ -285,8 +285,8 @@ export const declineCaseRequest = mutation({
     notificationId: v.id('hospiceNotifications'),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
 
@@ -332,8 +332,8 @@ export const acceptCaseRequest = mutation({
     notificationId: v.id('hospiceNotifications'),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
 
@@ -418,8 +418,8 @@ export const getSchedule = query({
     scheduleId: v.id('schedules'),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
     const schedule = await ctx.db.get(args.scheduleId);
@@ -436,8 +436,8 @@ export const updateScheduleStatus = mutation({
     status: scheduleStatus,
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
     const schedule = await ctx.db.get(args.scheduleId);

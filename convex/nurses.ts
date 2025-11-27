@@ -71,7 +71,7 @@ export const createNurse = mutation({
 
 export const getNurseById = query({
   args: {
-    userId: v.id('user'),
+    userId: v.string(),
   },
   handler: async (ctx, args) => {
     const user = await getUserHelper(ctx, args.userId);
@@ -192,8 +192,8 @@ export const editNurse = mutation({
     dateOfBirth: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
 
@@ -254,8 +254,8 @@ export const updateNurseProfilePicture = mutation({
 export const rateNurse = mutation({
   args: { rate: v.number(), nurseId: v.id('nurses') },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
 

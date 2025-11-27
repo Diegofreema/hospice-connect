@@ -7,7 +7,9 @@ import React from 'react';
 const BoardedLayout = () => {
   const { user } = useAuth();
 
-  const isNurse = !!user?.isNurse;
+  const isNurse = user?.role === 'nurse';
+  console.log('Board Layout', isNurse);
+
   return (
     <ChatWrapper>
       <ChatContext>
