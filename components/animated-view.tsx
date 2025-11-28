@@ -1,6 +1,7 @@
 import { useAnimationStore } from '@/hooks/use-animation';
 import LottieView from 'lottie-react-native';
 import React, { useEffect } from 'react';
+import { Platform } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -15,10 +16,12 @@ export const AnimatedView = () => {
   const animatedStyle = useAnimatedStyle(() => ({
     backgroundColor: backgroundColor.value,
   }));
+
   useEffect(() => {
+    const time = Platform.OS === 'ios' ? 3500 : 2500;
     const timer = setTimeout(() => {
       backgroundColor.value = withTiming('#000000', { duration: 600 });
-    }, 3500);
+    }, time);
 
     return () => clearTimeout(timer);
   }, [backgroundColor]);

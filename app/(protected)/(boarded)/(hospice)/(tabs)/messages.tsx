@@ -1,6 +1,7 @@
 import { useAuth } from '@/components/context/auth';
 import { useAppChatContext } from '@/components/context/chat-context';
 import { CustomListItem } from '@/features/messaging/components/custom-list-item';
+import { MessageEmpty } from '@/features/shared/components/message-empty';
 
 import { Wrapper } from '@/features/shared/components/wrapper';
 import { useRouter } from 'expo-router';
@@ -39,6 +40,7 @@ const MessageScreen = () => {
         onSelect={onPress}
         numberOfSkeletons={20}
         Preview={CustomListItem}
+        EmptyStateIndicator={MessageEmpty}
       />
     </Wrapper>
   );

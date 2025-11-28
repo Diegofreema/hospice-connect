@@ -55,6 +55,7 @@ export const LoginForm = () => {
         subtitle: `Welcome back ${res.data.user.name}`,
         autodismiss: true,
       });
+      reset();
     }
   };
   const toggleSecure = () => {

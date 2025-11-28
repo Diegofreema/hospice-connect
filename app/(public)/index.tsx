@@ -18,7 +18,7 @@ const LoginScreen = () => {
   return (
     <Wrapper>
       <KeyboardAwareScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={{ flexGrow: 1, gap: 15 }}
         style={{ flex: 1 }}
       >
         <Spacer height={50} />

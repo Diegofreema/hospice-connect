@@ -1,6 +1,6 @@
 import { api } from '@/convex/_generated/api';
 import { LoadingComponent } from '@/features/shared/components/loading';
-import { useConvexAuth, useQuery } from 'convex/react';
+import { useQuery } from 'convex/react';
 
 import { FunctionReturnType } from 'convex/server';
 import * as WebBrowser from 'expo-web-browser';
@@ -18,7 +18,7 @@ export const NurseProvider = ({ children }: { children: React.ReactNode }) => {
   const nurse = useQuery(api.nurses.getNurseById, {
     userId: user?.id as string,
   });
-  const { isAuthenticated } = useConvexAuth();
+
   if (nurse === undefined) {
     return <LoadingComponent />;
   }

@@ -422,42 +422,42 @@ const styles = StyleSheet.create((theme) => ({
       },
       mx: {
         none: {
-          paddingHorizontal: 0,
+          marginHorizontal: 0,
         },
         sm: {
-          paddingHorizontal: theme.paddings.sm,
+          marginHorizontal: theme.paddings.sm,
         },
         md: {
-          paddingHorizontal: theme.paddings.md,
+          marginHorizontal: theme.paddings.md,
         },
         lg: {
-          paddingHorizontal: theme.paddings.lg,
+          marginHorizontal: theme.paddings.lg,
         },
         xl: {
-          paddingHorizontal: theme.paddings.xl,
+          marginHorizontal: theme.paddings.xl,
         },
         xxl: {
-          paddingHorizontal: theme.paddings.xxl,
+          marginHorizontal: theme.paddings.xxl,
         },
       },
       my: {
         none: {
-          paddingVertical: 0,
+          marginVertical: 0,
         },
         sm: {
-          paddingVertical: theme.paddings.sm,
+          marginVertical: theme.margins.sm,
         },
         md: {
-          paddingVertical: theme.paddings.md,
+          marginVertical: theme.margins.md,
         },
         lg: {
-          paddingVertical: theme.paddings.lg,
+          marginVertical: theme.margins.lg,
         },
         xl: {
-          paddingVertical: theme.paddings.xl,
+          marginVertical: theme.margins.xl,
         },
         xxl: {
-          paddingVertical: theme.paddings.xxl,
+          marginVertical: theme.margins.xxl,
         },
       },
       borderRadius: {

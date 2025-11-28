@@ -22,7 +22,7 @@ const NurseProfileScreen = () => {
     return null;
   }
 
-  const name = nurse?.firstName + ' ' + nurse?.lastName;
+  const name = nurse?.name;
   return (
     <Wrapper>
       <BackButton

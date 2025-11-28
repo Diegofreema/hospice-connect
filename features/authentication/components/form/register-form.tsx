@@ -12,6 +12,7 @@ import {
   IconEyeOff,
   IconLock,
   IconMail,
+  IconUser,
   IconX,
 } from '@tabler/icons-react-native';
 
@@ -38,7 +39,10 @@ export const RegisterForm = () => {
   } = useForm<RegisterSchema>({
     defaultValues: {
       email: '',
+      firstName: '',
+      lastName: '',
       password: '',
+      confirmPassword: '',
     },
     resolver: zodResolver(registerSchema),
   });
@@ -48,7 +52,7 @@ export const RegisterForm = () => {
       const { data, error } = await authClient.signUp.email({
         email: values.email.trim(),
         password: values.password.trim(),
-        name: values.name.trim(),
+        name: `${values.firstName.trim()} ${values.lastName.trim()}`.trim(),
         isBoarded: false,
         role: 'nurse',
       });
@@ -126,11 +130,21 @@ export const RegisterForm = () => {
       <ControlInput
         control={control}
         errors={errors}
-        name="name"
-        label="Full name"
-        placeholder="Johndoe@gmail.com"
-        leftIcon={<IconMail color={theme.colors.iconGrey} />}
-        autoCapitalize="none"
+        name="firstName"
+        label="First name"
+        placeholder="John"
+        leftIcon={<IconUser color={theme.colors.iconGrey} />}
+        autoCapitalize="words"
+      />
+
+      <ControlInput
+        control={control}
+        errors={errors}
+        name="lastName"
+        label="Last name"
+        placeholder="Doe"
+        leftIcon={<IconUser color={theme.colors.iconGrey} />}
+        autoCapitalize="words"
       />
       <ControlInput
         control={control}
@@ -149,6 +163,25 @@ export const RegisterForm = () => {
         autoCapitalize="none"
         label="Password"
         placeholder="Enter password"
+        leftIcon={<IconLock color={theme.colors.iconGrey} />}
+        rightIcon={
+          <TouchableOpacity onPress={toggleSecure}>
+            {secured ? (
+              <IconEyeOff color={theme.colors.iconGrey} />
+            ) : (
+              <IconEye color={theme.colors.iconGrey} />
+            )}
+          </TouchableOpacity>
+        }
+        secureTextEntry={secured}
+      />
+      <ControlInput
+        control={control}
+        errors={errors}
+        name="confirmPassword"
+        autoCapitalize="none"
+        label="Confirm Password"
+        placeholder="Re-enter password"
         leftIcon={<IconLock color={theme.colors.iconGrey} />}
         rightIcon={
           <TouchableOpacity onPress={toggleSecure}>

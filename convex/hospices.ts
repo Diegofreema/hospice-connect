@@ -66,18 +66,18 @@ export const updateHospiceImage = mutation({
     hospiceId: v.id('hospices'),
     imageId: v.id('_storage'),
     oldImageId: v.optional(v.id('_storage')),
-    userId: v.id('user'),
   },
   handler: async (ctx, args) => {
     try {
+      const identity = await ctx.auth.getUserIdentity();
+      if (!identity) {
+        throw new ConvexError({ message: 'Unauthorized' });
+      }
       const hospice = await ctx.db.get(args.hospiceId);
       if (!hospice) {
         throw new ConvexError({ message: 'Hospice not found' });
       }
-      const user = await getUserHelper(ctx, args.userId);
-      if (!user) {
-        throw new ConvexError({ message: 'User not found' });
-      }
+
       await ctx.db.patch(hospice._id, {
         imageId: args.imageId,
       });

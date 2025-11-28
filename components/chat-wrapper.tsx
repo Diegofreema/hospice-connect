@@ -9,33 +9,81 @@ import { useToast } from './demos/toast';
 // const client = StreamChat.getInstance(chatApiKey as string);
 export const ChatWrapper = ({ children }: PropsWithChildren) => {
   const { user } = useAuth();
-  const userData = {
-    id: user?.id!,
-    name: user?.name!,
-    image: user?.image!,
-  };
 
+  // useEffect(() => {
+  //   // Skip if user is not authenticated
+  //   if (!user?.id || !user?.name || !user?.streamToken) {
+  //     return;
+  //   }
+
+  //   /**
+  //    * Connect the current user to Stream Chat using their ID and token
+  //    */
+  //   const connectUser = async () => {
+  //     try {
+  //       await client.connectUser(
+  //         {
+  //           id: user.id,
+  //           name: user.name,
+  //         },
+  //         user.streamToken
+  //       );
+  //       setIsReady(true);
+  //     } catch (err) {
+  //       const { data: response } = await axios.post(
+  //         `https://hospice-connect-web.vercel.app/api/token`,
+  //         {
+  //           name: user?.name,
+  //           email: user?.email,
+  //           id: user?.id,
+  //         }
+  //       );
+
+  //       await authClient.updateUser({
+  //         streamToken: response.token,
+  //       });
+  //       console.log('connectUser error', err);
+  //     }
+  //   };
+
+  //   connectUser();
+
+  //   // Cleanup function to disconnect user when component unmounts
+  //   // or when authentication state changes
+  //   return () => {
+  //     if (isReady) {
+  //       client.disconnectUser();
+  //     }
+  //     setIsReady(false);
+  //   };
+  // }, [user?.id, user?.name, user?.streamToken, isReady, user?.email]);
   const setUnreadCount = useUnread((state) => state.setUnread);
-  // const [isReady, setIsReady] = useState(false);
-  const chatClient = useCreateChatClient({
-    apiKey: chatApiKey,
-    userData,
+
+  const { showToast } = useToast();
+  const client = useCreateChatClient({
+    apiKey: chatApiKey as string,
+    userData: {
+      id: user?.id as string,
+      name: user?.name,
+      image: user?.image ?? undefined,
+    },
     tokenOrProvider: user?.streamToken,
   });
-  const { showToast } = useToast();
-  console.log({ userData, token: user?.streamToken, chatApiKey });
-
   useEffect(() => {
-    if (chatClient && user?.id) {
+    if (client && user?.id) {
       const onFetchUnreadCount = async () => {
-        const response = await chatClient.getUnreadCount(user?.id);
-        setUnreadCount(response.total_unread_count);
+        try {
+          const response = await client.getUnreadCount(user.id);
+          setUnreadCount(response.total_unread_count);
+        } catch (err) {
+          console.log('getUnreadCount error', err);
+        }
       };
       void onFetchUnreadCount();
     }
-  }, [chatClient, user?.id, setUnreadCount]);
+  }, [user?.id, setUnreadCount, client]);
   useEffect(() => {
-    const listener = chatClient?.on((e) => {
+    const listener = client?.on((e) => {
       if (e.total_unread_count !== undefined) {
         setUnreadCount(e.total_unread_count);
       }
@@ -46,9 +94,10 @@ export const ChatWrapper = ({ children }: PropsWithChildren) => {
         listener.unsubscribe();
       }
     };
-  }, [chatClient, setUnreadCount]);
+  }, [setUnreadCount, client]);
   useEffect(() => {
-    if (!user?.streamToken) {
+    if (!user) return;
+    if (!user.streamToken) {
       const onLogout = async () => {
         await authClient.signOut();
         showToast({
@@ -58,12 +107,11 @@ export const ChatWrapper = ({ children }: PropsWithChildren) => {
       };
       onLogout();
     }
-  }, [user?.streamToken, showToast]);
-  console.log({ chatClient }, 'before return');
-  if (!chatClient) {
+  }, [user, showToast]);
+
+  if (!client) {
     return <LoadingComponent />;
   }
-  console.log({ chatClient }, 'after return');
 
   const chatTheme = {
     channelPreview: {
@@ -75,7 +123,7 @@ export const ChatWrapper = ({ children }: PropsWithChildren) => {
 
   return (
     <OverlayProvider value={{ style: chatTheme }}>
-      <Chat client={chatClient}>{children}</Chat>
+      <Chat client={client}>{children}</Chat>
     </OverlayProvider>
   );
 };

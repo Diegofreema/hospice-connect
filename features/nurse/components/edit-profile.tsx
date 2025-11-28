@@ -34,8 +34,8 @@ export const EditProfile = () => {
     watch,
   } = useForm<CreateNurseValidator>({
     defaultValues: {
-      firstName: nurse?.firstName || '',
-      lastName: nurse?.lastName || '',
+      firstName: nurse?.name.split(' ')[0] || '',
+      lastName: nurse?.name.split(' ')[1] || '',
       phoneNumber: nurse?.phoneNumber || '',
       gender: nurse?.gender || '',
       dateOfBirth: date1 || new Date(),
@@ -70,8 +70,8 @@ export const EditProfile = () => {
         dateOfBirth: format(data?.dateOfBirth || new Date(), 'PPP'),
       });
       const fieldsChanged =
-        data.firstName !== nurse?.firstName ||
-        data.lastName !== nurse?.lastName ||
+        data.firstName !== nurse?.name.split(' ')[0] ||
+        data.lastName !== nurse?.name.split(' ')[1] ||
         data.discipline !== nurse?.discipline ||
         data.email !== nurse.email ||
         data.licenseState !== nurse.stateOfRegistration;
