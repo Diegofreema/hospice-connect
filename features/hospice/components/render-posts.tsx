@@ -5,13 +5,15 @@ import { Title } from '@/components/title/Title';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 import { CustomSheet } from '@/features/shared/components/custom-bottom-sheet';
+import { Text } from '@/features/shared/components/text';
+import { View } from '@/features/shared/components/view';
 import { Wrapper } from '@/features/shared/components/wrapper';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useQuery } from 'convex/react';
 import { FunctionReturnType } from 'convex/server';
 import { router } from 'expo-router';
 import { Fragment, useCallback, useRef } from 'react';
-import { FlatList } from 'react-native';
+import { FlatList, TouchableOpacity } from 'react-native';
 import { useGetScheduleId } from '../hooks/use-get-schedule-id';
 import { useSelectAssignment } from '../hooks/use-select-assignment';
 import { AssignmentSchedule } from './assignment-schedule';
@@ -112,9 +114,28 @@ export const RenderPosts = ({ posts, loadMore, loadingMore }: Props) => {
           ListFooterComponent={loadingMore ? <SmallLoader /> : null}
           style={{ flex: 1 }}
           ListEmptyComponent={
-            <Title size={30} textAlign="center" style={{ marginTop: 100 }}>
-              No assignments yet
-            </Title>
+            <View gap="md">
+              <Title size={30} textAlign="center" style={{ marginTop: 100 }}>
+                No assignments yet
+              </Title>
+              <TouchableOpacity
+                onPress={() => router.push('/create')}
+                style={{
+                  marginTop: 20,
+                  alignSelf: 'center',
+                  paddingHorizontal: 24,
+                  paddingVertical: 12,
+                  backgroundColor: '#007AFF',
+                  borderRadius: 8,
+                }}
+              >
+                <Text
+                  style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}
+                >
+                  Create
+                </Text>
+              </TouchableOpacity>
+            </View>
           }
         />
       </Wrapper>
