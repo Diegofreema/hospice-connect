@@ -173,7 +173,7 @@ export const ViewRouteSheet = () => {
       <p class="text-center text-small">${data?.assignment.hospiceAddress}</p>
       <p class="text-center text-normal">Route Sheet</p>
       <div class="flex-text">
-        <span>Staff Name: ${data?.nurse.firstName} ${data?.nurse.firstName}</span>
+        <span>Staff Name: ${data?.nurse.name}</span>
         <span>Discipline: ${data?.nurse.discipline}</span>
       </div>
     </div>

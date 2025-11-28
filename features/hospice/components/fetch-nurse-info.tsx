@@ -29,8 +29,7 @@ export const FetchNurseInfo = () => {
     discipline,
     address,
     image,
-    firstName,
-    lastName,
+    name,
     licenseNumber,
     gender,
     phoneNumber,
@@ -38,7 +37,6 @@ export const FetchNurseInfo = () => {
     stateOfRegistration,
     email,
   } = nurseInfo;
-  const name = firstName + ' ' + lastName;
   const formatedRate = `$${rate}/hr`;
   let age: number | undefined;
   if (dateOfBirth) {

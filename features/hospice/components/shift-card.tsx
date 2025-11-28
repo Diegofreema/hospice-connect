@@ -6,7 +6,6 @@ import { api } from '@/convex/_generated/api';
 import { Text } from '@/features/shared/components/text';
 import { Stack } from '@/features/shared/components/v-stack';
 import {
-  fullName,
   getScheduleStatusAndColor,
   getScheduleStatusText,
 } from '@/features/shared/utils';
@@ -96,8 +95,7 @@ export const ShiftCard = ({
             <View>
               <CustomPressable onPress={onPressName}>
                 <Text size="normal" isBold>
-                  {fullName(shift.nurse?.firstName, shift.nurse?.lastName) ||
-                    'No nurse assigned'}
+                  {shift.nurse?.name || 'No nurse assigned'}
                 </Text>
               </CustomPressable>
               <Text size="normal" isBold>

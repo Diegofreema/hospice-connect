@@ -5,7 +5,6 @@ import { api } from '@/convex/_generated/api';
 import { CustomPressable } from '@/features/shared/components/custom-pressable';
 import { Text } from '@/features/shared/components/text';
 import {
-  fullName,
   getScheduleStatusAndColor,
   getScheduleStatusText,
 } from '@/features/shared/utils';
@@ -63,8 +62,7 @@ export const LatestShiftCard = ({ shift }: Props) => {
             <View>
               <CustomPressable onPress={onPressName}>
                 <Text size="normal" isBold>
-                  {fullName(shift.nurse?.firstName, shift.nurse?.lastName) ||
-                    'No nurse assigned'}
+                  {shift.nurse?.name || 'No nurse assigned'}
                 </Text>
               </CustomPressable>
               <Text size="normal" isBold>

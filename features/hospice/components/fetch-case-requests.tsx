@@ -1,39 +1,39 @@
-import { Card, CardHeader } from "@/components/card";
-import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
-import { CustomPressable } from "@/features/shared/components/custom-pressable";
-import { FlexText } from "@/features/shared/components/flex-text";
-import { SmallLoader } from "@/features/shared/components/small-loader";
-import { Text } from "@/features/shared/components/text";
-import { View } from "@/features/shared/components/view";
+import { Card, CardHeader } from '@/components/card';
+import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
+import { CustomPressable } from '@/features/shared/components/custom-pressable';
+import { FlexText } from '@/features/shared/components/flex-text';
+import { SmallLoader } from '@/features/shared/components/small-loader';
+import { Text } from '@/features/shared/components/text';
+import { View } from '@/features/shared/components/view';
 import {
   changeFirstLetterToCapital,
   generateErrorMessage,
   getFontSize,
   trimText,
-} from "@/features/shared/utils";
+} from '@/features/shared/utils';
 import {
   IconMapPin,
   IconSend,
   IconStarFilled,
-} from "@tabler/icons-react-native";
-import { useMutation, useQuery } from "convex/react";
-import { Image } from "expo-image";
-import React, { useState } from "react";
+} from '@tabler/icons-react-native';
+import { useMutation, useQuery } from 'convex/react';
+import { Image } from 'expo-image';
+import React, { useState } from 'react';
 
-import { useHospice } from "@/components/context/hospice-context";
-import { useToast } from "@/components/demos/toast";
-import { FlexButtons } from "@/features/shared/components/flex-buttons";
-import { format, parse } from "date-fns";
-import { ScrollView } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { useMarkAsRead } from "@/features/hospice/hooks/use-mark-as-read";
+import { useHospice } from '@/components/context/hospice-context';
+import { useToast } from '@/components/demos/toast';
+import { useMarkAsRead } from '@/features/hospice/hooks/use-mark-as-read';
+import { FlexButtons } from '@/features/shared/components/flex-buttons';
+import { format, parse } from 'date-fns';
+import { ScrollView } from 'react-native';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
 type Props = {
-  nurseId: Id<"nurses">;
-  hospiceId: Id<"hospices">;
-  scheduleId: Id<"schedules">;
-  notificationId: Id<"hospiceNotifications">;
+  nurseId: Id<'nurses'>;
+  hospiceId: Id<'hospices'>;
+  scheduleId: Id<'schedules'>;
+  notificationId: Id<'hospiceNotifications'>;
 };
 
 const FetchCaseRequest = ({
@@ -73,17 +73,17 @@ const FetchCaseRequest = ({
         hospiceName: hospice.businessName as string,
       });
       showToast({
-        title: "Success",
-        subtitle: "Case request declined successfully",
+        title: 'Success',
+        subtitle: 'Case request declined successfully',
         autodismiss: true,
       });
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        "Failed to decline case request",
+        'Failed to decline case request'
       );
       showToast({
-        title: "Error",
+        title: 'Error',
         subtitle: errorMessage,
         autodismiss: true,
       });
@@ -103,17 +103,17 @@ const FetchCaseRequest = ({
         hospiceName: hospice.businessName as string,
       });
       showToast({
-        title: "Success",
-        subtitle: "Case request accepted successfully",
+        title: 'Success',
+        subtitle: 'Case request accepted successfully',
         autodismiss: true,
       });
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        "Failed to accept case request",
+        'Failed to accept case request'
       );
       showToast({
-        title: "Error",
+        title: 'Error',
         subtitle: errorMessage,
         autodismiss: true,
       });
@@ -122,15 +122,15 @@ const FetchCaseRequest = ({
     }
   };
   const { nurse, assignment, schedule, notification } = caseRequest;
-  const name = nurse.firstName + " " + nurse.lastName;
+  const name = nurse.name;
   const patientName =
-    assignment.patientFirstName + " " + assignment.patientLastName;
-  const startDate = parse(schedule.startDate, "dd-MM-yyyy", new Date());
-  const endDate = parse(schedule.endDate, "dd-MM-yyyy", new Date());
+    assignment.patientFirstName + ' ' + assignment.patientLastName;
+  const startDate = parse(schedule.startDate, 'dd-MM-yyyy', new Date());
+  const endDate = parse(schedule.endDate, 'dd-MM-yyyy', new Date());
   const showButtons =
-    notification.status !== "accepted" && notification.status !== "declined";
-  const isDeclined = notification?.status === "declined";
-  const isAccepted = notification?.status === "accepted";
+    notification.status !== 'accepted' && notification.status !== 'declined';
+  const isDeclined = notification?.status === 'declined';
+  const isAccepted = notification?.status === 'accepted';
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <View gap="xxl">
@@ -138,30 +138,30 @@ const FetchCaseRequest = ({
           <CardHeader style={styles.header}>
             <View gap="md">
               <View
-                justifyContent={"center"}
+                justifyContent={'center'}
                 flexDirection="row"
                 alignItems="center"
                 maxWidth={70}
                 p="lg"
                 flex={0}
-                borderRadius={"lg"}
+                borderRadius={'lg'}
                 backgroundColor={theme.colors.white}
               >
                 <IconStarFilled
                   size={getFontSize(20)}
                   color={theme.colors.yellowDark}
                 />
-                <Text>{nurse.ratings ? nurse.ratings : "N/A"}</Text>
+                <Text>{nurse.ratings ? nurse.ratings : 'N/A'}</Text>
               </View>
               <Text>Discipline: {nurse.discipline}</Text>
-              <Text size={"medium"} isMedium>
+              <Text size={'medium'} isMedium>
                 {trimText(name, 15)}
               </Text>
               <View
-                justifyContent={"flex-start"}
+                justifyContent={'flex-start'}
                 flexDirection="row"
                 alignItems="center"
-                gap={"lg"}
+                gap={'lg'}
               >
                 <IconMapPin
                   size={getFontSize(14)}
@@ -172,18 +172,18 @@ const FetchCaseRequest = ({
                   {changeFirstLetterToCapital(nurse.stateOfRegistration)}
                 </Text>
               </View>
-              <View flexDirection={"row"} alignItems={"baseline"}>
+              <View flexDirection={'row'} alignItems={'baseline'}>
                 <Text style={styles.rate}>${nurse.rate}</Text>
                 <Text>/hr</Text>
               </View>
             </View>
-            <View height={"100%"} flex={1}>
+            <View height={'100%'} flex={1}>
               <Image
                 source={{ uri: nurse.image as string }}
                 style={styles.image}
                 contentFit="contain"
                 placeholderContentFit="contain"
-                placeholder={require("@/assets/images/person.jpg")}
+                placeholder={require('@/assets/images/person.jpg')}
               />
               <CustomPressable onPress={onMessage} style={styles.messageBtn}>
                 <IconSend
@@ -197,7 +197,7 @@ const FetchCaseRequest = ({
         </Card>
         <Card style={styles.card}>
           <CardHeader style={styles.header}>
-            <Text size={"normal"}>{trimText(patientName, 15)}</Text>
+            <Text size={'normal'}>{trimText(patientName, 15)}</Text>
           </CardHeader>
           <View style={styles.content}>
             <FlexText
@@ -216,7 +216,7 @@ const FetchCaseRequest = ({
         <View style={styles.scheduleCard}>
           <View>
             <Text size="normal" isBold>
-              {format(startDate, "MM/dd/yy")} - {format(endDate, "MM/dd/yy")}
+              {format(startDate, 'MM/dd/yy')} - {format(endDate, 'MM/dd/yy')}
             </Text>
             <Text size="small">
               {schedule.startTime} - {schedule.endTime}
@@ -257,9 +257,9 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.cardGrey,
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   rate: {
     fontSize: getFontSize(20),
@@ -271,7 +271,7 @@ const styles = StyleSheet.create((theme) => ({
     padding: 12,
   },
   messageBtn: {
-    position: "absolute",
+    position: 'absolute',
     top: 5,
     right: 5,
     backgroundColor: theme.colors.white,
@@ -279,16 +279,16 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: 30,
     height: 50,
     width: 50,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   image: {
     flex: 1,
   },
   scheduleCard: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: 10,
-    alignItems: "center",
+    alignItems: 'center',
     backgroundColor: theme.colors.cardGrey,
     padding: theme.paddings.xxl,
     borderRadius: 10,

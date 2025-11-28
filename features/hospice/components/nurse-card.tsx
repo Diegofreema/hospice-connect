@@ -1,6 +1,5 @@
 import { Badge } from '@/components/badge/Badge';
 import { Card, CardContent, CardHeader } from '@/components/card';
-import { Id } from '@/convex/_generated/dataModel';
 import { CustomPressable } from '@/features/shared/components/custom-pressable';
 
 import { Text } from '@/features/shared/components/text';
@@ -20,9 +19,11 @@ import {
 import { format } from 'date-fns';
 import { Image } from 'expo-image';
 
+import { api } from '@/convex/_generated/api';
 import { Button } from '@/features/shared/components/button';
 import { Stack } from '@/features/shared/components/v-stack';
 import { useMessage } from '@/hooks/use-message';
+import { FunctionReturnType } from 'convex/server';
 import { router } from 'expo-router';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { useGetNurseId } from '../hooks/use-get-nurse-id';
@@ -30,41 +31,7 @@ import { useGetNurseId } from '../hooks/use-get-nurse-id';
 type Props = {
   isAssigned?: boolean;
   onAction?: (discipline?: string) => void;
-  nurse: {
-    image: string | null;
-    _id: Id<'nurses'>;
-    _creationTime: number;
-    imageId?: Id<'_storage'> | undefined;
-    rate?: number | undefined;
-    address?: string | undefined;
-    zipCode?: string | undefined;
-    firstName: string;
-    lastName: string;
-    gender: string;
-    phoneNumber: string;
-    licenseNumber: string;
-    stateOfRegistration: string;
-    dateOfBirth?: string | undefined;
-    discipline: 'RN' | 'LVN' | 'HHA';
-    isApproved: boolean;
-    userId: Id<'users'>;
-    available:
-      | {
-          startTime?: number | undefined;
-          endTime?: number | undefined;
-          available: boolean;
-          day:
-            | 'Monday'
-            | 'Tuesday'
-            | 'Wednesday'
-            | 'Thursday'
-            | 'Friday'
-            | 'Saturday'
-            | 'Sunday';
-        }
-      | undefined;
-    ratings: number;
-  };
+  nurse: FunctionReturnType<typeof api.nurses.getNurses>['page'][number];
 };
 
 export const NurseCard = ({ nurse, isAssigned, onAction }: Props) => {
@@ -72,7 +39,7 @@ export const NurseCard = ({ nurse, isAssigned, onAction }: Props) => {
   const { onMessage } = useMessage({ userToChat: nurse.userId });
   const setNurseId = useGetNurseId((state) => state.setId);
   const badgeText = isAvailable ? 'Available' : 'Unavailable';
-  const name = nurse.firstName + ' ' + nurse.lastName;
+  const name = nurse.name;
 
   const { theme } = useUnistyles();
   const onHandleAction = () => {
@@ -82,7 +49,6 @@ export const NurseCard = ({ nurse, isAssigned, onAction }: Props) => {
   const onPress = () => {
     router.push(`/view-nurse-profile?id=${nurse._id}`);
   };
-  console.log({ ratings: nurse.ratings });
 
   return (
     <Card style={styles.card}>

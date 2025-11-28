@@ -41,21 +41,26 @@ export const LoginForm = () => {
     const res = await authClient.signIn.email({
       email: data.email,
       password: data.password,
+      fetchOptions: {
+        onSuccess: ({ data }) => {
+          console.log({ data });
+          showToast({
+            title: 'Success',
+            subtitle: `Welcome back  ${data.user.name}`,
+            autodismiss: true,
+          });
+          reset();
+        },
+      },
     });
+
     if (res.error) {
       showToast({
         title: 'Error',
         subtitle: res.error.message,
         autodismiss: true,
       });
-    }
-    if (res.data) {
-      showToast({
-        title: 'Success',
-        subtitle: `Welcome back ${res.data.user.name}`,
-        autodismiss: true,
-      });
-      reset();
+      return;
     }
   };
   const toggleSecure = () => {

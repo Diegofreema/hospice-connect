@@ -3,10 +3,10 @@ import Provider from '@/components/provider';
 import { ErrorComponent } from '@/features/shared/components/error';
 
 import { AnimatedView } from '@/components/animated-view';
+import { useAuth } from '@/components/context/auth';
 import { StackedModalProvider } from '@/components/demos/modal/modal-manager';
 import { useAnimationStore } from '@/hooks/use-animation';
 import { setupBackgroundUpdates } from '@/updates';
-import { useConvexAuth } from 'convex/react';
 import { useFonts } from 'expo-font';
 import {
   ErrorBoundaryProps,
@@ -57,11 +57,12 @@ export default function RootLayout() {
 
 const InitialRoute = () => {
   const { theme } = useUnistyles();
-  const { isAuthenticated } = useConvexAuth();
+
+  const { user } = useAuth();
   const segment = useSegments();
   const pathname = usePathname();
-  console.log({ pathname, isAuthenticated, segment });
-
+  console.log({ pathname, segment });
+  const isAuthenticated = !!user;
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ToastProvider>

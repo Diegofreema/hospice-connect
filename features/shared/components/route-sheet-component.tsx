@@ -94,7 +94,7 @@ export const RoustSheetComponent = ({
         </Text>
         <Text textAlign="center">Route Sheet</Text>
         <FlexText
-          leftText={`Staff Name: ${nurse.firstName} ${nurse.lastName}`}
+          leftText={`Staff Name: ${nurse.name}`}
           rightText={`Discipline: ${nurse.discipline}`}
         />
       </View>
