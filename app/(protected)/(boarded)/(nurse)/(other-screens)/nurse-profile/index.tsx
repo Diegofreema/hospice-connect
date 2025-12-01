@@ -1,7 +1,7 @@
 import { useNurse } from '@/components/context/nurse-context';
 import { PrivacyNoticeLink } from '@/components/privacy-notice/privacy-notice-link';
 import { BackButton } from '@/features/shared/components/back-button';
-import { LoadingComponent } from '@/features/shared/components/loading';
+import { SmallLoader } from '@/features/shared/components/small-loader';
 import { ProfileCard } from '@/features/shared/components/profile-card';
 import { Spacer } from '@/features/shared/components/spacer';
 import { Stack } from '@/features/shared/components/v-stack';
@@ -16,7 +16,7 @@ import { useUnistyles } from 'react-native-unistyles';
 const NurseProfileScreen = () => {
   const { nurse } = useNurse();
   if (nurse === undefined) {
-    return <LoadingComponent />;
+    return <SmallLoader size={50} />;
   }
   if (nurse === null) {
     return null;

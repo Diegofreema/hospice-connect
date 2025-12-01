@@ -1,7 +1,7 @@
 import { useAppChatContext } from '@/components/context/chat-context';
 import { ChatHeader } from '@/features/shared/components/chat-header';
 import { CustomPressable } from '@/features/shared/components/custom-pressable';
-import { LoadingComponent } from '@/features/shared/components/loading';
+import { SmallLoader } from '@/features/shared/components/small-loader';
 import { Text } from '@/features/shared/components/text';
 import { View } from '@/features/shared/components/view';
 import { Wrapper } from '@/features/shared/components/wrapper';
@@ -26,7 +26,7 @@ const ChannelScreen = () => {
   const { bottom } = useSafeAreaInsets();
 
   if (!channel) {
-    return <LoadingComponent />;
+    return <SmallLoader size={50} />;
   }
 
   return (

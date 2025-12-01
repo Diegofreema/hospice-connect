@@ -7,13 +7,13 @@ import { StepperComponent } from '@/features/shared/components/stepper';
 import { Text } from '@/features/shared/components/text';
 import { View } from '@/features/shared/components/view';
 import {
-  convertTimeStringToDate,
+  convertTimeStringToDate2,
   generateErrorMessage,
   reverseDateString,
 } from '@/features/shared/utils';
 import { useMutation, useQuery } from 'convex/react';
 import { FunctionReturnType } from 'convex/server';
-import { addHours, format } from 'date-fns';
+import { addHours, format, parse } from 'date-fns';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { FlatList, ScrollView, TouchableOpacity } from 'react-native';
@@ -116,41 +116,30 @@ const RenderShifts = ({
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const extendAssignment = useMutation(api.shifts.extendAssignment);
-  const lastShiftEndTime = convertTimeStringToDate(
-    lastShift?.endTime as string
+  const baseEndDateTime = useMemo(() => {
+    if (!lastShift?.endDate || !lastShift?.endTime) return null;
+    const d = parse(lastShift.endDate, 'dd-MM-yyyy', new Date());
+    const parts = convertTimeStringToDate2(lastShift.endTime);
+    d.setHours(parts.hours, parts.minutes, 0, 0);
+    return d;
+  }, [lastShift?.endDate, lastShift?.endTime]);
+
+  const baseEndTimeMs = useMemo(
+    () => (baseEndDateTime ? baseEndDateTime.getTime() : NaN),
+    [baseEndDateTime]
   );
-  const lastShiftEndDate = lastShift?.endDate
-    ?.split('-')
-    ?.reverse()
-    ?.join('-') as string;
-  console.log(lastShift?.endDate);
 
   const extraShifts: Shift[] = useMemo(() => {
-    const [year, month, day] = lastShiftEndDate.split('-').map(Number);
-    console.log({ day, month, year });
-
-    const baseDate = new Date(year, month - 1, day);
-    baseDate.setHours(
-      lastShiftEndTime.getHours(),
-      lastShiftEndTime.getMinutes(),
-      0,
-      0
-    );
-
+    if (!baseEndDateTime || isNaN(baseEndTimeMs)) return [];
     const list: Shift[] = [];
-    let cursor = new Date(baseDate);
-    console.log(baseDate);
-    // clone
-
+    let cursor = new Date(baseEndDateTime);
     for (let i = 0; i < count; i++) {
-      const end = addHours(cursor, 12); // 12-hour shift
-
+      const end = addHours(cursor, 12);
       list.push(splitShift(cursor, end));
-
-      cursor = end; // next shift starts where this one ends
+      cursor = end;
     }
     return list;
-  }, [count, lastShiftEndDate, lastShiftEndTime]);
+  }, [count, baseEndTimeMs, baseEndDateTime]);
   const formattedShifts: Partial<ShiftCardType>[] = extraShifts.map(
     (shift) => ({
       _creationTime: shift.startISO.getTime(),
@@ -167,11 +156,11 @@ const RenderShifts = ({
     if (!hospice) return;
     setLoading(true);
     try {
-      const shifts = formattedShifts.map((shift) => ({
-        start: reverseDateString(shift.startDate!),
-        end: reverseDateString(shift.endDate!),
-        startShift: format(convertTimeStringToDate(shift.startTime!), 'h:mm a'),
-        endShift: format(convertTimeStringToDate(shift.endTime!), 'h:mm a'),
+      const shifts = extraShifts.map((shift) => ({
+        start: reverseDateString(shift.startDate),
+        end: reverseDateString(shift.endDate),
+        startShift: format(shift.startISO, 'h:mm a'),
+        endShift: format(shift.endISO, 'h:mm a'),
       }));
       await extendAssignment({
         assignmentId: lastShift?.assignmentId,

@@ -12,6 +12,7 @@ import { calculateAge, generateErrorMessage } from '@/features/shared/utils';
 import { useToast } from '@/components/demos/toast';
 import { ControlledDatePicker } from '@/features/authentication/components/form/control-date-picker';
 import { KeyboardAwareScrollViewComponent } from '@/features/shared/components/key-board-aware-scroll-view';
+import { authClient } from '@/lib/auth-client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from 'convex/react';
 import { format, parse } from 'date-fns';
@@ -62,8 +63,8 @@ export const EditProfile = () => {
         rate: Number(data.rate),
         stateOfRegistration: data.licenseState,
         discipline: data.discipline,
-        firstName: data.firstName.trim(),
-        lastName: data.lastName.trim(),
+        firstName: data.firstName?.trim() || '',
+        lastName: data.lastName?.trim() || '',
         phoneNumber: data.phoneNumber.trim(),
         licenseNumber: data.licenseNumber.trim(),
         zipCode: data.zipCode,
@@ -75,7 +76,14 @@ export const EditProfile = () => {
         data.discipline !== nurse?.discipline ||
         data.email !== nurse.email ||
         data.licenseState !== nurse.stateOfRegistration;
-
+      if (
+        data.firstName !== nurse?.name.split(' ')[0] ||
+        data.lastName !== nurse?.name.split(' ')[1]
+      ) {
+        await authClient.updateUser({
+          name: `${data.firstName?.trim() || ''} ${data.lastName?.trim() || ''}`,
+        });
+      }
       showToast({
         title: 'Success',
         subtitle: fieldsChanged

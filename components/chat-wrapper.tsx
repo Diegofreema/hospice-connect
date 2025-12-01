@@ -1,15 +1,25 @@
 import { chatApiKey } from '@/chat-config';
-import { LoadingComponent } from '@/features/shared/components/loading';
+import { SmallLoader } from '@/features/shared/components/small-loader';
 import { useUnread } from '@/features/shared/hooks/use-unread';
-import { authClient } from '@/lib/auth-client';
-import { PropsWithChildren, useEffect } from 'react';
+import axios from 'axios';
+import { PropsWithChildren, useCallback, useEffect } from 'react';
 import { Chat, OverlayProvider, useCreateChatClient } from 'stream-chat-expo';
 import { useAuth } from './context/auth';
-import { useToast } from './demos/toast';
 // const client = StreamChat.getInstance(chatApiKey as string);
 export const ChatWrapper = ({ children }: PropsWithChildren) => {
   const { user } = useAuth();
+  const tokenProvider = useCallback(async () => {
+    const { data: response } = await axios.post(
+      `https://hospice-connect-web.vercel.app/api/token`,
+      {
+        name: user?.name,
+        email: user?.email,
+        id: user?.id,
+      }
+    );
 
+    return response.token;
+  }, [user]);
   // useEffect(() => {
   //   // Skip if user is not authenticated
   //   if (!user?.id || !user?.name || !user?.streamToken) {
@@ -59,7 +69,6 @@ export const ChatWrapper = ({ children }: PropsWithChildren) => {
   // }, [user?.id, user?.name, user?.streamToken, isReady, user?.email]);
   const setUnreadCount = useUnread((state) => state.setUnread);
 
-  const { showToast } = useToast();
   const client = useCreateChatClient({
     apiKey: chatApiKey as string,
     userData: {
@@ -67,8 +76,9 @@ export const ChatWrapper = ({ children }: PropsWithChildren) => {
       name: user?.name,
       image: user?.image ?? undefined,
     },
-    tokenOrProvider: user?.streamToken,
+    tokenOrProvider: tokenProvider,
   });
+
   useEffect(() => {
     if (client && user?.id) {
       const onFetchUnreadCount = async () => {
@@ -95,22 +105,9 @@ export const ChatWrapper = ({ children }: PropsWithChildren) => {
       }
     };
   }, [setUnreadCount, client]);
-  useEffect(() => {
-    if (!user) return;
-    if (!user.streamToken) {
-      const onLogout = async () => {
-        await authClient.signOut();
-        showToast({
-          title: 'You have been signed out',
-          subtitle: 'Credentials not valid',
-        });
-      };
-      onLogout();
-    }
-  }, [user, showToast]);
 
   if (!client) {
-    return <LoadingComponent />;
+    return <SmallLoader size={50} />;
   }
 
   const chatTheme = {

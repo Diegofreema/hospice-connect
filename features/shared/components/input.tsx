@@ -17,7 +17,7 @@ export const Input = ({ label, rightIcon, leftIcon, ...props }: Props) => {
         <TextInput
           {...props}
           placeholderTextColor={'grey'}
-          style={{ flex: 1 }}
+          style={{ flex: 1, color: 'black' }}
         />
         {rightIcon}
       </View>

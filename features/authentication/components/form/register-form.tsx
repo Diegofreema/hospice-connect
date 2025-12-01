@@ -18,7 +18,6 @@ import {
 
 import { useToast } from '@/components/demos/toast';
 import { authClient } from '@/lib/auth-client';
-import axios from 'axios';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { TouchableOpacity } from 'react-native';
@@ -27,6 +26,7 @@ import { RegisterSchema, registerSchema } from '../../validators';
 import { ControlInput } from './control-input';
 export const RegisterForm = () => {
   const [secured, setSecured] = useState(true);
+  const [secured2, setSecured2] = useState(true);
 
   const { theme } = useUnistyles();
   const { showToast } = useToast();
@@ -49,7 +49,7 @@ export const RegisterForm = () => {
   const { password } = watch();
   const onSubmit = async (values: RegisterSchema) => {
     try {
-      const { data, error } = await authClient.signUp.email({
+      const { error } = await authClient.signUp.email({
         email: values.email.trim(),
         password: values.password.trim(),
         name: `${values.firstName.trim()} ${values.lastName.trim()}`.trim(),
@@ -65,22 +65,7 @@ export const RegisterForm = () => {
         return;
       }
 
-      if (data) {
-        const { user } = data;
-        const { data: response } = await axios.post(
-          `https://hospice-connect-web.vercel.app/api/token`,
-          {
-            name: user?.name,
-            email: user?.email,
-            id: user?.id,
-          }
-        );
-
-        await authClient.updateUser({
-          streamToken: response.token,
-        });
-        reset();
-      }
+      reset();
     } catch (error) {
       console.log(error);
 
@@ -92,6 +77,9 @@ export const RegisterForm = () => {
   };
   const toggleSecure = () => {
     setSecured(!secured);
+  };
+  const toggleSecure2 = () => {
+    setSecured2(!secured2);
   };
   const getPasswordStrength = (password: string) => {
     if (!password) return { strength: 0, label: '', color: '' };
@@ -184,8 +172,8 @@ export const RegisterForm = () => {
         placeholder="Re-enter password"
         leftIcon={<IconLock color={theme.colors.iconGrey} />}
         rightIcon={
-          <TouchableOpacity onPress={toggleSecure}>
-            {secured ? (
+          <TouchableOpacity onPress={toggleSecure2}>
+            {secured2 ? (
               <IconEyeOff color={theme.colors.iconGrey} />
             ) : (
               <IconEye color={theme.colors.iconGrey} />

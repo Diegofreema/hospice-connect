@@ -85,7 +85,7 @@ const NurseCreate = () => {
   };
 
   const onSubmit = async (data: CreateNurseValidator) => {
-    const { licenseState, ...rest } = data;
+    const { licenseState, firstName, lastName, ...rest } = data;
     if (!user) {
       return;
     }

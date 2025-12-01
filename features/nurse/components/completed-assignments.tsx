@@ -1,6 +1,6 @@
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
-import { LoadingComponent } from "@/features/shared/components/loading";
+import { SmallLoader } from "@/features/shared/components/small-loader";
 
 import { Stack } from "@/features/shared/components/v-stack";
 import { usePaginatedQuery } from "convex/react";
@@ -17,7 +17,7 @@ export const CompletedAssignments = ({ nurseId }: Props) => {
     { initialNumItems: 25 },
   );
   if (status === "LoadingFirstPage") {
-    return <LoadingComponent />;
+    return <SmallLoader size={50} />;
   }
 
   const handleFetchMore = () => {

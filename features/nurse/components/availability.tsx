@@ -1,6 +1,6 @@
 import { useNurse } from '@/components/context/nurse-context';
 import { DayType } from '@/convex/helper';
-import { LoadingComponent } from '@/features/shared/components/loading';
+import { SmallLoader } from '@/features/shared/components/small-loader';
 
 import { Stack } from '@/features/shared/components/v-stack';
 import BottomSheet from '@gorhom/bottom-sheet';
@@ -15,7 +15,7 @@ export const Availability = () => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const setData = useNurseSheet((state) => state.setDay);
   if (nurse === undefined) {
-    return <LoadingComponent />;
+    return <SmallLoader size={50} />;
   }
   const handlePress = (day: DayType) => {
     setData(day);

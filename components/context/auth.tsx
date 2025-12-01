@@ -2,7 +2,7 @@ import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
 
 import { ErrorComponent } from '@/features/shared/components/error';
-import { LoadingComponent } from '@/features/shared/components/loading';
+import { SmallLoader } from '@/features/shared/components/small-loader';
 import { authClient } from '@/lib/auth-client';
 
 WebBrowser.maybeCompleteAuthSession();
@@ -24,20 +24,14 @@ const AuthContext = React.createContext({
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const {
-    data: session,
-    isPending,
-    error,
-    isRefetching,
-    refetch,
-  } = authClient.useSession();
+  const { data: session, isPending, error, refetch } = authClient.useSession();
 
   if (error) {
     return <ErrorComponent text={error.message} refetch={refetch} />;
   }
 
-  if (isPending || isRefetching) {
-    return <LoadingComponent />;
+  if (isPending) {
+    return <SmallLoader size={50} />;
   }
 
   return (

@@ -18,9 +18,18 @@ import React from 'react';
 import { View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
-import 'react-native-reanimated';
-import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
+import {
+  configureReanimatedLogger,
+  ReanimatedLogLevel,
+} from 'react-native-reanimated';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+import { Toaster } from 'sonner-native';
+
+configureReanimatedLogger({
+  level: ReanimatedLogLevel.warn,
+  strict: false, // Reanimated runs in strict mode by default
+});
 void setupBackgroundUpdates();
 export function ErrorBoundary({ retry, error }: ErrorBoundaryProps) {
   return <ErrorComponent refetch={retry} text={error.message} />;
@@ -49,6 +58,7 @@ export default function RootLayout() {
       <View style={styles.container}>
         <KeyboardProvider>
           <InitialRoute />
+          <Toaster />
         </KeyboardProvider>
       </View>
     </Provider>

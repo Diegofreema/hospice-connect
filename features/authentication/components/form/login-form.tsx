@@ -18,6 +18,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { TouchableOpacity } from 'react-native';
 import { useUnistyles } from 'react-native-unistyles';
+import { toast } from 'sonner-native';
 import { loginSchema, LoginSchema } from '../../validators';
 import { ControlInput } from './control-input';
 export const LoginForm = () => {
@@ -42,12 +43,12 @@ export const LoginForm = () => {
       email: data.email,
       password: data.password,
       fetchOptions: {
-        onSuccess: ({ data }) => {
-          console.log({ data });
-          showToast({
-            title: 'Success',
-            subtitle: `Welcome back  ${data.user.name}`,
-            autodismiss: true,
+        onSuccess: async ({ data }) => {
+          const { user } = data;
+
+          toast.success('Success', {
+            description: `Welcome back  ${user.name}`,
+            position: 'bottom-center',
           });
           reset();
         },

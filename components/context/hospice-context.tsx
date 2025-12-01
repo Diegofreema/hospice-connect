@@ -1,5 +1,5 @@
 import { api } from '@/convex/_generated/api';
-import { LoadingComponent } from '@/features/shared/components/loading';
+import { SmallLoader } from '@/features/shared/components/small-loader';
 import { useQuery } from 'convex/react';
 
 import { FunctionReturnType } from 'convex/server';
@@ -22,7 +22,7 @@ export const HospiceProvider = ({
   const hospice = useQuery(api.hospices.getHospiceByUserId);
 
   if (hospice === undefined) {
-    return <LoadingComponent />;
+    return <SmallLoader size={50} />;
   }
 
   // if (!hospice?.approved) {

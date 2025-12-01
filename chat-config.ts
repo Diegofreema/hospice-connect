@@ -1,4 +1,4 @@
-export const chatApiKey = 'jeagup93jged';
+export const chatApiKey = process.env.EXPO_PUBLIC_CHAT_API_KEY;
 export const chatUserId = 'blue-breeze-4';
 export const chatUserName = 'blue';
 export const chatUserToken =

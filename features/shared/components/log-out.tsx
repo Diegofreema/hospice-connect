@@ -13,6 +13,7 @@ import { authClient } from '@/lib/auth-client';
 import { IconLogout2 } from '@tabler/icons-react-native';
 import { useState } from 'react';
 import { useUnistyles } from 'react-native-unistyles';
+import { toast } from 'sonner-native';
 import { Button } from './button';
 
 export const LogOut = () => {
@@ -24,13 +25,10 @@ export const LogOut = () => {
     setLoading(true);
     try {
       await authClient.signOut();
-      showToast({
-        title: 'Success',
-        subtitle: 'You have successfully logged out',
-        autodismiss: true,
+      toast('Success', {
+        description: 'You have successfully logged out',
       });
-    } catch (error) {
-      console.log({ error });
+    } catch {
       showToast({
         title: 'Error',
         subtitle: 'Failed to log out',

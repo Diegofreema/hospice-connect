@@ -2,8 +2,8 @@ import { useHospice } from '@/components/context/hospice-context';
 import { PrivacyNoticeLink } from '@/components/privacy-notice/privacy-notice-link';
 import { Id } from '@/convex/_generated/dataModel';
 import { BackButton } from '@/features/shared/components/back-button';
-import { LoadingComponent } from '@/features/shared/components/loading';
 import { ProfileCard } from '@/features/shared/components/profile-card';
+import { SmallLoader } from '@/features/shared/components/small-loader';
 import { Spacer } from '@/features/shared/components/spacer';
 import { Stack } from '@/features/shared/components/v-stack';
 
@@ -17,7 +17,7 @@ import { useUnistyles } from 'react-native-unistyles';
 const BusinessProfileScreen = () => {
   const { hospice } = useHospice();
   if (hospice === undefined) {
-    return <LoadingComponent />;
+    return <SmallLoader size={50} />;
   }
   if (hospice === null) {
     return null;
@@ -33,7 +33,7 @@ const BusinessProfileScreen = () => {
       <Spacer />
       <ProfileCard
         hospiceId={hospice._id!}
-        imageId={hospice.user.imageId}
+        imageId={hospice.imageId}
         name={hospice.businessName || 'N/A'}
         address={hospice?.address || 'N/A'}
         email={hospice?.email || 'N/A'}

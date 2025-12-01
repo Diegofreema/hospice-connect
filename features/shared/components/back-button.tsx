@@ -10,17 +10,26 @@ type Props = {
   rightContent?: React.ReactNode;
   marginTop?: number;
   marginLeft?: number;
+  onPress?: () => void;
 };
 export const BackButton = ({
   title,
   rightContent,
   marginTop = 30,
   marginLeft = -20,
+  onPress,
 }: Props) => {
   const { theme } = useUnistyles();
+  const onBack = () => {
+    if (onPress) {
+      onPress();
+    } else {
+      router.back();
+    }
+  };
   return (
     <Stack mode="flex">
-      <TouchableOpacity onPress={() => router.back()} style={{ marginTop }}>
+      <TouchableOpacity onPress={onBack} style={{ marginTop }}>
         <IconArrowLeft size={30} color={theme.colors.black} />
       </TouchableOpacity>
       {title ? (

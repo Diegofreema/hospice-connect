@@ -1,5 +1,5 @@
 import { api } from '@/convex/_generated/api';
-import { LoadingComponent } from '@/features/shared/components/loading';
+import { SmallLoader } from '@/features/shared/components/small-loader';
 import { useQuery } from 'convex/react';
 
 import { FunctionReturnType } from 'convex/server';
@@ -20,7 +20,7 @@ export const NurseProvider = ({ children }: { children: React.ReactNode }) => {
   });
 
   if (nurse === undefined) {
-    return <LoadingComponent />;
+    return <SmallLoader size={50} />;
   }
 
   // if (isAuthenticated && !nurse?.isApproved) {

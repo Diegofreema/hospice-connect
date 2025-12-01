@@ -12,8 +12,8 @@ export const createNurseValidator = z.object({
   rate: z.string().min(1, 'Rate is required'),
   email: z.email({ error: 'Please use a valid email' }).optional(),
   zipCode: z.string().min(1, 'Zip code is required'),
-  firstName: z.string().min(1, 'First name is required'),
-  lastName: z.string().min(1, 'Last name is required'),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
 });
 
 export type CreateNurseValidator = z.infer<typeof createNurseValidator>;

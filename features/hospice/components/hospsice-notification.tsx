@@ -50,11 +50,15 @@ export const HospiceNotification = ({ notification }: Props) => {
     };
     void onMark();
   }, [markAsRead, notification._id]);
+
+  const onPressRouteSheet = () => {
+    router.push(
+      `/view-route-sheet?id=${notification?.routeSheetId}&notificationId=${notification._id}`
+    );
+  };
   const onPress = () => {
     if (notification.type === 'route_sheet') {
-      router.push(
-        `/view-route-sheet?id=${notification?.routeSheetId}&notificationId=${notification._id}`
-      );
+      onPressRouteSheet();
     }
 
     if (notification.type === 'case_request') {
@@ -166,6 +170,7 @@ export const HospiceNotification = ({ notification }: Props) => {
     notification.type === 'cancel_request' ||
     notification.type === 'case_request' ||
     notification.type === 'route_sheet';
+  const notInteracted = !isDeclined && !isAccepted;
   return (
     <CustomPressable onPress={onPress}>
       <Card style={styles.card(notification.isRead)}>
@@ -227,6 +232,13 @@ export const HospiceNotification = ({ notification }: Props) => {
               <Text size="medium" color="green" isBold textAlign="center">
                 Accepted
               </Text>
+            )}
+            {isRouteSheet && notInteracted && (
+              <CustomPressable onPress={onPressRouteSheet}>
+                <Text size="medium" color="blue" isBold textAlign="center">
+                  View Route Sheet
+                </Text>
+              </CustomPressable>
             )}
           </CardFooter>
         )}

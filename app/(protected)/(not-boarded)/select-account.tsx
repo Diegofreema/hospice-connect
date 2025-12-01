@@ -4,6 +4,7 @@ import { BackButton } from '@/features/shared/components/back-button';
 import { Button } from '@/features/shared/components/button';
 import { MyTitle } from '@/features/shared/components/my-title';
 import { Wrapper } from '@/features/shared/components/wrapper';
+import { authClient } from '@/lib/auth-client';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 
@@ -16,9 +17,16 @@ const AccountType = () => {
       router.push('/hospice-create');
     }
   };
+  const onPress = async () => {
+    try {
+      await authClient.signOut();
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <Wrapper>
-      <BackButton marginTop={0} />
+      <BackButton marginTop={0} onPress={onPress} />
       <MyTitle title="Select account type" style={{ marginTop: 20 }} />
       <AccountSelector selected={selected} setSelected={setSelected} />
       <Button
