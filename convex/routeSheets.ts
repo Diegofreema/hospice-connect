@@ -30,10 +30,14 @@ export const nurseSubmittedRouteSheet = query({
       .filter((q) =>
         q.or(
           q.eq(q.field('status'), 'cancelled'),
-          q.eq(q.field('status'), 'completed')
+          q.eq(q.field('status'), 'completed'),
+          q.eq(q.field('status'), 'ended')
         )
       )
       .collect();
+    if (schedules.length === 0) {
+      return false;
+    }
 
     return schedules.every((schedule) => schedule.isSubmitted);
   },

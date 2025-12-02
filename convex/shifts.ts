@@ -1,3 +1,4 @@
+import { filter } from 'convex-helpers/server/filter';
 import { paginationOptsValidator, PaginationResult } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { Doc } from './_generated/dataModel';
@@ -37,9 +38,14 @@ export const getShifts = query({
 
     const shifts = schedules.map(async (schedule) => {
       const nurse = await getNurseDetails(ctx, schedule.nurseId);
+      const routeSheet = await filter(ctx.db.query('routeSheets'), (q) =>
+        q.scheduleIds.includes(schedule._id)
+      ).first();
+      const isRouteSheetApproved = !!routeSheet?.isApproved;
       return {
         ...schedule,
         nurse,
+        isRouteSheetApproved,
       };
     });
 

@@ -32,7 +32,7 @@ export const useUpdateUpdateStatus = ({
 
   useFocusEffect(
     useCallback(() => {
-      if (status === 'cancelled') return;
+      if (status === 'cancelled' || status === 'ended') return;
       let isMounted = true;
 
       const validateAndUpdateStatus = async () => {
@@ -105,7 +105,7 @@ export const useUpdateUpdateStatus = ({
   );
   useFocusEffect(
     useCallback(() => {
-      if (status === 'cancelled') return;
+      if (status === 'cancelled' || status === 'ended') return;
       let isMounted = true;
 
       const validateAndUpdateStatus = async () => {
@@ -183,7 +183,7 @@ export const useUpdateUpdateStatus = ({
 
   useFocusEffect(
     useCallback(() => {
-      if (status === 'cancelled') return;
+      if (status === 'cancelled' || status === 'ended') return;
       let isMounted = true; // Track component mount status
 
       const validateAndUpdateStatus = async () => {

@@ -126,7 +126,7 @@ export const ShiftCard = ({
         </View>
         <Stack mode="flex" gap="lg">
           {shift.status === 'completed' &&
-            shift.isSubmitted &&
+            shift.isRouteSheetApproved &&
             shift.nurseId && (
               <PrivacyNoticeLink
                 onPress={() =>

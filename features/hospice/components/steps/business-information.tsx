@@ -43,6 +43,7 @@ export const BusinessInformation = () => {
       authClient.updateUser({
         isBoarded: true,
         role: 'hospice',
+        name: data.businessName.trim(),
       });
       showToast({
         title: 'Success',

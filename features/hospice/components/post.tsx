@@ -43,7 +43,7 @@ export const Post = ({
   onOpenReOpenAssignment,
 }: Props) => {
   const name = post.patientFirstName + ' ' + post.patientLastName;
-  const isCanceled = post.status === 'cancelled';
+  const isCanceled = post.status === 'ended';
   const isCompleted = post.status === 'completed';
   const hasNurses = post.hasNurses;
   const { showToast } = useToast();
@@ -58,6 +58,12 @@ export const Post = ({
       label: 'Edit',
       value: 'edit',
       ios: 'pencil' as SFSymbol,
+      android: 'mode-edit',
+    },
+    {
+      label: 'Duplicate',
+      value: 'duplicate',
+      ios: 'doc.on.doc' as SFSymbol,
       android: 'mode-edit',
     },
     ...(!isCompleted
@@ -86,7 +92,6 @@ export const Post = ({
   const onDelete = async () => {
     setDeleting(true);
     try {
-      console.log(post._id);
       await deleteAssignment({ assignmentId: post._id, hospiceId });
       showToast({
         title: 'Success',
@@ -135,6 +140,9 @@ export const Post = ({
     if (value === 'extend') {
       router.push(`/extend/${post._id}`);
     }
+    if (value === 'duplicate') {
+      router.push(`/duplicate/${post._id}`);
+    }
   };
   const onReOpen = async () => {
     onOpenReOpenAssignment();
@@ -143,7 +151,7 @@ export const Post = ({
     router.push(`/assign-nurse?id=${post._id}&discipline=${post.discipline}`);
   };
   const onHandleAction = () => {
-    if (post.status === 'completed' || post.status === 'cancelled') {
+    if (post.status === 'completed' || post.status === 'ended') {
       void onReOpen();
       setId(post._id);
     } else {
@@ -152,7 +160,7 @@ export const Post = ({
   };
   const disabled = post.status === 'booked';
   const buttonText =
-    post.status === 'completed' || post.status === 'cancelled'
+    post.status === 'completed' || post.status === 'ended'
       ? 'Re-Open'
       : 'Assign';
   return (

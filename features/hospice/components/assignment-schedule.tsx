@@ -103,7 +103,7 @@ export const AssignmentSchedule = ({
         ListFooterComponent={
           showCancelButton && shiftsHasNurse ? (
             <Button
-              title="Cancel assignment"
+              title="End assignment"
               onPress={() => setVisible(true)}
               disabled={loading}
             />

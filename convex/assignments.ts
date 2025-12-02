@@ -548,7 +548,7 @@ export const updateAssignmentStatus = mutation({
     if (!assignment) {
       return;
     }
-    if (['completed', 'cancelled'].includes(assignment.status)) {
+    if (['completed', 'cancelled', 'ended'].includes(assignment.status)) {
       return;
     }
 
@@ -557,40 +557,36 @@ export const updateAssignmentStatus = mutation({
       args.assignmentId
     );
     let newStatus: any;
-    const someScheduleIsStillAvailable = schedules.some(
-      (s) => s.status === 'available'
-    );
-
     const lastSchedule = schedules[schedules.length - 1];
-    const lastScheduleIsCompletedOrIsNotCovered =
-      lastSchedule.status === 'not_covered' ||
-      lastSchedule.status === 'completed' ||
-      lastSchedule.status === 'cancelled';
-
-    const endDate = stringToDate(lastSchedule.endDate);
-    endDate.setHours(0, 0, 0, 0);
+    const lastEndDate = lastSchedule
+      ? stringToDate(lastSchedule.endDate)
+      : null;
+    lastEndDate?.setHours(0, 0, 0, 0);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const timeHasPassed = endDate < today;
+    const timeHasPassed = lastEndDate && lastEndDate < today;
 
-    if (timeHasPassed && assignment.status !== 'completed') {
-      if (!['cancelled'].includes(assignment.status)) {
-        newStatus = 'completed';
-      }
+    // Auto-complete if the entire assignment is in the past
+    if (timeHasPassed && !['completed', 'ended'].includes(assignment.status)) {
+      newStatus = 'completed';
+    } else if (assignment.status === 'ended') {
+      newStatus = 'cancelled';
     } else {
-      const hasSchedules = schedules.length > 0;
-      const isFullyStaffed = hasSchedules && schedules.every((s) => s.nurseId);
+      const hasAvailableSchedule = schedules.some(
+        (s) => s.status === 'available'
+      );
+      const allSchedulesCovered =
+        schedules.length > 0 && schedules.every((s) => !!s.nurseId);
 
-      if (isFullyStaffed && !lastScheduleIsCompletedOrIsNotCovered) {
-        newStatus = 'booked';
-      } else if (
-        !someScheduleIsStillAvailable ||
-        lastScheduleIsCompletedOrIsNotCovered
-      ) {
-        newStatus = 'completed';
-      } else {
+      if (hasAvailableSchedule) {
         newStatus = 'available';
+      } else if (allSchedulesCovered) {
+        newStatus = 'booked'; // fully staffed, but not necessarily past
+      } else {
+        // No available slots, but not fully covered → should only happen if time passed
+        // But if we're here, time hasn't passed yet → edge case (e.g. manual status?)
+        newStatus = 'available'; // or maybe 'partially_booked'? but based on your states...
       }
     }
 
@@ -681,7 +677,7 @@ export const cancelAssignment = mutation({
     for (const schedule of schedules) {
       if (cancellableStatuses.has(schedule.status)) {
         await ctx.db.patch(schedule._id, {
-          status: 'cancelled',
+          status: 'ended',
           canceledAt: args.cancelledAt,
         });
       }
