@@ -14,7 +14,8 @@ type Props = {
     | 'completed'
     | 'available'
     | 'cancelled'
-    | 'on_going';
+    | 'on_going'
+    | 'ended';
   endDate: Date;
   closingShift: Date;
 };

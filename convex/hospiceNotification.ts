@@ -204,7 +204,7 @@ export const sendCaseRequestNotification = mutation({
 
         if (hasConflict) {
           throw new ConvexError({
-            message: `You already has a shift from ${formatDate(shift.startDate)} ${shift.startTime} to ${formatDate(shift.endDate)} ${shift.endTime}`,
+            message: `You already have a shift from ${formatDate(shift.startDate)} ${shift.startTime} to ${formatDate(shift.endDate)} ${shift.endTime}`,
           });
         }
       }

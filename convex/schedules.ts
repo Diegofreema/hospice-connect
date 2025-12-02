@@ -22,35 +22,39 @@ export const cancelSchedule = mutation({
     if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
-    const hospice = await ctx.db.get(args.hospiceId);
-    if (!hospice) {
-      throw new ConvexError({ message: 'Hospice not found' });
-    }
-    const schedule = await ctx.db.get(args.scheduleId);
-    if (!schedule) {
-      throw new ConvexError({ message: 'Shift not found' });
-    }
+    const [hospice, schedule] = await Promise.all([
+      ctx.db.get(args.hospiceId),
+      ctx.db.get(args.scheduleId),
+    ]);
 
-    if (schedule.status !== 'booked' && schedule.status !== 'on_going') {
-      throw new ConvexError({ message: 'You cannot cancel this schedule' });
+    if (!hospice) throw new ConvexError({ message: 'Hospice not found' });
+    if (!schedule) throw new ConvexError({ message: 'Shift not found' });
+
+    if (!['booked', 'on_going'].includes(schedule.status)) {
+      throw new ConvexError({ message: 'You cannot cancel this shift' });
     }
 
     const assignment = await ctx.db.get(schedule.assignmentId);
-    if (!assignment) {
-      throw new ConvexError({ message: 'Assignment not found' });
-    }
+    if (!assignment) throw new ConvexError({ message: 'Assignment not found' });
     if (assignment.hospiceId !== args.hospiceId) {
       throw new ConvexError({
-        message: 'You do not have permission to cancel this schedule',
+        message: 'You do not have permission to cancel this shift',
       });
     }
-    if (schedule.nurseId) {
-      const nurse = await ctx.db.get(schedule.nurseId);
-      if (!nurse) {
-        throw new ConvexError({ message: 'Nurse not found' });
-      }
 
-      // check if this is the only shift that this nurse is working on this assignment;
+    // If no nurse is assigned, this shouldn't happen in valid state — but guard anyway
+    if (!schedule.nurseId) {
+      throw new ConvexError({
+        message: 'Cannot cancel a shift with no assigned nurse',
+      });
+    }
+
+    // === 4. Fetch nurse once (used in both branches) ===
+    const nurse = await ctx.db.get(schedule.nurseId);
+    if (!nurse) throw new ConvexError({ message: 'Assigned nurse not found' });
+
+    // check if this is the only shift that this nurse is working on this assignment;
+    const removeNurseAssignmentIfLastShift = async () => {
       const nurseAssignment = await ctx.db
         .query('nurseAssignments')
         .withIndex('assignmentId', (q) =>
@@ -73,27 +77,48 @@ export const cancelSchedule = mutation({
           await ctx.db.delete(nurseAssignment._id);
         }
       }
+    };
+    const isOngoing = schedule.status === 'on_going';
+    const isCancelRequest = !!args.isCancelRequest;
+
+    const notificationText = isCancelRequest
+      ? 'accepted your shift cancel request'
+      : 'cancelled your shift';
+
+    const notificationTitle = isOngoing ? 'Shift cancelled' : 'Shift released';
+
+    if (isOngoing) {
+      // ON_GOING → CANCELLED
       await ctx.db.patch(args.scheduleId, {
         status: 'cancelled',
-        canceledAt: args.cancelledAt,
+        canceledAt: Date.now(),
       });
-      const text = args.isCancelRequest
-        ? 'accepted your shift cancel request'
-        : 'cancelled your shift';
-      await ctx.db.insert('nurseNotifications', {
-        nurseId: schedule.nurseId,
-        isRead: false,
-        hospiceId: args.hospiceId,
-        scheduleId: args.scheduleId,
-        description: `${hospice.businessName} has ${text} for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
-        title: 'Schedule cancelled',
-        type: 'normal',
+    } else {
+      // BOOKED → AVAILABLE (nurse is removed)
+      await ctx.db.patch(args.scheduleId, {
+        status: 'available',
+        nurseId: undefined, // explicitly unassign
       });
-      if (args.notificationId) {
-        await ctx.db.patch(args.notificationId, {
-          status: 'accepted',
-        });
-      }
+    }
+    await removeNurseAssignmentIfLastShift();
+    // === 8. Send notification to nurse ===
+    await ctx.db.insert('nurseNotifications', {
+      nurseId: schedule.nurseId,
+      isRead: false,
+      hospiceId: args.hospiceId,
+      scheduleId: args.scheduleId,
+      title: notificationTitle,
+      description: `${hospice.businessName} has ${notificationText} for ${formatDate(
+        schedule.startDate
+      )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
+      type: 'normal',
+    });
+
+    // === 9. If this was a response to a cancel request, mark it as accepted ===
+    if (args.notificationId) {
+      await ctx.db.patch(args.notificationId, {
+        status: 'accepted',
+      });
     }
   },
 });

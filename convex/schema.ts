@@ -7,7 +7,8 @@ export const scheduleStatus = v.union(
   v.literal('booked'),
   v.literal('on_going'),
   v.literal('available'),
-  v.literal('cancelled')
+  v.literal('cancelled'),
+  v.literal('ended')
 );
 export const discipline = v.union(
   v.literal('RN'),
@@ -41,7 +42,6 @@ export const hospiceSubscription = {
 };
 export const Nurse = {
   name: v.string(),
-
   gender: v.string(),
   phoneNumber: v.string(),
   licenseNumber: v.string(),
@@ -138,8 +138,7 @@ export const assignment = {
     v.literal('not_covered'),
     v.literal('booked'),
     v.literal('available'),
-
-    v.literal('cancelled')
+    v.literal('ended')
   ),
   rate: v.number(),
   careLevel,

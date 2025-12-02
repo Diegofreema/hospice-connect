@@ -1,19 +1,22 @@
-import {useToast} from '@/components/demos/toast';
-import {ControlledDatePicker} from '@/features/authentication/components/form/control-date-picker';
-import {FlexButtons} from '@/features/shared/components/flex-buttons';
+import { useToast } from '@/components/demos/toast';
+import { ControlledDatePicker } from '@/features/authentication/components/form/control-date-picker';
+import { FlexButtons } from '@/features/shared/components/flex-buttons';
 
-import {useHospice} from '@/components/context/hospice-context';
-import {api} from '@/convex/_generated/api';
-import {ControlInput} from '@/features/authentication/components/form/control-input';
-import {convertTimeStringToDate, generateErrorMessage,} from '@/features/shared/utils';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {useMutation} from 'convex/react';
-import {FunctionReturnType} from 'convex/server';
-import {format, parse} from 'date-fns';
-import {useForm} from 'react-hook-form';
-import {useGetScheduleId} from '../hooks/use-get-schedule-id';
-import {editScheduleValidator, EditScheduleValidator} from '../validator';
-import BottomSheetKeyboardAwareScrollView from '@/features/shared/components/bottom-sheet-aware-scroll-view'
+import { useHospice } from '@/components/context/hospice-context';
+import { api } from '@/convex/_generated/api';
+import { ControlInput } from '@/features/authentication/components/form/control-input';
+import BottomSheetKeyboardAwareScrollView from '@/features/shared/components/bottom-sheet-aware-scroll-view';
+import {
+  convertTimeStringToDate,
+  generateErrorMessage,
+} from '@/features/shared/utils';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from 'convex/react';
+import { FunctionReturnType } from 'convex/server';
+import { format, parse } from 'date-fns';
+import { useForm } from 'react-hook-form';
+import { useGetScheduleId } from '../hooks/use-get-schedule-id';
+import { editScheduleValidator, EditScheduleValidator } from '../validator';
 
 type Props = {
   onClose: () => void;
@@ -94,16 +97,17 @@ export const EditSchedule = ({ onClose, initialValues }: Props) => {
       <ControlledDatePicker
         control={control}
         errors={errors}
-        name="endDate"
-        label="End date"
-      />
-      <ControlledDatePicker
-        control={control}
-        errors={errors}
         name="openShift"
         label="Start Time"
         mode="time"
       />
+      <ControlledDatePicker
+        control={control}
+        errors={errors}
+        name="endDate"
+        label="End date"
+      />
+
       <ControlledDatePicker
         control={control}
         errors={errors}

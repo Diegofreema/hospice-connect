@@ -106,6 +106,8 @@ export const getScheduleStatusText = (status: Infer<typeof scheduleStatus>) => {
       return 'Completed';
     case 'cancelled':
       return 'Cancelled';
+    case 'ended':
+      return 'Ended';
     default:
       return 'Not Covered';
   }
@@ -122,6 +124,8 @@ export const getAssignmentStatusText = (
       return 'Completed';
     case 'cancelled':
       return 'Cancelled';
+    case 'ended':
+      return 'Ended';
     default:
       return 'Not Covered';
   }
@@ -143,6 +147,8 @@ export const getScheduleStatusAndColor = (
     case 'not_covered':
       return { status: 'error', color: '#991B1B' };
     case 'cancelled':
+      return { status: 'error', color: '#991B1B' };
+    case 'ended':
       return { status: 'error', color: '#991B1B' };
     default:
       return { status: 'warning', color: '#FFBF00' };

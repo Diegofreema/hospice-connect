@@ -648,7 +648,7 @@ export const cancelAssignment = mutation({
       // Maybe just mark assignment as cancelled
       await ctx.db.patch(assignment._id, {
         isCanceled: true,
-        status: 'cancelled',
+        status: 'ended',
         canceledAt: args.cancelledAt,
       });
       return;
@@ -669,7 +669,7 @@ export const cancelAssignment = mutation({
           hospiceId: args.hospiceId,
           scheduleId: schedule._id,
           description: text,
-          title: 'Assignment Cancelled',
+          title: 'Assignment Ended',
           type: 'normal',
         });
       }
@@ -699,7 +699,7 @@ export const cancelAssignment = mutation({
     // === Step 3: Update assignment ===
     await ctx.db.patch(assignment._id, {
       isCanceled: true,
-      status: 'cancelled',
+      status: 'ended',
       canceledAt: args.cancelledAt,
     });
   },

@@ -68,7 +68,7 @@ export const NurseCard = ({ nurse, isAssigned, onAction }: Props) => {
               size={getFontSize(20)}
               color={theme.colors.yellowDark}
             />
-            <Text>{nurse.ratings ? nurse.ratings : 'N/A'}</Text>
+            <Text>{nurse.ratings ? nurse.ratings.toFixed(1) : 'N/A'}</Text>
           </View>
           <Text>Discipline: {nurse.discipline}</Text>
           <CustomPressable onPress={onPress}>
