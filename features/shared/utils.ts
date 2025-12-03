@@ -4,14 +4,7 @@ import { scheduleStatus } from '@/convex/schema';
 import { ReactMutation } from 'convex/react';
 import { FunctionReference } from 'convex/server';
 import { ConvexError, Infer } from 'convex/values';
-import {
-  addHours,
-  differenceInYears,
-  eachDayOfInterval,
-  format,
-  parse,
-  set,
-} from 'date-fns';
+import { addHours, differenceInYears, format, parse, set } from 'date-fns';
 import { Dimensions } from 'react-native';
 
 const { width } = Dimensions.get('window');
@@ -272,26 +265,28 @@ export const generateShiftsWithDateFns = ({
   openShift,
   startDate,
 }: ShiftWithDateFns): Shift[] => {
-  const days = eachDayOfInterval({ start: startDate, end: endDate });
+  const shifts: Shift[] = [];
+  let cursor = set(startDate, {
+    hours: openShift.getHours(),
+    minutes: openShift.getMinutes(),
+    seconds: 0,
+    milliseconds: 0,
+  });
 
-  return days.map((day) => {
-    const shiftStart = set(day, {
-      hours: openShift.getHours(),
-      minutes: openShift.getMinutes(),
-      seconds: 0,
-      milliseconds: 0,
+  while (cursor < endDate) {
+    const shiftEnd = addHours(cursor, 12);
+
+    shifts.push({
+      start: format(cursor, 'dd-MM-yyyy'),
+      end: format(shiftEnd, 'dd-MM-yyyy'),
+      startShift: format(cursor, 'h:mm a'),
+      endShift: format(shiftEnd, 'h:mm a'),
     });
 
-    const shiftEnd = addHours(shiftStart, 12);
-    const actualEnd = shiftEnd > endDate ? endDate : shiftEnd;
+    cursor = shiftEnd;
+  }
 
-    return {
-      start: format(shiftStart, 'dd-MM-yyyy'),
-      end: format(actualEnd, 'dd-MM-yyyy'),
-      startShift: format(shiftStart, 'h:mm a'),
-      endShift: format(shiftEnd, 'h:mm a'),
-    };
-  });
+  return shifts;
 };
 
 export const calculateAge = (dob: Date): number => {
