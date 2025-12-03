@@ -4,7 +4,7 @@ import { scheduleStatus } from '@/convex/schema';
 import { ReactMutation } from 'convex/react';
 import { FunctionReference } from 'convex/server';
 import { ConvexError, Infer } from 'convex/values';
-import { addHours, differenceInYears, format, parse, set } from 'date-fns';
+import { addHours, differenceInYears, format, set } from 'date-fns';
 import { Dimensions } from 'react-native';
 
 const { width } = Dimensions.get('window');
@@ -211,14 +211,14 @@ function timeToHours(timeStr: string) {
 
 // Function to calculate hours for a single shift
 function calculateShiftHours(shift: Doc<'schedules'>) {
-  if (shift.canceledAt) {
-    const startDateObj = parse(shift.startDate, 'dd-MM-yyyy', new Date());
-    const startTime = convertTimeStringToDate2(shift.startTime);
-    startDateObj.setHours(startTime.hours, startTime.minutes, 0, 0);
-    const canceledDate = new Date(shift.canceledAt);
-    const diff = (canceledDate.getTime() - startDateObj.getTime()) / 3600000;
-    return diff < 0 ? 0 : diff;
-  }
+  // if (shift.canceledAt) {
+  //   const startDateObj = parse(shift.startDate, 'dd-MM-yyyy', new Date());
+  //   const startTime = convertTimeStringToDate2(shift.startTime);
+  //   startDateObj.setHours(startTime.hours, startTime.minutes, 0, 0);
+  //   const canceledDate = new Date(shift.canceledAt);
+  //   const diff = (canceledDate.getTime() - startDateObj.getTime()) / 3600000;
+  //   return diff < 0 ? 0 : diff;
+  // }
 
   let startHours = timeToHours(shift.startTime);
   let endHours = timeToHours(shift.endTime);

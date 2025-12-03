@@ -192,7 +192,7 @@ const Header = ({ assignment, nurse }: HeaderProps) => {
     <View style={styles.card}>
       <View px="lg">
         <FlexText
-          leftText={`Staff Name: ${nurse.name}`}
+          leftText={`Staff Name: ${trimText(nurse.name, 15)}`}
           rightText={`Discipline: ${nurse.discipline}`}
         />
       </View>

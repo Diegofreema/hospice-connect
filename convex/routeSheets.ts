@@ -82,7 +82,8 @@ export const getDetailsForRouteSheet = query({
           q.eq(q.field('isSubmitted'), false),
           q.or(
             q.eq(q.field('status'), 'cancelled'),
-            q.eq(q.field('status'), 'completed')
+            q.eq(q.field('status'), 'completed'),
+            q.eq(q.field('status'), 'ended')
           )
         )
       )
