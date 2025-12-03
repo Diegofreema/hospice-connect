@@ -231,6 +231,20 @@ export const formatDateString = (date: Date): string => {
 
   return `${day}-${month}-${year}`;
 };
+/**
+ * Parse date (DD-MM-YYYY) and time (h:mm a) into a timezone-agnostic Date
+ * Treats values as wall-clock (local) by constructing with Date.UTC
+ */
+export const parseDateTimeWallClock = (dateStr: string, timeStr: string): Date => {
+  const [day, month, year] = dateStr.split('-').map(Number);
+  const [time, period] = timeStr.trim().split(/\s+/);
+  const [hoursStr, minutesStr] = time.split(':');
+  let hours = Number(hoursStr);
+  const minutes = Number(minutesStr);
+  if (period.toUpperCase() === 'PM' && hours !== 12) hours += 12;
+  else if (period.toUpperCase() === 'AM' && hours === 12) hours = 0;
+  return new Date(Date.UTC(year, month - 1, day, hours, minutes, 0, 0));
+};
 
 export const parseDateTime = (dateStr: string, timeStr: string): Date => {
   // Parse date: "24-10-2025" -> day=24, month=10, year=2025
@@ -283,8 +297,8 @@ export const checkIfNurseHasAShiftOnDateAndTime = async (
     .collect();
 
   // Parse the new shift's start and end datetime
-  const newShiftStart = parseDateTime(startDate, startTime);
-  const newShiftEnd = parseDateTime(endDate, endTime);
+  const newShiftStart = parseDateTimeWallClock(startDate, startTime);
+  const newShiftEnd = parseDateTimeWallClock(endDate, endTime);
 
   // Validate that end time is after start time
   if (newShiftEnd.getTime() <= newShiftStart.getTime()) {
@@ -294,8 +308,14 @@ export const checkIfNurseHasAShiftOnDateAndTime = async (
   // Check each existing shift for conflicts
   for (const shift of shifts) {
     // Parse existing shift's start and end datetime
-    const existingShiftStart = parseDateTime(shift.startDate, shift.startTime);
-    const existingShiftEnd = parseDateTime(shift.endDate, shift.endTime);
+    const existingShiftStart = parseDateTimeWallClock(
+      shift.startDate,
+      shift.startTime
+    );
+    const existingShiftEnd = parseDateTimeWallClock(
+      shift.endDate,
+      shift.endTime
+    );
 
     // Check if the intervals overlap
     const hasConflict = doIntervalsOverlap(

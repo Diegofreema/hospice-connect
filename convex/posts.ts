@@ -3,7 +3,11 @@ import { filter } from 'convex-helpers/server/filter';
 import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { mutation, query } from './_generated/server';
-import { doIntervalsOverlap, formatDate, parseDateTime } from './helper';
+import {
+  doIntervalsOverlap,
+  formatDate,
+  parseDateTimeWallClock,
+} from './helper';
 import { discipline } from './schema';
 import { getUserHelper } from './users';
 
@@ -156,17 +160,26 @@ export const acceptAssignment = mutation({
     ).collect();
 
     // Parse the new shift's start and end datetime
-    const newShiftStart = parseDateTime(schedule.startDate, schedule.startTime);
-    const newShiftEnd = parseDateTime(schedule.endDate, schedule.endTime);
+    const newShiftStart = parseDateTimeWallClock(
+      schedule.startDate,
+      schedule.startTime
+    );
+    const newShiftEnd = parseDateTimeWallClock(
+      schedule.endDate,
+      schedule.endTime
+    );
 
     // Check each existing shift for conflicts
     for (const shift of shifts) {
       // Parse existing shift's start and end datetime
-      const existingShiftStart = parseDateTime(
+      const existingShiftStart = parseDateTimeWallClock(
         shift.startDate,
         shift.startTime
       );
-      const existingShiftEnd = parseDateTime(shift.endDate, shift.endTime);
+      const existingShiftEnd = parseDateTimeWallClock(
+        shift.endDate,
+        shift.endTime
+      );
 
       // Check if the intervals overlap
       const hasConflict = doIntervalsOverlap(

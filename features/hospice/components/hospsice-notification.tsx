@@ -11,11 +11,12 @@ import { generateErrorMessage } from '@/features/shared/utils';
 import { useMutation } from 'convex/react';
 import { format } from 'date-fns';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { useHandleCaseRequest } from '@/features/shared/hooks/use-handle-case-request';
 import { FunctionReturnType } from 'convex/server';
 import { StyleSheet } from 'react-native-unistyles';
+import { useMarkAsRead } from '../hooks/use-mark-as-read';
 
 type Props = {
   notification: FunctionReturnType<
@@ -34,25 +35,15 @@ export const HospiceNotification = ({ notification }: Props) => {
   const firstPart = date.split(' ')[0];
 
   const secondPart = date.split(' ')[1] + ' ' + date.split(' ')[2];
-  const updateViewCount = useMutation(api.hospiceNotification.updateViewCount);
 
-  useEffect(() => {
-    const onUpdateViewCount = async () => {
-      if (notification.isRead) return;
-      try {
-        await updateViewCount({
-          notificationId: notification._id,
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    void onUpdateViewCount();
-  }, [updateViewCount, notification._id, notification.isRead]);
+  useMarkAsRead({
+    notificationId: notification._id,
+    isRead: notification.isRead,
+  });
 
   const onPressRouteSheet = () => {
     router.push(
-      `/view-route-sheet?id=${notification?.routeSheetId}&notificationId=${notification._id}`
+      `/view-route-sheet?id=${notification?.routeSheetId}&notificationId=${notification._id}&isRead=${notification.isRead}`
     );
   };
   const onPress = () => {

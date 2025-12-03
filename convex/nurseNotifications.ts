@@ -40,6 +40,7 @@ export const unreadMessagesCount = query({
       .withIndex('by_nurseId', (q) =>
         q.eq('nurseId', nurseId).eq('isRead', false)
       )
+      .filter((q) => q.lt(q.field('viewCount'), 1))
       .collect();
 
     return notifications.length;

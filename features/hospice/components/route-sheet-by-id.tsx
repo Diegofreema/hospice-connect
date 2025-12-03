@@ -13,16 +13,17 @@ import { ApproveRouteSheetModal } from './accept-notification';
 import { DeclineRouteSheetModal } from './delcine-route-sheet';
 
 export const RouteSheetById = () => {
-  const { id, notificationId } = useLocalSearchParams<{
+  const { id, notificationId, isRead } = useLocalSearchParams<{
     id: Id<'routeSheets'>;
     notificationId: Id<'hospiceNotifications'>;
+    isRead: string;
   }>();
 
   const [declineModalVisible, setDeclineModalVisible] = useState(false);
   const [approveModalVisible, setApproveModalVisible] = useState(false);
 
   const { hospice } = useHospice();
-  useMarkAsRead({ notificationId });
+  useMarkAsRead({ notificationId, isRead: isRead === 'true' });
   const data = useQuery(
     api.routeSheets.getRouteSheetById,
     hospice && hospice._id

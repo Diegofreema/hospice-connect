@@ -1,24 +1,26 @@
-import { useMutation } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import { useEffect } from "react";
-import { Id } from "@/convex/_generated/dataModel";
+import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
+import { useMutation } from 'convex/react';
+import { useEffect } from 'react';
 
 type Props = {
-  notificationId: Id<"hospiceNotifications">;
+  notificationId: Id<'hospiceNotifications'>;
+  isRead: boolean;
 };
 
-export const useMarkAsRead = ({ notificationId }: Props) => {
-  const markAsRead = useMutation(
-    api.hospiceNotification.markSingleNotificationAsRead,
-  );
+export const useMarkAsRead = ({ notificationId, isRead }: Props) => {
+  const updateViewCount = useMutation(api.hospiceNotification.updateViewCount);
   useEffect(() => {
-    const onHandleMarkAsRead = async () => {
+    const onUpdateViewCount = async () => {
+      if (isRead) return;
       try {
-        await markAsRead({ notificationId });
-      } catch (e) {
-        console.log(e);
+        await updateViewCount({
+          notificationId,
+        });
+      } catch (error) {
+        console.log(error);
       }
     };
-    void onHandleMarkAsRead();
-  }, [markAsRead, notificationId]);
+    void onUpdateViewCount();
+  }, [updateViewCount, notificationId, isRead]);
 };

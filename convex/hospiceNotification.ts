@@ -1,7 +1,11 @@
 import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { mutation, query } from './_generated/server';
-import { doIntervalsOverlap, formatDate, parseDateTime } from './helper';
+import {
+  doIntervalsOverlap,
+  formatDate,
+  parseDateTimeWallClock,
+} from './helper';
 import { getNurseDetails } from './nurses';
 
 export const unreadMessagesCount = query({
@@ -14,6 +18,7 @@ export const unreadMessagesCount = query({
       .withIndex('by_hospice_id', (q) =>
         q.eq('hospiceId', hospiceId).eq('isRead', false)
       )
+      .filter((q) => q.lt(q.field('viewCount'), 1))
       .collect();
 
     return notifications.length;
@@ -188,23 +193,33 @@ export const sendCaseRequestNotification = mutation({
 
       const shifts = await ctx.db
         .query('schedules')
-        .withIndex('nurse', (q) =>
-          q.eq('nurseId', nurse._id).eq('status', 'booked')
+        .withIndex('nurse', (q) => q.eq('nurseId', nurse._id))
+        .filter((q) =>
+          q.or(
+            q.eq(q.field('status'), 'booked'),
+            q.eq(q.field('status'), 'on_going')
+          )
         )
         .collect();
 
       // Parse the new shift's start and end datetime
-      const newShiftStart = parseDateTime(shift.startDate, shift.startTime);
-      const newShiftEnd = parseDateTime(shift.endDate, shift.endTime);
+      const newShiftStart = parseDateTimeWallClock(
+        shift.startDate,
+        shift.startTime
+      );
+      const newShiftEnd = parseDateTimeWallClock(shift.endDate, shift.endTime);
 
       // Check each existing shift for conflicts
-      for (const shift of shifts) {
+      for (const existing of shifts) {
         // Parse existing shift's start and end datetime
-        const existingShiftStart = parseDateTime(
-          shift.startDate,
-          shift.startTime
+        const existingShiftStart = parseDateTimeWallClock(
+          existing.startDate,
+          existing.startTime
         );
-        const existingShiftEnd = parseDateTime(shift.endDate, shift.endTime);
+        const existingShiftEnd = parseDateTimeWallClock(
+          existing.endDate,
+          existing.endTime
+        );
 
         // Check if the intervals overlap
         const hasConflict = doIntervalsOverlap(
@@ -216,7 +231,11 @@ export const sendCaseRequestNotification = mutation({
 
         if (hasConflict) {
           throw new ConvexError({
-            message: `You already have a shift from ${formatDate(shift.startDate)} ${shift.startTime} to ${formatDate(shift.endDate)} ${shift.endTime}`,
+            message: `You already have a shift from ${formatDate(
+              existing.startDate
+            )} ${existing.startTime} to ${formatDate(existing.endDate)} ${
+              existing.endTime
+            }`,
           });
         }
       }
