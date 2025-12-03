@@ -263,6 +263,7 @@ export const submitRouteSheet = mutation({
       description: 'Submitted a route sheet, Click to view to accept/decline',
       type: 'route_sheet',
       routeSheetId,
+      viewCount: 0,
     });
   },
 });
@@ -326,6 +327,7 @@ export const approveOrDeclineRouteSheet = mutation({
         description: `${hospice.businessName} declined your route sheet for ${assignment.patientFirstName} ${assignment.patientLastName}. ${text}`,
         type: 'normal',
         hospiceId: hospice._id,
+        viewCount: 0,
       });
     } else {
       await ctx.db.insert('nurseNotifications', {
@@ -335,6 +337,7 @@ export const approveOrDeclineRouteSheet = mutation({
         description: `${hospice.businessName} accepted your route sheet for ${assignment.patientFirstName} ${assignment.patientLastName}.`,
         type: 'normal',
         hospiceId: hospice._id,
+        viewCount: 0,
       });
       await ctx.db.patch(notification._id, {
         status: 'accepted',

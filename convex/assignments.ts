@@ -268,6 +268,7 @@ export const createAssignment = mutation({
         title: 'New Assignment Available',
         type: 'normal',
         hospiceId: args.hospiceId,
+        viewCount: 0,
       });
     }
   },
@@ -342,6 +343,7 @@ export const reopenAssignment = mutation({
         title: 'New Assignment Available',
         type: 'normal',
         hospiceId: args.hospiceId,
+        viewCount: 0,
       });
     }
   },
@@ -667,6 +669,7 @@ export const cancelAssignment = mutation({
           description: text,
           title: 'Assignment Ended',
           type: 'normal',
+          viewCount: 0,
         });
       }
     }

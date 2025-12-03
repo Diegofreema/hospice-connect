@@ -112,6 +112,7 @@ export const cancelSchedule = mutation({
         schedule.startDate
       )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
       type: 'normal',
+      viewCount: 0,
     });
 
     // === 9. If this was a response to a cancel request, mark it as accepted ===
@@ -246,6 +247,7 @@ export const sendScheduleNotification = mutation({
         description: `${args.hospiceName} has assigned you a schedule for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
         title: 'Schedule assigned',
         type: 'assignment',
+        viewCount: 0,
       });
     }
   },
@@ -292,6 +294,7 @@ export const declineSchedule = mutation({
       description: `${args.hospiceName} has declined your shift cancel request for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
       title: 'Cancel request declined',
       type: 'normal',
+      viewCount: 0,
     });
     await ctx.db.patch(args.notificationId, {
       status: 'declined',
@@ -339,6 +342,7 @@ export const declineCaseRequest = mutation({
       description: `${args.hospiceName} has declined your case request for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
       title: 'Case request declined',
       type: 'normal',
+      viewCount: 0,
     });
     await ctx.db.patch(args.notificationId, {
       status: 'declined',
@@ -420,6 +424,7 @@ export const acceptCaseRequest = mutation({
       description: `${args.hospiceName} has approved your case request for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
       title: 'Case request accepted',
       type: 'normal',
+      viewCount: 0,
     });
     // updates the notification status to accepted
     await ctx.db.patch(args.notificationId, {

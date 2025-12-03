@@ -34,22 +34,21 @@ export const HospiceNotification = ({ notification }: Props) => {
   const firstPart = date.split(' ')[0];
 
   const secondPart = date.split(' ')[1] + ' ' + date.split(' ')[2];
-  const markAsRead = useMutation(
-    api.hospiceNotification.markNotificationAsRead
-  );
+  const updateViewCount = useMutation(api.hospiceNotification.updateViewCount);
 
   useEffect(() => {
-    const onMark = async () => {
+    const onUpdateViewCount = async () => {
+      if (notification.isRead) return;
       try {
-        await markAsRead({
+        await updateViewCount({
           notificationId: notification._id,
         });
       } catch (error) {
         console.log(error);
       }
     };
-    void onMark();
-  }, [markAsRead, notification._id]);
+    void onUpdateViewCount();
+  }, [updateViewCount, notification._id, notification.isRead]);
 
   const onPressRouteSheet = () => {
     router.push(

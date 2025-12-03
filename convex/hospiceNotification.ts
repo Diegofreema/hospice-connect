@@ -50,7 +50,7 @@ export const getNotifications = query({
 });
 
 // ? mutations
-export const markNotificationAsRead = mutation({
+export const updateViewCount = mutation({
   args: {
     notificationId: v.id('hospiceNotifications'),
   },
@@ -61,31 +61,42 @@ export const markNotificationAsRead = mutation({
         return;
       }
 
-      if (notification.isRead) {
+      if (notification.viewCount > 1) {
         return;
       }
 
-      await ctx.db.patch(notification._id, { isRead: true });
+      await ctx.db.patch(notification._id, {
+        viewCount: notification.viewCount + 1,
+      });
     } catch (error) {
       console.log(error);
     }
   },
 });
-export const markSingleNotificationAsRead = mutation({
+export const markNotificationAsRead = mutation({
   args: {
-    notificationId: v.id('hospiceNotifications'),
+    hospiceId: v.id('hospices'),
   },
   handler: async (ctx, args) => {
-    const notification = await ctx.db.get(args.notificationId);
-    if (!notification) {
+    const hospice = await ctx.db.get(args.hospiceId);
+    if (!hospice) {
       return;
     }
 
-    if (notification.isRead) {
+    const notifications = await ctx.db
+      .query('hospiceNotifications')
+      .withIndex('by_hospice_id', (q) =>
+        q.eq('hospiceId', hospice._id).eq('isRead', false)
+      )
+      .collect();
+    if (notifications.length === 0) {
       return;
     }
-
-    await ctx.db.patch(notification._id, { isRead: true });
+    for (const notification of notifications) {
+      if (notification.viewCount > 1) {
+        await ctx.db.patch(notification._id, { isRead: true });
+      }
+    }
   },
 });
 
@@ -133,6 +144,7 @@ export const cancelShiftNotification = mutation({
       description: args.reason,
       scheduleId: shift._id,
       title: `${nurse.name} submitted cancel request for ${formatDate(shift.startDate)} to ${formatDate(shift.endDate)}: ${shift.startTime}-${shift.endTime}`,
+      viewCount: 0,
     });
   },
 });
@@ -233,6 +245,7 @@ export const sendCaseRequestNotification = mutation({
         description: '',
         scheduleId: scheduleId,
         title: `${nurse.name} has submitted a case request for ${formatDate(shift.startDate)} to ${formatDate(shift.endDate)}: ${shift.startTime}-${shift.endTime}`,
+        viewCount: 0,
       });
     }
   },

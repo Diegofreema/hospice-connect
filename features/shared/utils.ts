@@ -326,3 +326,34 @@ export const reverseDateStringToMDY = (dateString: string) => {
   const [day, month, year] = dateString.split('-');
   return `${month}-${day}-${year}`;
 };
+
+export type Reaction = {
+  type: 'like' | 'love' | 'haha' | 'sad' | 'wow';
+};
+
+export const renderReaction = (
+  reaction?: Reaction,
+  userId?: string,
+  reactUserId?: string,
+  reactUserName?: string
+) => {
+  const isMyReaction = userId === reactUserId;
+  if (!reaction) return '';
+
+  if (reaction.type === 'like') {
+    return `${isMyReaction ? 'You reacted 👍 to ' : `${reactUserName} reacted 👍 to `}`;
+  }
+  if (reaction.type === 'love') {
+    return `${isMyReaction ? 'You reacted ❤️ to ' : `${reactUserName} reacted ❤️ to `}`;
+  }
+  if (reaction.type === 'haha') {
+    return `${isMyReaction ? 'You reacted 😂 to ' : `${reactUserName} reacted 😂 to `}`;
+  }
+  if (reaction.type === 'sad') {
+    return `${isMyReaction ? 'You reacted 😢 to ' : `${reactUserName} reacted 😢 to `}`;
+  }
+  if (reaction.type === 'wow') {
+    return `${isMyReaction ? 'You reacted 😲 to ' : `${reactUserName} reacted 😲 to `}`;
+  }
+  return '';
+};

@@ -8,12 +8,14 @@ import { Text } from '@/features/shared/components/text';
 import { View } from '@/features/shared/components/view';
 import { useAcceptDecline } from '@/features/shared/hooks/use-accept-decline';
 import { useMutation } from 'convex/react';
+import { FunctionReturnType } from 'convex/server';
 import { format } from 'date-fns';
 import { StyleSheet } from 'react-native-unistyles';
-import { NurseNotificationType } from '../types';
 
 type Props = {
-  notification: NurseNotificationType;
+  notification: FunctionReturnType<
+    typeof api.nurseNotifications.getNurseNotifications
+  >['page'][0];
 };
 
 export const NurseNotification = ({ notification }: Props) => {
@@ -26,20 +28,23 @@ export const NurseNotification = ({ notification }: Props) => {
     nurseId: notification.nurseId!,
     nurseNotificationId: notification._id,
   });
-  const markAsRead = useMutation(api.nurseNotifications.markNotificationAsRead);
+  const updateViewCount = useMutation(api.nurseNotifications.updateViewCount);
 
   useEffect(() => {
-    const onMark = async () => {
+    const onUpdate = async () => {
       try {
-        await markAsRead({
+        if (notification.isRead) {
+          return;
+        }
+        await updateViewCount({
           notificationId: notification._id,
         });
       } catch (error) {
         console.log(error);
       }
     };
-    onMark();
-  }, [markAsRead, notification._id]);
+    onUpdate();
+  }, [updateViewCount, notification._id, notification.isRead]);
   // const onPress = () => {
   //   if (notification.type === "assignment") {
   //     router.push(

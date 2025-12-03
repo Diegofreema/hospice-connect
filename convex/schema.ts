@@ -207,6 +207,7 @@ export const NurseNotification = {
   hospiceId: v.optional(v.id('hospices')),
   scheduleId: v.optional(v.id('schedules')),
   status: v.optional(v.union(v.literal('accepted'), v.literal('declined'))),
+  viewCount: v.number(),
 };
 export const HospiceNotification = {
   hospiceId: v.id('hospices'),
@@ -224,6 +225,7 @@ export const HospiceNotification = {
   scheduleId: v.optional(v.id('schedules')),
   nurseId: v.optional(v.id('nurses')),
   status: v.optional(v.union(v.literal('accepted'), v.literal('declined'))),
+  viewCount: v.number(),
 };
 export default defineSchema({
   ...authTables,

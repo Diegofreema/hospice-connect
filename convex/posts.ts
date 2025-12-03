@@ -208,6 +208,7 @@ export const acceptAssignment = mutation({
       scheduleId: args.scheduleId,
       description: `${user.name} has accepted your case request for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
       nurseId: args.nurseId,
+      viewCount: 0,
     });
     if (args.nurseNotificationId) {
       const notification = await ctx.db.get(args.nurseNotificationId);
@@ -261,6 +262,7 @@ export const declineAssignment = mutation({
       scheduleId: args.scheduleId,
       description: `${user.name} has declined your case request for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
       nurseId: notification.nurseId,
+      viewCount: 0,
     });
   },
 });
