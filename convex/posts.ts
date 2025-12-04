@@ -127,6 +127,10 @@ export const acceptAssignment = mutation({
     if (!user) {
       throw new ConvexError({ message: 'User not found' });
     }
+    const nurse = await ctx.db.get(args.nurseId);
+    if (!nurse) {
+      throw new ConvexError({ message: 'Nurse not found' });
+    }
     const schedule = await ctx.db.get(args.scheduleId);
     if (!schedule) {
       throw new ConvexError({ message: 'Schedule not found' });
@@ -219,7 +223,7 @@ export const acceptAssignment = mutation({
       type: 'assignment',
       title: 'Shift accepted',
       scheduleId: args.scheduleId,
-      description: `${user.name} has accepted your case request for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
+      description: `${nurse.name} (${nurse.discipline}) has accepted your case request for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
       nurseId: args.nurseId,
       viewCount: 0,
     });
@@ -263,6 +267,11 @@ export const declineAssignment = mutation({
       throw new ConvexError({ message: 'Notification not found' });
     }
 
+    const nurse = await ctx.db.get(notification.nurseId);
+    if (!nurse) {
+      throw new ConvexError({ message: 'Nurse not found' });
+    }
+
     await ctx.db.patch(args.nurseNotificationId, {
       status: 'declined',
     });
@@ -273,7 +282,7 @@ export const declineAssignment = mutation({
       type: 'assignment',
       title: 'Assignment Declined',
       scheduleId: args.scheduleId,
-      description: `${user.name} has declined your case request for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
+      description: `${nurse.name} (${nurse.discipline}) has declined your case request for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
       nurseId: notification.nurseId,
       viewCount: 0,
     });

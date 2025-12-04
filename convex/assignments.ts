@@ -282,6 +282,7 @@ export const reopenAssignment = mutation({
     hospiceId: v.id('hospices'),
     shifts: v.array(shifts),
     assignmentId: v.id('assignments'),
+    discipline: discipline,
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -300,7 +301,7 @@ export const reopenAssignment = mutation({
       .query('nurses')
       .withIndex('by_discipline', (q) =>
         q
-          .eq('discipline', assignment.discipline)
+          .eq('discipline', args.discipline)
           .eq('stateOfRegistration', assignment.state)
       )
       .collect();
@@ -308,7 +309,7 @@ export const reopenAssignment = mutation({
       notes: assignment.notes,
       patientAddress: assignment.patientAddress,
       dateOfBirth: assignment.dateOfBirth,
-      discipline: assignment.discipline,
+      discipline: args.discipline,
       endDate: args.endDate,
       patientFirstName: assignment.patientFirstName,
       gender: assignment.gender,
@@ -417,6 +418,28 @@ export const updateAssignment = mutation({
       throw new ConvexError({
         message: 'You not permitted to update this assignment',
       });
+    }
+
+    if (args.discipline !== assignment.discipline) {
+      const nurses = await ctx.db
+        .query('nurses')
+        .withIndex('by_discipline', (q) =>
+          q
+            .eq('discipline', args.discipline)
+            .eq('stateOfRegistration', args.state)
+        )
+        .collect();
+      for (const nurse of nurses) {
+        await ctx.db.insert('nurseNotifications', {
+          nurseId: nurse._id,
+          isRead: false,
+          description: `A new assignment matching your discipline has been posted by ${hospice.businessName}.`,
+          title: 'New Assignment Available',
+          type: 'normal',
+          hospiceId: args.hospiceId,
+          viewCount: 0,
+        });
+      }
     }
     const oldSchedules = await ctx.db
       .query('schedules')

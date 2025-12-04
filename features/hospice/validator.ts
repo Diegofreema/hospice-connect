@@ -96,6 +96,9 @@ export const reopenAssignmentValidator = z
     startDate: z.date(),
     endDate: z.date(),
     openShift: z.date(),
+    discipline: z.enum(['RN', 'LVN', 'HHA'], {
+      error: 'Discipline is required',
+    }),
   })
   .refine(
     (data) => {

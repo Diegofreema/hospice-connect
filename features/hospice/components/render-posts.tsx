@@ -172,7 +172,7 @@ export const RenderPosts = ({ posts, loadMore, loadingMore }: Props) => {
         ref={bottomSheetRefReOpenAssignment}
         onClose={onCloseReOpenAssignment}
         title="Reopen case"
-        customSnapPoints={['25%', '60%']}
+        customSnapPoints={['25%', '70%']}
       >
         <ReopenCase onClose={onCloseReOpenAssignment} />
       </CustomSheet>

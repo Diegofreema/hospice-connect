@@ -11,11 +11,13 @@ import { format } from 'date-fns';
 import React from 'react';
 
 import { ControlledDatePicker } from '@/features/authentication/components/form/control-date-picker';
+import { ControlSelect } from '@/features/authentication/components/form/control-select';
 import { FlexButtons } from '@/features/shared/components/flex-buttons';
 import { BottomSheetView } from '@gorhom/bottom-sheet';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSelectAssignment } from '../hooks/use-select-assignment';
 import {
   reopenAssignmentValidator,
@@ -30,6 +32,7 @@ export const ReopenCase = ({ onClose }: Props) => {
   const id = useSelectAssignment((state) => state.id);
   const { showToast } = useToast();
   const { hospice } = useHospice();
+  const { bottom } = useSafeAreaInsets();
   const reopenCase = useMutation(api.assignments.reopenAssignment);
   const {
     handleSubmit,
@@ -62,6 +65,7 @@ export const ReopenCase = ({ onClose }: Props) => {
         hospiceId: hospice._id as Id<'hospices'>,
         assignmentId: id as Id<'assignments'>,
         shifts,
+        discipline: data.discipline,
       });
       showToast({
         title: 'Success',
@@ -84,7 +88,7 @@ export const ReopenCase = ({ onClose }: Props) => {
     <BottomSheetView>
       <KeyboardAwareScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ gap: 10 }}
+        contentContainerStyle={{ gap: 10, paddingBottom: bottom }}
       >
         <ControlledDatePicker
           control={control}
@@ -104,6 +108,18 @@ export const ReopenCase = ({ onClose }: Props) => {
           name="openShift"
           label="Open shift"
           mode="time"
+        />
+        <ControlSelect
+          control={control}
+          errors={errors}
+          name="discipline"
+          label="Discipline needed"
+          placeholder="Select discipline"
+          items={[
+            { label: 'RN', value: 'RN' },
+            { label: 'LVN', value: 'LVN' },
+            { label: 'HHA', value: 'HHA' },
+          ]}
         />
         <FlexButtons
           onPress={handleSubmit(onSubmit)}
