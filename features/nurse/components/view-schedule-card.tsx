@@ -26,7 +26,9 @@ import { useWindowDimensions, View } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 
 type Props = {
-  shift: FunctionReturnType<typeof api.shifts.getShifts>['shifts'][number];
+  shift: FunctionReturnType<
+    typeof api.shifts.getShiftsByOnlyAssignmentId
+  >[number];
 
   onAcceptSchedule: () => void;
   nurseId: Id<'nurses'>;

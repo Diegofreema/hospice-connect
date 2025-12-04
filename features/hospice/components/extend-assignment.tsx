@@ -116,6 +116,8 @@ const RenderShifts = ({
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const extendAssignment = useMutation(api.shifts.extendAssignment);
+  console.log(lastShift.endDate);
+
   const baseEndDateTime = useMemo(() => {
     if (!lastShift?.endDate || !lastShift?.endTime) return null;
     const d = parse(lastShift.endDate, 'dd-MM-yyyy', new Date());

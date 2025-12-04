@@ -4,7 +4,7 @@ import { paginationOptsValidator, PaginationResult } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { Doc, Id } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
-import { stringToDate } from './helper';
+import { parseDateTimeWallClock } from './helper';
 import { getSchedulesByAssignmentIdHelper } from './schedules';
 import { careLevel, discipline, shifts } from './schema';
 import { AssignmentsWithHospicesType, AvailableAssignmentType } from './types';
@@ -573,7 +573,7 @@ export const updateAssignmentStatus = mutation({
     if (!assignment) {
       return;
     }
-    if (['completed', 'cancelled', 'ended'].includes(assignment.status)) {
+    if (['cancelled', 'ended'].includes(assignment.status)) {
       return;
     }
 
@@ -581,48 +581,56 @@ export const updateAssignmentStatus = mutation({
       ctx,
       args.assignmentId
     );
-    let newStatus: any;
-    const lastSchedule = schedules[schedules.length - 1];
-    const lastEndDate = lastSchedule
-      ? stringToDate(lastSchedule.endDate)
-      : null;
-    lastEndDate?.setHours(0, 0, 0, 0);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    type Status =
+      | 'completed'
+      | 'not_covered'
+      | 'booked'
+      | 'available'
+      | 'ended';
 
-    const timeHasPassed = lastEndDate && lastEndDate < today;
+    let newStatus: Status | undefined;
 
-    // Auto-complete if the entire assignment is in the past
-    if (timeHasPassed && !['completed', 'ended'].includes(assignment.status)) {
-      newStatus = 'completed';
-    } else if (assignment.status === 'ended') {
-      newStatus = 'cancelled';
-    } else {
-      const hasAvailableSchedule = schedules.some(
-        (s) => s.status === 'available'
+    if (schedules.length > 0) {
+      const lastEndMs = schedules.reduce((max, s) => {
+        const endMs = parseDateTimeWallClock(s.endDate, s.endTime).getTime();
+        return Math.max(max, endMs);
+      }, 0);
+
+      const now = new Date();
+      const wallClockNow = new Date(
+        Date.UTC(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+          now.getHours(),
+          now.getMinutes(),
+          0,
+          0
+        )
       );
-      const allSchedulesCovered =
-        schedules.length > 0 && schedules.every((s) => !!s.nurseId);
 
-      if (hasAvailableSchedule) {
+      const hasAvailable = schedules.some((s) => s.status === 'available');
+      const hasBookedOrOngoing = schedules.some(
+        (s) => s.status === 'booked' || s.status === 'on_going'
+      );
+
+      const lastHasPassed = wallClockNow.getTime() > lastEndMs;
+
+      if (lastHasPassed) {
+        newStatus = 'completed';
+      } else if (hasAvailable) {
         newStatus = 'available';
-      } else if (allSchedulesCovered) {
-        newStatus = 'booked'; // fully staffed, but not necessarily past
-      } else {
-        // No available slots, but not fully covered → should only happen if time passed
-        // But if we're here, time hasn't passed yet → edge case (e.g. manual status?)
-        newStatus = 'available'; // or maybe 'partially_booked'? but based on your states...
+      } else if (hasBookedOrOngoing || !hasAvailable) {
+        newStatus = 'booked';
       }
+    } else {
+      newStatus = 'available';
     }
 
-    if (newStatus !== assignment.status) {
+    if (newStatus && newStatus !== assignment.status) {
       await ctx.db.patch(args.assignmentId, { status: newStatus });
     }
-    if (
-      newStatus === 'completed' ||
-      newStatus === 'cancelled' ||
-      newStatus === 'ended'
-    ) {
+    if (newStatus === 'completed' || newStatus === 'ended') {
       const nursesAssignments = await ctx.db
         .query('nurseAssignments')
         .withIndex('assignmentId', (q) =>
@@ -679,7 +687,7 @@ export const cancelAssignment = mutation({
       return;
     }
 
-    const text = `${hospice.businessName} has cancelled the assignment for ${assignment.patientFirstName} ${assignment.patientLastName}. Reason: ${args.reason || 'No reason provided'}`;
+    const text = `${hospice.businessName} has ended the assignment for ${assignment.patientFirstName} ${assignment.patientLastName}. Reason: ${args.reason || 'No reason provided'}`;
 
     // === Step 1: Send ONE notification per nurse ===
     const notifiedNurses = new Set<string>();

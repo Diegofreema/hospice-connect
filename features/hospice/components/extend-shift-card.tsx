@@ -9,7 +9,7 @@ import {
 } from '@/features/shared/utils';
 import { IconCircle } from '@tabler/icons-react-native';
 import { FunctionReturnType } from 'convex/server';
-import { format } from 'date-fns';
+import { format, parse } from 'date-fns';
 import { Image } from 'expo-image';
 import React from 'react';
 import { useWindowDimensions, View } from 'react-native';
@@ -30,18 +30,19 @@ export const ExtendShiftCard = ({ shift }: Props) => {
   const statusText = getScheduleStatusText(shift.status!);
   const statusInfo = getScheduleStatusAndColor(shift.status!);
 
-  const startDate = new Date(shift.startDate!);
-  const endDate = new Date(shift.endDate!);
+  const today = new Date();
+  const startDate = parse(shift.startDate!, 'yyyy-MM-dd', today);
+  const endDate = parse(shift.endDate!, 'yyyy-MM-dd', today);
   const startTime = shift.startTime as string;
   const endTime = shift.endTime as string;
 
   const formattedStartTime = format(
-    new Date(`${shift.startDate} ${startTime}:00`),
+    parse(`${shift.startDate} ${startTime}`, 'yyyy-MM-dd HH:mm', today),
     'h:mm a'
   );
 
   const formattedEndTime = format(
-    new Date(`${shift.endDate} ${endTime}:00`),
+    parse(`${shift.endDate} ${endTime}`, 'yyyy-MM-dd HH:mm', today),
     'h:mm a'
   );
 

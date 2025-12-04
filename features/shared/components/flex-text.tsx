@@ -9,17 +9,27 @@ type Props = {
 
 export const FlexText = ({ leftText, rightText }: Props) => {
   return (
-    <Stack mode="flex"  gap="xl">
+    <Stack mode="flex" gap="xl">
       <Text size={'normal'}>{leftText}</Text>
-      <Text
-        size={'normal'}
-        isMedium
-        fontSize={getFontSize(14)}
-        textAlign="right"
-
-      >
-        {rightText}
-      </Text>
+      {leftText.toLowerCase() === 'discipline' ? (
+        <Text
+          size={'normal'}
+          isBold
+          fontSize={getFontSize(16)}
+          textAlign="right"
+        >
+          {rightText}
+        </Text>
+      ) : (
+        <Text
+          size={'normal'}
+          isMedium
+          fontSize={getFontSize(14)}
+          textAlign="right"
+        >
+          {rightText}
+        </Text>
+      )}
     </Stack>
   );
 };
