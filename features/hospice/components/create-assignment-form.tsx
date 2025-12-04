@@ -1,27 +1,27 @@
-import { ControlInput } from "@/features/authentication/components/form/control-input";
-import { Button } from "@/features/shared/components/button";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { ControlInput } from '@/features/authentication/components/form/control-input';
+import { Button } from '@/features/shared/components/button';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 
-import { ControlledDatePicker } from "@/features/authentication/components/form/control-date-picker";
-import { ControlSelect } from "@/features/authentication/components/form/control-select";
-import { usStates } from "@/features/nurse/data";
+import { ControlledDatePicker } from '@/features/authentication/components/form/control-date-picker';
+import { ControlSelect } from '@/features/authentication/components/form/control-select';
+import { usStates } from '@/features/nurse/data';
 
-import { KeyboardAwareScrollViewComponent } from "@/features/shared/components/key-board-aware-scroll-view";
-import { Stack } from "@/features/shared/components/v-stack";
-import { useEffect } from "react";
+import { KeyboardAwareScrollViewComponent } from '@/features/shared/components/key-board-aware-scroll-view';
+import { Stack } from '@/features/shared/components/v-stack';
+import { calculateAge } from '@/features/shared/utils';
+import { useEffect } from 'react';
 import {
   createAssignmentValidator,
   CreateAssignmentValidator,
-} from "../validator";
-import { calculateAge } from "@/features/shared/utils";
+} from '../validator';
 const careLevel = [
-  "Initial Evaluation",
-  "Follow Up",
-  "Continuous Care",
-  "Supervision",
-  "Recertification",
-  "Discharge",
+  'Initial Evaluation',
+  'Follow Up',
+  'Continuous Care',
+  'Supervision',
+  'Recertification',
+  'Discharge',
 ];
 type Props = {
   onSubmit: (data: CreateAssignmentValidator) => void;
@@ -32,7 +32,7 @@ type Props = {
 export const CreateAssignmentForm = ({
   onSubmit,
   initialValues,
-  btnTitle = "Create",
+  btnTitle = 'Create',
   disabled = false,
 }: Props) => {
   const {
@@ -43,37 +43,37 @@ export const CreateAssignmentForm = ({
     watch,
   } = useForm<CreateAssignmentValidator>({
     defaultValues: {
-      additionalNotes: "",
-      address: "",
+      additionalNotes: '',
+      address: '',
       dateOfBirth: new Date(),
-      discipline: "RN",
+      discipline: 'RN',
       endDate: new Date(),
-      firstName: "",
-      gender: "male",
-      lastName: "",
-      phoneNumber: "",
-      rate: "",
+      firstName: '',
+      gender: 'male',
+      lastName: '',
+      phoneNumber: '',
+      rate: '',
       startDate: new Date(),
-      state: "",
+      state: '',
       openShift: new Date(),
-      zipcode: "",
+      zipcode: '',
       ...initialValues,
     },
     resolver: zodResolver(createAssignmentValidator),
   });
-  const dob = watch("dateOfBirth");
+  const dob = watch('dateOfBirth');
   const age = calculateAge(dob);
   useEffect(() => {
     if (isSubmitSuccessful) {
       reset();
     }
   }, [isSubmitSuccessful, reset]);
-  const gender = watch("gender");
-  const selectedOther = gender === "others";
+  const gender = watch('gender');
+  const selectedOther = gender === 'others';
 
   return (
     <KeyboardAwareScrollViewComponent>
-      <Stack gap={"xl"}>
+      <Stack gap={'xl'}>
         <ControlInput
           control={control}
           errors={errors}
@@ -103,9 +103,9 @@ export const CreateAssignmentForm = ({
           label="Gender"
           placeholder="Select gender"
           items={[
-            { label: "Male", value: "male" },
-            { label: "Female", value: "female" },
-            { label: "Other", value: "others" },
+            { label: 'Male', value: 'male' },
+            { label: 'Female', value: 'female' },
+            { label: 'Other', value: 'others' },
           ]}
         />
         {selectedOther && (
@@ -132,9 +132,9 @@ export const CreateAssignmentForm = ({
           label="Discipline needed"
           placeholder="Select discipline"
           items={[
-            { label: "RN", value: "RN" },
-            { label: "LVN", value: "LVN" },
-            { label: "HHA", value: "HHA" },
+            { label: 'RN', value: 'RN' },
+            { label: 'LVN', value: 'LVN' },
+            { label: 'HHA', value: 'HHA' },
           ]}
         />
 
@@ -197,8 +197,8 @@ export const CreateAssignmentForm = ({
           control={control}
           errors={errors}
           name="zipcode"
-          label="Zipcode"
-          placeholder="Enter zipcode"
+          label="Zip code"
+          placeholder="Enter zip code"
         />
 
         <ControlInput

@@ -1,5 +1,11 @@
 import React, { ReactNode } from 'react';
-import { StyleSheet, TextInput, TextInputProps, View } from 'react-native';
+import {
+  Platform,
+  StyleSheet,
+  TextInput,
+  TextInputProps,
+  View,
+} from 'react-native';
 import { Text } from './text';
 
 type Props = TextInputProps & {
@@ -31,7 +37,7 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     borderRadius: 8,
     paddingVertical: 5,
-    height: 50,
+    height: Platform.OS === 'ios' ? 50 : 55,
     paddingHorizontal: 10,
     flexDirection: 'row',
     alignItems: 'center',

@@ -2,10 +2,11 @@ import { useHospice } from '@/components/context/hospice-context';
 import { useToast } from '@/components/demos/toast';
 import { api } from '@/convex/_generated/api';
 import { FlexButtons } from '@/features/shared/components/flex-buttons';
+import { SmallLoader } from '@/features/shared/components/small-loader';
 import { Text } from '@/features/shared/components/text';
 import { View } from '@/features/shared/components/view';
 import { generateErrorMessage } from '@/features/shared/utils';
-import { useMutation } from 'convex/react';
+import { useMutation, useQuery } from 'convex/react';
 import { useState } from 'react';
 import { useGetScheduleId } from '../hooks/use-get-schedule-id';
 
@@ -17,6 +18,14 @@ export const CancelSchedule = ({ onClose }: Props) => {
   const id = useGetScheduleId((state) => state.id);
   const { hospice } = useHospice();
   const cancelSchedule = useMutation(api.schedules.cancelSchedule);
+  const schedule = useQuery(
+    api.schedules.getSchedule,
+    id
+      ? {
+          scheduleId: id,
+        }
+      : 'skip'
+  );
   const [cancelling, setCanceling] = useState(false);
   const { showToast } = useToast();
   const onCancelSchedule = async () => {
@@ -53,11 +62,14 @@ export const CancelSchedule = ({ onClose }: Props) => {
     onClose();
     clearId();
   };
+  if (!schedule) return <SmallLoader size={20} />;
+  const text =
+    schedule.status === 'on_going'
+      ? 'This schedule is on-going. Are you sure you want to cancel it?'
+      : 'This shift has not started, So it will be open for reassignment.';
   return (
     <View gap="md">
-      <Text isMedium>
-        Once schedule is cancelled, it can no longer be reassigned.
-      </Text>
+      <Text isMedium>{text}</Text>
       <FlexButtons
         onPress={onCancelSchedule}
         onCancel={handleClose}

@@ -595,7 +595,11 @@ export const updateAssignmentStatus = mutation({
     if (newStatus !== assignment.status) {
       await ctx.db.patch(args.assignmentId, { status: newStatus });
     }
-    if (newStatus === 'completed' || newStatus === 'cancelled') {
+    if (
+      newStatus === 'completed' ||
+      newStatus === 'cancelled' ||
+      newStatus === 'ended'
+    ) {
       const nursesAssignments = await ctx.db
         .query('nurseAssignments')
         .withIndex('assignmentId', (q) =>

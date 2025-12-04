@@ -85,11 +85,10 @@ export const ShiftCard = ({
     router.push(`/view-nurse-profile?id=${shift.nurseId}`);
   };
   const showRouteSheetButton =
-    (shift.status === 'completed' ||
-      shift.status === 'cancelled' ||
-      shift.status === 'ended') &&
-    shift.isRouteSheetApproved &&
-    shift.nurseId;
+    !!shift &&
+    ['completed', 'cancelled', 'ended'].includes(shift.status) &&
+    shift.isRouteSheetApproved === true &&
+    shift.nurseId != null;
   return (
     <Card style={styles.card}>
       <CardHeader style={{ gap: 10 }}>
@@ -142,15 +141,18 @@ export const ShiftCard = ({
           )}
           {shift.status !== 'completed' &&
             shift.nurseId &&
-            shift.status !== 'cancelled' && (
+            shift.status !== 'cancelled' &&
+            shift.status !== 'ended' && (
               <PrivacyNoticeLink onPress={handleCancelSchedule}>
                 Cancel Schedule
               </PrivacyNoticeLink>
             )}
 
-          <PrivacyNoticeLink onPress={handleEditSchedule}>
-            Edit Schedule
-          </PrivacyNoticeLink>
+          {shift.status !== 'not_covered' && (
+            <PrivacyNoticeLink onPress={handleEditSchedule}>
+              Edit Schedule
+            </PrivacyNoticeLink>
+          )}
 
           {shift.status === 'completed' && (
             <PrivacyNoticeLink onPress={handleRateNurse}>

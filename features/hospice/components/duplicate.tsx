@@ -98,7 +98,6 @@ export const DuplicateComponent = () => {
       onSubmit={onSubmit}
       initialValues={formattedAssignment}
       btnTitle="Duplicate"
-      disabled={assignment.hasNurses}
     />
   );
 };
