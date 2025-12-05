@@ -78,6 +78,7 @@ export const Hospice = {
   licenseNumber: v.string(),
   state: v.string(),
   approved: v.boolean(),
+  zipcode: v.optional(v.string()),
   userId: v.string(),
   faxNumber: v.optional(v.string()),
   phoneNumber: v.string(),
@@ -95,6 +96,7 @@ const PendingHospice = {
   email: v.string(),
   isApproved: v.boolean(),
   hospiceId: v.id('hospices'),
+  zipcode: v.optional(v.string()),
 };
 
 export const Schedule = {

@@ -38,8 +38,11 @@ export const getShifts = query({
 
     const shifts = schedules.map(async (schedule) => {
       const nurse = await getNurseDetails(ctx, schedule.nurseId);
-      const routeSheet = await filter(ctx.db.query('routeSheets'), (q) =>
-        q.scheduleIds.includes(schedule._id)
+      const routeSheet = await filter(
+        ctx.db
+          .query('routeSheets')
+          .filter((q) => q.eq(q.field('isApproved'), true)),
+        (q) => q.scheduleIds.includes(schedule._id)
       ).first();
       const isRouteSheetApproved = !!routeSheet?.isApproved;
       return {

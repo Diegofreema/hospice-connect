@@ -224,8 +224,11 @@ export const HospiceNotification = ({ notification }: Props) => {
               </Text>
             )}
             {isRouteSheet && notInteracted && (
-              <CustomPressable onPress={onPressRouteSheet}>
-                <Text size="medium" color="blue" isBold textAlign="center">
+              <CustomPressable
+                onPress={onPressRouteSheet}
+                style={styles.button}
+              >
+                <Text size="medium" color="white" isBold textAlign="center">
                   View Route Sheet
                 </Text>
               </CustomPressable>
@@ -243,4 +246,13 @@ const styles = StyleSheet.create((theme) => ({
     borderWidth: 1,
     borderColor: isRead ? 'transparent' : theme.colors.grey,
   }),
+  button: {
+    padding: 5,
+    borderRadius: 5,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 45,
+    backgroundColor: theme.colors.blue,
+  },
 }));

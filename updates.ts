@@ -15,6 +15,6 @@ export const setupBackgroundUpdates = async () => {
   });
 
   await BackgroundTask.registerTaskAsync(BACKGROUND_TASK_NAME, {
-    minimumInterval: 60 * 24,
+    minimumInterval: 10, // 10 minutes
   });
 };

@@ -9,7 +9,7 @@ export const createHospiceValidator = z.object({
   phoneNumber: z
     .string()
     .min(10, 'Phone number must be at least 10 characters'),
-
+  zipcode: z.string().min(5, 'Zip code must be at least 5 characters'),
   licenseNumber: z
     .string()
     .min(2, 'License number must be at least 2 characters'),
@@ -162,6 +162,7 @@ export const updateProfileValidator = z.object({
   state: z.string().min(1, 'State is required'),
   phoneNumber: z.string().min(1, 'Phone number is required'),
   licenseNumber: z.string().min(1, 'License number is required'),
+  zipcode: z.string().min(1, 'Zip code is required'),
 
   email: z
     .email({ error: 'Please put a valid email' })

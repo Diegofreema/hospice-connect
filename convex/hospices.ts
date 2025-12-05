@@ -10,6 +10,7 @@ export const createHospice = mutation({
     licenseNumber: v.string(),
     state: v.string(),
     phoneNumber: v.string(),
+    zipcode: v.string(),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -28,6 +29,7 @@ export const createHospice = mutation({
       phoneNumber: args.phoneNumber,
       email: identity.email as string,
       isApproved: false,
+      zipcode: args.zipcode,
     });
   },
 });
@@ -101,6 +103,7 @@ export const updateHospiceProfile = mutation({
     phoneNumber: v.string(),
     hospiceId: v.id('hospices'),
     email: v.string(),
+    zipcode: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -129,6 +132,7 @@ export const updateHospiceProfile = mutation({
       email: args.email,
       hospiceId: args.hospiceId,
       isApproved: false,
+      zipcode: args.zipcode,
     });
   },
 });

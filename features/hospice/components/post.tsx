@@ -206,6 +206,7 @@ export const Post = ({
         <FlexText leftText="Phone number" rightText={post.phoneNumber} />
         <FlexText leftText="Care level" rightText={post.careLevel} />
         <FlexText leftText="Discipline" rightText={post.discipline} />
+        <FlexText leftText="Zip Code" rightText={post.zipcode || 'N/A'} />
 
         <LongInfo title="Location" description={post.patientAddress} />
         <View flexDirection="row" gap="lg" style={styles.footer}>
@@ -272,8 +273,6 @@ const styles = StyleSheet.create((theme) => ({
     borderColor: theme.colors.cardGrey,
   },
   assign: {
-    padding: 5,
-    borderRadius: 5,
     flex: 1,
     backgroundColor: theme.colors.blue,
   },

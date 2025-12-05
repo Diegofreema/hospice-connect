@@ -40,6 +40,7 @@ const BusinessProfileScreen = () => {
         phoneNumber={hospice.phoneNumber || 'N/A'}
         licenseNumber={hospice.licenseNumber || 'N/A'}
         imageUrl={hospice.image as string}
+        zipCode={hospice.zipcode || 'N/A'}
       />
     </Wrapper>
   );

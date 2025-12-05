@@ -32,6 +32,7 @@ const EditBusinessProfile = () => {
       phoneNumber: hospice?.phoneNumber || '',
       licenseNumber: hospice?.licenseNumber || '',
       email: hospice?.email || '',
+      zipcode: hospice?.zipcode || '',
     },
   });
 
@@ -45,6 +46,7 @@ const EditBusinessProfile = () => {
         licenseNumber: data.licenseNumber?.trim(),
         phoneNumber: data.phoneNumber?.trim(),
         state: data.state?.trim(),
+        zipcode: data.zipcode?.trim(),
       });
       showToast({
         title: 'Success',
@@ -104,6 +106,15 @@ const EditBusinessProfile = () => {
             placeholder="Enter your business address"
             label="Address"
             variant="textarea"
+          />
+
+          <ControlInput
+            control={control}
+            errors={errors}
+            name="zipcode"
+            placeholder="Enter your zip code"
+            label="Zip Code"
+            keyboardType="number-pad"
           />
           <ControlSelect
             control={control}

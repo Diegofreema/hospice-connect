@@ -23,6 +23,7 @@
     "@convex-dev/better-auth": "^0.9.7",
     "@convex-dev/react-query": "^0.0.0-alpha.11",
     "@convex-dev/resend": "^0.1.13",
+    "@convex-dev/stripe": "^0.1.1",
     "@expo/ui": "~0.1.1-alpha.10",
     "@expo/vector-icons": "^14.1.0",
     "@gorhom/bottom-sheet": "^5",

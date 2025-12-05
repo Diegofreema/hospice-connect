@@ -4,7 +4,7 @@ import { scheduleStatus } from '@/convex/schema';
 import { ReactMutation } from 'convex/react';
 import { FunctionReference } from 'convex/server';
 import { ConvexError, Infer } from 'convex/values';
-import { addHours, differenceInYears, format, set } from 'date-fns';
+import { addHours, differenceInYears, format, parse, set } from 'date-fns';
 import { Dimensions } from 'react-native';
 
 const { width } = Dimensions.get('window');
@@ -232,11 +232,31 @@ function calculateShiftHours(shift: Doc<'schedules'>) {
 export function calculateTotalHours(shifts: Doc<'schedules'>[]) {
   let totalHours = 0;
 
-  shifts.forEach((shift) => {
-    const hours = calculateShiftHours(shift);
+  for (const shift of shifts) {
+    const startDateObj = parse(shift.startDate, 'dd-MM-yyyy', new Date());
+    const startParts = convertTimeStringToDate2(shift.startTime);
+    startDateObj.setHours(startParts.hours, startParts.minutes, 0, 0);
 
+    if (shift.canceledAt) {
+      const canceledDate = new Date(shift.canceledAt);
+      if (canceledDate.getTime() <= startDateObj.getTime()) {
+        continue;
+      }
+      const diff = (canceledDate.getTime() - startDateObj.getTime()) / 3600000;
+      totalHours += diff < 0 ? 0 : diff;
+      continue;
+    }
+
+    const endDateObj = parse(shift.endDate, 'dd-MM-yyyy', new Date());
+    const endParts = convertTimeStringToDate2(shift.endTime);
+    endDateObj.setHours(endParts.hours, endParts.minutes, 0, 0);
+
+    let hours = (endDateObj.getTime() - startDateObj.getTime()) / 3600000;
+    if (hours < 0) {
+      hours += 24;
+    }
     totalHours += hours;
-  });
+  }
 
   return totalHours;
 }

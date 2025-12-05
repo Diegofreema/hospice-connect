@@ -39,6 +39,7 @@ export const BusinessInformation = () => {
         licenseNumber: data.licenseNumber.trim(),
         phoneNumber: data.phoneNumber.trim(),
         state: data.state.trim(),
+        zipcode: data.zipcode.trim(),
       });
       authClient.updateUser({
         isBoarded: true,
@@ -88,6 +89,15 @@ export const BusinessInformation = () => {
         label="License Number"
         placeholder="Add your license number"
       />
+
+      <ControlInput
+        control={control}
+        errors={errors}
+        name="zipcode"
+        label="Zip Code"
+        placeholder="Add your zip code"
+      />
+
       <ControlInput
         control={control}
         errors={errors}
