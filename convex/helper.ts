@@ -1,6 +1,7 @@
 import { ConvexError, Infer } from 'convex/values';
-import { Id } from './_generated/dataModel';
+import { Doc, Id } from './_generated/dataModel';
 import { mutation, MutationCtx, QueryCtx } from './_generated/server';
+import { parseDateTimeWallClock } from './actionHelper';
 import { day } from './schema';
 
 export const getImage = (ctx: QueryCtx, imageId?: Id<'_storage'>) => {
@@ -235,16 +236,6 @@ export const formatDateString = (date: Date): string => {
  * Parse date (DD-MM-YYYY) and time (h:mm a) into a timezone-agnostic Date
  * Treats values as wall-clock (local) by constructing with Date.UTC
  */
-export const parseDateTimeWallClock = (dateStr: string, timeStr: string): Date => {
-  const [day, month, year] = dateStr.split('-').map(Number);
-  const [time, period] = timeStr.trim().split(/\s+/);
-  const [hoursStr, minutesStr] = time.split(':');
-  let hours = Number(hoursStr);
-  const minutes = Number(minutesStr);
-  if (period.toUpperCase() === 'PM' && hours !== 12) hours += 12;
-  else if (period.toUpperCase() === 'AM' && hours === 12) hours = 0;
-  return new Date(Date.UTC(year, month - 1, day, hours, minutes, 0, 0));
-};
 
 export const parseDateTime = (dateStr: string, timeStr: string): Date => {
   // Parse date: "24-10-2025" -> day=24, month=10, year=2025
@@ -288,7 +279,8 @@ export const checkIfNurseHasAShiftOnDateAndTime = async (
   startDate: string,
   endDate: string,
   startTime: string,
-  endTime: string
+  endTime: string,
+  facilityTimezone: string
 ) => {
   // Fetch all booked shifts for the nurse
   const shifts = await ctx.db
@@ -297,8 +289,16 @@ export const checkIfNurseHasAShiftOnDateAndTime = async (
     .collect();
 
   // Parse the new shift's start and end datetime
-  const newShiftStart = parseDateTimeWallClock(startDate, startTime);
-  const newShiftEnd = parseDateTimeWallClock(endDate, endTime);
+  const newShiftStart = parseDateTimeWallClock(
+    startDate,
+    startTime,
+    facilityTimezone
+  );
+  const newShiftEnd = parseDateTimeWallClock(
+    endDate,
+    endTime,
+    facilityTimezone
+  );
 
   // Validate that end time is after start time
   if (newShiftEnd.getTime() <= newShiftStart.getTime()) {
@@ -310,11 +310,13 @@ export const checkIfNurseHasAShiftOnDateAndTime = async (
     // Parse existing shift's start and end datetime
     const existingShiftStart = parseDateTimeWallClock(
       shift.startDate,
-      shift.startTime
+      shift.startTime,
+      facilityTimezone
     );
     const existingShiftEnd = parseDateTimeWallClock(
       shift.endDate,
-      shift.endTime
+      shift.endTime,
+      facilityTimezone
     );
 
     // Check if the intervals overlap
@@ -328,6 +330,75 @@ export const checkIfNurseHasAShiftOnDateAndTime = async (
     if (hasConflict) {
       throw new ConvexError({
         message: `You already has a shift from ${formatDate(shift.startDate)} ${shift.startTime} to ${formatDate(shift.endDate)} ${shift.endTime}`,
+      });
+    }
+  }
+};
+
+type CheckNurseHasShiftType = {
+  ctx: MutationCtx;
+  nurseId: Id<'nurses'>;
+  hospiceTimezone: string;
+  shift: Doc<'schedules'>;
+};
+export const checkIfNurseHasActiveShift = async ({
+  ctx,
+  nurseId,
+  shift,
+  hospiceTimezone,
+}: CheckNurseHasShiftType) => {
+  const shifts = await ctx.db
+    .query('schedules')
+    .withIndex('nurse', (q) => q.eq('nurseId', nurseId))
+    .filter((q) =>
+      q.or(
+        q.eq(q.field('status'), 'booked'),
+        q.eq(q.field('status'), 'on_going')
+      )
+    )
+    .collect();
+
+  // Parse the new shift's start and end datetime
+  const newShiftStart = parseDateTimeWallClock(
+    shift.startDate,
+    shift.startTime,
+    hospiceTimezone
+  );
+  const newShiftEnd = parseDateTimeWallClock(
+    shift.endDate,
+    shift.endTime,
+    hospiceTimezone
+  );
+
+  // Check each existing shift for conflicts
+  for (const existing of shifts) {
+    // Parse existing shift's start and end datetime
+    const existingShiftStart = parseDateTimeWallClock(
+      existing.startDate,
+      existing.startTime,
+      hospiceTimezone
+    );
+    const existingShiftEnd = parseDateTimeWallClock(
+      existing.endDate,
+      existing.endTime,
+      hospiceTimezone
+    );
+
+    // Check if the intervals overlap
+    const hasConflict = doIntervalsOverlap(
+      newShiftStart,
+      newShiftEnd,
+      existingShiftStart,
+      existingShiftEnd
+    );
+
+    if (hasConflict) {
+      throw new ConvexError({
+        message: `You already have a shift from ${formatDate(
+          existing.startDate
+        )} ${existing.startTime} to ${formatDate(existing.endDate)} ${
+          existing.endTime
+        }`,
       });
     }
   }

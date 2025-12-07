@@ -4,6 +4,7 @@ import { FlexText } from '@/features/shared/components/flex-text';
 import {
   calculateAge,
   changeFirstLetterToCapital,
+  formatPhoneNumber,
 } from '@/features/shared/utils';
 import React from 'react';
 
@@ -48,7 +49,10 @@ export const InProgressCard = ({ item: post, onOpenSheet }: Props) => {
         />
 
         <FlexText leftText="Patient name" rightText={name} />
-        <FlexText leftText="Phone number" rightText={post.phoneNumber} />
+        <FlexText
+          leftText="Phone number"
+          rightText={formatPhoneNumber(post.phoneNumber)}
+        />
         <FlexText
           leftText="Start date"
           rightText={format(startDate, 'MM/dd/yy')}

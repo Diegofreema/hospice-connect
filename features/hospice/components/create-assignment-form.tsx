@@ -1,11 +1,10 @@
+import { ControlledDatePicker } from '@/features/authentication/components/form/control-date-picker';
 import { ControlInput } from '@/features/authentication/components/form/control-input';
+import { ControlSelect } from '@/features/authentication/components/form/control-select';
+import { usStates } from '@/features/nurse/data';
 import { Button } from '@/features/shared/components/button';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-
-import { ControlledDatePicker } from '@/features/authentication/components/form/control-date-picker';
-import { ControlSelect } from '@/features/authentication/components/form/control-select';
-import { usStates } from '@/features/nurse/data';
 
 import { KeyboardAwareScrollViewComponent } from '@/features/shared/components/key-board-aware-scroll-view';
 import { Stack } from '@/features/shared/components/v-stack';
@@ -61,6 +60,7 @@ export const CreateAssignmentForm = ({
     },
     resolver: zodResolver(createAssignmentValidator),
   });
+
   const dob = watch('dateOfBirth');
   const age = calculateAge(dob);
   useEffect(() => {
@@ -88,6 +88,7 @@ export const CreateAssignmentForm = ({
           label="Patient's last name"
           placeholder="Doe"
         />
+
         <ControlInput
           control={control}
           errors={errors}

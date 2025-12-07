@@ -18,6 +18,7 @@ export const createNurse = mutation({
     rate: v.number(),
     address: v.string(),
     zipCode: v.string(),
+    nurseTimezone: v.string(),
   },
   handler: async (ctx, args) => {
     try {

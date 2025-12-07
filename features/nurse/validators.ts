@@ -2,7 +2,10 @@ import { UseFormReturn } from 'react-hook-form';
 import { z } from 'zod';
 
 export const createNurseValidator = z.object({
-  phoneNumber: z.string().min(1, 'Phone number is required'),
+  phoneNumber: z
+    .string()
+    .min(10, 'Phone number must be at least 10 characters')
+    .max(10, 'Phone number must be at most 10 characters'),
   gender: z.string().min(1, 'Gender is required'),
   dateOfBirth: z.date().optional(),
   discipline: z.enum(['RN', 'LVN', 'HHA']),

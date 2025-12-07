@@ -8,6 +8,7 @@ import { Wrapper } from '@/features/shared/components/wrapper';
 import {
   generateErrorMessage,
   generateShiftsWithDateFns,
+  timezone,
 } from '@/features/shared/utils';
 
 import { useMutation } from 'convex/react';
@@ -21,6 +22,8 @@ const CreateScreen = () => {
   const { showToast } = useToast();
   const { hospice } = useHospice();
   const createAssignment = useMutation(api.assignments.createAssignment);
+  const timeZone = timezone();
+  console.log(timeZone);
   const onSubmit = async (data: CreateAssignmentValidator) => {
     if (!hospice) return;
 
@@ -45,6 +48,7 @@ const CreateScreen = () => {
         rate: Number(data.rate),
         shifts,
         zipcode: rest.zipcode || 'N/A',
+        hospiceTimezone: timeZone,
       });
       showToast({
         title: 'Success',

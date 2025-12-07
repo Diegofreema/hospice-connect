@@ -372,3 +372,16 @@ export const renderReaction = (
   }
   return '';
 };
+
+export const timezone = () => Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+export const formatPhoneNumber = (phoneNumber: string | number): string => {
+  const cleaned = String(phoneNumber).replace(/\D/g, '');
+  const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+
+  if (match) {
+    return `(${match[1]}) ${match[2]}-${match[3]}`;
+  }
+
+  return String(phoneNumber);
+};

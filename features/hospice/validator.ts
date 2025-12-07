@@ -8,7 +8,8 @@ export const createHospiceValidator = z.object({
   state: z.string().min(2, 'State of registration is required'),
   phoneNumber: z
     .string()
-    .min(10, 'Phone number must be at least 10 characters'),
+    .min(10, 'Phone number must be at least 10 characters')
+    .max(10, 'Phone number must be at most 10 characters'),
   zipcode: z.string().min(5, 'Zip code must be at least 5 characters'),
   licenseNumber: z
     .string()
@@ -19,7 +20,10 @@ export const createAssignmentValidator = z
   .object({
     firstName: z.string().min(2, 'First name is required'),
     lastName: z.string().min(2, 'Last name is required'),
-    phoneNumber: z.string().min(1, 'Phone number is required'),
+    phoneNumber: z
+      .string()
+      .min(10, 'Phone number must be at least 10 characters')
+      .max(10, 'Phone number must be at most 10 characters'),
     gender: z.string().min(1, 'Please select a gender'),
     customGender: z.string().optional(),
     dateOfBirth: z.date(),
@@ -160,10 +164,12 @@ export const updateProfileValidator = z.object({
   businessName: z.string().min(1, 'Business name is required'),
   address: z.string().min(1, 'Address is required'),
   state: z.string().min(1, 'State is required'),
-  phoneNumber: z.string().min(1, 'Phone number is required'),
+  phoneNumber: z
+    .string()
+    .min(10, 'Phone number must be at least 10 characters')
+    .max(10, 'Phone number must be at most 10 characters'),
   licenseNumber: z.string().min(1, 'License number is required'),
   zipcode: z.string().min(1, 'Zip code is required'),
-
   email: z
     .email({ error: 'Please put a valid email' })
     .min(1, 'Email is required'),

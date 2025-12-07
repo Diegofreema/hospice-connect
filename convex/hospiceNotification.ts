@@ -1,11 +1,7 @@
 import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { mutation, query } from './_generated/server';
-import {
-  doIntervalsOverlap,
-  formatDate,
-  parseDateTimeWallClock,
-} from './helper';
+import { checkIfNurseHasActiveShift, formatDate } from './helper';
 import { getNurseDetails } from './nurses';
 
 export const unreadMessagesCount = query({
@@ -191,54 +187,12 @@ export const sendCaseRequestNotification = mutation({
         throw new ConvexError({ message: 'Hospice not found' });
       }
 
-      const shifts = await ctx.db
-        .query('schedules')
-        .withIndex('nurse', (q) => q.eq('nurseId', nurse._id))
-        .filter((q) =>
-          q.or(
-            q.eq(q.field('status'), 'booked'),
-            q.eq(q.field('status'), 'on_going')
-          )
-        )
-        .collect();
-
-      // Parse the new shift's start and end datetime
-      const newShiftStart = parseDateTimeWallClock(
-        shift.startDate,
-        shift.startTime
-      );
-      const newShiftEnd = parseDateTimeWallClock(shift.endDate, shift.endTime);
-
-      // Check each existing shift for conflicts
-      for (const existing of shifts) {
-        // Parse existing shift's start and end datetime
-        const existingShiftStart = parseDateTimeWallClock(
-          existing.startDate,
-          existing.startTime
-        );
-        const existingShiftEnd = parseDateTimeWallClock(
-          existing.endDate,
-          existing.endTime
-        );
-
-        // Check if the intervals overlap
-        const hasConflict = doIntervalsOverlap(
-          newShiftStart,
-          newShiftEnd,
-          existingShiftStart,
-          existingShiftEnd
-        );
-
-        if (hasConflict) {
-          throw new ConvexError({
-            message: `You already have a shift from ${formatDate(
-              existing.startDate
-            )} ${existing.startTime} to ${formatDate(existing.endDate)} ${
-              existing.endTime
-            }`,
-          });
-        }
-      }
+      await checkIfNurseHasActiveShift({
+        ctx,
+        nurseId: nurse._id,
+        hospiceTimezone: assignment.hospiceTimezone,
+        shift,
+      });
       const notificationExists = await ctx.db
         .query('hospiceNotifications')
         .filter((q) =>

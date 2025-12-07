@@ -1,23 +1,24 @@
-import { Avatar } from "@/components/avatar/Avatar";
-import { SpinnerArc } from "@/components/loaders";
-import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
+import { Avatar } from '@/components/avatar/Avatar';
+import { SpinnerArc } from '@/components/loaders';
+import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
 
-import { IconCamera, IconUpload } from "@tabler/icons-react-native";
-import { useMutation } from "convex/react";
-import * as ImagePicker from "expo-image-picker";
-import { useState } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { IconCamera, IconUpload } from '@tabler/icons-react-native';
+import { useMutation } from 'convex/react';
+import * as ImagePicker from 'expo-image-picker';
+import { useState } from 'react';
+import { TouchableOpacity, View } from 'react-native';
 import {
   changeFirstLetterToCapital,
+  formatPhoneNumber,
   generateErrorMessage,
   uploadProfilePicture,
-} from "../utils";
+} from '../utils';
 
-import { useToast } from "@/components/demos/toast";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { FlexText } from "./flex-text";
-import { LongInfo } from "@/features/shared/components/long-info";
+import { useToast } from '@/components/demos/toast';
+import { LongInfo } from '@/features/shared/components/long-info';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+import { FlexText } from './flex-text';
 
 type Props = {
   imageUrl?: string;
@@ -31,9 +32,9 @@ type Props = {
   discipline?: string;
   nurse?: boolean;
   rate?: number;
-  nurseId?: Id<"nurses">;
-  hospiceId?: Id<"hospices">;
-  imageId?: Id<"_storage">;
+  nurseId?: Id<'nurses'>;
+  hospiceId?: Id<'hospices'>;
+  imageId?: Id<'_storage'>;
   state?: string;
 };
 
@@ -53,7 +54,7 @@ export const ProfileCard = ({
   hospiceId,
   state,
 }: Props) => {
-  const formattedRate = rate ? `$${rate}/hr` : "";
+  const formattedRate = rate ? `$${rate}/hr` : '';
 
   const [image, setImage] = useState<string | null>(null);
   const { theme } = useUnistyles();
@@ -65,7 +66,7 @@ export const ProfileCard = ({
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
+      mediaTypes: ['images'],
       allowsEditing: true,
       aspect: [4, 3],
       quality: 0.5,
@@ -97,26 +98,26 @@ export const ProfileCard = ({
           });
         }
         showToast({
-          title: "Success",
-          subtitle: "Image updated",
+          title: 'Success',
+          subtitle: 'Image updated',
         });
       }
       setImage(null);
     } catch (error) {
       showToast({
-        title: "Error",
-        subtitle: generateErrorMessage(error, "Failed to update image"),
+        title: 'Error',
+        subtitle: generateErrorMessage(error, 'Failed to update image'),
       });
     } finally {
       setUploading(false);
     }
   };
   return (
-    <View style={{ gap: 10,  }}>
+    <View style={{ gap: 10 }}>
       <View style={styles.top}>
         <View style={styles.container}>
           <Avatar
-            image={{ uri: image || imageUrl || "", name: name }}
+            image={{ uri: image || imageUrl || '', name: name }}
             size={120}
             onPress={pickImage}
           />
@@ -139,14 +140,15 @@ export const ProfileCard = ({
           )}
         </View>
       </View>
-      <View
-        style={{ backgroundColor: theme.colors.cardGrey, padding: 10,  }}
-      >
+      <View style={{ backgroundColor: theme.colors.cardGrey, padding: 10 }}>
         <View style={styles.card}>
           <View style={styles.content}>
             <FlexText leftText="Name" rightText={name} />
             <FlexText leftText="Email" rightText={email} />
-            <FlexText leftText="Mobile number" rightText={phoneNumber} />
+            <FlexText
+              leftText="Mobile number"
+              rightText={formatPhoneNumber(phoneNumber)}
+            />
             {licenseNumber && (
               <FlexText leftText="License number" rightText={licenseNumber} />
             )}
@@ -168,7 +170,7 @@ export const ProfileCard = ({
             {faxNumber && (
               <FlexText leftText="Fax number" rightText={faxNumber} />
             )}
-            {address && <LongInfo title={"Address"} description={address} />}
+            {address && <LongInfo title={'Address'} description={address} />}
           </View>
         </View>
       </View>
@@ -178,12 +180,12 @@ export const ProfileCard = ({
 
 const styles = StyleSheet.create((theme) => ({
   camera: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 5,
     right: 5,
     backgroundColor: theme.colors.white,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 50,
     width: 50,
     height: 50,
@@ -198,18 +200,16 @@ const styles = StyleSheet.create((theme) => ({
     width: 120,
     height: 120,
     borderRadius: 80,
-    alignSelf: "center",
+    alignSelf: 'center',
   },
   card: {
-    backgroundColor: "white",
+    backgroundColor: 'white',
     padding: theme.paddings.xl,
     borderRadius: theme.borderRadius.md,
     marginTop: theme.margins.md,
     gap: 15,
-
   },
   content: {
     gap: 10,
-
   },
 }));

@@ -4,7 +4,8 @@ import { paginationOptsValidator, PaginationResult } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { Doc, Id } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
-import { parseDateTimeWallClock } from './helper';
+import { parseDateTimeWallClock } from './actionHelper';
+import { checkIfNurseHasActiveShift } from './helper';
 import { getSchedulesByAssignmentIdHelper } from './schedules';
 import { careLevel, discipline, shifts } from './schema';
 import { AssignmentsWithHospicesType, AvailableAssignmentType } from './types';
@@ -209,6 +210,7 @@ export const createAssignment = mutation({
     careLevel: careLevel,
     shifts: v.array(shifts),
     zipcode: v.string(),
+    hospiceTimezone: v.string(),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -245,6 +247,7 @@ export const createAssignment = mutation({
       status: 'available',
       careLevel: args.careLevel,
       zipcode: args.zipcode,
+      hospiceTimezone: args.hospiceTimezone,
     });
 
     for (const shift of args.shifts) {
@@ -283,6 +286,7 @@ export const reopenAssignment = mutation({
     shifts: v.array(shifts),
     assignmentId: v.id('assignments'),
     discipline: discipline,
+    hospiceTimezone: v.string(),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -322,6 +326,8 @@ export const reopenAssignment = mutation({
       hospiceId: args.hospiceId,
       status: 'available',
       careLevel: assignment.careLevel,
+      zipcode: assignment.zipcode,
+      hospiceTimezone: args.hospiceTimezone,
     });
 
     for (const shift of args.shifts) {
@@ -581,6 +587,8 @@ export const updateAssignmentStatus = mutation({
       ctx,
       args.assignmentId
     );
+    // console.log({ first: schedules[0], last: schedules.at(-1) });
+
     type Status =
       | 'completed'
       | 'not_covered'
@@ -591,57 +599,56 @@ export const updateAssignmentStatus = mutation({
     let newStatus: Status | undefined;
 
     if (schedules.length > 0) {
-      const lastEndMs = schedules.reduce((max, s) => {
-        const endMs = parseDateTimeWallClock(s.endDate, s.endTime).getTime();
-        return Math.max(max, endMs);
-      }, 0);
-
       const now = new Date();
       const wallClockNow = new Date(
-        Date.UTC(
-          now.getFullYear(),
-          now.getMonth(),
-          now.getDate(),
-          now.getHours(),
-          now.getMinutes(),
-          0,
-          0
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        now.getHours(),
+        now.getMinutes(),
+        0,
+        0
+      );
+
+      const lastEndTime = Math.max(
+        ...schedules.map((s) =>
+          parseDateTimeWallClock(
+            s.endDate,
+            s.endTime,
+            assignment.hospiceTimezone
+          ).getTime()
         )
       );
-
+      const hasPassed = wallClockNow.getTime() > lastEndTime;
       const hasAvailable = schedules.some((s) => s.status === 'available');
-      const hasBookedOrOngoing = schedules.some(
-        (s) => s.status === 'booked' || s.status === 'on_going'
+      const hasBooked = schedules.some((s) =>
+        ['booked', 'on_going'].includes(s.status)
       );
 
-      const lastHasPassed = wallClockNow.getTime() > lastEndMs;
-
-      if (lastHasPassed) {
+      if (hasPassed && !hasBooked) {
         newStatus = 'completed';
       } else if (hasAvailable) {
         newStatus = 'available';
-      } else if (hasBookedOrOngoing || !hasAvailable) {
+      } else if (hasBooked) {
         newStatus = 'booked';
       }
-    } else {
-      newStatus = 'available';
-    }
 
-    if (newStatus && newStatus !== assignment.status) {
-      await ctx.db.patch(args.assignmentId, { status: newStatus });
-    }
-    if (newStatus === 'completed' || newStatus === 'ended') {
-      const nursesAssignments = await ctx.db
-        .query('nurseAssignments')
-        .withIndex('assignmentId', (q) =>
-          q.eq('assignmentId', args.assignmentId)
-        )
-        .collect();
-      for (const nurseAssignment of nursesAssignments) {
-        await ctx.db.patch(nurseAssignment._id, {
-          isCompleted: true,
-          completedAt: Date.now(),
-        });
+      if (newStatus && newStatus !== assignment.status) {
+        await ctx.db.patch(args.assignmentId, { status: newStatus });
+      }
+      if (newStatus === 'completed' || newStatus === 'ended') {
+        const nursesAssignments = await ctx.db
+          .query('nurseAssignments')
+          .withIndex('assignmentId', (q) =>
+            q.eq('assignmentId', args.assignmentId)
+          )
+          .collect();
+        for (const nurseAssignment of nursesAssignments) {
+          await ctx.db.patch(nurseAssignment._id, {
+            isCompleted: true,
+            completedAt: Date.now(),
+          });
+        }
       }
     }
   },
@@ -735,6 +742,55 @@ export const cancelAssignment = mutation({
       isCanceled: true,
       status: 'ended',
       canceledAt: args.cancelledAt,
+    });
+  },
+});
+
+export const reassignShift = mutation({
+  args: {
+    hospiceId: v.id('hospices'),
+    shift: v.id('schedules'),
+    newNurseId: v.id('nurses'),
+    assignedAt: v.number(),
+    assignmentId: v.id('assignments'),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError({ message: 'Unauthorized' });
+    }
+    const [nurse, assignment, schedule] = await Promise.all([
+      ctx.db.get(args.newNurseId),
+      ctx.db.get(args.assignmentId),
+      ctx.db.get(args.shift),
+    ]);
+    if (!nurse) throw new ConvexError({ message: 'Nurse not found' });
+    if (!assignment) throw new ConvexError({ message: 'Assignment not found' });
+    if (!schedule) throw new ConvexError({ message: 'Schedule not found' });
+    if (schedule.status !== 'on_going') {
+      throw new ConvexError({ message: 'Can only reassign on-going schedule' });
+    }
+    if (assignment.status === 'ended')
+      throw new ConvexError({ message: 'Assignment is ended' });
+
+    if (assignment.hospiceId !== args.hospiceId) {
+      throw new ConvexError({ message: 'Permission denied' });
+    }
+    await checkIfNurseHasActiveShift({
+      ctx,
+      nurseId: args.newNurseId,
+      hospiceTimezone: assignment.hospiceTimezone,
+      shift: schedule,
+    });
+
+    await ctx.db.insert('schedules', {
+      ...schedule,
+      canceledAt: args.assignedAt,
+    });
+    await ctx.db.patch(schedule._id, {
+      nurseId: args.newNurseId,
+      isReassigned: true,
+      reassignedAt: args.assignedAt,
     });
   },
 });

@@ -1,13 +1,8 @@
 import { getAuthUserId } from '@convex-dev/auth/server';
-import { filter } from 'convex-helpers/server/filter';
 import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { mutation, query } from './_generated/server';
-import {
-  doIntervalsOverlap,
-  formatDate,
-  parseDateTimeWallClock,
-} from './helper';
+import { checkIfNurseHasActiveShift, formatDate } from './helper';
 import { discipline } from './schema';
 import { getUserHelper } from './users';
 
@@ -156,49 +151,14 @@ export const acceptAssignment = mutation({
       throw new ConvexError({ message: 'Shift already accepted' });
     }
 
-    const shifts = await filter(
-      ctx.db.query('schedules'),
-      (schedule) =>
-        (schedule.nurseId === args.nurseId && schedule.status === 'booked') ||
-        (schedule.nurseId === args.nurseId && schedule.status === 'on_going')
-    ).collect();
+    // Check if the nurse has an active shift
+    await checkIfNurseHasActiveShift({
+      ctx,
+      nurseId: args.nurseId,
+      hospiceTimezone: assignment.hospiceTimezone,
+      shift: schedule,
+    });
 
-    // Parse the new shift's start and end datetime
-    const newShiftStart = parseDateTimeWallClock(
-      schedule.startDate,
-      schedule.startTime
-    );
-    const newShiftEnd = parseDateTimeWallClock(
-      schedule.endDate,
-      schedule.endTime
-    );
-
-    // Check each existing shift for conflicts
-    for (const shift of shifts) {
-      // Parse existing shift's start and end datetime
-      const existingShiftStart = parseDateTimeWallClock(
-        shift.startDate,
-        shift.startTime
-      );
-      const existingShiftEnd = parseDateTimeWallClock(
-        shift.endDate,
-        shift.endTime
-      );
-
-      // Check if the intervals overlap
-      const hasConflict = doIntervalsOverlap(
-        newShiftStart,
-        newShiftEnd,
-        existingShiftStart,
-        existingShiftEnd
-      );
-
-      if (hasConflict) {
-        throw new ConvexError({
-          message: `You already have a shift from ${formatDate(shift.startDate)} ${shift.startTime} to ${formatDate(shift.endDate)} ${shift.endTime}`,
-        });
-      }
-    }
     const nurseAssignmentExists = await ctx.db
       .query('nurseAssignments')
       .withIndex('assignmentId', (q) =>

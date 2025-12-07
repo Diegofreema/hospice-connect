@@ -5,6 +5,7 @@ import { Id } from '@/convex/_generated/dataModel';
 import {
   generateErrorMessage,
   generateShiftsWithDateFns,
+  timezone,
 } from '@/features/shared/utils';
 import { useMutation } from 'convex/react';
 import { format } from 'date-fns';
@@ -34,6 +35,7 @@ export const ReopenCase = ({ onClose }: Props) => {
   const { hospice } = useHospice();
   const { bottom } = useSafeAreaInsets();
   const reopenCase = useMutation(api.assignments.reopenAssignment);
+  const hospiceTimezone = timezone();
   const {
     handleSubmit,
     control,
@@ -66,6 +68,7 @@ export const ReopenCase = ({ onClose }: Props) => {
         assignmentId: id as Id<'assignments'>,
         shifts,
         discipline: data.discipline,
+        hospiceTimezone,
       });
       showToast({
         title: 'Success',

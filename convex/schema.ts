@@ -54,6 +54,7 @@ export const Nurse = {
   userId: v.string(),
   address: v.optional(v.string()),
   zipCode: v.optional(v.string()),
+  nurseTimezone: v.string(),
 };
 const PendingNurse = {
   firstName: v.string(),
@@ -108,6 +109,8 @@ export const Schedule = {
   startDate: v.string(),
   endDate: v.string(),
   rate: v.number(),
+  isReassigned: v.optional(v.boolean()),
+  reassignedAt: v.optional(v.number()),
   canceledAt: v.optional(v.number()),
   isEdited: v.optional(v.boolean()),
   isSubmitted: v.optional(v.boolean()),
@@ -146,6 +149,7 @@ export const assignment = {
   careLevel,
   isCanceled: v.optional(v.boolean()),
   canceledAt: v.optional(v.number()),
+  hospiceTimezone: v.string(),
 };
 export const routeSheet = {
   nurseId: v.id('nurses'),

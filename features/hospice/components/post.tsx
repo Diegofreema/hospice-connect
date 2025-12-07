@@ -4,6 +4,7 @@ import { FlexText } from '@/features/shared/components/flex-text';
 import { MyMenu } from '@/features/shared/components/menu';
 
 import {
+  formatPhoneNumber,
   generateErrorMessage,
   getAssignmentStatusText,
   getScheduleStatusAndColor,
@@ -203,7 +204,10 @@ export const Post = ({
             }
           />
         </View>
-        <FlexText leftText="Phone number" rightText={post.phoneNumber} />
+        <FlexText
+          leftText="Phone number"
+          rightText={formatPhoneNumber(post.phoneNumber)}
+        />
         <FlexText leftText="Care level" rightText={post.careLevel} />
         <FlexText leftText="Discipline" rightText={post.discipline} />
         <FlexText leftText="Zip Code" rightText={post.zipcode || 'N/A'} />

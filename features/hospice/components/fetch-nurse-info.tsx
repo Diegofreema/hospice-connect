@@ -7,6 +7,7 @@ import { SmallLoader } from '@/features/shared/components/small-loader';
 import {
   calculateAge,
   changeFirstLetterToCapital,
+  formatPhoneNumber,
 } from '@/features/shared/utils';
 import { useQuery } from 'convex/react';
 import { parse } from 'date-fns';
@@ -59,7 +60,10 @@ export const FetchNurseInfo = () => {
           <View style={styles.content}>
             <FlexText leftText="Name" rightText={name} />
             <FlexText leftText="Email" rightText={email} />
-            <FlexText leftText="Mobile number" rightText={phoneNumber} />
+            <FlexText
+              leftText="Mobile number"
+              rightText={formatPhoneNumber(phoneNumber)}
+            />
             <FlexText
               leftText="Gender"
               rightText={changeFirstLetterToCapital(gender)}

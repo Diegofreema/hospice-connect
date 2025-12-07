@@ -14,7 +14,11 @@ import { Text } from '@/features/shared/components/text';
 import { Stack } from '@/features/shared/components/v-stack';
 
 import { Wrapper } from '@/features/shared/components/wrapper';
-import { generateErrorMessage, validateFields } from '@/features/shared/utils';
+import {
+  generateErrorMessage,
+  timezone,
+  validateFields,
+} from '@/features/shared/utils';
 import { authClient } from '@/lib/auth-client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -97,6 +101,7 @@ const NurseCreate = () => {
         licenseNumber: data.licenseNumber.trim(),
         phoneNumber: data.phoneNumber.trim(),
         rate: Number(data.rate),
+        nurseTimezone: timezone(),
       });
       await authClient.updateUser({
         isBoarded: true,

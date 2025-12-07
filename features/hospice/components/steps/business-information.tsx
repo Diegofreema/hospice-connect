@@ -49,6 +49,7 @@ export const BusinessInformation = () => {
       showToast({
         title: 'Success',
         subtitle: 'Hospice account created successfully',
+        autodismiss: true,
       });
     } catch (error) {
       const errorMessage = generateErrorMessage(
