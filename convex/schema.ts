@@ -206,7 +206,8 @@ export const NurseNotification = {
   type: v.union(
     v.literal('assignment'),
     v.literal('normal'),
-    v.literal('admin')
+    v.literal('admin'),
+    v.literal('reassignment')
   ),
   title: v.string(),
   description: v.optional(v.string()),

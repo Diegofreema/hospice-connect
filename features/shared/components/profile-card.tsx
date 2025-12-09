@@ -100,6 +100,7 @@ export const ProfileCard = ({
         showToast({
           title: 'Success',
           subtitle: 'Image updated',
+          autodismiss: true,
         });
       }
       setImage(null);
@@ -121,9 +122,11 @@ export const ProfileCard = ({
             size={120}
             onPress={pickImage}
           />
-          <View style={styles.camera} pointerEvents="none">
-            <IconCamera size={25} color={theme.colors.black} />
-          </View>
+          {!image && (
+            <View style={styles.camera} pointerEvents="none">
+              <IconCamera size={25} color={theme.colors.black} />
+            </View>
+          )}
           {image && (
             <TouchableOpacity
               onPress={uploadImage}
@@ -134,7 +137,7 @@ export const ProfileCard = ({
               {uploading ? (
                 <SpinnerArc />
               ) : (
-                <IconUpload size={25} color={theme.colors.white} />
+                <IconUpload size={25} color={theme.colors.black} />
               )}
             </TouchableOpacity>
           )}

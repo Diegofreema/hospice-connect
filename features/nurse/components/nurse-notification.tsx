@@ -27,6 +27,7 @@ export const NurseNotification = ({ notification }: Props) => {
     scheduleId: notification.scheduleId!,
     nurseId: notification.nurseId!,
     nurseNotificationId: notification._id,
+    type: notification.type,
   });
   const updateViewCount = useMutation(api.nurseNotifications.updateViewCount);
 

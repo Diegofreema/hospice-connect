@@ -10,13 +10,16 @@ type Props = {
   nurseId: Id<'nurses'>;
   scheduleId?: Id<'schedules'>;
   nurseNotificationId: Id<'nurseNotifications'>;
+  type: 'admin' | 'assignment' | 'normal' | 'reassignment';
 };
 export const useAcceptDecline = ({
   nurseId,
   nurseNotificationId,
   scheduleId,
+  type,
 }: Props) => {
   const acceptAssignment = useMutation(api.posts.acceptAssignment);
+  const acceptResignAssignment = useMutation(api.assignments.reassignShift);
   const declineAssignment = useMutation(api.posts.declineAssignment);
   const schedule = useQuery(
     api.posts.getShift,
@@ -48,11 +51,21 @@ export const useAcceptDecline = ({
 
     setProcessing(true);
     try {
-      await acceptAssignment({
-        nurseId,
-        nurseNotificationId,
-        scheduleId,
-      });
+      if (type === 'reassignment') {
+        await acceptResignAssignment({
+          newNurseId: nurseId,
+          notificationId: nurseNotificationId,
+          assignmentId: schedule.assignmentId,
+          shift: schedule._id,
+          assignedAt: Date.now(),
+        });
+      } else {
+        await acceptAssignment({
+          nurseId,
+          nurseNotificationId,
+          scheduleId,
+        });
+      }
       showToast({
         title: 'Success',
         subtitle: 'Shift accepted successfully',

@@ -564,7 +564,12 @@ export const getSchedulesByAssignmentIdHelper = async (
 ) => {
   return await ctx.db
     .query('schedules')
-    .filter((q) => q.eq(q.field('assignmentId'), assignmentId))
+    .filter((q) =>
+      q.and(
+        q.eq(q.field('assignmentId'), assignmentId),
+        q.neq(q.field('isReassigned'), true)
+      )
+    )
     .order('asc')
     .collect();
 };

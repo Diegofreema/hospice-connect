@@ -27,7 +27,7 @@ type Props = {
 
 export const CompletedCard = ({ item: post }: Props) => {
   const { nurse } = useNurse();
-  const name = post.patientFirstName + ' ' + post.patientLastName;
+  const name = `${post.patientFirstName} ${post.patientLastName}`;
   const startDate = parse(post.startDate, 'dd-MM-yyyy', new Date());
   const endDate = parse(post.endDate, 'dd-MM-yyyy', new Date());
   const dob = parse(post.dateOfBirth, 'dd-MM-yyyy', new Date());

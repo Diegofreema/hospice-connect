@@ -92,6 +92,7 @@ export const AssignmentSchedule = ({
         renderItem={({ item }) => (
           <ShiftCard
             shift={item}
+            discipline={data.assignment?.discipline || ''}
             onCancelSchedule={onCancelSchedule}
             onEditSchedule={onEditSchedule}
             onRateNurse={onRateNurse}

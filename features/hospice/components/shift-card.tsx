@@ -1,7 +1,7 @@
 import { Badge } from '@/components/badge/Badge';
 import { BadgeVariant } from '@/components/badge/types';
 import { Card, CardHeader } from '@/components/card';
-import { PrivacyNoticeLink } from '@/components/privacy-notice/privacy-notice-link';
+import { PrivacyNoticeLink as ActionButton } from '@/components/privacy-notice/privacy-notice-link';
 import { api } from '@/convex/_generated/api';
 import { Text } from '@/features/shared/components/text';
 import { Stack } from '@/features/shared/components/v-stack';
@@ -31,6 +31,7 @@ type Props = {
     assignmentId: Id<'assignments'>,
     nurseId: Id<'nurses'>
   ) => void;
+  discipline: string;
 };
 
 export const ShiftCard = ({
@@ -39,6 +40,7 @@ export const ShiftCard = ({
   onEditSchedule,
   onRateNurse,
   onViewRouteSheet,
+  discipline,
 }: Props) => {
   const { width } = useWindowDimensions();
   const size = width * 0.13;
@@ -78,6 +80,9 @@ export const ShiftCard = ({
     onRateNurse();
     getScheduleId(shift._id);
   };
+  const handleReassign = () => {
+    router.push(`/reassign?id=${shift._id}&discipline=${discipline}`);
+  };
   const onPressName = () => {
     if (!shift.nurseId) {
       return;
@@ -89,6 +94,12 @@ export const ShiftCard = ({
     ['completed', 'cancelled', 'ended'].includes(shift.status) &&
     shift.isRouteSheetApproved === true &&
     shift.nurseId != null;
+  const showCancelButton =
+    shift.status !== 'completed' &&
+    !!shift.nurseId &&
+    shift.status !== 'cancelled' &&
+    shift.status !== 'ended';
+
   return (
     <Card style={styles.card}>
       <CardHeader style={{ gap: 10 }}>
@@ -131,33 +142,31 @@ export const ShiftCard = ({
         </View>
         <Stack mode="flex" gap="lg">
           {showRouteSheetButton && (
-            <PrivacyNoticeLink
+            <ActionButton
               onPress={() =>
                 onViewRouteSheet(shift.assignmentId, shift.nurseId!)
               }
             >
               View Route Sheet
-            </PrivacyNoticeLink>
+            </ActionButton>
           )}
-          {shift.status !== 'completed' &&
-            shift.nurseId &&
-            shift.status !== 'cancelled' &&
-            shift.status !== 'ended' && (
-              <PrivacyNoticeLink onPress={handleCancelSchedule}>
-                Cancel Schedule
-              </PrivacyNoticeLink>
-            )}
+          {showCancelButton && (
+            <ActionButton onPress={handleCancelSchedule}>
+              Cancel Schedule
+            </ActionButton>
+          )}
 
           {shift.status !== 'not_covered' && (
-            <PrivacyNoticeLink onPress={handleEditSchedule}>
+            <ActionButton onPress={handleEditSchedule}>
               Edit Schedule
-            </PrivacyNoticeLink>
+            </ActionButton>
           )}
 
           {shift.status === 'completed' && (
-            <PrivacyNoticeLink onPress={handleRateNurse}>
-              Rate nurse
-            </PrivacyNoticeLink>
+            <ActionButton onPress={handleRateNurse}>Rate nurse</ActionButton>
+          )}
+          {shift.status === 'on_going' && (
+            <ActionButton onPress={handleReassign}>Reassign</ActionButton>
           )}
         </Stack>
       </CardHeader>

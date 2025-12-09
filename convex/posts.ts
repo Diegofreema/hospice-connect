@@ -181,7 +181,7 @@ export const acceptAssignment = mutation({
       isRead: false,
       hospiceId: assignment.hospiceId,
       type: 'assignment',
-      title: 'Shift accepted',
+      title: 'Schedule accepted',
       scheduleId: args.scheduleId,
       description: `${nurse.name} (${nurse.discipline}) has accepted your case request for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
       nurseId: args.nurseId,

@@ -5,7 +5,7 @@ import { ConvexError, v } from 'convex/values';
 import { Doc, Id } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import { parseDateTimeWallClock } from './actionHelper';
-import { checkIfNurseHasActiveShift } from './helper';
+import { checkIfNurseHasActiveShift, formatDate } from './helper';
 import { getSchedulesByAssignmentIdHelper } from './schedules';
 import { careLevel, discipline, shifts } from './schema';
 import { AssignmentsWithHospicesType, AvailableAssignmentType } from './types';
@@ -748,11 +748,11 @@ export const cancelAssignment = mutation({
 
 export const reassignShift = mutation({
   args: {
-    hospiceId: v.id('hospices'),
     shift: v.id('schedules'),
     newNurseId: v.id('nurses'),
     assignedAt: v.number(),
     assignmentId: v.id('assignments'),
+    notificationId: v.id('nurseNotifications'),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -773,8 +773,9 @@ export const reassignShift = mutation({
     if (assignment.status === 'ended')
       throw new ConvexError({ message: 'Assignment is ended' });
 
-    if (assignment.hospiceId !== args.hospiceId) {
-      throw new ConvexError({ message: 'Permission denied' });
+    const hospice = await ctx.db.get(assignment.hospiceId);
+    if (!hospice) {
+      throw new ConvexError({ message: 'Hospice not found' });
     }
     await checkIfNurseHasActiveShift({
       ctx,
@@ -782,15 +783,81 @@ export const reassignShift = mutation({
       hospiceTimezone: assignment.hospiceTimezone,
       shift: schedule,
     });
-
+    const { _creationTime, _id, ...rest } = schedule;
     await ctx.db.insert('schedules', {
-      ...schedule,
+      ...rest,
       canceledAt: args.assignedAt,
+      isReassigned: true,
+      status: 'cancelled',
+    });
+    await ctx.db.insert('nurseNotifications', {
+      hospiceId: assignment.hospiceId,
+      nurseId: schedule.nurseId!,
+      title: 'Schedule cancelled',
+      description: `${hospice.businessName} has cancelled your schedule for  ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
+      type: 'normal',
+      viewCount: 0,
+      isRead: false,
     });
     await ctx.db.patch(schedule._id, {
       nurseId: args.newNurseId,
-      isReassigned: true,
       reassignedAt: args.assignedAt,
+    });
+    await ctx.db.insert('hospiceNotifications', {
+      isRead: false,
+      hospiceId: assignment.hospiceId,
+      type: 'assignment',
+      title: 'Schedule accepted',
+      scheduleId: args.shift,
+      description: `${nurse.name} (${nurse.discipline}) has accepted your case request for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
+      nurseId: args.newNurseId,
+      viewCount: 0,
+    });
+  },
+});
+
+export const sendReassignmentNotification = mutation({
+  args: {
+    scheduleId: v.id('schedules'),
+    hospiceId: v.id('hospices'),
+    nurseId: v.id('nurses'),
+    hospiceName: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError({ message: 'Unauthorized' });
+    }
+
+    const schedule = await ctx.db.get(args.scheduleId);
+    if (!schedule) {
+      throw new ConvexError({ message: 'Schedule not found' });
+    }
+    const assignment = await ctx.db.get(schedule.assignmentId);
+    if (!assignment) {
+      throw new ConvexError({ message: 'Assignment not found' });
+    }
+    if (assignment.hospiceId !== args.hospiceId) {
+      throw new ConvexError({
+        message: 'You do not have permission to assign this schedule',
+      });
+    }
+    await checkIfNurseHasActiveShift({
+      ctx,
+      nurseId: args.nurseId,
+      hospiceTimezone: assignment.hospiceTimezone,
+      shift: schedule,
+    });
+
+    await ctx.db.insert('nurseNotifications', {
+      nurseId: args.nurseId,
+      isRead: false,
+      hospiceId: args.hospiceId,
+      scheduleId: schedule._id,
+      description: `${args.hospiceName} has assigned you a schedule for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
+      title: 'Schedule assigned',
+      type: 'reassignment',
+      viewCount: 0,
     });
   },
 });
