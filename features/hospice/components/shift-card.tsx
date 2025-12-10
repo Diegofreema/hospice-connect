@@ -48,6 +48,7 @@ export const ShiftCard = ({
   const statusText = getScheduleStatusText(shift.status);
   const statusInfo = getScheduleStatusAndColor(shift.status);
   const getScheduleId = useGetScheduleId((state) => state.setId);
+
   const startDate = parse(shift.startDate, 'dd-MM-yyyy', today);
   const endDate = parse(shift.endDate, 'dd-MM-yyyy', today);
   const openingShiftStr = shift.startTime.replace(/\s+/, ' ');
@@ -81,7 +82,10 @@ export const ShiftCard = ({
     getScheduleId(shift._id);
   };
   const handleReassign = () => {
-    router.push(`/reassign?id=${shift._id}&discipline=${discipline}`);
+    if (!shift.nurseId) return;
+    router.push(
+      `/reassign?id=${shift._id}&discipline=${discipline}&oldNurseId=${shift.nurseId}`
+    );
   };
   const onPressName = () => {
     if (!shift.nurseId) {

@@ -246,6 +246,16 @@ export function calculateTotalHours(shifts: Doc<'schedules'>[]) {
       totalHours += diff < 0 ? 0 : diff;
       continue;
     }
+    if (shift.reassignedAt) {
+      const reassignedDate = new Date(shift.reassignedAt);
+      if (reassignedDate.getTime() <= startDateObj.getTime()) {
+        continue;
+      }
+      const diff =
+        (reassignedDate.getTime() - startDateObj.getTime()) / 3600000;
+      totalHours += diff < 0 ? 0 : diff;
+      continue;
+    }
 
     const endDateObj = parse(shift.endDate, 'dd-MM-yyyy', new Date());
     const endParts = convertTimeStringToDate2(shift.endTime);

@@ -43,6 +43,8 @@ export const NurseCard = ({ nurse, isAssigned, onAction }: Props) => {
 
   const { theme } = useUnistyles();
   const onHandleAction = () => {
+    console.log('Pressed action');
+
     onAction && onAction(nurse.discipline);
     setNurseId(nurse._id);
   };
@@ -71,6 +73,7 @@ export const NurseCard = ({ nurse, isAssigned, onAction }: Props) => {
             <Text>{nurse.ratings ? nurse.ratings.toFixed(1) : 'N/A'}</Text>
           </View>
           <Text>Discipline: {nurse.discipline}</Text>
+          {/* <Text>{nurse._id}</Text> */}
           <CustomPressable onPress={onPress}>
             <Text size={'medium'} isMedium style={{ flex: 1 }}>
               {name}

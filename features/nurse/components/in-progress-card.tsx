@@ -69,10 +69,10 @@ export const InProgressCard = ({ item: post, onOpenSheet }: Props) => {
         />
         <FlexText leftText="Discipline" rightText={post.discipline} />
 
-        <LongInfo title={'Address'} description={post.patientAddress} />
         {post.zipcode && (
           <FlexText leftText="Zipcode" rightText={post.zipcode} />
         )}
+        <LongInfo title={'Address'} description={post.patientAddress} />
         {post.notes && (
           <LongInfo title={'Additional notes'} description={post.notes} />
         )}

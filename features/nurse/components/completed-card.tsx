@@ -78,11 +78,10 @@ export const CompletedCard = ({ item: post }: Props) => {
         />
         <FlexText leftText="Discipline" rightText={post.discipline} />
 
-        {/*<FlexText leftText="Location" rightText={post.patientAddress} />*/}
-        <LongInfo title={'Address'} description={post.patientAddress} />
         {post.zipcode && (
           <FlexText leftText="Zipcode" rightText={post.zipcode} />
         )}
+        <LongInfo title={'Address'} description={post.patientAddress} />
         {post.notes && (
           <LongInfo title={'Additional notes'} description={post.notes} />
         )}

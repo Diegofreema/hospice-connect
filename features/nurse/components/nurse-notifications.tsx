@@ -1,3 +1,4 @@
+import { Title } from '@/components/title/Title';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 import { SmallLoader } from '@/features/shared/components/small-loader';
@@ -91,6 +92,11 @@ export const FetchNurseNotification = ({ nurseId }: Props) => {
       recycleItems
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ gap: 20, paddingBottom: 100 }}
+      ListEmptyComponent={
+        <Title textAlign="center" size={20}>
+          No notifications found.
+        </Title>
+      }
     />
   );
 };

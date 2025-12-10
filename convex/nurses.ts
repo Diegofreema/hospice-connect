@@ -276,6 +276,7 @@ export const getNurses = query({
     ),
     todayToText: v.string(),
     paginationOpts: paginationOptsValidator,
+    nurseId: v.optional(v.union(v.id('nurses'), v.null())),
   },
   handler: async (ctx, args) => {
     const minRange = Math.min(args.range1, args.range2);
@@ -289,7 +290,9 @@ export const getNurses = query({
       // Apply range filter
       const matchesRange =
         (nurse.rate || 0) >= minRange && (nurse.rate || 0) <= maxRange;
-      return matchesDiscipline && matchesRange;
+      // Apply nurseId filter
+      const matchesNurseId = !args.nurseId || nurse._id !== args.nurseId;
+      return matchesDiscipline && matchesRange && matchesNurseId;
     }).paginate(args.paginationOpts);
     const nursesImage = await Promise.all(
       nurses.page.map(async (nurse) => {

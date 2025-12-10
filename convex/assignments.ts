@@ -828,6 +828,7 @@ export const sendReassignmentNotification = mutation({
     if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
+    console.log({ id: args.nurseId });
 
     const schedule = await ctx.db.get(args.scheduleId);
     if (!schedule) {

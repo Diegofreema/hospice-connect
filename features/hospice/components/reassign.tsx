@@ -21,10 +21,12 @@ import { useGetNurseId } from '../hooks/use-get-nurse-id';
 
 export const Reassign = () => {
   const { hospice } = useHospice();
-  const { id, discipline } = useLocalSearchParams<{
+  const { id, discipline, oldNurseId } = useLocalSearchParams<{
     id: Id<'schedules'>;
     discipline: 'RN' | 'LVN' | 'HHA';
+    oldNurseId: Id<'nurses'>;
   }>();
+  const [sending, setSending] = useState(false);
   const sendReassignmentNotification = useMutation(
     api.assignments.sendReassignmentNotification
   );
@@ -35,17 +37,27 @@ export const Reassign = () => {
   const { showToast } = useToast();
   const bottomSheetRef = useRef<BottomSheet>(null);
   const nurseId = useGetNurseId((state) => state.id);
+
   const onOpenSheet = () => {
     bottomSheetRef.current?.expand();
   };
-  const onOpenScheduleSheet = async () => {
+  const onReassign = async () => {
+    console.log({ id, hospice, nurseId });
+
     if (!hospice || !hospice?._id || !nurseId) return;
+    console.log('Pressed');
+    setSending(true);
     try {
       await sendReassignmentNotification({
         scheduleId: id,
         hospiceId: hospice._id,
         nurseId,
         hospiceName: hospice.businessName as string,
+      });
+      showToast({
+        title: 'Success',
+        subtitle: 'Reassign notification sent successfully',
+        autodismiss: true,
       });
     } catch (error) {
       const errorMessage = generateErrorMessage(
@@ -57,6 +69,8 @@ export const Reassign = () => {
         subtitle: errorMessage,
         autodismiss: true,
       });
+    } finally {
+      setSending(false);
     }
   };
   const onCloseSheet = () => {
@@ -71,7 +85,7 @@ export const Reassign = () => {
         <Stack gap={'lg'} mode="flexCentered">
           <SearchComponent
             placeholder="Search for nurses"
-            path={`/search-nurses?discipline=${discipline}`}
+            path={`/search-nurses?discipline=${discipline}&id=${id}`}
             isButton
           />
           <PressableIcon
@@ -86,7 +100,8 @@ export const Reassign = () => {
           rate1={range.rate1}
           rate2={range.rate2}
           isAssigned
-          onAction={onOpenScheduleSheet}
+          onAction={() => onReassign()}
+          nurseId={oldNurseId}
         />
       </Wrapper>
       <CustomSheet

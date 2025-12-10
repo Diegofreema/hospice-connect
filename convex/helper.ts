@@ -347,6 +347,8 @@ export const checkIfNurseHasActiveShift = async ({
   shift,
   hospiceTimezone,
 }: CheckNurseHasShiftType) => {
+  console.log({ nurseId });
+
   const shifts = await ctx.db
     .query('schedules')
     .withIndex('nurse', (q) => q.eq('nurseId', nurseId))

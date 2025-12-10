@@ -4,6 +4,7 @@ import { usePaginatedQuery } from 'convex/react';
 
 import { Title } from '@/components/title/Title';
 
+import { Id } from '@/convex/_generated/dataModel';
 import { Stack } from '@/features/shared/components/v-stack';
 import { sortedArrayByAvailability } from '@/features/shared/utils';
 import { LegendList } from '@legendapp/list';
@@ -17,6 +18,7 @@ type Props = {
   rate2: string;
   isAssigned?: boolean;
   onAction?: () => void;
+  nurseId?: Id<'nurses'> | null;
 };
 
 export const FetchNurses = ({
@@ -25,12 +27,19 @@ export const FetchNurses = ({
   rate2,
   isAssigned,
   onAction,
+  nurseId,
 }: Props) => {
   const todayToText = format(new Date(), 'EEEE');
 
   const { loadMore, results, status } = usePaginatedQuery(
     api.nurses.getNurses,
-    { discipline: nurseType, range1: +rate1, range2: +rate2, todayToText },
+    {
+      discipline: nurseType,
+      range1: +rate1,
+      range2: +rate2,
+      todayToText,
+      nurseId,
+    },
     { initialNumItems: 30 }
   );
   const onLoadMore = () => {
@@ -53,7 +62,11 @@ export const FetchNurses = ({
         onEndReached={onLoadMore}
         onEndReachedThreshold={0.5}
         renderItem={({ item }) => (
-          <NurseCard nurse={item} isAssigned={isAssigned} onAction={onAction} />
+          <NurseCard
+            nurse={item}
+            isAssigned={isAssigned}
+            onAction={onAction ? () => onAction() : undefined}
+          />
         )}
         keyExtractor={(item) => item._id}
         ListFooterComponent={status === 'LoadingMore' ? <SmallLoader /> : null}
