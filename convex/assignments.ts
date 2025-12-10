@@ -5,7 +5,11 @@ import { ConvexError, v } from 'convex/values';
 import { Doc, Id } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import { parseDateTimeWallClock } from './actionHelper';
-import { checkIfNurseHasActiveShift, formatDate } from './helper';
+import {
+  checkIfNotificationHasBeenSentBeforeAndNotInteractedWith,
+  checkIfNurseHasActiveShift,
+  formatDate,
+} from './helper';
 import { getSchedulesByAssignmentIdHelper } from './schedules';
 import { careLevel, discipline, shifts } from './schema';
 import { AssignmentsWithHospicesType, AvailableAssignmentType } from './types';
@@ -849,7 +853,16 @@ export const sendReassignmentNotification = mutation({
       hospiceTimezone: assignment.hospiceTimezone,
       shift: schedule,
     });
-
+    const alreadySentNotification =
+      await checkIfNotificationHasBeenSentBeforeAndNotInteractedWith(
+        ctx,
+        args.nurseId,
+        schedule._id,
+        'reassignment'
+      );
+    if (alreadySentNotification) {
+      await ctx.db.delete(alreadySentNotification._id);
+    }
     await ctx.db.insert('nurseNotifications', {
       nurseId: args.nurseId,
       isRead: false,

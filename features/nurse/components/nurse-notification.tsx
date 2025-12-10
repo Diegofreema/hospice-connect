@@ -46,13 +46,6 @@ export const NurseNotification = ({ notification }: Props) => {
     };
     onUpdate();
   }, [updateViewCount, notification._id, notification.isRead]);
-  // const onPress = () => {
-  //   if (notification.type === "assignment") {
-  //     router.push(
-  //       `/view-assignment?id=${notification.scheduleId}&nurseId=${notification.nurseId}&nurseNotificationId=${notification._id}`,
-  //     );
-  //   }
-  // };
 
   const isDeclined = notification?.status === 'declined';
   const isAccepted = notification?.status === 'accepted';
@@ -95,30 +88,31 @@ export const NurseNotification = ({ notification }: Props) => {
           </View>
         </View>
       </CardHeader>
-      {notification.type === 'assignment' && (
-        <CardFooter>
-          {showButtons && (
-            <FlexButtons
-              onCancel={onDecline}
-              onPress={onAccept}
-              buttonText="Decline"
-              buttonText2="Accept"
-              disabled2={processing}
-              disabled={processing}
-            />
-          )}
-          {isDeclined && (
-            <Text size="medium" color="red" isBold textAlign="center">
-              Declined
-            </Text>
-          )}
-          {isAccepted && (
-            <Text size="medium" color="green" isBold textAlign="center">
-              Accepted
-            </Text>
-          )}
-        </CardFooter>
-      )}
+      {notification.type === 'assignment' ||
+        (notification.type === 'reassignment' && (
+          <CardFooter>
+            {showButtons && (
+              <FlexButtons
+                onCancel={onDecline}
+                onPress={onAccept}
+                buttonText="Decline"
+                buttonText2="Accept"
+                disabled2={processing}
+                disabled={processing}
+              />
+            )}
+            {isDeclined && (
+              <Text size="medium" color="red" isBold textAlign="center">
+                Declined
+              </Text>
+            )}
+            {isAccepted && (
+              <Text size="medium" color="green" isBold textAlign="center">
+                Accepted
+              </Text>
+            )}
+          </CardFooter>
+        ))}
     </Card>
   );
 };

@@ -40,7 +40,7 @@ export const useAcceptDecline = ({
       seconds: 0,
       milliseconds: 0,
     });
-    if (isPast(fullDateTime)) {
+    if (isPast(fullDateTime) && type !== 'reassignment') {
       showToast({
         title: 'Error',
         subtitle: 'Shift has already passed',

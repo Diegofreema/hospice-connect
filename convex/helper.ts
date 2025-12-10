@@ -405,3 +405,24 @@ export const checkIfNurseHasActiveShift = async ({
     }
   }
 };
+
+export const checkIfNotificationHasBeenSentBeforeAndNotInteractedWith = async (
+  ctx: MutationCtx,
+  nurseId: Id<'nurses'>,
+  scheduleId: Id<'schedules'>,
+  type: 'admin' | 'assignment' | 'normal' | 'reassignment'
+) => {
+  const notification = await ctx.db
+    .query('nurseNotifications')
+    .withIndex('nurseId_scheduleId', (q) =>
+      q.eq('nurseId', nurseId).eq('scheduleId', scheduleId).eq('type', type)
+    )
+    .filter((q) =>
+      q.and(
+        q.neq(q.field('status'), 'accepted'),
+        q.neq(q.field('status'), 'declined')
+      )
+    )
+    .first();
+  return notification;
+};
