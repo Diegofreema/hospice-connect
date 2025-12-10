@@ -763,14 +763,17 @@ export const reassignShift = mutation({
     if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
-    const [nurse, assignment, schedule] = await Promise.all([
+    const [nurse, assignment, schedule, notification] = await Promise.all([
       ctx.db.get(args.newNurseId),
       ctx.db.get(args.assignmentId),
       ctx.db.get(args.shift),
+      ctx.db.get(args.notificationId),
     ]);
     if (!nurse) throw new ConvexError({ message: 'Nurse not found' });
     if (!assignment) throw new ConvexError({ message: 'Assignment not found' });
     if (!schedule) throw new ConvexError({ message: 'Schedule not found' });
+    if (!notification)
+      throw new ConvexError({ message: 'Notification not found' });
     if (schedule.status !== 'on_going') {
       throw new ConvexError({ message: 'Can only reassign on-going schedule' });
     }
@@ -816,6 +819,9 @@ export const reassignShift = mutation({
       description: `${nurse.name} (${nurse.discipline}) has accepted your case request for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
       nurseId: args.newNurseId,
       viewCount: 0,
+    });
+    await ctx.db.patch(args.notificationId, {
+      status: 'accepted',
     });
   },
 });
