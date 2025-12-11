@@ -50,6 +50,8 @@ export const NurseNotification = ({ notification }: Props) => {
   const isDeclined = notification?.status === 'declined';
   const isAccepted = notification?.status === 'accepted';
   const showButtons = !isDeclined && !isAccepted;
+  const isAssignmentOrReassignment =
+    notification.type === 'assignment' || notification.type === 'reassignment';
   return (
     <Card style={styles.card(notification.isRead)}>
       <CardHeader>
@@ -88,31 +90,30 @@ export const NurseNotification = ({ notification }: Props) => {
           </View>
         </View>
       </CardHeader>
-      {notification.type === 'assignment' ||
-        (notification.type === 'reassignment' && (
-          <CardFooter>
-            {showButtons && (
-              <FlexButtons
-                onCancel={onDecline}
-                onPress={onAccept}
-                buttonText="Decline"
-                buttonText2="Accept"
-                disabled2={processing}
-                disabled={processing}
-              />
-            )}
-            {isDeclined && (
-              <Text size="medium" color="red" isBold textAlign="center">
-                Declined
-              </Text>
-            )}
-            {isAccepted && (
-              <Text size="medium" color="green" isBold textAlign="center">
-                Accepted
-              </Text>
-            )}
-          </CardFooter>
-        ))}
+      {isAssignmentOrReassignment && (
+        <CardFooter>
+          {showButtons && (
+            <FlexButtons
+              onCancel={onDecline}
+              onPress={onAccept}
+              buttonText="Decline"
+              buttonText2="Accept"
+              disabled2={processing}
+              disabled={processing}
+            />
+          )}
+          {isDeclined && (
+            <Text size="medium" color="red" isBold textAlign="center">
+              Declined
+            </Text>
+          )}
+          {isAccepted && (
+            <Text size="medium" color="green" isBold textAlign="center">
+              Accepted
+            </Text>
+          )}
+        </CardFooter>
+      )}
     </Card>
   );
 };

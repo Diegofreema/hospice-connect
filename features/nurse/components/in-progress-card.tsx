@@ -32,7 +32,7 @@ export const InProgressCard = ({ item: post, onOpenSheet }: Props) => {
   const endDate = parse(post.endDate, 'dd-MM-yyyy', new Date());
   const dob = parse(post.dateOfBirth, 'dd-MM-yyyy', new Date());
 
-  useUpdatePostStatus({ assignmentId: post._id });
+  useUpdatePostStatus({ assignmentId: post._id, status: post.status });
   const { onMessage } = useMessage({ userToChat: post.hospiceUserId });
   const handleAccept = () => {
     setId(post._id);

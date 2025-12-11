@@ -89,7 +89,7 @@ export const Post = ({
       : []),
   ];
   const deleteAssignment = useMutation(api.assignments.deleteAssignment);
-  useUpdatePostStatus({ assignmentId: post._id });
+  useUpdatePostStatus({ assignmentId: post._id, status: post.status });
   const onDelete = async () => {
     setDeleting(true);
     try {

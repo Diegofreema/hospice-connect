@@ -4,7 +4,6 @@ import { paginationOptsValidator, PaginationResult } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { Doc, Id } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
-import { parseDateTimeWallClock } from './actionHelper';
 import {
   checkIfNotificationHasBeenSentBeforeAndNotInteractedWith,
   checkIfNurseHasActiveShift,
@@ -603,35 +602,12 @@ export const updateAssignmentStatus = mutation({
     let newStatus: Status | undefined;
 
     if (schedules.length > 0) {
-      const now = new Date();
-      const wallClockNow = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
-        now.getHours(),
-        now.getMinutes(),
-        0,
-        0
-      );
-
-      const lastEndTime = Math.max(
-        ...schedules.map((s) =>
-          parseDateTimeWallClock(
-            s.endDate,
-            s.endTime,
-            assignment.hospiceTimezone
-          ).getTime()
-        )
-      );
-      const hasPassed = wallClockNow.getTime() > lastEndTime;
       const hasAvailable = schedules.some((s) => s.status === 'available');
       const hasBooked = schedules.some((s) =>
         ['booked', 'on_going'].includes(s.status)
       );
 
-      if (hasPassed && !hasBooked) {
-        newStatus = 'completed';
-      } else if (hasAvailable) {
+      if (hasAvailable) {
         newStatus = 'available';
       } else if (hasBooked) {
         newStatus = 'booked';
@@ -640,20 +616,40 @@ export const updateAssignmentStatus = mutation({
       if (newStatus && newStatus !== assignment.status) {
         await ctx.db.patch(args.assignmentId, { status: newStatus });
       }
-      if (newStatus === 'completed' || newStatus === 'ended') {
-        const nursesAssignments = await ctx.db
-          .query('nurseAssignments')
-          .withIndex('assignmentId', (q) =>
-            q.eq('assignmentId', args.assignmentId)
-          )
-          .collect();
-        for (const nurseAssignment of nursesAssignments) {
-          await ctx.db.patch(nurseAssignment._id, {
-            isCompleted: true,
-            completedAt: Date.now(),
-          });
-        }
-      }
+    }
+  },
+});
+
+export const updateAssignmentStatusToCompleted = mutation({
+  args: {
+    status: v.literal('completed'),
+    assignmentId: v.id('assignments'),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      return;
+    }
+
+    const assignment = await ctx.db.get(args.assignmentId);
+    if (!assignment) {
+      return;
+    }
+    if (['cancelled', 'ended'].includes(assignment.status)) {
+      return;
+    }
+
+    await ctx.db.patch(args.assignmentId, { status: args.status });
+
+    const nursesAssignments = await ctx.db
+      .query('nurseAssignments')
+      .withIndex('assignmentId', (q) => q.eq('assignmentId', args.assignmentId))
+      .collect();
+    for (const nurseAssignment of nursesAssignments) {
+      await ctx.db.patch(nurseAssignment._id, {
+        isCompleted: true,
+        completedAt: Date.now(),
+      });
     }
   },
 });

@@ -33,7 +33,7 @@ export const AssignmentPost = ({
 }: Props) => {
   const name = `${post.patientFirstName} ${post.patientLastName}`;
   const setAssignmentId = useSelectAssignment((state) => state.setId);
-  useUpdatePostStatus({ assignmentId: post._id });
+  useUpdatePostStatus({ assignmentId: post._id, status: post.status });
 
   const disabled = post.status === 'booked';
   const handleOpen = () => {

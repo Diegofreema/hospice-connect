@@ -6,6 +6,7 @@ import {
   convertTimeStringToDate,
   generateErrorMessage,
   generateShiftsWithDateFns,
+  timezone,
 } from '@/features/shared/utils';
 import { useMutation, useQuery } from 'convex/react';
 import { format, parse } from 'date-fns';
@@ -48,6 +49,7 @@ export const DuplicateComponent = () => {
         hospiceId: hospice?._id as Id<'hospices'>,
         shifts,
         zipcode: rest.zipcode || 'N/A',
+        hospiceTimezone: timezone(),
       });
       showToast({
         title: 'Success',
