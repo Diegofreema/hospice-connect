@@ -114,6 +114,7 @@ export const Schedule = {
   canceledAt: v.optional(v.number()),
   isEdited: v.optional(v.boolean()),
   isSubmitted: v.optional(v.boolean()),
+  isTimeEdited: v.optional(v.boolean()),
 };
 
 export const gender = v.union(

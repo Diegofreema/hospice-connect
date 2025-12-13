@@ -69,7 +69,10 @@ export const cancelSchedule = mutation({
           (s) => s._id !== schedule._id
         );
         if (schedulesAfterFilter.length < 1) {
-          await ctx.db.delete(nurseAssignment._id);
+          await ctx.db.patch(nurseAssignment._id, {
+            completedAt: args.cancelledAt,
+            isCompleted: true,
+          });
         }
       }
     };
@@ -86,7 +89,7 @@ export const cancelSchedule = mutation({
       // ON_GOING → CANCELLED
       await ctx.db.patch(args.scheduleId, {
         status: 'cancelled',
-        canceledAt: Date.now(),
+        canceledAt: args.cancelledAt,
       });
     } else {
       // BOOKED → AVAILABLE (nurse is removed)
@@ -157,6 +160,12 @@ export const editSchedule = mutation({
         message: 'You do not have permission to edit this schedule',
       });
     }
+    // check if the new time is different from the old time, so we need to update the isTimeEdited flag
+    const isTimeEdited =
+      schedule.startTime !== args.startTime ||
+      schedule.endTime !== args.endTime ||
+      schedule.startDate !== args.startDate ||
+      schedule.endDate !== args.endDate;
 
     await ctx.db.patch(args.scheduleId, {
       startDate: args.startDate,
@@ -164,6 +173,7 @@ export const editSchedule = mutation({
       startTime: args.startTime,
       endTime: args.endTime,
       rate: args.rate,
+      isTimeEdited,
     });
   },
 });

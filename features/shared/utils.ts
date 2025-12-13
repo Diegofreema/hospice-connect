@@ -196,37 +196,7 @@ export function convertTimeStringToDate2(timeString: string, value?: string) {
   return { hours: hours24, minutes: minutes };
 }
 
-function timeToHours(timeStr: string) {
-  const [time, period] = timeStr.split(/\s+/);
-  let [hours, minutes] = time.split(':').map(Number);
-
-  if (period === 'PM' && hours !== 12) {
-    hours += 12;
-  } else if (period === 'AM' && hours === 12) {
-    hours = 0;
-  }
-
-  return hours + minutes / 60;
-}
-
 // Function to calculate hours for a single shift
-function calculateShiftHours(shift: Doc<'schedules'>) {
-  // if (shift.canceledAt) {
-  //   const startDateObj = parse(shift.startDate, 'dd-MM-yyyy', new Date());
-  //   const startTime = convertTimeStringToDate2(shift.startTime);
-  //   startDateObj.setHours(startTime.hours, startTime.minutes, 0, 0);
-  //   const canceledDate = new Date(shift.canceledAt);
-  //   const diff = (canceledDate.getTime() - startDateObj.getTime()) / 3600000;
-  //   return diff < 0 ? 0 : diff;
-  // }
-
-  let startHours = timeToHours(shift.startTime);
-  let endHours = timeToHours(shift.endTime);
-  if (endHours < startHours) {
-    endHours += 24;
-  }
-  return endHours - startHours;
-}
 
 // Calculate total hours worked
 export function calculateTotalHours(shifts: Doc<'schedules'>[]) {
@@ -236,6 +206,18 @@ export function calculateTotalHours(shifts: Doc<'schedules'>[]) {
     const startDateObj = parse(shift.startDate, 'dd-MM-yyyy', new Date());
     const startParts = convertTimeStringToDate2(shift.startTime);
     startDateObj.setHours(startParts.hours, startParts.minutes, 0, 0);
+
+    if (shift.isTimeEdited) {
+      const endDateObj = parse(shift.endDate, 'dd-MM-yyyy', new Date());
+      const endParts = convertTimeStringToDate2(shift.endTime);
+      endDateObj.setHours(endParts.hours, endParts.minutes, 0, 0);
+      let hours = (endDateObj.getTime() - startDateObj.getTime()) / 3600000;
+      if (hours < 0) {
+        hours += 24;
+      }
+      totalHours += hours;
+      continue;
+    }
 
     if (shift.canceledAt) {
       const canceledDate = new Date(shift.canceledAt);
