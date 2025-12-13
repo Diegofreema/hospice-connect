@@ -102,6 +102,7 @@ export const Reassign = () => {
           isAssigned
           onAction={() => onReassign()}
           nurseId={oldNurseId}
+          disabled={sending}
         />
       </Wrapper>
       <CustomSheet

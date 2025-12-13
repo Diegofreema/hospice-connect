@@ -32,9 +32,10 @@ type Props = {
   isAssigned?: boolean;
   onAction?: (discipline?: string) => void;
   nurse: FunctionReturnType<typeof api.nurses.getNurses>['page'][number];
+  disabled?: boolean;
 };
 
-export const NurseCard = ({ nurse, isAssigned, onAction }: Props) => {
+export const NurseCard = ({ nurse, isAssigned, onAction, disabled }: Props) => {
   const isAvailable = !!nurse.available?.available;
   const { onMessage } = useMessage({ userToChat: nurse.userId });
   const setNurseId = useGetNurseId((state) => state.setId);
@@ -149,6 +150,7 @@ export const NurseCard = ({ nurse, isAssigned, onAction }: Props) => {
               title="Assign"
               style={{ padding: 10 }}
               onPress={onHandleAction}
+              disabled={disabled}
             />
           )}
         </Stack>

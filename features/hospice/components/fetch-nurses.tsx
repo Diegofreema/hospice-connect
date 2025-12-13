@@ -19,6 +19,7 @@ type Props = {
   isAssigned?: boolean;
   onAction?: () => void;
   nurseId?: Id<'nurses'> | null;
+  disabled?: boolean;
 };
 
 export const FetchNurses = ({
@@ -28,6 +29,7 @@ export const FetchNurses = ({
   isAssigned,
   onAction,
   nurseId,
+  disabled,
 }: Props) => {
   const todayToText = format(new Date(), 'EEEE');
 
@@ -66,6 +68,7 @@ export const FetchNurses = ({
             nurse={item}
             isAssigned={isAssigned}
             onAction={onAction ? () => onAction() : undefined}
+            disabled={disabled}
           />
         )}
         keyExtractor={(item) => item._id}
