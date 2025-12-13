@@ -1,11 +1,8 @@
-import * as WebBrowser from 'expo-web-browser';
-import * as React from 'react';
-
 import { ErrorComponent } from '@/features/shared/components/error';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { authClient } from '@/lib/auth-client';
+import { createContext, useContext } from 'react';
 
-WebBrowser.maybeCompleteAuthSession();
 type User = {
   id: string;
   createdAt: Date;
@@ -19,7 +16,7 @@ type User = {
   role: string;
   streamToken?: string;
 };
-const AuthContext = React.createContext({
+const AuthContext = createContext({
   user: null as User | null,
 });
 
@@ -46,7 +43,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 };
 
 export const useAuth = () => {
-  const context = React.useContext(AuthContext);
+  const context = useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }

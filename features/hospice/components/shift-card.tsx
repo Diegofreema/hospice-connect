@@ -1,6 +1,6 @@
 import { Badge } from '@/components/badge/Badge';
 import { BadgeVariant } from '@/components/badge/types';
-import { Card, CardHeader } from '@/components/card';
+import { Card, CardFooter, CardHeader } from '@/components/card';
 import { PrivacyNoticeLink as ActionButton } from '@/components/privacy-notice/privacy-notice-link';
 import { api } from '@/convex/_generated/api';
 import { Text } from '@/features/shared/components/text';
@@ -174,6 +174,11 @@ export const ShiftCard = ({
           )}
         </Stack>
       </CardHeader>
+      {shift.status === 'ended' && shift.canceledAt && (
+        <CardFooter>
+          <Text>Ended At: {format(shift.canceledAt, 'MM/dd/yy h:mm a')}</Text>
+        </CardFooter>
+      )}
     </Card>
   );
 };

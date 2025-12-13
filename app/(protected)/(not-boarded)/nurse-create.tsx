@@ -108,13 +108,13 @@ const NurseCreate = () => {
       });
       showToast({
         title: 'Success',
-        subtitle: 'Nurse account created successfully',
+        subtitle: 'Healthcare professional account created successfully',
         autodismiss: true,
       });
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to create nurse'
+        'Failed to create healthcare professional'
       );
 
       showToast({

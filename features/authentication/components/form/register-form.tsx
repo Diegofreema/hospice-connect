@@ -180,7 +180,7 @@ export const RegisterForm = () => {
             )}
           </TouchableOpacity>
         }
-        secureTextEntry={secured}
+        secureTextEntry={secured2}
       />
       <View>
         <View mb="md" gap={'sm'}>

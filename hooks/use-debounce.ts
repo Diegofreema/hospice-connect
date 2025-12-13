@@ -1,17 +1,6 @@
-import { useEffect, useState } from 'react';
+// This is a shim for web and Android where the tab bar is generally opaque.
+export default undefined;
 
-export function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
+export function useBottomTabOverflow() {
+  return 0;
 }

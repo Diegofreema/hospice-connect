@@ -7,7 +7,7 @@ import { TouchableOpacity } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 
 const accountTypes = [
-  { type: 'nurse', text: 'Nurse' },
+  { type: 'nurse', text: 'Healthcare Professional' },
   { type: 'hospice', text: 'Hospice' },
 ] as const;
 type Props = {

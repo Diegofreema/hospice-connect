@@ -155,7 +155,7 @@ type ScheduleProps = {
 const ScheduleCard = ({ schedule }: ScheduleProps) => {
   const startDate = parse(schedule.startDate, 'dd-MM-yyyy', new Date());
   const endDate = parse(schedule.endDate, 'dd-MM-yyyy', new Date());
-
+  const text = schedule.status === 'cancelled' ? 'Canceled At' : 'Ended At';
   return (
     <View gap="md" style={styles.container}>
       <View>
@@ -172,7 +172,7 @@ const ScheduleCard = ({ schedule }: ScheduleProps) => {
       </View>
       {schedule.canceledAt && (
         <Text>
-          Canceled At: {format(schedule.canceledAt!, 'MM/dd/yy h:mm a')}
+          {text}: {format(schedule.canceledAt!, 'MM/dd/yy h:mm a')}
         </Text>
       )}
       <Text>Hourly Rate: ${schedule.rate.toString()}</Text>
