@@ -156,6 +156,7 @@ const ScheduleCard = ({ schedule }: ScheduleProps) => {
   const startDate = parse(schedule.startDate, 'dd-MM-yyyy', new Date());
   const endDate = parse(schedule.endDate, 'dd-MM-yyyy', new Date());
   const text = schedule.status === 'cancelled' ? 'Canceled At' : 'Ended At';
+  const hoursWorked = calculateTotalHours([schedule]).toFixed(2);
   return (
     <View gap="md" style={styles.container}>
       <View>
@@ -167,10 +168,10 @@ const ScheduleCard = ({ schedule }: ScheduleProps) => {
         <Text>{schedule.startTime}</Text>
         <Text>-</Text>
         <Text>
-          {schedule.endTime} ({calculateTotalHours([schedule]).toFixed(2)}hrs)
+          {schedule.endTime} ({hoursWorked}hrs)
         </Text>
       </View>
-      {schedule.canceledAt && (
+      {schedule.canceledAt && Number(hoursWorked) > 0 && (
         <Text>
           {text}: {format(schedule.canceledAt!, 'MM/dd/yy h:mm a')}
         </Text>

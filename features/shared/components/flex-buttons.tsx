@@ -10,6 +10,7 @@ type Props = {
   buttonText?: string;
   buttonText2?: string;
   disabled2?: boolean;
+  hideCancelButton?: boolean;
 };
 
 export const FlexButtons = ({
@@ -19,22 +20,26 @@ export const FlexButtons = ({
   buttonText2 = ' Yes, Cancel',
   buttonText = "No, Don't Cancel",
   disabled2,
+  hideCancelButton,
 }: Props) => {
   return (
     <View flexDirection="row" gap="lg" style={styles.footer} mt="lg">
-      <CustomPressable
-        onPress={onCancel}
-        style={[
-          styles.button,
-          styles.viewSchedule,
-          { opacity: disabled ? 0.5 : 1 },
-        ]}
-        disabled={disabled2}
-      >
-        <Text size={'normal'} color={'blue'}>
-          {buttonText}
-        </Text>
-      </CustomPressable>
+      {!hideCancelButton && (
+        <CustomPressable
+          onPress={onCancel}
+          style={[
+            styles.button,
+            styles.viewSchedule,
+            { opacity: disabled ? 0.5 : 1 },
+          ]}
+          disabled={disabled2}
+        >
+          <Text size={'normal'} color={'blue'}>
+            {buttonText}
+          </Text>
+        </CustomPressable>
+      )}
+
       <CustomPressable
         onPress={onPress}
         style={[styles.button, styles.assign, { opacity: disabled ? 0.5 : 1 }]}
@@ -54,14 +59,10 @@ const styles = StyleSheet.create((theme) => ({
     gap: 10,
   },
   viewSchedule: {
-
     borderWidth: 1,
     borderColor: theme.colors.cardGrey,
   },
   assign: {
-
-
-
     backgroundColor: theme.colors.blue,
   },
   button: {

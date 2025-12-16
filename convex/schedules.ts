@@ -174,6 +174,7 @@ export const editSchedule = mutation({
       endTime: args.endTime,
       rate: args.rate,
       isTimeEdited,
+      isEdited: true,
     });
   },
 });
@@ -184,6 +185,7 @@ export const sendScheduleNotification = mutation({
     hospiceId: v.id('hospices'),
     nurseId: v.id('nurses'),
     hospiceName: v.string(),
+    isHospice: v.boolean(),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -209,6 +211,7 @@ export const sendScheduleNotification = mutation({
         nurseId: args.nurseId,
         hospiceTimezone: assignment.hospiceTimezone,
         shift: schedule,
+        isHospice: args.isHospice,
       });
 
       await ctx.db.insert('nurseNotifications', {
@@ -328,14 +331,19 @@ export const acceptCaseRequest = mutation({
     nurseId: v.id('nurses'),
     hospiceName: v.string(),
     notificationId: v.id('hospiceNotifications'),
+    reassignedAt: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
-
-    const schedule = await ctx.db.get(args.scheduleId);
+    const [nurse, schedule, notification, hospice] = await Promise.all([
+      ctx.db.get(args.nurseId),
+      ctx.db.get(args.scheduleId),
+      ctx.db.get(args.notificationId),
+      ctx.db.get(args.hospiceId),
+    ]);
     if (!schedule) {
       throw new ConvexError({ message: 'Shift not found' });
     }
@@ -344,18 +352,11 @@ export const acceptCaseRequest = mutation({
       throw new ConvexError({ message: 'Shift has already passed' });
     }
 
-    if (schedule.status === 'booked') {
-      throw new ConvexError({ message: 'Shift already booked' });
+    if (!hospice) {
+      throw new ConvexError({ message: 'Hospice not found' });
     }
-
-    if (schedule.status === 'completed') {
-      throw new ConvexError({ message: 'Shift already completed' });
-    }
-
-    if (schedule.nurseId) {
-      throw new ConvexError({
-        message: 'Shift already accepted by another nurse',
-      });
+    if (!notification) {
+      throw new ConvexError({ message: 'Notification not found' });
     }
 
     const assignment = await ctx.db.get(schedule.assignmentId);
@@ -368,7 +369,6 @@ export const acceptCaseRequest = mutation({
       });
     }
 
-    const nurse = await ctx.db.get(args.nurseId);
     if (!nurse) {
       throw new ConvexError({ message: 'Nurse not found' });
     }
@@ -403,10 +403,47 @@ export const acceptCaseRequest = mutation({
       status: 'accepted',
     });
     // update the schedule status to booked
-    await ctx.db.patch(args.scheduleId, {
-      status: 'booked',
-      nurseId: args.nurseId,
-    });
+
+    if (notification.type === 'reassignment') {
+      const { _creationTime, _id, ...rest } = schedule;
+      await ctx.db.insert('schedules', {
+        ...rest,
+        canceledAt: args.reassignedAt,
+        isReassigned: true,
+        status: 'cancelled',
+      });
+      await ctx.db.insert('nurseNotifications', {
+        hospiceId: assignment.hospiceId,
+        nurseId: schedule.nurseId!,
+        title: 'Schedule cancelled',
+        description: `${hospice.businessName} has cancelled your schedule for  ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
+        type: 'normal',
+        viewCount: 0,
+        isRead: false,
+      });
+      await ctx.db.patch(schedule._id, {
+        nurseId: args.nurseId,
+        reassignedAt: args.reassignedAt,
+      });
+    } else {
+      if (schedule.status === 'booked') {
+        throw new ConvexError({ message: 'Shift already booked' });
+      }
+
+      if (schedule.status === 'completed') {
+        throw new ConvexError({ message: 'Shift already completed' });
+      }
+
+      if (schedule.nurseId) {
+        throw new ConvexError({
+          message: 'Shift already accepted by another nurse',
+        });
+      }
+      await ctx.db.patch(args.scheduleId, {
+        status: 'booked',
+        nurseId: args.nurseId,
+      });
+    }
   },
 });
 
@@ -574,12 +611,7 @@ export const getSchedulesByAssignmentIdHelper = async (
 ) => {
   return await ctx.db
     .query('schedules')
-    .filter((q) =>
-      q.and(
-        q.eq(q.field('assignmentId'), assignmentId),
-        q.neq(q.field('isReassigned'), true)
-      )
-    )
+    .filter((q) => q.eq(q.field('assignmentId'), assignmentId))
     .order('asc')
     .collect();
 };

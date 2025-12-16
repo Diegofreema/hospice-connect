@@ -1,6 +1,6 @@
 import { Badge } from '@/components/badge/Badge';
 import { BadgeVariant } from '@/components/badge/types';
-import { Card, CardHeader } from '@/components/card';
+import { Card, CardFooter, CardHeader } from '@/components/card';
 import { useToast } from '@/components/demos/toast';
 import { PrivacyNoticeLink } from '@/components/privacy-notice/privacy-notice-link';
 import { api } from '@/convex/_generated/api';
@@ -158,6 +158,24 @@ export const ViewShiftCard = ({
           )}
         </Stack>
       </CardHeader>
+      <CardFooter>
+        {shift.status === 'ended' ||
+          (shift.status === 'cancelled' && (
+            <>
+              {shift.canceledAt && !shift.isReassigned && (
+                <Text>
+                  Ended At: {format(shift.canceledAt, 'MM/dd/yy h:mm a')}
+                </Text>
+              )}
+
+              {shift.canceledAt && shift.isReassigned && (
+                <Text>
+                  Reassigned At: {format(shift.canceledAt, 'MM/dd/yy h:mm a')}
+                </Text>
+              )}
+            </>
+          ))}
+      </CardFooter>
     </Card>
   );
 };

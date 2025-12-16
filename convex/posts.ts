@@ -157,6 +157,7 @@ export const acceptAssignment = mutation({
       nurseId: args.nurseId,
       hospiceTimezone: assignment.hospiceTimezone,
       shift: schedule,
+      isHospice: false,
     });
 
     const nurseAssignmentExists = await ctx.db

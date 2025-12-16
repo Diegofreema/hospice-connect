@@ -77,6 +77,10 @@ export const CompletedCard = ({ item: post }: Props) => {
           rightText={changeFirstLetterToCapital(post.gender)}
         />
         <FlexText leftText="Discipline" rightText={post.discipline} />
+        <FlexText
+          leftText="State"
+          rightText={changeFirstLetterToCapital(post.state)}
+        />
 
         {post.zipcode && (
           <FlexText leftText="Zip Code" rightText={post.zipcode} />

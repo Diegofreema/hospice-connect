@@ -4,11 +4,7 @@ import { paginationOptsValidator, PaginationResult } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { Doc, Id } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
-import {
-  checkIfNotificationHasBeenSentBeforeAndNotInteractedWith,
-  checkIfNurseHasActiveShift,
-  formatDate,
-} from './helper';
+import { checkIfNurseHasActiveShift, formatDate } from './helper';
 import { getSchedulesByAssignmentIdHelper } from './schedules';
 import { careLevel, discipline, shifts } from './schema';
 import { AssignmentsWithHospicesType, AvailableAssignmentType } from './types';
@@ -785,6 +781,7 @@ export const reassignShift = mutation({
       nurseId: args.newNurseId,
       hospiceTimezone: assignment.hospiceTimezone,
       shift: schedule,
+      isHospice: false,
     });
     const { _creationTime, _id, ...rest } = schedule;
     await ctx.db.insert('schedules', {
@@ -826,19 +823,22 @@ export const sendReassignmentNotification = mutation({
   args: {
     scheduleId: v.id('schedules'),
     hospiceId: v.id('hospices'),
-    nurseId: v.id('nurses'),
-    hospiceName: v.string(),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
-    console.log({ id: args.nurseId });
 
-    const schedule = await ctx.db.get(args.scheduleId);
+    const [hospice, schedule] = await Promise.all([
+      ctx.db.get(args.hospiceId),
+      ctx.db.get(args.scheduleId),
+    ]);
     if (!schedule) {
       throw new ConvexError({ message: 'Schedule not found' });
+    }
+    if (!hospice) {
+      throw new ConvexError({ message: 'Hospice not found' });
     }
     const assignment = await ctx.db.get(schedule.assignmentId);
     if (!assignment) {
@@ -849,30 +849,124 @@ export const sendReassignmentNotification = mutation({
         message: 'You do not have permission to assign this schedule',
       });
     }
+
+    // find nurses that are within that state and match the discipline
+    const nurses = await ctx.db
+      .query('nurses')
+      .withIndex('by_discipline', (q) =>
+        q
+          .eq('discipline', assignment.discipline)
+          .eq('stateOfRegistration', assignment.state)
+      )
+      .filter((q) => q.neq(q.field('_id'), schedule.nurseId!))
+      .collect();
+
+    if (nurses.length === 0) {
+      throw new ConvexError({
+        message: 'No nurses available for this discipline and state',
+      });
+    }
+
+    const size = 500;
+    for (let i = 0; i < nurses.length; i += size) {
+      const batch = nurses.slice(i, i + size);
+      await Promise.all(
+        batch.map((nurse) =>
+          ctx.db.insert('nurseNotifications', {
+            nurseId: nurse._id,
+            isRead: false,
+            hospiceId: args.hospiceId,
+            scheduleId: schedule._id,
+            description: `${hospice.businessName} has opened a shift for reassignment scheduled for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
+            title: 'Schedule reassignment',
+            type: 'reassignment',
+            viewCount: 0,
+          })
+        )
+      );
+    }
+  },
+});
+
+export const sendReassignmentNotificationToHospice = mutation({
+  args: {
+    nurseId: v.id('nurses'),
+    scheduleId: v.id('schedules'),
+    isHospice: v.boolean(),
+    notificationId: v.id('nurseNotifications'),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError({ message: 'Unauthorized' });
+    }
+    const [nurse, shift, notification] = await Promise.all([
+      ctx.db.get(args.nurseId),
+      ctx.db.get(args.scheduleId),
+      ctx.db.get(args.notificationId),
+    ]);
+    if (!notification) {
+      throw new ConvexError({ message: 'Notification not found' });
+    }
+    if (!nurse) {
+      throw new ConvexError({ message: 'Nurse not found' });
+    }
+
+    if (!shift) {
+      throw new ConvexError({ message: 'Shift not found' });
+    }
+
+    if (shift.status === 'ended' || shift.status === 'cancelled') {
+      throw new ConvexError({
+        message: 'This shift has already ended or been cancelled',
+      });
+    }
+
+    const assignment = await ctx.db.get(shift.assignmentId);
+    if (!assignment) {
+      throw new ConvexError({ message: 'Assignment not found' });
+    }
+
+    const hospice = await ctx.db.get(assignment.hospiceId);
+    if (!hospice) {
+      throw new ConvexError({ message: 'Hospice not found' });
+    }
+
     await checkIfNurseHasActiveShift({
       ctx,
-      nurseId: args.nurseId,
+      nurseId: nurse._id,
       hospiceTimezone: assignment.hospiceTimezone,
-      shift: schedule,
+      shift,
+      isHospice: args.isHospice,
     });
-    const alreadySentNotification =
-      await checkIfNotificationHasBeenSentBeforeAndNotInteractedWith(
-        ctx,
-        args.nurseId,
-        schedule._id,
-        'reassignment'
-      );
-    if (alreadySentNotification) {
-      await ctx.db.delete(alreadySentNotification._id);
+    const notificationExists = await ctx.db
+      .query('hospiceNotifications')
+      .filter((q) =>
+        q.and(
+          q.eq(q.field('nurseId'), nurse._id),
+          q.eq(q.field('type'), 'case_request'),
+          q.eq(q.field('scheduleId'), args.scheduleId),
+
+          q.neq(q.field('status'), 'declined')
+        )
+      )
+      .first();
+
+    if (notificationExists) {
+      await ctx.db.delete(notificationExists._id);
     }
-    await ctx.db.insert('nurseNotifications', {
-      nurseId: args.nurseId,
+    await ctx.db.patch(notification._id, {
+      status: 'accepted',
+    });
+
+    await ctx.db.insert('hospiceNotifications', {
       isRead: false,
-      hospiceId: args.hospiceId,
-      scheduleId: schedule._id,
-      description: `${args.hospiceName} has assigned you a schedule for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
-      title: 'Schedule assigned',
+      hospiceId: assignment.hospiceId,
+      nurseId: nurse._id,
       type: 'reassignment',
+      description: `${nurse.name} (${nurse.discipline}) has submitted a case request for ${formatDate(shift.startDate)} to ${formatDate(shift.endDate)}: ${shift.startTime}-${shift.endTime}`,
+      scheduleId: args.scheduleId,
+      title: 'Request for case reassignment',
       viewCount: 0,
     });
   },

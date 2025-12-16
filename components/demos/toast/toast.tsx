@@ -163,7 +163,7 @@ const Toast: React.FC<ToastProps> = ({ toast, index, onDismiss }) => {
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    height: 70,
+    minHeight: 70,
     backgroundColor: 'white',
     borderRadius: 20,
     shadowColor: '#000',

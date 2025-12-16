@@ -155,6 +155,7 @@ export const sendCaseRequestNotification = mutation({
     nurseId: v.id('nurses'),
     scheduleIds: v.array(v.id('schedules')),
     startTime: v.optional(v.string()),
+    isHospice: v.boolean(),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -192,6 +193,7 @@ export const sendCaseRequestNotification = mutation({
         nurseId: nurse._id,
         hospiceTimezone: assignment.hospiceTimezone,
         shift,
+        isHospice: args.isHospice,
       });
       const notificationExists = await ctx.db
         .query('hospiceNotifications')

@@ -156,10 +156,12 @@ export const HospiceNotification = ({ notification }: Props) => {
   const isDeclined = notification?.status === 'declined';
   const isAccepted = notification?.status === 'accepted';
   const isRouteSheet = notification.type === 'route_sheet';
-  const showFooter =
-    notification.type === 'cancel_request' ||
-    notification.type === 'case_request' ||
-    notification.type === 'route_sheet';
+  const showFooter = [
+    'cancel_request',
+    'case_request',
+    'route_sheet',
+    'reassignment',
+  ].includes(notification.type);
   const notInteracted = !isDeclined && !isAccepted;
   return (
     <CustomPressable onPress={onPress}>
@@ -195,6 +197,7 @@ export const HospiceNotification = ({ notification }: Props) => {
               <Text size="small" color="grey" textAlign="right">
                 {firstPart}
               </Text>
+
               <Text size="small" color="grey" textAlign="right">
                 {secondPart}
               </Text>

@@ -19,7 +19,9 @@ export const useAcceptDecline = ({
   type,
 }: Props) => {
   const acceptAssignment = useMutation(api.posts.acceptAssignment);
-  const acceptResignAssignment = useMutation(api.assignments.reassignShift);
+  const sendReassignmentNotificationToHospice = useMutation(
+    api.assignments.sendReassignmentNotificationToHospice
+  );
   const declineAssignment = useMutation(api.posts.declineAssignment);
   const schedule = useQuery(
     api.posts.getShift,
@@ -31,9 +33,9 @@ export const useAcceptDecline = ({
   const onAccept = async () => {
     if (!scheduleId || !nurseId || !nurseNotificationId || !schedule) return;
 
-    const startDate = schedule.startDate;
-    const { hours, minutes } = convertTimeStringToDate2(schedule.startTime);
-    const date = parse(startDate, 'dd-MM-yyyy', new Date());
+    const endDate = schedule.endDate;
+    const { hours, minutes } = convertTimeStringToDate2(schedule.endTime);
+    const date = parse(endDate, 'dd-MM-yyyy', new Date());
     const fullDateTime = set(date, {
       hours: hours,
       minutes: minutes,
@@ -52,12 +54,11 @@ export const useAcceptDecline = ({
     setProcessing(true);
     try {
       if (type === 'reassignment') {
-        await acceptResignAssignment({
-          newNurseId: nurseId,
+        await sendReassignmentNotificationToHospice({
           notificationId: nurseNotificationId,
-          assignmentId: schedule.assignmentId,
-          shift: schedule._id,
-          assignedAt: Date.now(),
+          scheduleId: schedule._id,
+          isHospice: false,
+          nurseId: nurseId,
         });
       } else {
         await acceptAssignment({

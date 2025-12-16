@@ -50,6 +50,7 @@ export const NurseNotification = ({ notification }: Props) => {
   const isDeclined = notification?.status === 'declined';
   const isAccepted = notification?.status === 'accepted';
   const showButtons = !isDeclined && !isAccepted;
+  const isReassignment = notification.type === 'reassignment';
   const isAssignmentOrReassignment =
     notification.type === 'assignment' || notification.type === 'reassignment';
   return (
@@ -97,9 +98,10 @@ export const NurseNotification = ({ notification }: Props) => {
               onCancel={onDecline}
               onPress={onAccept}
               buttonText="Decline"
-              buttonText2="Accept"
+              buttonText2={isReassignment ? 'Apply' : 'Accept'}
               disabled2={processing}
               disabled={processing}
+              hideCancelButton={isReassignment}
             />
           )}
           {isDeclined && (
@@ -109,7 +111,7 @@ export const NurseNotification = ({ notification }: Props) => {
           )}
           {isAccepted && (
             <Text size="medium" color="green" isBold textAlign="center">
-              Accepted
+              {isReassignment ? 'Applied' : 'Accepted'}
             </Text>
           )}
         </CardFooter>

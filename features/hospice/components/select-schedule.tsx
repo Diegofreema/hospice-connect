@@ -65,11 +65,11 @@ export const SelectSchedule = ({ id, hospiceId, name, onClose }: Props) => {
   const onSend = async () => {
     if (!nurseId) return;
     for (const selectedSchedule of selectedSchedules) {
-      const startDate = selectedSchedule.startDate;
+      const endDate = selectedSchedule.endDate;
       const { hours, minutes } = convertTimeStringToDate2(
-        selectedSchedule.startTime
+        selectedSchedule.endTime
       );
-      const date = parse(startDate, 'dd-MM-yyyy', new Date());
+      const date = parse(endDate, 'dd-MM-yyyy', new Date());
       const fullDateTime = set(date, {
         hours: hours,
         minutes: minutes,
@@ -92,6 +92,7 @@ export const SelectSchedule = ({ id, hospiceId, name, onClose }: Props) => {
         scheduleIds: selectedIds,
         hospiceId,
         hospiceName: name,
+        isHospice: true,
       });
       showToast({
         title: 'Success',

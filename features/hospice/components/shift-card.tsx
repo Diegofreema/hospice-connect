@@ -6,18 +6,24 @@ import { api } from '@/convex/_generated/api';
 import { Text } from '@/features/shared/components/text';
 import { Stack } from '@/features/shared/components/v-stack';
 import {
+  calculateTotalHours,
+  generateErrorMessage,
   getScheduleStatusAndColor,
   getScheduleStatusText,
 } from '@/features/shared/utils';
 
+import { useHospice } from '@/components/context/hospice-context';
+import { useToast } from '@/components/demos/toast';
 import { Id } from '@/convex/_generated/dataModel';
 import { CustomPressable } from '@/features/shared/components/custom-pressable';
 import { useUpdateUpdateStatus } from '@/hooks/use-update-status';
 import { IconCircle } from '@tabler/icons-react-native';
+import { useMutation } from 'convex/react';
 import { FunctionReturnType } from 'convex/server';
 import { format, parse } from 'date-fns';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
+import { useState } from 'react';
 import { useWindowDimensions, View } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 import { useGetScheduleId } from '../hooks/use-get-schedule-id';
@@ -43,12 +49,17 @@ export const ShiftCard = ({
   discipline,
 }: Props) => {
   const { width } = useWindowDimensions();
+  const [sending, setSending] = useState(false);
+  const { hospice } = useHospice();
+  const { showToast } = useToast();
   const size = width * 0.13;
   const today = new Date();
   const statusText = getScheduleStatusText(shift.status);
   const statusInfo = getScheduleStatusAndColor(shift.status);
   const getScheduleId = useGetScheduleId((state) => state.setId);
-
+  const sendReassignNotification = useMutation(
+    api.assignments.sendReassignmentNotification
+  );
   const startDate = parse(shift.startDate, 'dd-MM-yyyy', today);
   const endDate = parse(shift.endDate, 'dd-MM-yyyy', today);
   const openingShiftStr = shift.startTime.replace(/\s+/, ' ');
@@ -82,10 +93,31 @@ export const ShiftCard = ({
     getScheduleId(shift._id);
   };
   const handleReassign = () => {
-    if (!shift.nurseId) return;
-    router.push(
-      `/reassign?id=${shift._id}&discipline=${discipline}&oldNurseId=${shift.nurseId}`
-    );
+    if (!hospice || !hospice._id) return;
+    setSending(true);
+    try {
+      sendReassignNotification({
+        scheduleId: shift._id,
+        hospiceId: hospice._id,
+      });
+      showToast({
+        title: 'Success',
+        subtitle: 'Reassignment notification sent successfully',
+        autodismiss: true,
+      });
+    } catch (error) {
+      const errorMessage = generateErrorMessage(
+        error,
+        'Failed to send reassignment notification'
+      );
+      showToast({
+        title: 'Error',
+        subtitle: errorMessage,
+        autodismiss: true,
+      });
+    } finally {
+      setSending(false);
+    }
   };
   const onPressName = () => {
     if (!shift.nurseId) {
@@ -103,6 +135,8 @@ export const ShiftCard = ({
     !!shift.nurseId &&
     shift.status !== 'cancelled' &&
     shift.status !== 'ended';
+  const isEndedOrCancelled = ['ended', 'cancelled'].includes(shift.status);
+  const hoursWorked = calculateTotalHours([shift]);
 
   return (
     <Card style={styles.card}>
@@ -170,15 +204,29 @@ export const ShiftCard = ({
             <ActionButton onPress={handleRateNurse}>Rate nurse</ActionButton>
           )}
           {shift.status === 'on_going' && (
-            <ActionButton onPress={handleReassign}>Reassign</ActionButton>
+            <ActionButton onPress={handleReassign} disabled={sending}>
+              Reassign
+            </ActionButton>
           )}
         </Stack>
       </CardHeader>
-      {shift.status === 'ended' && shift.canceledAt && (
-        <CardFooter>
-          <Text>Ended At: {format(shift.canceledAt, 'MM/dd/yy h:mm a')}</Text>
-        </CardFooter>
-      )}
+      <CardFooter>
+        {isEndedOrCancelled && hoursWorked > 0 && (
+          <>
+            {shift.canceledAt && !shift.isReassigned && (
+              <Text>
+                Ended At: {format(shift.canceledAt, 'MM/dd/yy h:mm a')}
+              </Text>
+            )}
+
+            {shift.canceledAt && shift.isReassigned && (
+              <Text>
+                Reassigned At: {format(shift.canceledAt, 'MM/dd/yy h:mm a')}
+              </Text>
+            )}
+          </>
+        )}
+      </CardFooter>
     </Card>
   );
 };

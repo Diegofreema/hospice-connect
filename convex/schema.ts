@@ -225,7 +225,8 @@ export const HospiceNotification = {
     v.literal('route_sheet'),
     v.literal('cancel_request'),
     v.literal('admin'),
-    v.literal('assignment')
+    v.literal('assignment'),
+    v.literal('reassignment')
   ),
   title: v.string(),
   description: v.optional(v.string()),

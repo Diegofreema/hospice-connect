@@ -340,12 +340,14 @@ type CheckNurseHasShiftType = {
   nurseId: Id<'nurses'>;
   hospiceTimezone: string;
   shift: Doc<'schedules'>;
+  isHospice: boolean;
 };
 export const checkIfNurseHasActiveShift = async ({
   ctx,
   nurseId,
   shift,
   hospiceTimezone,
+  isHospice,
 }: CheckNurseHasShiftType) => {
   console.log({ nurseId });
 
@@ -395,8 +397,11 @@ export const checkIfNurseHasActiveShift = async ({
     );
 
     if (hasConflict) {
+      const message = isHospice
+        ? 'This healthcare professional already has a shift from'
+        : 'You already have a shift from';
       throw new ConvexError({
-        message: `You already have a shift from ${formatDate(
+        message: `${message} ${formatDate(
           existing.startDate
         )} ${existing.startTime} to ${formatDate(existing.endDate)} ${
           existing.endTime
