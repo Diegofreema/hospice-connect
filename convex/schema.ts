@@ -265,11 +265,11 @@ export default defineSchema({
   availabilities: defineTable(Availability).index('nurseId', ['nurseId']),
   nurseNotifications: defineTable(NurseNotification)
     .index('by_nurseId', ['nurseId', 'isRead'])
-    .index('nurseId_scheduleId', ['nurseId', 'scheduleId', 'type']),
-  hospiceNotifications: defineTable(HospiceNotification).index(
-    'by_hospice_id',
-    ['hospiceId', 'isRead']
-  ),
+    .index('nurseId_scheduleId', ['nurseId', 'scheduleId', 'type'])
+    .index('scheduleId', ['scheduleId', 'type']),
+  hospiceNotifications: defineTable(HospiceNotification)
+    .index('by_hospice_id', ['hospiceId', 'isRead'])
+    .index('hospiceId_scheduleId', ['hospiceId', 'scheduleId', 'type']),
   hospiceSubscriptions: defineTable(hospiceSubscription).index(
     'by_hospice_id',
     ['hospiceId']

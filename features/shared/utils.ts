@@ -4,7 +4,16 @@ import { scheduleStatus } from '@/convex/schema';
 import { ReactMutation } from 'convex/react';
 import { FunctionReference } from 'convex/server';
 import { ConvexError, Infer } from 'convex/values';
-import { addHours, differenceInYears, format, parse, set } from 'date-fns';
+import {
+  addHours,
+  addMinutes,
+  differenceInYears,
+  endOfDay,
+  format,
+  isSameDay,
+  parse,
+  set,
+} from 'date-fns';
 import { Dimensions } from 'react-native';
 
 const { width } = Dimensions.get('window');
@@ -278,6 +287,8 @@ export const generateShiftsWithDateFns = ({
   startDate,
 }: ShiftWithDateFns): Shift[] => {
   const shifts: Shift[] = [];
+
+  // Set cursor to the desired start time on startDate
   let cursor = set(startDate, {
     hours: openShift.getHours(),
     minutes: openShift.getMinutes(),
@@ -285,6 +296,21 @@ export const generateShiftsWithDateFns = ({
     milliseconds: 0,
   });
 
+  // Special case: same day → only one shift, ending at end of day
+  if (isSameDay(startDate, endDate)) {
+    const shiftEnd = addMinutes(endOfDay(cursor), 1);
+
+    shifts.push({
+      start: format(cursor, 'dd-MM-yyyy'),
+      end: format(shiftEnd, 'dd-MM-yyyy'),
+      startShift: format(cursor, 'h:mm a'),
+      endShift: format(shiftEnd, 'h:mm a'), // will be "11:59 PM"
+    });
+
+    return shifts;
+  }
+
+  // Multi-day case: generate full 12-hour shifts until we can't anymore
   while (cursor < endDate) {
     const shiftEnd = addHours(cursor, 12);
 

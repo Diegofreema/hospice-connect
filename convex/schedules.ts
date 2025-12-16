@@ -1,7 +1,12 @@
 import { ConvexError, v } from 'convex/values';
 import { Id } from './_generated/dataModel';
 import { mutation, MutationCtx, query, QueryCtx } from './_generated/server';
-import { checkIfNurseHasActiveShift, formatDate, getRatings } from './helper';
+import {
+  checkIfNurseHasActiveShift,
+  deleteAllOtherNotifications,
+  formatDate,
+  getRatings,
+} from './helper';
 import { scheduleStatus } from './schema';
 
 export const cancelSchedule = mutation({
@@ -425,6 +430,14 @@ export const acceptCaseRequest = mutation({
         nurseId: args.nurseId,
         reassignedAt: args.reassignedAt,
       });
+      await deleteAllOtherNotifications(
+        ctx,
+        args.nurseId,
+        notification._id,
+        args.scheduleId,
+        'reassignment',
+        args.hospiceId
+      );
     } else {
       if (schedule.status === 'booked') {
         throw new ConvexError({ message: 'Shift already booked' });

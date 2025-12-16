@@ -34,23 +34,7 @@ export const useHandleCaseRequest = ({
   const acceptCaseRequest = useMutation(api.schedules.acceptCaseRequest);
   const onDecline = async () => {
     if (!nurseId || !scheduleId || !schedule) return;
-    const startDate = schedule.startDate;
-    const { hours, minutes } = convertTimeStringToDate2(schedule.startTime);
-    const date = parse(startDate, 'dd-MM-yyyy', new Date());
-    const fullDateTime = set(date, {
-      hours: hours,
-      minutes: minutes,
-      seconds: 0,
-      milliseconds: 0,
-    });
-    if (isPast(fullDateTime)) {
-      showToast({
-        title: 'Error',
-        subtitle: 'Shift has already passed',
-        autodismiss: true,
-      });
-      return;
-    }
+
     setProcessing(true);
 
     try {
@@ -81,7 +65,24 @@ export const useHandleCaseRequest = ({
     }
   };
   const onAcceptCaseRequest = async () => {
-    if (!nurseId || !scheduleId) return;
+    if (!nurseId || !scheduleId || !schedule) return;
+    const endDate = schedule.endDate;
+    const { hours, minutes } = convertTimeStringToDate2(schedule.endTime);
+    const date = parse(endDate, 'dd-MM-yyyy', new Date());
+    const fullDateTime = set(date, {
+      hours: hours,
+      minutes: minutes,
+      seconds: 0,
+      milliseconds: 0,
+    });
+    if (isPast(fullDateTime)) {
+      showToast({
+        title: 'Error',
+        subtitle: 'Shift has already passed',
+        autodismiss: true,
+      });
+      return;
+    }
     setProcessing(true);
     try {
       await acceptCaseRequest({
@@ -90,6 +91,7 @@ export const useHandleCaseRequest = ({
         scheduleId,
         hospiceId,
         hospiceName: businessName,
+        reassignedAt: Date.now(),
       });
       showToast({
         title: 'Success',

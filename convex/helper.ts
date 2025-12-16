@@ -431,3 +431,62 @@ export const checkIfNotificationHasBeenSentBeforeAndNotInteractedWith = async (
     .first();
   return notification;
 };
+
+export const deleteAllOtherNotifications = async (
+  ctx: MutationCtx,
+  nurseId: Id<'nurses'>,
+  hospiceNotificationId: Id<'hospiceNotifications'>,
+  scheduleId: Id<'schedules'>,
+  type: 'reassignment',
+  hospiceId: Id<'hospices'>
+) => {
+  // find hospice notifications with the same scheduleId and type
+  const hospiceNotifications = await ctx.db
+    .query('hospiceNotifications')
+    .withIndex('hospiceId_scheduleId', (q) =>
+      q.eq('hospiceId', hospiceId).eq('scheduleId', scheduleId).eq('type', type)
+    )
+    .filter((q) =>
+      q.and(
+        q.neq(q.field('_id'), hospiceNotificationId),
+        q.neq(q.field('status'), 'declined')
+      )
+    )
+    .collect();
+
+  // find nurses notifications with the same scheduleId and type
+  const nurseNotifications = await ctx.db
+    .query('nurseNotifications')
+    .withIndex('scheduleId', (q) =>
+      q.eq('scheduleId', scheduleId).eq('type', type)
+    )
+    .filter((q) =>
+      q.and(
+        q.neq(q.field('nurseId'), nurseId),
+        q.neq(q.field('status'), 'declined')
+      )
+    )
+    .collect();
+
+  // delete both nurses and hospice notification in batches of 500 to avoid database overload
+  const size = 500;
+  const deleteInBatches = async (
+    notifications: Doc<'nurseNotifications'>[] | Doc<'hospiceNotifications'>[]
+  ) => {
+    for (let i = 0; i < notifications.length; i += size) {
+      const batch = notifications.slice(i, i + size);
+      await Promise.all(
+        batch.map(async (n) => {
+          const notification = await ctx.db.get(n._id);
+          if (notification) {
+            return ctx.db.delete(notification._id);
+          }
+        })
+      );
+    }
+  };
+  await Promise.all([
+    deleteInBatches(nurseNotifications),
+    deleteInBatches(hospiceNotifications),
+  ]);
+};
