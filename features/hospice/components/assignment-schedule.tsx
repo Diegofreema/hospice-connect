@@ -83,7 +83,11 @@ export const AssignmentSchedule = ({
   const showCancelButton =
     data.assignment?.status !== 'completed' && !data.assignment?.isCanceled;
 
-  const sortedShift = data.shifts;
+  const sortedShift = [...data.shifts].sort((a, b) => {
+    if (a.status === 'cancelled' && b.status !== 'cancelled') return 1;
+    if (a.status !== 'cancelled' && b.status === 'cancelled') return -1;
+    return 0;
+  });
   return (
     <View pt="xl" gap="md" mt="lg">
       <BottomSheetFlatList

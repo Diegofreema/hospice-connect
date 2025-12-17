@@ -63,7 +63,10 @@ export const ExtendAssignment = () => {
   if (data === undefined) {
     return <SmallLoader size={50} />;
   }
-  const lastShift = data?.shifts[data?.shifts.length - 1];
+  const shiftsWithoutEnded = data?.shifts.filter(
+    (shift) => shift.status !== 'ended' && shift.status !== 'cancelled'
+  );
+  const lastShift = shiftsWithoutEnded?.[shiftsWithoutEnded.length - 1];
 
   return (
     <ScrollView
@@ -116,7 +119,6 @@ const RenderShifts = ({
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const extendAssignment = useMutation(api.shifts.extendAssignment);
-  console.log(lastShift.endDate);
 
   const baseEndDateTime = useMemo(() => {
     if (!lastShift?.endDate || !lastShift?.endTime) return null;

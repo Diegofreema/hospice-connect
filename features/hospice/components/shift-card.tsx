@@ -153,7 +153,9 @@ export const ShiftCard = ({
     !!shift.nurseId &&
     shift.status !== 'cancelled' &&
     shift.status !== 'ended';
-  const isEndedOrCancelled = ['ended', 'cancelled'].includes(shift.status);
+  const isEndedOrCancelled = ['ended', 'cancelled', 'on_going'].includes(
+    shift.status
+  );
   const hoursWorked = calculateTotalHours([shift]);
 
   return (
@@ -240,6 +242,11 @@ export const ShiftCard = ({
             {shift.canceledAt && shift.isReassigned && (
               <Text>
                 Reassigned At: {format(shift.canceledAt, 'MM/dd/yy h:mm a')}
+              </Text>
+            )}
+            {shift.reassignedAt && (
+              <Text>
+                Reassigned At: {format(shift.reassignedAt, 'MM/dd/yy h:mm a')}
               </Text>
             )}
           </>
