@@ -878,7 +878,7 @@ export const sendReassignmentNotification = mutation({
             hospiceId: args.hospiceId,
             scheduleId: schedule._id,
             description: `${hospice.businessName} has opened a shift for reassignment scheduled for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
-            title: 'Schedule reassignment',
+            title: 'ASAP schedule reassignment',
             type: 'reassignment',
             viewCount: 0,
           })

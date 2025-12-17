@@ -3,7 +3,11 @@ import { format } from 'date-fns';
 import { Image } from 'expo-image';
 import React from 'react';
 import { StyleSheet } from 'react-native-unistyles';
-import { calculateTotalHours, reverseDateStringToMDY } from '../utils';
+import {
+  calculateTotalHours,
+  convertNumberToStringThenToNumber,
+  reverseDateStringToMDY,
+} from '../utils';
 import { FlexButtons } from './flex-buttons';
 import { FlexText } from './flex-text';
 import { Table } from './table';
@@ -62,6 +66,7 @@ export const RoustSheetComponent = ({
   date,
 }: Props) => {
   const totalHours = calculateTotalHours(shifts);
+
   const data = [
     ...shifts.map((shift) => [
       ` ${reverseDateStringToMDY(shift.startDate)} - ${reverseDateStringToMDY(shift.endDate)}`,
@@ -71,11 +76,15 @@ export const RoustSheetComponent = ({
       shift.endTime,
       calculateTotalHours([shift]).toFixed(2),
       shift.rate.toFixed(2),
-      `$${(calculateTotalHours([shift]) * shift.rate).toFixed(2)}`,
+      `$${convertNumberToStringThenToNumber(calculateTotalHours([shift])) * shift.rate}`,
     ]),
   ];
   const totalPay = shifts.reduce(
-    (acc, shift) => acc + calculateTotalHours([shift]) * shift.rate,
+    (acc, shift) =>
+      acc +
+      convertNumberToStringThenToNumber(
+        calculateTotalHours([shift]) * shift.rate
+      ),
     0
   );
   return (

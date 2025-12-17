@@ -24,7 +24,7 @@ import { format, parse } from 'date-fns';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { useWindowDimensions, View } from 'react-native';
+import { Alert, useWindowDimensions, View } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 import { useGetScheduleId } from '../hooks/use-get-schedule-id';
 
@@ -119,6 +119,24 @@ export const ShiftCard = ({
       setSending(false);
     }
   };
+
+  const onAlertReassign = () => {
+    Alert.alert(
+      'Reassign Nurse',
+      'Are you sure you want to reassign this nurse?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: handleReassign,
+        },
+      ],
+      { cancelable: true }
+    );
+  };
   const onPressName = () => {
     if (!shift.nurseId) {
       return;
@@ -204,7 +222,7 @@ export const ShiftCard = ({
             <ActionButton onPress={handleRateNurse}>Rate nurse</ActionButton>
           )}
           {shift.status === 'on_going' && (
-            <ActionButton onPress={handleReassign} disabled={sending}>
+            <ActionButton onPress={onAlertReassign} disabled={sending}>
               Reassign
             </ActionButton>
           )}

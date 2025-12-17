@@ -403,3 +403,6 @@ export const formatPhoneNumber = (phoneNumber: string | number): string => {
 
   return String(phoneNumber);
 };
+
+export const convertNumberToStringThenToNumber = (num: number) =>
+  Number(num.toFixed(2));
