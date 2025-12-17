@@ -18,7 +18,7 @@ import {
 } from '@/features/shared/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery } from 'convex/react';
-import { format, parse } from 'date-fns';
+import { format, isBefore, parse } from 'date-fns';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -156,7 +156,13 @@ const ScheduleCard = ({ schedule }: ScheduleProps) => {
   const startDate = parse(schedule.startDate, 'dd-MM-yyyy', new Date());
   const endDate = parse(schedule.endDate, 'dd-MM-yyyy', new Date());
   const text = schedule.status === 'cancelled' ? 'Canceled At' : 'Ended At';
-  const hoursWorked = calculateTotalHours([schedule]).toFixed(2);
+  const totalHours = calculateTotalHours([schedule]);
+
+  const hoursWorked =
+    schedule.canceledAt && isBefore(schedule.canceledAt, startDate)
+      ? '0.00'
+      : totalHours.toFixed(2);
+
   return (
     <View gap="md" style={styles.container}>
       <View>
