@@ -6,7 +6,6 @@ import { AnimatedView } from '@/components/animated-view';
 import { useAuth } from '@/components/context/auth';
 import { StackedModalProvider } from '@/components/demos/modal/modal-manager';
 import { useAnimationStore } from '@/hooks/use-animation';
-import { setupBackgroundUpdates } from '@/updates';
 import { useFonts } from 'expo-font';
 import {
   ErrorBoundaryProps,
@@ -14,11 +13,12 @@ import {
   usePathname,
   useSegments,
 } from 'expo-router';
+
+import { useUpdate } from '@/hooks/use-update';
 import React from 'react';
 import { View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
-
 import {
   configureReanimatedLogger,
   ReanimatedLogLevel,
@@ -30,12 +30,13 @@ configureReanimatedLogger({
   level: ReanimatedLogLevel.warn,
   strict: false, // Reanimated runs in strict mode by default
 });
-void setupBackgroundUpdates();
+
 export function ErrorBoundary({ retry, error }: ErrorBoundaryProps) {
   return <ErrorComponent refetch={retry} text={error.message} />;
 }
 export default function RootLayout() {
   const isFinished = useAnimationStore((state) => state.isFinished);
+
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     PublicSansBold: require('@/assets/fonts/PublicSans-Bold.ttf'),
@@ -44,6 +45,8 @@ export default function RootLayout() {
     PublicSansRegular: require('@/assets/fonts/PublicSans-Regular.ttf'),
     PublicSansLight: require('@/assets/fonts/PublicSans-Light.ttf'),
   });
+
+  useUpdate();
 
   if (!loaded) {
     // Async font loading only occurs in development.
