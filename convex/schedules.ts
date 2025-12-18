@@ -54,33 +54,33 @@ export const cancelSchedule = mutation({
     if (!nurse) throw new ConvexError({ message: 'Assigned nurse not found' });
 
     // check if this is the only shift that this nurse is working on this assignment;
-    const removeNurseAssignmentIfLastShift = async () => {
-      const nurseAssignment = await ctx.db
-        .query('nurseAssignments')
-        .withIndex('assignmentId', (q) =>
-          q.eq('assignmentId', schedule.assignmentId).eq('nurseId', nurse._id)
-        )
-        .first();
-      if (nurseAssignment) {
-        const schedules = await ctx.db
-          .query('schedules')
-          .withIndex('nurse_id', (q) =>
-            q
-              .eq('nurseId', nurseAssignment.nurseId)
-              .eq('assignmentId', nurseAssignment.assignmentId)
-          )
-          .collect();
-        const schedulesAfterFilter = schedules.filter(
-          (s) => s._id !== schedule._id
-        );
-        if (schedulesAfterFilter.length < 1) {
-          await ctx.db.patch(nurseAssignment._id, {
-            completedAt: args.cancelledAt,
-            isCompleted: true,
-          });
-        }
-      }
-    };
+    // const removeNurseAssignmentIfLastShift = async () => {
+    //   const nurseAssignment = await ctx.db
+    //     .query('nurseAssignments')
+    //     .withIndex('assignmentId', (q) =>
+    //       q.eq('assignmentId', schedule.assignmentId).eq('nurseId', nurse._id)
+    //     )
+    //     .first();
+    //   if (nurseAssignment) {
+    //     const schedules = await ctx.db
+    //       .query('schedules')
+    //       .withIndex('nurse_id', (q) =>
+    //         q
+    //           .eq('nurseId', nurseAssignment.nurseId)
+    //           .eq('assignmentId', nurseAssignment.assignmentId)
+    //       )
+    //       .collect();
+    //     const schedulesAfterFilter = schedules.filter(
+    //       (s) => s._id !== schedule._id
+    //     );
+    //     if (schedulesAfterFilter.length < 1) {
+    //       await ctx.db.patch(nurseAssignment._id, {
+    //         completedAt: args.cancelledAt,
+    //         isCompleted: true,
+    //       });
+    //     }
+    //   }
+    // };
     const isOngoing = schedule.status === 'on_going';
     const isCancelRequest = !!args.isCancelRequest;
 
@@ -103,7 +103,7 @@ export const cancelSchedule = mutation({
         nurseId: undefined, // explicitly unassign
       });
     }
-    await removeNurseAssignmentIfLastShift();
+
     // === 8. Send notification to nurse ===
     await ctx.db.insert('nurseNotifications', {
       nurseId: schedule.nurseId,

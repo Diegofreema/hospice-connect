@@ -157,7 +157,7 @@ export const ShiftCard = ({
     shift.status
   );
   const hoursWorked = calculateTotalHours([shift]);
-
+  const text = shift.status === 'ended' ? 'Ended at' : 'Cancelled at';
   return (
     <Card style={styles.card}>
       <CardHeader style={{ gap: 10 }}>
@@ -235,7 +235,7 @@ export const ShiftCard = ({
           <>
             {shift.canceledAt && !shift.isReassigned && (
               <Text>
-                Ended At: {format(shift.canceledAt, 'MM/dd/yy h:mm a')}
+                {text}: {format(shift.canceledAt, 'MM/dd/yy h:mm a')}
               </Text>
             )}
 

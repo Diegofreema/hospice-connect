@@ -137,10 +137,15 @@ export const HospiceNotification = ({ notification }: Props) => {
         notificationId: notification._id,
         isCancelRequest: true,
       });
+      showToast({
+        title: 'Success',
+        subtitle: 'Case cancel request accepted successfully',
+        autodismiss: true,
+      });
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to accept case request'
+        'Failed to accept case cancel request'
       );
       showToast({
         title: 'Error',

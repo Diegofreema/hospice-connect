@@ -76,17 +76,17 @@ export const RoustSheetComponent = ({
       shift.endTime,
       calculateTotalHours([shift]).toFixed(2),
       shift.rate.toFixed(2),
-      `$${convertNumberToStringThenToNumber(calculateTotalHours([shift])) * shift.rate}`,
+      `$${(convertNumberToStringThenToNumber(calculateTotalHours([shift])) * shift.rate).toFixed(2)}`,
     ]),
   ];
   const totalPay = shifts.reduce(
     (acc, shift) =>
       acc +
-      convertNumberToStringThenToNumber(
-        calculateTotalHours([shift]) * shift.rate
-      ),
+      convertNumberToStringThenToNumber(calculateTotalHours([shift])) *
+        shift.rate,
     0
   );
+
   return (
     <View gap={'xxl'}>
       <View gap="xl">
