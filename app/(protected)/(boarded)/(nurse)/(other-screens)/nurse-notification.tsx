@@ -9,7 +9,7 @@ const NurseNotification = () => {
 
   return (
     <Wrapper>
-      <BackButton title="Notification" marginTop={0} marginLeft={-20} />
+      <BackButton title="Notifications" marginTop={0} marginLeft={-20} />
       <FetchNurseNotification nurseId={nurse?._id!} />
     </Wrapper>
   );

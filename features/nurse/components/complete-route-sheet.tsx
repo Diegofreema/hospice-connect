@@ -11,14 +11,10 @@ import { SmallLoader } from '@/features/shared/components/small-loader';
 import { Text } from '@/features/shared/components/text';
 import { View } from '@/features/shared/components/view';
 import { ViewSignature } from '@/features/shared/components/view-signature';
-import {
-  calculateTotalHours,
-  generateErrorMessage,
-  trimText,
-} from '@/features/shared/utils';
+import { generateErrorMessage, trimText } from '@/features/shared/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery } from 'convex/react';
-import { format, isBefore, parse } from 'date-fns';
+
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -30,6 +26,7 @@ import {
 import { FlatList } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 import { routeSheetValidator, RouteSheetValidator } from '../validators';
+import { ScheduleCard } from './schedule-card';
 import { SignatureModal } from './signature-modal';
 
 type Props = {
@@ -145,45 +142,6 @@ export const CompleteRouteSheet = ({ assignmentId, nurseId }: Props) => {
         </>
       )}
     </KeyboardAwareScrollViewComponent>
-  );
-};
-
-type ScheduleProps = {
-  schedule: Doc<'schedules'>;
-};
-
-const ScheduleCard = ({ schedule }: ScheduleProps) => {
-  const startDate = parse(schedule.startDate, 'dd-MM-yyyy', new Date());
-  const endDate = parse(schedule.endDate, 'dd-MM-yyyy', new Date());
-  const text = schedule.status === 'cancelled' ? 'Canceled At' : 'Ended At';
-  const totalHours = calculateTotalHours([schedule]);
-
-  const hoursWorked =
-    schedule.canceledAt && isBefore(schedule.canceledAt, startDate)
-      ? '0.00'
-      : totalHours.toFixed(2);
-
-  return (
-    <View gap="md" style={styles.container}>
-      <View>
-        <Text size="medium" isMedium>
-          {format(startDate, 'MM/dd/yy')} - {format(endDate, 'MM/dd/yy')}
-        </Text>
-      </View>
-      <View flexDirection="row">
-        <Text>{schedule.startTime}</Text>
-        <Text>-</Text>
-        <Text>
-          {schedule.endTime} ({hoursWorked}hrs)
-        </Text>
-      </View>
-      {schedule.canceledAt && Number(hoursWorked) > 0 && (
-        <Text>
-          {text}: {format(schedule.canceledAt!, 'MM/dd/yy h:mm a')}
-        </Text>
-      )}
-      <Text>Hourly Rate: ${schedule.rate.toString()}</Text>
-    </View>
   );
 };
 
