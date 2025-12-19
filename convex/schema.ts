@@ -1,6 +1,6 @@
 import { authTables } from '@convex-dev/auth/server';
 import { defineSchema, defineTable } from 'convex/server';
-import { v } from 'convex/values';
+import { Infer, v } from 'convex/values';
 export const scheduleStatus = v.union(
   v.literal('completed'),
   v.literal('not_covered'),
@@ -15,7 +15,7 @@ export const discipline = v.union(
   v.literal('LVN'),
   v.literal('HHA')
 );
-
+export type DisciplineType = Infer<typeof discipline>;
 export const careLevel = v.union(
   v.union(
     v.literal('Initial Evaluation'),

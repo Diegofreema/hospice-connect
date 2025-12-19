@@ -122,15 +122,15 @@ export const ShiftCard = ({
 
   const onAlertReassign = () => {
     Alert.alert(
-      'Reassign Nurse',
-      'Are you sure you want to reassign this nurse?',
+      'Reassign schedule',
+      'Are you sure you want to reassign this schedule?',
       [
         {
           text: 'Cancel',
           style: 'cancel',
         },
         {
-          text: 'OK',
+          text: 'Yes',
           onPress: handleReassign,
         },
       ],
@@ -232,7 +232,7 @@ export const ShiftCard = ({
       </CardHeader>
       <CardFooter>
         {isEndedOrCancelled && hoursWorked > 0 && (
-          <>
+          <View style={{ gap: 5 }}>
             {shift.canceledAt && !shift.isReassigned && (
               <Text>
                 {text}: {format(shift.canceledAt, 'MM/dd/yy h:mm a')}
@@ -249,7 +249,7 @@ export const ShiftCard = ({
                 Reassigned At: {format(shift.reassignedAt, 'MM/dd/yy h:mm a')}
               </Text>
             )}
-          </>
+          </View>
         )}
       </CardFooter>
     </Card>

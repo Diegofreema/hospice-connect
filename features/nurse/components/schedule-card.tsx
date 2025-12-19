@@ -1,8 +1,11 @@
 import { Doc } from '@/convex/_generated/dataModel';
 import { Text } from '@/features/shared/components/text';
 import { View } from '@/features/shared/components/view';
-import { calculateTotalHours } from '@/features/shared/utils';
-import { format, isBefore, parse } from 'date-fns';
+import {
+  calculateTotalHours,
+  timeIsBeforeOrSameTime,
+} from '@/features/shared/utils';
+import { format, parse } from 'date-fns';
 import { StyleSheet } from 'react-native-unistyles';
 type ScheduleProps = {
   schedule: Doc<'schedules'>;
@@ -15,7 +18,8 @@ export const ScheduleCard = ({ schedule }: ScheduleProps) => {
   const totalHours = calculateTotalHours([schedule]);
 
   const hoursWorked =
-    schedule.canceledAt && isBefore(schedule.canceledAt, startDate)
+    schedule.canceledAt &&
+    timeIsBeforeOrSameTime(schedule.canceledAt, startDate.getTime())
       ? '0.00'
       : totalHours.toFixed(2);
 
@@ -33,7 +37,7 @@ export const ScheduleCard = ({ schedule }: ScheduleProps) => {
           {schedule.endTime} ({hoursWorked}hrs)
         </Text>
       </View>
-      {schedule.canceledAt && Number(hoursWorked) > 0 && (
+      {schedule.canceledAt && (
         <Text>
           {text}: {format(schedule.canceledAt!, 'MM/dd/yy h:mm a')}
         </Text>

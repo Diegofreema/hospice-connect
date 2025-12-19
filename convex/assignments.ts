@@ -4,7 +4,11 @@ import { paginationOptsValidator, PaginationResult } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { Doc, Id } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
-import { checkIfNurseHasActiveShift, formatDate } from './helper';
+import {
+  checkIfNurseHasActiveShift,
+  formatDate,
+  sendAvailableAssignmentNotificationToNurse,
+} from './helper';
 import { getSchedulesByAssignmentIdHelper } from './schedules';
 import { careLevel, discipline, shifts } from './schema';
 import { AssignmentsWithHospicesType, AvailableAssignmentType } from './types';
@@ -220,14 +224,7 @@ export const createAssignment = mutation({
     if (!hospice) {
       throw new ConvexError({ message: 'Hospice not found' });
     }
-    const nurses = await ctx.db
-      .query('nurses')
-      .withIndex('by_discipline', (q) =>
-        q
-          .eq('discipline', args.discipline)
-          .eq('stateOfRegistration', args.state)
-      )
-      .collect();
+
     const assignmentId = await ctx.db.insert('assignments', {
       notes: args.additionalNotes,
       patientAddress: args.address,
@@ -262,17 +259,12 @@ export const createAssignment = mutation({
       });
     }
 
-    for (const nurse of nurses) {
-      await ctx.db.insert('nurseNotifications', {
-        nurseId: nurse._id,
-        isRead: false,
-        description: `A new assignment matching your discipline has been posted by ${hospice.businessName}.`,
-        title: 'New Assignment Available',
-        type: 'normal',
-        hospiceId: args.hospiceId,
-        viewCount: 0,
-      });
-    }
+    await sendAvailableAssignmentNotificationToNurse(
+      ctx,
+      args.discipline,
+      args.state,
+      hospice
+    );
   },
 });
 
@@ -300,14 +292,7 @@ export const reopenAssignment = mutation({
     if (!assignment) {
       throw new ConvexError({ message: 'Assignment not found' });
     }
-    const nurses = await ctx.db
-      .query('nurses')
-      .withIndex('by_discipline', (q) =>
-        q
-          .eq('discipline', args.discipline)
-          .eq('stateOfRegistration', assignment.state)
-      )
-      .collect();
+
     const assignmentId = await ctx.db.insert('assignments', {
       notes: assignment.notes,
       patientAddress: assignment.patientAddress,
@@ -341,17 +326,12 @@ export const reopenAssignment = mutation({
         isSubmitted: false,
       });
     }
-    for (const nurse of nurses) {
-      await ctx.db.insert('nurseNotifications', {
-        nurseId: nurse._id,
-        isRead: false,
-        description: `A new assignment matching your discipline has been posted by ${hospice.businessName}.`,
-        title: 'New Assignment Available',
-        type: 'normal',
-        hospiceId: args.hospiceId,
-        viewCount: 0,
-      });
-    }
+    await sendAvailableAssignmentNotificationToNurse(
+      ctx,
+      assignment.discipline,
+      assignment.state,
+      hospice
+    );
   },
 });
 

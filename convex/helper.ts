@@ -2,7 +2,7 @@ import { ConvexError, Infer } from 'convex/values';
 import { Doc, Id } from './_generated/dataModel';
 import { mutation, MutationCtx, QueryCtx } from './_generated/server';
 import { parseDateTimeWallClock } from './actionHelper';
-import { day } from './schema';
+import { day, DisciplineType } from './schema';
 
 export const getImage = (ctx: QueryCtx, imageId?: Id<'_storage'>) => {
   return imageId ? ctx.storage.getUrl(imageId) : null;
@@ -349,8 +349,6 @@ export const checkIfNurseHasActiveShift = async ({
   hospiceTimezone,
   isHospice,
 }: CheckNurseHasShiftType) => {
-  console.log({ nurseId });
-
   const shifts = await ctx.db
     .query('schedules')
     .withIndex('nurse', (q) => q.eq('nurseId', nurseId))
@@ -489,4 +487,35 @@ export const deleteAllOtherNotifications = async (
     deleteInBatches(nurseNotifications),
     deleteInBatches(hospiceNotifications),
   ]);
+};
+
+export const sendAvailableAssignmentNotificationToNurse = async (
+  ctx: MutationCtx,
+  discipline: DisciplineType,
+  state: string,
+  hospice: Doc<'hospices'>
+) => {
+  const nurses = await ctx.db
+    .query('nurses')
+    .withIndex('by_discipline', (q) =>
+      q.eq('discipline', discipline).eq('stateOfRegistration', state)
+    )
+    .collect();
+  const size = 500;
+  for (let i = 0; i < nurses.length; i += size) {
+    const batch = nurses.slice(i, i + size);
+    await Promise.all(
+      batch.map(async (n) => {
+        await ctx.db.insert('nurseNotifications', {
+          nurseId: n._id,
+          isRead: false,
+          description: `A new assignment matching your discipline has been posted by ${hospice.businessName}.`,
+          title: 'New Assignment Available',
+          type: 'normal',
+          hospiceId: hospice._id,
+          viewCount: 0,
+        });
+      })
+    );
+  }
 };

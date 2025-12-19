@@ -3,6 +3,7 @@ import { paginationOptsValidator, PaginationResult } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
+import { sendAvailableAssignmentNotificationToNurse } from './helper';
 import { getNurseDetails } from './nurses';
 import { getSchedulesByAssignmentIdHelper } from './schedules';
 import { shifts } from './schema';
@@ -205,5 +206,12 @@ export const extendAssignment = mutation({
       endDate: args.shifts[args.shifts.length - 1].end,
       status: 'available',
     });
+    // Send notification to nurses
+    await sendAvailableAssignmentNotificationToNurse(
+      ctx,
+      assignment.discipline,
+      assignment.state,
+      hospice
+    );
   },
 });

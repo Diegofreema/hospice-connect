@@ -406,3 +406,6 @@ export const formatPhoneNumber = (phoneNumber: string | number): string => {
 
 export const convertNumberToStringThenToNumber = (num: number) =>
   Number(num.toFixed(2));
+
+export const timeIsBeforeOrSameTime = (time1: number, time2: number) =>
+  time1 <= time2;
