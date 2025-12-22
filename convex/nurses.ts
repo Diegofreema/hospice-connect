@@ -395,7 +395,7 @@ export const getNurseDetails = async (
   if (!nurseId) {
     return null;
   }
-  const nurse = await ctx.db.get(nurseId);
+  const nurse = await ctx.db.get('nurses', nurseId);
   if (!nurse) {
     return null;
   }

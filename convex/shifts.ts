@@ -42,7 +42,9 @@ export const getShifts = query({
       const routeSheet = await filter(
         ctx.db
           .query('routeSheets')
-          .filter((q) => q.eq(q.field('isApproved'), true)),
+          .withIndex('is_approved', (q) =>
+            q.eq('isApproved', true).eq('assignmentId', args.assignmentId)
+          ),
         (q) => q.scheduleIds.includes(schedule._id)
       ).first();
       const isRouteSheetApproved = !!routeSheet?.isApproved;

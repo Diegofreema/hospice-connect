@@ -635,7 +635,6 @@ export const cancelAssignment = mutation({
     assignmentId: v.id('assignments'),
     hospiceId: v.id('hospices'),
     reason: v.string(),
-
     cancelledAt: v.number(),
   },
   handler: async (ctx, args) => {

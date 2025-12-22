@@ -16,7 +16,7 @@ import {
 
 import { useUpdate } from '@/hooks/use-update';
 import React from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import {
@@ -52,7 +52,8 @@ export default function RootLayout() {
     // Async font loading only occurs in development.
     return null;
   }
-  if (!isFinished) {
+
+  if (!isFinished && Platform.OS !== 'web') {
     return <AnimatedView />;
   }
 

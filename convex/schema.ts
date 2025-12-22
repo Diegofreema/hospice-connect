@@ -55,6 +55,7 @@ export const Nurse = {
   address: v.optional(v.string()),
   zipCode: v.optional(v.string()),
   nurseTimezone: v.string(),
+  isSuspended: v.optional(v.boolean()),
 };
 const PendingNurse = {
   firstName: v.string(),
@@ -86,6 +87,7 @@ export const Hospice = {
   email: v.string(),
   isApproved: v.boolean(),
   imageId: v.optional(v.id('_storage')),
+  isSuspended: v.optional(v.boolean()),
 };
 const PendingHospice = {
   address: v.string(),
@@ -255,12 +257,14 @@ export default defineSchema({
       'nurseId',
       'isSubmitted',
     ]),
-  routeSheets: defineTable(routeSheet).index('by_assignment_id', [
-    'assignmentId',
-    'nurseId',
-    'hospiceId',
-    'isApproved',
-  ]),
+  routeSheets: defineTable(routeSheet)
+    .index('by_assignment_id', [
+      'assignmentId',
+      'nurseId',
+      'hospiceId',
+      'isApproved',
+    ])
+    .index('is_approved', ['isApproved', 'assignmentId']),
   ratings: defineTable(Rating).index('nurseId', ['nurseId']),
   availabilities: defineTable(Availability).index('nurseId', ['nurseId']),
   nurseNotifications: defineTable(NurseNotification)
