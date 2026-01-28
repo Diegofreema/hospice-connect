@@ -1,5 +1,3 @@
-'use client';
-
 import { Button } from '@/components/web/ui/button';
 import {
   Card,
@@ -34,7 +32,7 @@ const SignInSchema = z.object({
 
 type SignInValues = z.infer<typeof SignInSchema>;
 
-export default function SignIn({ redirectTo }: { redirectTo?: string }) {
+export default function SignIn() {
   const router = useRouter();
   const form = useForm<SignInValues>({
     resolver: zodResolver(SignInSchema),
@@ -54,7 +52,6 @@ export default function SignIn({ redirectTo }: { redirectTo?: string }) {
           toast.success('Signed in', {
             description: 'Welcome back',
           });
-          router.replace((redirectTo || '/admin') as any);
         },
         onError: ({ error }) => {
           toast.error('Error', {
