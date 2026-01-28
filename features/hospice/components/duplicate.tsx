@@ -1,7 +1,7 @@
 import { useHospice } from '@/components/context/hospice-context';
 import { useToast } from '@/components/demos/toast';
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import {
   convertTimeStringToDate,
   generateErrorMessage,
@@ -13,7 +13,7 @@ import { format, parse } from 'date-fns';
 import { router, useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { useUnistyles } from 'react-native-unistyles';
-import { CreateAssignmentValidator } from '../validator';
+import { type CreateAssignmentValidator } from '../validator';
 
 import { IconCheck, IconX } from '@tabler/icons-react-native';
 import { CreateAssignmentForm } from './create-assignment-form';
@@ -61,7 +61,7 @@ export const DuplicateComponent = () => {
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to update assignment'
+        'Failed to update assignment',
       );
       showToast({
         title: 'Error',

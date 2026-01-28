@@ -4,12 +4,12 @@ import { usePaginatedQuery } from 'convex/react';
 
 import { Title } from '@/components/title/Title';
 
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import { Stack } from '@/features/shared/components/v-stack';
 import { sortedArrayByAvailability } from '@/features/shared/utils';
 import { LegendList } from '@legendapp/list';
 import { format } from 'date-fns';
-import { NurseType } from '../types';
+import { type NurseType } from '../types';
 import { NurseCard } from './nurse-card';
 
 type Props = {
@@ -42,7 +42,7 @@ export const FetchNurses = ({
       todayToText,
       nurseId,
     },
-    { initialNumItems: 30 }
+    { initialNumItems: 30 },
   );
   const onLoadMore = () => {
     if (status === 'CanLoadMore') {

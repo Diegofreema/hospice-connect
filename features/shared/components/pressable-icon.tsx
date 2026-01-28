@@ -1,5 +1,5 @@
-import { Icon } from '@tabler/icons-react-native';
-import { StyleProp, ViewStyle } from 'react-native';
+import { type Icon } from '@tabler/icons-react-native';
+import { type StyleProp, type ViewStyle } from 'react-native';
 import { CustomPressable } from './custom-pressable';
 
 type Props = {

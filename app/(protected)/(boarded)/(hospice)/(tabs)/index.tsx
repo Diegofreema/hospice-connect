@@ -3,7 +3,7 @@ import { api } from '@/convex/_generated/api';
 import { FetchNurses } from '@/features/hospice/components/fetch-nurses';
 import { RateRange } from '@/features/hospice/components/rate-range';
 import { nurseFilter } from '@/features/hospice/constants';
-import { NurseType } from '@/features/hospice/types';
+import { type NurseType } from '@/features/hospice/types';
 import { AccountBrief } from '@/features/shared/components/account-brief';
 import { CustomSheet } from '@/features/shared/components/custom-bottom-sheet';
 import { CustomerSelector } from '@/features/shared/components/custom-selector';
@@ -13,7 +13,7 @@ import { SearchComponent } from '@/features/shared/components/search-component';
 import { Stack } from '@/features/shared/components/v-stack';
 import { Wrapper } from '@/features/shared/components/wrapper';
 
-import BottomSheet from '@gorhom/bottom-sheet';
+import type BottomSheet from '@gorhom/bottom-sheet';
 import { IconFilter2 } from '@tabler/icons-react-native';
 import { useQuery } from 'convex/react';
 import { useRef, useState } from 'react';
@@ -28,7 +28,7 @@ export default function HomeScreen() {
   });
   const unreadCount = useQuery(
     api.hospiceNotification.unreadMessagesCount,
-    hospice && hospice._id ? { hospiceId: hospice._id } : 'skip'
+    hospice && hospice._id ? { hospiceId: hospice._id } : 'skip',
   );
   const bottomSheetRef = useRef<BottomSheet>(null);
 

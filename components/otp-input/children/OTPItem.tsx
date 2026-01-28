@@ -1,5 +1,5 @@
 import { otpInputStyles as styles } from "../styles";
-import React, { FC, useContext, useEffect } from "react";
+import React, { type FC, useContext, useEffect } from "react";
 import { Dimensions, Keyboard, Pressable, TextInput, View } from "react-native";
 import Animated, {
   LinearTransition,

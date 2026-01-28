@@ -6,7 +6,6 @@ import {
   changeFirstLetterToCapital,
   formatPhoneNumber,
 } from '@/features/shared/utils';
-import React from 'react';
 
 import { useSelectAssignment } from '@/features/hospice/hooks/use-select-assignment';
 import { useUpdatePostStatus } from '@/features/hospice/hooks/use-update-post-status';
@@ -15,12 +14,13 @@ import { LongInfo } from '@/features/shared/components/long-info';
 import { useMessage } from '@/hooks/use-message';
 import { format, parse } from 'date-fns';
 import { StyleSheet } from 'react-native-unistyles';
+import { type FunctionReturnType } from 'convex/server';
+import { type api } from '@/convex/_generated/api';
 
 type Props = {
-  item: Doc<'assignments'> & {
-    businessName?: string;
-    hospiceUserId: Id<'users'>;
-  };
+  item: FunctionReturnType<
+    typeof api.shifts.getInProgressShifts
+  >['page'][number];
   onOpenSheet: () => void;
 };
 
@@ -60,7 +60,9 @@ export const InProgressCard = ({ item: post, onOpenSheet }: Props) => {
         <FlexText leftText="End date" rightText={format(endDate, 'MM/dd/yy')} />
         <FlexText
           leftText="Date of birth"
-          rightText={`${format(dob, 'MM/dd/yy')} (${calculateAge(dob).toString()})`}
+          rightText={`${format(dob, 'MM/dd/yy')} (${calculateAge(
+            dob,
+          ).toString()})`}
         />
         <FlexText leftText="Care level" rightText={post.careLevel} />
         <FlexText

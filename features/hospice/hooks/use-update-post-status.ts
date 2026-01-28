@@ -1,5 +1,5 @@
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import { convertTimeStringToDate2 } from '@/features/shared/utils';
 import { useMutation, useQuery } from 'convex/react';
 import { isPast, parse, set } from 'date-fns';
@@ -14,7 +14,7 @@ type Props = {
 export const useUpdatePostStatus = ({ assignmentId, status }: Props) => {
   const updateStatus = useMutation(api.assignments.updateAssignmentStatus);
   const updateStatusToCompleted = useMutation(
-    api.assignments.updateAssignmentStatusToCompleted
+    api.assignments.updateAssignmentStatusToCompleted,
   );
   const schedules = useQuery(api.shifts.getShiftsByOnlyAssignmentId, {
     assignmentId,
@@ -65,6 +65,6 @@ export const useUpdatePostStatus = ({ assignmentId, status }: Props) => {
       lastEnd,
       updateStatus,
       updateStatusToCompleted,
-    ])
+    ]),
   );
 };

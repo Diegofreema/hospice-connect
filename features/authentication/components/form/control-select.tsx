@@ -1,12 +1,11 @@
 import { Text } from '@/features/shared/components/text';
 import { IconChevronDown } from '@tabler/icons-react-native';
-import React from 'react';
 import {
-  Control,
+  type Control,
   Controller,
-  FieldErrors,
-  FieldPath,
-  FieldValues,
+  type FieldErrors,
+  type FieldPath,
+  type FieldValues,
 } from 'react-hook-form';
 import { View } from '../../../shared/components/view';
 

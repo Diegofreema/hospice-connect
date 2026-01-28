@@ -1,4 +1,4 @@
-import { TextStyle, ViewStyle } from 'react-native';
+import { type TextStyle, type ViewStyle } from 'react-native';
 
 export type BorderRadiusKey =
   | 'none'

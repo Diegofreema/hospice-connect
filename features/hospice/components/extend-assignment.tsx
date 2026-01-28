@@ -1,6 +1,6 @@
 import { useHospice } from '@/components/context/hospice-context';
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { StepperComponent } from '@/features/shared/components/stepper';
 import { Text } from '@/features/shared/components/text';
@@ -22,14 +22,14 @@ export const ExtendAssignment = () => {
     api.shifts.getShifts,
     hospice && hospice._id && id
       ? { assignmentId: id, hospiceId: hospice._id }
-      : 'skip'
+      : 'skip',
   );
 
   if (data === undefined) {
     return <SmallLoader size={50} />;
   }
   const shiftsWithoutEnded = data?.shifts.filter(
-    (shift) => shift.status !== 'ended' && shift.status !== 'cancelled'
+    (shift) => shift.status !== 'ended' && shift.status !== 'cancelled',
   );
   const lastShift = shiftsWithoutEnded?.[shiftsWithoutEnded.length - 1];
 

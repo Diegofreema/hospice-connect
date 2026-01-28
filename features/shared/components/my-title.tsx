@@ -1,7 +1,7 @@
 import { Title } from '@/components/title/Title';
 
 import React from 'react';
-import { StyleProp, TextStyle } from 'react-native';
+import { type StyleProp, type TextStyle } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 import { getFontSize } from '../utils';
 

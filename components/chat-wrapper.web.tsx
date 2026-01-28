@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react';
+import { type PropsWithChildren } from 'react';
 import { View } from '@/features/shared/components/view';
 import { Text } from '@/features/shared/components/text';
 

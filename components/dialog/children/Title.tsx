@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
-import { DialogTitleProps } from "../Dialog.types";
+import { type DialogTitleProps } from "../Dialog.types";
 
 export const DialogTitle: React.FC<DialogTitleProps> = ({
   children,

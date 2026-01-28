@@ -1,6 +1,6 @@
 import { Pressable } from "react-native";
 import { useDialog } from "../hooks/useDialog";
-import { ReactNode } from "react";
+import { type ReactNode } from "react";
 
 export const DialogClose = ({
   children,

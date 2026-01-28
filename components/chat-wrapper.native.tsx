@@ -2,7 +2,7 @@ import { chatApiKey } from '@/chat-config';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { useUnread } from '@/features/shared/hooks/use-unread';
 import axios from 'axios';
-import { PropsWithChildren, useCallback, useEffect } from 'react';
+import { type PropsWithChildren, useCallback, useEffect } from 'react';
 import { Chat, OverlayProvider, useCreateChatClient } from 'stream-chat-expo';
 import { useAuth } from './context/auth';
 

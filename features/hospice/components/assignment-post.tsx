@@ -12,10 +12,10 @@ import { View } from '../../shared/components/view';
 import { SymbolView } from 'expo-symbols';
 
 import { Badge } from '@/components/badge/Badge';
-import { BadgeVariant } from '@/components/badge/types';
-import { api } from '@/convex/_generated/api';
+import { type BadgeVariant } from '@/components/badge/types';
+import { type api } from '@/convex/_generated/api';
 import { Text } from '@/features/shared/components/text';
-import { FunctionReturnType } from 'convex/server';
+import { type FunctionReturnType } from 'convex/server';
 import { StyleSheet } from 'react-native-unistyles';
 import { useSelectAssignment } from '../hooks/use-select-assignment';
 import { useUpdatePostStatus } from '../hooks/use-update-post-status';

@@ -5,7 +5,6 @@ import { MyTitle } from '@/features/shared/components/my-title';
 import { Wrapper } from '@/features/shared/components/wrapper';
 
 import { useLocalSearchParams } from 'expo-router';
-import React from 'react';
 
 const ResetPassword = () => {
   const { email } = useLocalSearchParams<{ email: string }>();

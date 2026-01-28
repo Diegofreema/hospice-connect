@@ -5,8 +5,9 @@ import { MessageEmpty } from '@/features/shared/components/message-empty';
 
 import { Wrapper } from '@/features/shared/components/wrapper';
 import { useRouter } from 'expo-router';
-import React, { useMemo } from 'react';
-import { Channel as ChannelType } from 'stream-chat';
+import { useMemo } from 'react';
+import { type Channel } from 'stream-chat';
+// import { Channel as ChannelType } from 'stream-chat';
 import { ChannelList } from 'stream-chat-expo';
 
 const MessageScreen = () => {
@@ -26,7 +27,7 @@ const MessageScreen = () => {
     state: true,
     watch: true,
   };
-  const onPress = (channel: ChannelType) => {
+  const onPress = (channel: Channel) => {
     setChannel(channel);
     router.push(`/channel/${channel.cid}`);
   };
@@ -37,7 +38,8 @@ const MessageScreen = () => {
         filters={filters}
         options={options}
         sort={sort}
-        onSelect={onPress}
+        // @ts-ignore
+        onSelect={(channel) => onPress(channel)}
         numberOfSkeletons={20}
         Preview={CustomListItem}
         EmptyStateIndicator={MessageEmpty}

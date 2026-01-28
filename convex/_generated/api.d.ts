@@ -452,7 +452,7 @@ export declare const components: {
       updateSubscriptionQuantity: FunctionReference<
         "action",
         "internal",
-        { apiKey: string; quantity: number; stripeSubscriptionId: string },
+        { quantity: number; stripeSubscriptionId: string },
         null
       >;
     };
@@ -479,6 +479,57 @@ export declare const components: {
         any
       >;
       reset: FunctionReference<"mutation", "internal", { name: string }, any>;
+    };
+  };
+  crons: {
+    public: {
+      del: FunctionReference<
+        "mutation",
+        "internal",
+        { identifier: { id: string } | { name: string } },
+        null
+      >;
+      get: FunctionReference<
+        "query",
+        "internal",
+        { identifier: { id: string } | { name: string } },
+        {
+          args: Record<string, any>;
+          functionHandle: string;
+          id: string;
+          name?: string;
+          schedule:
+            | { kind: "interval"; ms: number }
+            | { cronspec: string; kind: "cron"; tz?: string };
+        } | null
+      >;
+      list: FunctionReference<
+        "query",
+        "internal",
+        {},
+        Array<{
+          args: Record<string, any>;
+          functionHandle: string;
+          id: string;
+          name?: string;
+          schedule:
+            | { kind: "interval"; ms: number }
+            | { cronspec: string; kind: "cron"; tz?: string };
+        }>
+      >;
+      register: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          args: Record<string, any>;
+          functionHandle: string;
+          name?: string;
+          schedule:
+            | { kind: "interval"; ms: number }
+            | { cronspec: string; kind: "cron"; tz?: string };
+        },
+        string
+      >;
     };
   };
   betterAuth: {
@@ -1500,7 +1551,7 @@ export declare const components: {
           headers?: Array<{ name: string; value: string }>;
           replyTo?: Array<string>;
           subject: string;
-          to: Array<string> | string;
+          to: string;
         },
         string
       >;
@@ -1509,15 +1560,9 @@ export declare const components: {
         "internal",
         { emailId: string },
         {
-          bcc?: Array<string>;
-          bounced?: boolean;
-          cc?: Array<string>;
-          clicked?: boolean;
           complained: boolean;
           createdAt: number;
-          deliveryDelayed?: boolean;
           errorMessage?: string;
-          failed?: boolean;
           finalizedAt: number;
           from: string;
           headers?: Array<{ name: string; value: string }>;
@@ -1535,13 +1580,9 @@ export declare const components: {
             | "delivery_delayed"
             | "bounced"
             | "failed";
-          subject?: string;
-          template?: {
-            id: string;
-            variables?: Record<string, string | number>;
-          };
+          subject: string;
           text?: string;
-          to: Array<string>;
+          to: string;
         } | null
       >;
       getStatus: FunctionReference<
@@ -1549,12 +1590,8 @@ export declare const components: {
         "internal",
         { emailId: string },
         {
-          bounced: boolean;
-          clicked: boolean;
           complained: boolean;
-          deliveryDelayed: boolean;
           errorMessage: string | null;
-          failed: boolean;
           opened: boolean;
           status:
             | "waiting"
@@ -1577,8 +1614,6 @@ export declare const components: {
         "mutation",
         "internal",
         {
-          bcc?: Array<string>;
-          cc?: Array<string>;
           from: string;
           headers?: Array<{ name: string; value: string }>;
           html?: string;
@@ -1590,13 +1625,9 @@ export declare const components: {
             testMode: boolean;
           };
           replyTo?: Array<string>;
-          subject?: string;
-          template?: {
-            id: string;
-            variables?: Record<string, string | number>;
-          };
+          subject: string;
           text?: string;
-          to: Array<string>;
+          to: string;
         },
         string
       >;

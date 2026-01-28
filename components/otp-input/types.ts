@@ -4,7 +4,7 @@ import {
   type TextStyle,
   type ViewStyle,
 } from "react-native";
-import { LinearTransition } from "react-native-reanimated";
+import { type LinearTransition } from "react-native-reanimated";
 
 export interface IOtpInput {
   otpCount: number;

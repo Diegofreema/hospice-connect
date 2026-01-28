@@ -10,7 +10,7 @@ export default function TabTwoScreen() {
   const { loadMore, results, status } = usePaginatedQuery(
     api.posts.getOurPosts,
     { hospiceId: hospice?._id! },
-    { initialNumItems: 25 }
+    { initialNumItems: 25 },
   );
   const handleFetchMore = useCallback(() => {
     if (status === 'CanLoadMore') {

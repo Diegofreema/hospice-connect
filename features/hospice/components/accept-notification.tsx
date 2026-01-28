@@ -1,6 +1,6 @@
 import { useToast } from '@/components/demos/toast';
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import { FlexButtons } from '@/features/shared/components/flex-buttons';
 import { generateErrorMessage } from '@/features/shared/utils';
 import { useMutation } from 'convex/react';
@@ -20,7 +20,7 @@ interface ApproveRouteSheetModalProps {
 export const ApproveRouteSheetModal: React.FC<ApproveRouteSheetModalProps> = ({
   visible,
   onClose,
-notificationId,
+  notificationId,
   hospiceId,
   routeSheetId,
 }) => {
@@ -39,7 +39,7 @@ notificationId,
         routeSheetId,
         isApproved: true,
         hospiceId,
-          notificationId
+        notificationId,
       });
 
       showToast({
@@ -47,11 +47,11 @@ notificationId,
         subtitle: 'Route sheet approved successfully',
         autodismiss: true,
       });
-      handleClose()
+      handleClose();
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to approve route sheet'
+        'Failed to approve route sheet',
       );
       showToast({
         title: 'Error',

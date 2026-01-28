@@ -4,7 +4,7 @@ import { api } from '@/convex/_generated/api';
 import { CustomSheet } from '@/features/shared/components/custom-bottom-sheet';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { Wrapper } from '@/features/shared/components/wrapper';
-import BottomSheet from '@gorhom/bottom-sheet';
+import type BottomSheet from '@gorhom/bottom-sheet';
 import { LegendList } from '@legendapp/list';
 import { useQuery } from 'convex/react';
 import { useLocalSearchParams } from 'expo-router';

@@ -4,11 +4,11 @@ import { Text } from '@/features/shared/components/text';
 import { ViewSignature } from '@/features/shared/components/view-signature';
 import { IconX } from '@tabler/icons-react-native';
 import React, { useRef } from 'react';
-import { FieldErrors } from 'react-hook-form';
+import { type FieldErrors } from 'react-hook-form';
 import { Modal, View } from 'react-native';
-import { SignatureViewRef } from 'react-native-signature-canvas';
+import { type SignatureViewRef } from 'react-native-signature-canvas';
 import { StyleSheet } from 'react-native-unistyles';
-import { RouteSheetValidator } from '../validators';
+import { type RouteSheetValidator } from '../validators';
 
 interface SignatureModalProps {
   visible: boolean;

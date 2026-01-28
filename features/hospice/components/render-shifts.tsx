@@ -9,7 +9,7 @@ import {
   reverseDateString,
 } from '@/features/shared/utils';
 import { useMutation } from 'convex/react';
-import { FunctionReturnType } from 'convex/server';
+import { type FunctionReturnType } from 'convex/server';
 import { addHours, format, parse } from 'date-fns';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
@@ -70,7 +70,7 @@ export const RenderShifts = ({
 
   const baseEndTimeMs = useMemo(
     () => (baseEndDateTime ? baseEndDateTime.getTime() : NaN),
-    [baseEndDateTime]
+    [baseEndDateTime],
   );
 
   const extraShifts: Shift[] = useMemo(() => {
@@ -93,7 +93,7 @@ export const RenderShifts = ({
       endTime: shift.endTime,
       startDate: shift.startDate,
       rate: lastShift?.rate,
-    })
+    }),
   );
 
   const handleSubmit = async () => {
@@ -121,7 +121,7 @@ export const RenderShifts = ({
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to extend assignment'
+        'Failed to extend assignment',
       );
       showToast({
         title: 'Error',

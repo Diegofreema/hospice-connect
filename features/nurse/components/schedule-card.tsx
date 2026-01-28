@@ -1,4 +1,4 @@
-import { Doc } from '@/convex/_generated/dataModel';
+import { type Doc } from '@/convex/_generated/dataModel';
 import { Text } from '@/features/shared/components/text';
 import { View } from '@/features/shared/components/view';
 import {

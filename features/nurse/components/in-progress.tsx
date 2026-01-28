@@ -1,12 +1,14 @@
-import {ActionComponent} from "@/features/shared/components/action-component";
-import {SmallLoader} from "@/features/shared/components/small-loader";
-import React from "react";
-import {AssignmentWithBusiness} from "../types";
-import {InProgressCard} from "./in-progress-card";
-import {FlatList} from "react-native";
+import { ActionComponent } from '@/features/shared/components/action-component';
+import { SmallLoader } from '@/features/shared/components/small-loader';
+import React from 'react';
+import { AssignmentWithBusiness } from '../types';
+import { InProgressCard } from './in-progress-card';
+import { FlatList } from 'react-native';
+import { type FunctionReturnType } from 'convex/server';
+import { type api } from '@/convex/_generated/api';
 
 type Props = {
-  data: AssignmentWithBusiness[];
+  data: FunctionReturnType<typeof api.shifts.getInProgressShifts>['page'];
   handleMore: () => void;
   isLoadingMore: boolean;
   title?: string;
@@ -19,8 +21,8 @@ export const InProgress = ({
   handleMore,
   isLoadingMore,
   onOpenSheet,
-  description = "Please check available assignments.",
-  title = "No assignments in progress",
+  description = 'Please check available assignments.',
+  title = 'No assignments in progress',
 }: Props) => {
   return (
     <FlatList
@@ -39,7 +41,7 @@ export const InProgress = ({
         <ActionComponent
           title={title}
           description={description}
-          imageUrl={require("@/assets/images/review.png")}
+          imageUrl={require('@/assets/images/review.png')}
         />
       }
     />

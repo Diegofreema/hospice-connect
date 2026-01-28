@@ -1,6 +1,6 @@
 import { Title } from '@/components/title/Title';
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { useScrollToTop } from '@/features/shared/hooks/use-scroll-to-top';
 import { LegendList } from '@legendapp/list';
@@ -19,11 +19,11 @@ export const FetchNurseNotification = ({ nurseId }: Props) => {
     {
       nurseId,
     },
-    { initialNumItems: 25 }
+    { initialNumItems: 25 },
   );
   const ref = useScrollToTop();
   const markNotificationAsRead = useMutation(
-    api.nurseNotifications.markNotificationAsRead
+    api.nurseNotifications.markNotificationAsRead,
   );
   useEffect(() => {
     const onMarkNotificationAsRead = async () => {

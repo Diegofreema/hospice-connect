@@ -1,5 +1,5 @@
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import { useMutation } from 'convex/react';
 import { useFocusEffect } from 'expo-router';
 import { useCallback } from 'react';
@@ -52,7 +52,7 @@ export const useUpdateUpdateStatus = ({
           openingShift.getHours(),
           openingShift.getMinutes(),
           0,
-          0
+          0,
         );
 
         const shiftEndDateTime = new Date(endDate);
@@ -60,7 +60,7 @@ export const useUpdateUpdateStatus = ({
           closingShift.getHours(),
           closingShift.getMinutes(),
           0,
-          0
+          0,
         );
         const now = new Date();
 
@@ -101,7 +101,7 @@ export const useUpdateUpdateStatus = ({
       nurseId,
       openingShift,
       closingShift,
-    ])
+    ]),
   );
   useFocusEffect(
     useCallback(() => {
@@ -128,7 +128,7 @@ export const useUpdateUpdateStatus = ({
           openingShift.getHours(),
           openingShift.getMinutes(),
           0,
-          0
+          0,
         );
 
         const shiftEndDateTime = new Date(endDate);
@@ -136,7 +136,7 @@ export const useUpdateUpdateStatus = ({
           closingShift.getHours(),
           closingShift.getMinutes(),
           0,
-          0
+          0,
         );
 
         // 1. Shift has STARTED → mark as 'ongoing' (if nurse assigned)
@@ -178,7 +178,7 @@ export const useUpdateUpdateStatus = ({
       closingShift,
       nurseId,
       updateStatus,
-    ])
+    ]),
   );
 
   useFocusEffect(
@@ -198,7 +198,7 @@ export const useUpdateUpdateStatus = ({
           openingShift.getHours(),
           openingShift.getMinutes(),
           0,
-          0
+          0,
         );
 
         // Combine date and time for shift end
@@ -207,7 +207,7 @@ export const useUpdateUpdateStatus = ({
           closingShift.getHours(),
           closingShift.getMinutes(),
           0,
-          0
+          0,
         );
 
         const now = new Date();
@@ -246,6 +246,6 @@ export const useUpdateUpdateStatus = ({
       openingShift,
       closingShift,
       updateStatus,
-    ])
+    ]),
   );
 };

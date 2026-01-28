@@ -1,6 +1,6 @@
 import { useHospice } from '@/components/context/hospice-context';
 import { PrivacyNoticeLink } from '@/components/privacy-notice/privacy-notice-link';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import { BackButton } from '@/features/shared/components/back-button';
 import { ProfileCard } from '@/features/shared/components/profile-card';
 import { SmallLoader } from '@/features/shared/components/small-loader';

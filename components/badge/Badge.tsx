@@ -12,7 +12,7 @@
  */
 
 import React from "react";
-import { StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
+import { StyleSheet, Text, type TextStyle, View, type ViewStyle } from "react-native";
 // import * as constants from "@/constants/components/index";
 
 import { borderRadiusStyles, type BorderRadiusKey } from "./types";

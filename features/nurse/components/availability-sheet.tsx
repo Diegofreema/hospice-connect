@@ -33,7 +33,7 @@ export const AvailabilitySheet = forwardRef<BottomSheet, Props>(
     const { theme } = useUnistyles();
     const [loading, setLoading] = useState(false);
     const updateTime = useMutation(
-      api.nurses.updateNurseStartAndEndTimeAvailability
+      api.nurses.updateNurseStartAndEndTimeAvailability,
     );
     const { showToast } = useToast();
     const [startTime, setStartTime] = useState(() => {
@@ -71,7 +71,7 @@ export const AvailabilitySheet = forwardRef<BottomSheet, Props>(
       } catch (error) {
         const errorMessage = generateErrorMessage(
           error,
-          'Failed to update availability'
+          'Failed to update availability',
         );
 
         showToast({
@@ -197,7 +197,7 @@ export const AvailabilitySheet = forwardRef<BottomSheet, Props>(
         </BottomSheetView>
       </BottomSheet>
     );
-  }
+  },
 );
 
 AvailabilitySheet.displayName = 'AvailabilitySheet';

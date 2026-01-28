@@ -1,6 +1,6 @@
 import { useToast } from '@/components/demos/toast';
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import { FlexButtons } from '@/features/shared/components/flex-buttons';
 import { generateErrorMessage } from '@/features/shared/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -34,7 +34,7 @@ export const DeclineRouteSheetModal: React.FC<DeclineRouteSheetModalProps> = ({
   notificationId,
 }) => {
   const approveOrDecline = useMutation(
-    api.routeSheets.approveOrDeclineRouteSheet
+    api.routeSheets.approveOrDeclineRouteSheet,
   );
   const { showToast } = useToast();
   const {
@@ -75,7 +75,7 @@ export const DeclineRouteSheetModal: React.FC<DeclineRouteSheetModalProps> = ({
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to decline route sheet'
+        'Failed to decline route sheet',
       );
       showToast({
         title: 'Error',

@@ -1,5 +1,5 @@
-import React, { PropsWithChildren, useState } from 'react';
-import { Channel as ChannelType } from 'stream-chat';
+import React, { type PropsWithChildren, useState } from 'react';
+import { type Channel as ChannelType } from 'stream-chat';
 
 type AppContextType = {
   channel: ChannelType | undefined;

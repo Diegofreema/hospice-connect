@@ -1,4 +1,4 @@
-import { ReactNode, useContext, useEffect, useState } from "react";
+import { type ReactNode, useContext, useEffect, useState } from "react";
 import { DialogContext } from "../context/DialogContext";
 import Animated, {
   Easing,
@@ -10,10 +10,10 @@ import Animated, {
 } from "react-native-reanimated";
 import {
   Pressable,
-  StyleProp,
+  type StyleProp,
   StyleSheet,
   View,
-  ViewStyle,
+  type ViewStyle,
 } from "react-native";
 import { DialogStyles as styles } from "../styles/styles";
 import { BlurView } from "expo-blur";

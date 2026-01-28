@@ -1,6 +1,6 @@
 import { useToast } from '@/components/demos/toast';
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import { Schedule } from '@/features/hospice/components/select-schedule';
 import { useSelectAssignment } from '@/features/hospice/hooks/use-select-assignment';
 import { Button } from '@/features/shared/components/button';
@@ -26,7 +26,7 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
   const [loading, setLoading] = useState(false);
 
   const sendCaseRequest = useMutation(
-    api.hospiceNotification.sendCaseRequestNotification
+    api.hospiceNotification.sendCaseRequestNotification,
   );
   const { showToast } = useToast();
 
@@ -36,7 +36,7 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
       ? {
           assignmentId,
         }
-      : 'skip'
+      : 'skip',
   );
   const [selectedIds, setSelectedIds] = useState<Id<'schedules'>[]>([]);
 
@@ -46,7 +46,7 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
   const availableSchedules = schedules.filter(
     (schedule) =>
       schedule.nurseId === nurseId &&
-      (schedule.status === 'booked' || schedule.status === 'on_going')
+      (schedule.status === 'booked' || schedule.status === 'on_going'),
   );
   const onSelect = (id: Id<'schedules'>) => {
     setSelectedIds((prev) => {
@@ -60,7 +60,7 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
   const selectedSchedules = selectedIds
     .map((selectedId) => {
       return availableSchedules.find(
-        (schedule) => schedule._id === selectedId
+        (schedule) => schedule._id === selectedId,
       )!;
     })
     .filter((schedule) => schedule !== undefined);
@@ -69,7 +69,7 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
       const endDate = selectedSchedule.endDate;
 
       const { hours, minutes } = convertTimeStringToDate2(
-        selectedSchedule.endTime
+        selectedSchedule.endTime,
       );
 
       const date = parse(endDate, 'dd-MM-yyyy', new Date());
@@ -108,7 +108,7 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to send case request, please try again'
+        'Failed to send case request, please try again',
       );
       console.log(error);
 
@@ -125,8 +125,8 @@ export const ChooseSchedule = ({ onClose, nurseId }: Props) => {
     <View>
       <BottomSheetFlatList
         data={schedules}
-        keyExtractor={(item) => item._id}
-        renderItem={({ item }) => (
+        keyExtractor={(item: (typeof schedules)[number]) => item._id}
+        renderItem={({ item }: { item: (typeof schedules)[number] }) => (
           <Schedule onSelect={onSelect} item={item} selectedIds={selectedIds} />
         )}
         contentContainerStyle={{

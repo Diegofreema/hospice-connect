@@ -1,8 +1,8 @@
-import { api } from '@/convex/_generated/api';
+import { type api } from '@/convex/_generated/api';
 import { ActionComponent } from '@/features/shared/components/action-component';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { LegendList } from '@legendapp/list';
-import { FunctionReturnType } from 'convex/server';
+import { type FunctionReturnType } from 'convex/server';
 import React from 'react';
 import { CompletedCard } from './completed-card';
 

@@ -1,6 +1,6 @@
 import {ActionComponent} from "@/features/shared/components/action-component";
 import {SmallLoader} from "@/features/shared/components/small-loader";
-import {AvailableAssignmentType} from "../types";
+import {type AvailableAssignmentType} from "../types";
 import {AssignmentAvailableCard} from "./assignment-card";
 import {FlatList} from "react-native";
 

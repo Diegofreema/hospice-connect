@@ -31,7 +31,7 @@ type Props = {
 
 export const Day = ({ day, onPress }: Props) => {
   const updateAvailabilityMutation = useMutation(
-    api.nurses.updateNurseDailyAvailability
+    api.nurses.updateNurseDailyAvailability,
   );
   const { nurse } = useNurse();
   const { showToast } = useToast();
@@ -63,7 +63,7 @@ export const Day = ({ day, onPress }: Props) => {
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to update availability'
+        'Failed to update availability',
       );
 
       showToast({

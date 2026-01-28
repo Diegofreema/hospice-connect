@@ -5,7 +5,7 @@ import { MessageEmpty } from '@/features/shared/components/message-empty';
 import { Wrapper } from '@/features/shared/components/wrapper';
 import { useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
-import { Channel as ChannelType } from 'stream-chat';
+import { type Channel as ChannelType } from 'stream-chat';
 import { ChannelList } from 'stream-chat-expo';
 
 const MessageScreen = () => {

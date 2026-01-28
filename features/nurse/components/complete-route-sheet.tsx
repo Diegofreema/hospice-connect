@@ -1,6 +1,9 @@
 import { useToast } from '@/components/demos/toast';
 import { api } from '@/convex/_generated/api';
-import { Doc, Id } from '@/convex/_generated/dataModel';
+import {
+  type Doc,
+  type Id,
+} from '@/convex/_generated/dataModel';
 import { ControlInput } from '@/features/authentication/components/form/control-input';
 import { Button } from '@/features/shared/components/button';
 import { CustomPressable } from '@/features/shared/components/custom-pressable';
@@ -18,14 +21,14 @@ import { useMutation, useQuery } from 'convex/react';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  Control,
-  FieldErrors,
+  type Control,
+  type FieldErrors,
   useForm,
-  UseFormSetValue,
+  type UseFormSetValue,
 } from 'react-hook-form';
 import { FlatList } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
-import { routeSheetValidator, RouteSheetValidator } from '../validators';
+import { routeSheetValidator, type RouteSheetValidator } from '../validators';
 import { ScheduleCard } from './schedule-card';
 import { SignatureModal } from './signature-modal';
 
@@ -39,7 +42,7 @@ export const CompleteRouteSheet = ({ assignmentId, nurseId }: Props) => {
     nurseId,
     assignmentId,
   });
-
+  const commission = useQuery(api.adminSettings.getCommission);
   const submitRouteSheet = useMutation(api.routeSheets.submitRouteSheet);
   const { showToast } = useToast();
   const [showRouteSheet, setShowRouteSheet] = useState(false);
@@ -81,7 +84,7 @@ export const CompleteRouteSheet = ({ assignmentId, nurseId }: Props) => {
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to submit route sheet'
+        'Failed to submit route sheet',
       );
       showToast({
         title: 'Error',
@@ -90,7 +93,7 @@ export const CompleteRouteSheet = ({ assignmentId, nurseId }: Props) => {
       });
     }
   };
-  if (data === undefined) {
+  if (data === undefined || commission === undefined) {
     return <SmallLoader size={50} />;
   }
 
@@ -100,6 +103,7 @@ export const CompleteRouteSheet = ({ assignmentId, nurseId }: Props) => {
     <KeyboardAwareScrollViewComponent>
       {showRouteSheet ? (
         <RoustSheetComponent
+          commission={commission}
           nurse={data.nurse}
           shifts={data.schedules}
           comment={comment || ''}

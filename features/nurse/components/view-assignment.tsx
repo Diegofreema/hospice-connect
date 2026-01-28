@@ -1,5 +1,5 @@
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import { FlexButtons } from '@/features/shared/components/flex-buttons';
 import { FlexText } from '@/features/shared/components/flex-text';
 import { NotFound } from '@/features/shared/components/not-found';
@@ -18,13 +18,20 @@ type Props = {
   id: Id<'schedules'>;
   nurseId: Id<'nurses'>;
   nurseNotificationId: Id<'nurseNotifications'>;
+  type: 'admin' | 'assignment' | 'normal' | 'reassignment';
 };
 
-export const ViewAssignment = ({ id, nurseId, nurseNotificationId }: Props) => {
+export const ViewAssignment = ({
+  id,
+  nurseId,
+  nurseNotificationId,
+  type,
+}: Props) => {
   const { onAccept, onDecline, processing } = useAcceptDecline({
     scheduleId: id,
     nurseId,
     nurseNotificationId,
+    type,
   });
   const assignment = useQuery(api.posts.getPost, {
     scheduleId: id,

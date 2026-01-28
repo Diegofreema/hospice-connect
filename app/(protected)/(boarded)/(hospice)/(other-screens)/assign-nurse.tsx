@@ -1,5 +1,5 @@
 import { useHospice } from '@/components/context/hospice-context';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import { FetchNurses } from '@/features/hospice/components/fetch-nurses';
 import { RateRange } from '@/features/hospice/components/rate-range';
 import { SelectSchedule } from '@/features/hospice/components/select-schedule';
@@ -10,7 +10,7 @@ import { PressableIcon } from '@/features/shared/components/pressable-icon';
 import { SearchComponent } from '@/features/shared/components/search-component';
 import { Stack } from '@/features/shared/components/v-stack';
 import { Wrapper } from '@/features/shared/components/wrapper';
-import BottomSheet from '@gorhom/bottom-sheet';
+import type BottomSheet from '@gorhom/bottom-sheet';
 import { IconFilter2 } from '@tabler/icons-react-native';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useRef, useState } from 'react';

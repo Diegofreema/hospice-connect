@@ -16,7 +16,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from 'convex/react';
 import {
   createHospiceValidator,
-  CreateHospiceValidator,
+  type CreateHospiceValidator,
 } from '../../validator';
 
 export const BusinessInformation = () => {
@@ -54,7 +54,7 @@ export const BusinessInformation = () => {
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to create hospice account'
+        'Failed to create hospice account',
       );
 
       showToast({

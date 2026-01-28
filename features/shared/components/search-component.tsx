@@ -1,8 +1,8 @@
 import { IconSearch, IconX } from '@tabler/icons-react-native';
-import { Href, router } from 'expo-router';
-import { TextInput, TextInputProps } from 'react-native';
+import { type Href, router } from 'expo-router';
+import { TextInput, type TextInputProps } from 'react-native';
 
-import { Dispatch, SetStateAction } from 'react';
+import { type Dispatch, type SetStateAction } from 'react';
 import { useUnistyles } from 'react-native-unistyles';
 import { CustomPressable } from './custom-pressable';
 import { Text } from './text';

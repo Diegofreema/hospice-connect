@@ -5,7 +5,14 @@ import { MyTitle } from './my-title';
 import { Text } from './text';
 import { Wrapper } from './wrapper';
 
-export const UnderReview = () => {
+type Props = {
+  title?: string;
+  description?: string;
+};
+export const UnderReview = ({
+  title = 'Account Under Review',
+  description = 'We are currently verifying your information. You will be contacted shortly',
+}: Props) => {
   return (
     <Wrapper>
       <Center
@@ -16,10 +23,9 @@ export const UnderReview = () => {
           style={{ width: 200, height: 200 }}
           contentFit="contain"
         />
-        <MyTitle title="Account Under Review" />
+        <MyTitle title={title} />
         <Text size={'normal'} textAlign={'center'}>
-          We are currently verifying your information. You will be contacted
-          shortly
+          {description}
         </Text>
       </Center>
     </Wrapper>

@@ -6,7 +6,6 @@ import { Spacer } from '@/features/shared/components/spacer';
 import { Wrapper } from '@/features/shared/components/wrapper';
 
 import { useLocalSearchParams } from 'expo-router';
-import React from 'react';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 
 const Verify = () => {

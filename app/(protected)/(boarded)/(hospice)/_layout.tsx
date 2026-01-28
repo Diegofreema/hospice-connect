@@ -1,6 +1,5 @@
 import { HospiceProvider } from '@/components/context/hospice-context';
 import { Stack } from 'expo-router';
-import React from 'react';
 import { Platform } from 'react-native';
 
 const HospiceLayout = () => {

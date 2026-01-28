@@ -9,7 +9,6 @@ import { Spacer } from '@/features/shared/components/spacer';
 
 import { Wrapper } from '@/features/shared/components/wrapper';
 import { router } from 'expo-router';
-import React from 'react';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useUnistyles } from 'react-native-unistyles';
 
@@ -20,6 +19,7 @@ const LoginScreen = () => {
       <KeyboardAwareScrollView
         contentContainerStyle={{ flexGrow: 1, gap: 15 }}
         style={{ flex: 1 }}
+        showsVerticalScrollIndicator={false}
       >
         <Spacer height={50} />
         <MyTitle title="Sign in" />

@@ -10,7 +10,7 @@ import {
 } from '@tabler/icons-react-native';
 
 import { View } from 'react-native';
-import { LinkType } from '../types';
+import { type LinkType } from '../types';
 import { MoreLinks } from './more-links';
 
 export const More = () => {

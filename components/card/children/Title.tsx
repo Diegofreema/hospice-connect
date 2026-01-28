@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, StyleProp, TextStyle } from "react-native";
+import { View, Text, StyleSheet, type StyleProp, type TextStyle } from "react-native";
 import React from "react";
 
 interface TitleProps {

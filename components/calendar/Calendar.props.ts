@@ -1,4 +1,4 @@
-import { darkTheme } from "./constants";
+import { type darkTheme } from "./constants";
 
 export interface CalendarDate {
   date: string;

@@ -1,7 +1,7 @@
 import { useHospice } from '@/components/context/hospice-context';
 import { useToast } from '@/components/demos/toast';
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import {
   generateErrorMessage,
   generateShiftsWithDateFns,
@@ -22,7 +22,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSelectAssignment } from '../hooks/use-select-assignment';
 import {
   reopenAssignmentValidator,
-  ReopenAssignmentValidator,
+  type ReopenAssignmentValidator,
 } from '../validator';
 
 type Props = {

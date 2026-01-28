@@ -1,4 +1,4 @@
-import { SFSymbol } from 'expo-symbols';
+import { type SFSymbol } from 'expo-symbols';
 import { StyleSheet } from 'react-native';
 import { useUnistyles } from 'react-native-unistyles';
 import * as DropdownMenu from 'zeego/dropdown-menu';

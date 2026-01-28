@@ -5,16 +5,17 @@ import { useToast } from '@/components/demos/toast';
 import { authClient } from '@/lib/auth-client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { IconMail } from '@tabler/icons-react-native';
-import { Href, router } from 'expo-router';
+import { type Href, router } from 'expo-router';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useUnistyles } from 'react-native-unistyles';
-import { forgotPasswordSchema, ForgotPasswordSchema } from '../../validators';
+import { forgotPasswordSchema, type ForgotPasswordSchema } from '../../validators';
 import { ControlInput } from './control-input';
 
 type Props = {
   link?: Href;
 };
+// @ts-ignore
 export const ForgotForm = ({ link = '/reset-password' }: Props) => {
   const { theme } = useUnistyles();
   const {

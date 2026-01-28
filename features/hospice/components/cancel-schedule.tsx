@@ -24,7 +24,7 @@ export const CancelSchedule = ({ onClose }: Props) => {
       ? {
           scheduleId: id,
         }
-      : 'skip'
+      : 'skip',
   );
   const [cancelling, setCanceling] = useState(false);
   const { showToast } = useToast();
@@ -46,7 +46,7 @@ export const CancelSchedule = ({ onClose }: Props) => {
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to cancel schedule'
+        'Failed to cancel schedule',
       );
       showToast({
         title: 'Error',

@@ -1,4 +1,7 @@
-import { Doc, Id } from '@/convex/_generated/dataModel';
+import {
+  type Doc,
+  type Id,
+} from '@/convex/_generated/dataModel';
 
 export type NurseType = 'RN' | 'LVN' | 'HHA';
 

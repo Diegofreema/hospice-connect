@@ -8,7 +8,7 @@ import { Spacer } from '@/features/shared/components/spacer';
 import { Stack } from '@/features/shared/components/v-stack';
 import { calculateAge } from '@/features/shared/utils';
 import React from 'react';
-import { StepProps } from '../../validators';
+import { type StepProps } from '../../validators';
 
 export const PersonalInfo = ({ form }: StepProps) => {
   const {
@@ -17,7 +17,10 @@ export const PersonalInfo = ({ form }: StepProps) => {
     watch,
   } = form;
   const dob = watch('dateOfBirth');
+
   const age = calculateAge(dob as Date);
+  console.log({ age });
+
   return (
     <Stack mb="xl">
       <Spacer />

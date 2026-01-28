@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
-import { StyleProp, TextStyle } from "react-native";
+import { type ReactNode } from "react";
+import { type StyleProp, type TextStyle } from "react-native";
 
 export type DialogContextType = {
   open: boolean;

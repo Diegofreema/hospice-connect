@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, type ReactNode } from "react";
 import {
   Modal,
   View,
@@ -8,8 +8,8 @@ import {
   Pressable,
   Animated,
   Dimensions,
-  StyleProp,
-  TextStyle,
+  type StyleProp,
+  type TextStyle,
 } from "react-native";
 
 // Types

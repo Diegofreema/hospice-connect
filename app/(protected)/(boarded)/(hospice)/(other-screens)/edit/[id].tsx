@@ -3,9 +3,9 @@ import { useHospice } from '@/components/context/hospice-context';
 import { useToast } from '@/components/demos/toast';
 
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import { CreateAssignmentForm } from '@/features/hospice/components/create-assignment-form';
-import { CreateAssignmentValidator } from '@/features/hospice/validator';
+import { type CreateAssignmentValidator } from '@/features/hospice/validator';
 import { BackButton } from '@/features/shared/components/back-button';
 import { Wrapper } from '@/features/shared/components/wrapper';
 import {
@@ -65,7 +65,7 @@ const EditScreen = () => {
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to update assignment'
+        'Failed to update assignment',
       );
       showToast({
         title: 'Error',

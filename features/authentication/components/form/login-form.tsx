@@ -19,7 +19,7 @@ import { useForm } from 'react-hook-form';
 import { TouchableOpacity } from 'react-native';
 import { useUnistyles } from 'react-native-unistyles';
 import { toast } from 'sonner-native';
-import { loginSchema, LoginSchema } from '../../validators';
+import { loginSchema, type LoginSchema } from '../../validators';
 import { ControlInput } from './control-input';
 export const LoginForm = () => {
   const [secured, setSecured] = useState(true);
@@ -99,6 +99,7 @@ export const LoginForm = () => {
       />
       <PrivacyNoticeLink
         style={{ alignSelf: 'flex-end' }}
+        // @ts-ignore
         onPress={() => router.push('/forgot-password')}
       >
         Forgot Password?

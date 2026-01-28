@@ -12,11 +12,14 @@ import {
 } from '@/features/shared/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from 'convex/react';
-import { FunctionReturnType } from 'convex/server';
+import { type FunctionReturnType } from 'convex/server';
 import { format, parse } from 'date-fns';
 import { useForm } from 'react-hook-form';
 import { useGetScheduleId } from '../hooks/use-get-schedule-id';
-import { editScheduleValidator, EditScheduleValidator } from '../validator';
+import {
+  editScheduleValidator,
+  type EditScheduleValidator,
+} from '../validator';
 
 type Props = {
   onClose: () => void;
@@ -68,7 +71,7 @@ export const EditSchedule = ({ onClose, initialValues }: Props) => {
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to edit schedule'
+        'Failed to edit schedule',
       );
 
       showToast({

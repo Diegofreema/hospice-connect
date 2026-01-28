@@ -1,5 +1,5 @@
 import { Badge } from '@/components/badge/Badge';
-import { BadgeVariant } from '@/components/badge/types';
+import { type BadgeVariant } from '@/components/badge/types';
 import { Card, CardFooter, CardHeader } from '@/components/card';
 import { PrivacyNoticeLink as ActionButton } from '@/components/privacy-notice/privacy-notice-link';
 import { api } from '@/convex/_generated/api';
@@ -14,12 +14,12 @@ import {
 
 import { useHospice } from '@/components/context/hospice-context';
 import { useToast } from '@/components/demos/toast';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import { CustomPressable } from '@/features/shared/components/custom-pressable';
 import { useUpdateUpdateStatus } from '@/hooks/use-update-status';
 import { IconCircle } from '@tabler/icons-react-native';
 import { useMutation } from 'convex/react';
-import { FunctionReturnType } from 'convex/server';
+import { type FunctionReturnType } from 'convex/server';
 import { format, parse } from 'date-fns';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
@@ -35,7 +35,7 @@ type Props = {
   onRateNurse: () => void;
   onViewRouteSheet: (
     assignmentId: Id<'assignments'>,
-    nurseId: Id<'nurses'>
+    nurseId: Id<'nurses'>,
   ) => void;
   discipline: string;
 };
@@ -58,7 +58,7 @@ export const ShiftCard = ({
   const statusInfo = getScheduleStatusAndColor(shift.status);
   const getScheduleId = useGetScheduleId((state) => state.setId);
   const sendReassignNotification = useMutation(
-    api.assignments.sendReassignmentNotification
+    api.assignments.sendReassignmentNotification,
   );
   const startDate = parse(shift.startDate, 'dd-MM-yyyy', today);
   const endDate = parse(shift.endDate, 'dd-MM-yyyy', today);
@@ -108,7 +108,7 @@ export const ShiftCard = ({
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to send reassignment notification'
+        'Failed to send reassignment notification',
       );
       showToast({
         title: 'Error',
@@ -134,7 +134,7 @@ export const ShiftCard = ({
           onPress: handleReassign,
         },
       ],
-      { cancelable: true }
+      { cancelable: true },
     );
   };
   const onPressName = () => {
@@ -154,7 +154,7 @@ export const ShiftCard = ({
     shift.status !== 'cancelled' &&
     shift.status !== 'ended';
   const isEndedOrCancelled = ['ended', 'cancelled', 'on_going'].includes(
-    shift.status
+    shift.status,
   );
   const hoursWorked = calculateTotalHours([shift]);
   const text = shift.status === 'ended' ? 'Ended at' : 'Cancelled at';

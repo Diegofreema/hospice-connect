@@ -4,7 +4,7 @@ import { View } from '../../shared/components/view';
 
 import BottomSheetKeyboardAwareScrollView from '@/features/shared/components/bottom-sheet-aware-scroll-view';
 import { FlexButtons } from '@/features/shared/components/flex-buttons';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { type Dispatch, type SetStateAction, useState } from 'react';
 import { TextInput } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 

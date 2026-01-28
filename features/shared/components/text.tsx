@@ -1,5 +1,5 @@
-import { forwardRef, PropsWithChildren } from 'react';
-import { Text as RNText, StyleProp, TextStyle } from 'react-native';
+import { forwardRef, type PropsWithChildren } from 'react';
+import { Text as RNText, type StyleProp, type TextStyle } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 import { getFontSize } from '../utils';
 

@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
-import { ReactNode } from 'react';
-import { ImageSourcePropType } from 'react-native';
+import { type ReactNode } from 'react';
+import { type ImageSourcePropType } from 'react-native';
 import { Text } from './text';
 
 import { Stack } from './v-stack';

@@ -3,13 +3,13 @@ import { Text } from '@/features/shared/components/text';
 import { Textarea } from '@/features/shared/components/text-area';
 import React from 'react';
 import {
-  Control,
+  type Control,
   Controller,
-  FieldErrors,
-  FieldPath,
-  FieldValues,
+  type FieldErrors,
+  type FieldPath,
+  type FieldValues,
 } from 'react-hook-form';
-import { TextInputProps, View } from 'react-native';
+import { type TextInputProps, View } from 'react-native';
 
 type Props<TFieldValues extends FieldValues> = TextInputProps & {
   label?: string;

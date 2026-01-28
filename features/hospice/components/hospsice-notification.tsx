@@ -14,7 +14,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 
 import { useHandleCaseRequest } from '@/features/shared/hooks/use-handle-case-request';
-import { FunctionReturnType } from 'convex/server';
+import { type FunctionReturnType } from 'convex/server';
 import { StyleSheet } from 'react-native-unistyles';
 import { useMarkAsRead } from '../hooks/use-mark-as-read';
 
@@ -43,7 +43,7 @@ export const HospiceNotification = ({ notification }: Props) => {
 
   const onPressRouteSheet = () => {
     router.push(
-      `/view-route-sheet?id=${notification?.routeSheetId}&notificationId=${notification._id}&isRead=${notification.isRead}`
+      `/view-route-sheet?id=${notification?.routeSheetId}&notificationId=${notification._id}&isRead=${notification.isRead}`,
     );
   };
   const onPress = () => {
@@ -53,7 +53,7 @@ export const HospiceNotification = ({ notification }: Props) => {
 
     if (notification.type === 'case_request') {
       router.push(
-        `/case-request?nurseId=${notification?.nurseId}&shiftId=${notification?.scheduleId}&notificationId=${notification._id}`
+        `/case-request?nurseId=${notification?.nurseId}&shiftId=${notification?.scheduleId}&notificationId=${notification._id}`,
       );
     }
   };
@@ -109,7 +109,7 @@ export const HospiceNotification = ({ notification }: Props) => {
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to decline case request'
+        'Failed to decline case request',
       );
       showToast({
         title: 'Error',
@@ -145,7 +145,7 @@ export const HospiceNotification = ({ notification }: Props) => {
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to accept case cancel request'
+        'Failed to accept case cancel request',
       );
       showToast({
         title: 'Error',

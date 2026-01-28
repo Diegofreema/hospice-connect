@@ -1,6 +1,6 @@
 import { StyleSheet, Pressable } from "react-native";
 import React from "react";
-import { DialogTriggerProps } from "../Dialog.types";
+import { type DialogTriggerProps } from "../Dialog.types";
 import { useDialog } from "../hooks/useDialog";
 
 export const DialogTrigger: React.FC<DialogTriggerProps> = ({

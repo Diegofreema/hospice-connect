@@ -13,17 +13,17 @@ import { View } from '../../shared/components/view';
 
 import { IconCircle, IconDots } from '@tabler/icons-react-native';
 import { router } from 'expo-router';
-import { SFSymbol } from 'expo-symbols';
+import { type SFSymbol } from 'expo-symbols';
 
 import { Badge } from '@/components/badge/Badge';
-import { BadgeVariant } from '@/components/badge/types';
+import { type BadgeVariant } from '@/components/badge/types';
 import { useToast } from '@/components/demos/toast';
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import { LongInfo } from '@/features/shared/components/long-info';
 import { Text } from '@/features/shared/components/text';
 import { useMutation } from 'convex/react';
-import { FunctionReturnType } from 'convex/server';
+import { type FunctionReturnType } from 'convex/server';
 import { useState } from 'react';
 import { Alert } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
@@ -102,7 +102,7 @@ export const Post = ({
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to delete assignment'
+        'Failed to delete assignment',
       );
       showToast({
         title: 'Error',
@@ -135,7 +135,7 @@ export const Post = ({
             style: 'destructive',
             onPress: () => onDelete(),
           },
-        ]
+        ],
       );
     }
     if (value === 'extend') {

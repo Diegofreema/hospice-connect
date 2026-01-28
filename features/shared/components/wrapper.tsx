@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react';
+import { type PropsWithChildren } from 'react';
 import { useUnistyles } from 'react-native-unistyles';
 import { Stack } from './v-stack';
 

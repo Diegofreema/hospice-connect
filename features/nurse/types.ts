@@ -1,9 +1,12 @@
-import { Doc, Id } from '@/convex/_generated/dataModel';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { Icon } from '@tabler/icons-react-native';
-import { Href } from 'expo-router';
-import { SymbolViewProps } from 'expo-symbols';
-import { ComponentProps } from 'react';
+import {
+  type Doc,
+  type Id,
+} from '@/convex/_generated/dataModel';
+import type MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { type Icon } from '@tabler/icons-react-native';
+import { type Href } from 'expo-router';
+import { type SymbolViewProps } from 'expo-symbols';
+import { type ComponentProps } from 'react';
 
 type IconMapping = Record<
   SymbolViewProps['name'],

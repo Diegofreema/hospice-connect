@@ -1,5 +1,5 @@
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import { useQuery } from 'convex/react';
 import { format } from 'date-fns';
 import { useLocalSearchParams } from 'expo-router';
@@ -169,7 +169,9 @@ export const ViewRouteSheet = () => {
     <!-- Header Section -->
     <div class="header-section">
       <img src="https://pastel-albatross-709.convex.cloud/api/storage/8c5eaabd-2b0a-41c1-8ad8-dfb01505fa19" alt="Hospice Logo" class="logo">
-      <h1 class="text-center text-bold text-medium">${data?.assignment.businessName}</h1>
+      <h1 class="text-center text-bold text-medium">${
+        data?.assignment.businessName
+      }</h1>
       <p class="text-center text-small">${data?.assignment.hospiceAddress}</p>
       <p class="text-center text-normal">Route Sheet</p>
       <div class="flex-text">
@@ -199,15 +201,19 @@ export const ViewRouteSheet = () => {
                (shift) => `
         <tr>
           <td> ${shift?.startDate} - ${shift?.endDate}</td>
-          <td>${data?.assignment.patientFirstName} ${data?.assignment.patientLastName}</td>
+          <td>${data?.assignment.patientFirstName} ${
+            data?.assignment.patientLastName
+          }</td>
           <td>${data?.assignment.careLevel}</td>
           <td>${shift.startTime}</td>
           <td>${shift.endTime}</td>
           <td>${calculateTotalHours([shift]).toFixed(2)}</td>
           <td>${data?.assignment.rate.toFixed(2)}</td>
-          <td>$${(calculateTotalHours([shift]) * data?.assignment.rate || 0).toFixed(2)}</td>
+          <td>$${(
+            calculateTotalHours([shift]) * data?.assignment.rate || 0
+          ).toFixed(2)}</td>
         </tr>
-      `
+      `,
              )
              .join('')}
         </tbody>
@@ -216,8 +222,13 @@ export const ViewRouteSheet = () => {
 
     <!-- Totals Section -->
     <div class="totals-row">
-      <p class="text-medium text-bold">Total hours: ${calculateTotalHours(data?.schedules || []).toFixed(2)}</p>
-      <p class="text-medium text-bold">Total pay: $${(Number(calculateTotalHours(data?.schedules || []).toFixed(2)) * (data?.assignment.rate || 0)).toFixed(2)}</p>
+      <p class="text-medium text-bold">Total hours: ${calculateTotalHours(
+        data?.schedules || [],
+      ).toFixed(2)}</p>
+      <p class="text-medium text-bold">Total pay: $${(
+        Number(calculateTotalHours(data?.schedules || []).toFixed(2)) *
+        (data?.assignment.rate || 0)
+      ).toFixed(2)}</p>
     </div>
 
     <!-- Certification Text -->
@@ -227,13 +238,20 @@ export const ViewRouteSheet = () => {
 
     <!-- Signature Section -->
     <div class="signature-section">
-      <img src="${data?.routeSheet.signature}" class="signature-image" alt="Signature">
-       <p class="text-normal"><strong>Date:</strong> ${data?.routeSheet && format(data?.routeSheet._creationTime, 'MM/dd/yy HH:mm')}</p>
+      <img src="${
+        data?.routeSheet.signature
+      }" class="signature-image" alt="Signature">
+       <p class="text-normal"><strong>Date:</strong> ${
+         data?.routeSheet &&
+         format(data?.routeSheet._creationTime, 'MM/dd/yy HH:mm')
+       }</p>
     </div>
 
     <!-- Comment Section -->
     <div class="comment-section">
-      <p class="text-normal"><strong>Comment:</strong> ${data?.routeSheet.comment}</p>
+      <p class="text-normal"><strong>Comment:</strong> ${
+        data?.routeSheet.comment
+      }</p>
     </div>
   </div>
 </body>

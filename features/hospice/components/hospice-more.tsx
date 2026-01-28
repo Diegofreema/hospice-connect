@@ -1,6 +1,6 @@
 import { useHospice } from '@/components/context/hospice-context';
 import { MoreLinks } from '@/features/nurse/components/more-links';
-import { LinkType } from '@/features/nurse/types';
+import { type LinkType } from '@/features/nurse/types';
 import { AccountBrief } from '@/features/shared/components/account-brief';
 import { Spacer } from '@/features/shared/components/spacer';
 import { Stack } from '@/features/shared/components/v-stack';

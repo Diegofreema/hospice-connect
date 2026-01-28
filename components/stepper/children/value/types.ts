@@ -1,5 +1,5 @@
 import type { EasingFunction, TextStyle } from "react-native";
-import { EasingFunctionFactory, ReduceMotion } from "react-native-reanimated";
+import { type EasingFunctionFactory, type ReduceMotion } from "react-native-reanimated";
 
 export interface StepperValueProps {
   style?: TextStyle;

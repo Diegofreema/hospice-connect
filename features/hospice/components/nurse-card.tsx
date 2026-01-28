@@ -19,11 +19,11 @@ import {
 import { format } from 'date-fns';
 import { Image } from 'expo-image';
 
-import { api } from '@/convex/_generated/api';
+import { type api } from '@/convex/_generated/api';
 import { Button } from '@/features/shared/components/button';
 import { Stack } from '@/features/shared/components/v-stack';
 import { useMessage } from '@/hooks/use-message';
-import { FunctionReturnType } from 'convex/server';
+import { type FunctionReturnType } from 'convex/server';
 import { router } from 'expo-router';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { useGetNurseId } from '../hooks/use-get-nurse-id';

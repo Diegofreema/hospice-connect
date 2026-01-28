@@ -1,9 +1,9 @@
-import { PropsWithChildren } from 'react';
+import { type PropsWithChildren } from 'react';
 import {
-  StyleProp,
+  type StyleProp,
   TouchableOpacity,
-  TouchableOpacityProps,
-  ViewStyle,
+  type TouchableOpacityProps,
+  type ViewStyle,
 } from 'react-native';
 
 type Props = TouchableOpacityProps & {

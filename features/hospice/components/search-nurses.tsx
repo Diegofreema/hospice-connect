@@ -2,7 +2,7 @@ import { useHospice } from '@/components/context/hospice-context';
 import { useToast } from '@/components/demos/toast';
 import { Title } from '@/components/title/Title';
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import {
   generateErrorMessage,
@@ -33,22 +33,20 @@ export const SearchNurses = ({ query }: Props) => {
   const { hospice } = useHospice();
   const { showToast } = useToast();
   const sendReassignmentNotification = useMutation(
-    api.assignments.sendReassignmentNotification
+    api.assignments.sendReassignmentNotification,
   );
   const nurseId = useGetNurseId((state) => state.id);
   const onReassign = async () => {
-    if (!hospice || !hospice?._id || !nurseId || !id) return;
+    if (!hospice || !hospice?._id || !id) return;
     try {
       await sendReassignmentNotification({
         scheduleId: id,
         hospiceId: hospice._id,
-        nurseId,
-        hospiceName: hospice.businessName as string,
       });
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Error sending reassignment notification'
+        'Error sending reassignment notification',
       );
       showToast({
         title: 'Error',
@@ -84,7 +82,9 @@ export const SearchNurses = ({ query }: Props) => {
         ListEmptyComponent={
           <Title textAlign="center" size={20}>
             {query.length > 0
-              ? `No professionals found for "${query}" ${discipline ? 'under ' + discipline : ''}. `
+              ? `No professionals found for "${query}" ${
+                  discipline ? 'under ' + discipline : ''
+                }. `
               : 'Start typing to search for professionals.'}
           </Title>
         }

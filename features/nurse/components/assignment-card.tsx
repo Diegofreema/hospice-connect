@@ -13,7 +13,7 @@ import { LongInfo } from '@/features/shared/components/long-info';
 import { useMessage } from '@/hooks/use-message';
 import { format, parse } from 'date-fns';
 import { StyleSheet } from 'react-native-unistyles';
-import { AvailableAssignmentType } from '../types';
+import { type AvailableAssignmentType } from '../types';
 
 type Props = {
   item: AvailableAssignmentType;

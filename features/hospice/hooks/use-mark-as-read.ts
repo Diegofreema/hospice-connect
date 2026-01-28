@@ -1,11 +1,11 @@
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import { useMutation } from 'convex/react';
 import { useEffect } from 'react';
 
 type Props = {
   notificationId: Id<'hospiceNotifications'>;
-  isRead: boolean;
+  isRead?: boolean;
 };
 
 export const useMarkAsRead = ({ notificationId, isRead }: Props) => {

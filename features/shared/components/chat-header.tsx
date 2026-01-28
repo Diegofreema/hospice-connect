@@ -4,7 +4,7 @@ import { IconArrowLeft } from '@tabler/icons-react-native';
 import { router } from 'expo-router';
 import React from 'react';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
-import { Channel as ChannelType } from 'stream-chat';
+import { type Channel as ChannelType } from 'stream-chat';
 import { CustomPressable } from './custom-pressable';
 type Props = {
   channel: ChannelType;

@@ -1,6 +1,6 @@
 import { Text, View } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
-import { ChannelPreviewUnreadCountProps, useTheme } from 'stream-chat-expo';
+import { type ChannelPreviewUnreadCountProps, useTheme } from 'stream-chat-expo';
 
 export const ChannelPreviewCount = (props: ChannelPreviewUnreadCountProps) => {
   const { maxUnreadCount, unread } = props;

@@ -1,7 +1,7 @@
 import { Badge } from '@/components/badge/Badge';
-import { BadgeVariant } from '@/components/badge/types';
+import { type BadgeVariant } from '@/components/badge/types';
 import { Card, CardHeader } from '@/components/card';
-import { api } from '@/convex/_generated/api';
+import { type api } from '@/convex/_generated/api';
 import { CustomPressable } from '@/features/shared/components/custom-pressable';
 import { Text } from '@/features/shared/components/text';
 import {
@@ -10,7 +10,7 @@ import {
 } from '@/features/shared/utils';
 import { useUpdateUpdateStatus } from '@/hooks/use-update-status';
 import { IconCircle } from '@tabler/icons-react-native';
-import { FunctionReturnType } from 'convex/server';
+import { type FunctionReturnType } from 'convex/server';
 import { format, parse } from 'date-fns';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';

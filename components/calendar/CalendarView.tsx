@@ -30,12 +30,12 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import {
-  CalendarConfig,
-  CalendarDate,
-  CalendarMode,
-  CalendarViewProps,
-  CalendarViewRef,
-  DateRange,
+  type CalendarConfig,
+  type CalendarDate,
+  type CalendarMode,
+  type CalendarViewProps,
+  type CalendarViewRef,
+  type DateRange,
 } from './Calendar.props';
 import { darkTheme } from './constants';
 import { calenderStyles as styles } from './styles';
@@ -478,7 +478,7 @@ export const CalendarView = forwardRef<CalendarViewRef, CalendarViewProps>(
       const endOfWeek = endOfMonth.clone().endOf('week');
 
       const days: CalendarDate[] = [];
-      let day = startOfWeek.clone();
+      const day = startOfWeek.clone();
 
       while (day.isSameOrBefore(endOfWeek, 'day')) {
         const dateStr = day.format('YYYY-MM-DD');

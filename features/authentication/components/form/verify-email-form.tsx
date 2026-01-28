@@ -7,8 +7,7 @@ import { Text } from '@/features/shared/components/text';
 
 import { useTimer } from '@/hooks/use-timer';
 
-import { useAuthActions } from '@convex-dev/auth/react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useWindowDimensions, View } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
@@ -18,7 +17,6 @@ type Props = {
 };
 
 export const VerifyEmailForm = ({ email, password }: Props) => {
-  const { signIn } = useAuthActions();
   const { theme } = useUnistyles();
   const [otpValue, setOtpValue] = useState<string>('');
   const [loading, setLoading] = useState(false);
@@ -36,50 +34,50 @@ export const VerifyEmailForm = ({ email, password }: Props) => {
   };
 
   const handleResendCode = () => {
-    setLoading(true);
-    void signIn('password-custom', { email, password, flow: 'signUp' })
-      .then(() => {
-        clearOtp();
-        startTimer();
-      })
-      .then(() => {
-        showToast({
-          title: 'Success',
-          subtitle: 'Verification code sent successfully.',
-        });
-      })
-      .catch(() => {
-        showToast({
-          title: 'Error',
-          subtitle:
-            'Failed to verify email. Check if your email or verification code is correct.',
-        });
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    // setLoading(true);
+    // void signIn('password-custom', { email, password, flow: 'signUp' })
+    //   .then(() => {
+    //     clearOtp();
+    //     startTimer();
+    //   })
+    //   .then(() => {
+    //     showToast({
+    //       title: 'Success',
+    //       subtitle: 'Verification code sent successfully.',
+    //     });
+    //   })
+    //   .catch(() => {
+    //     showToast({
+    //       title: 'Error',
+    //       subtitle:
+    //         'Failed to verify email. Check if your email or verification code is correct.',
+    //     });
+    //   })
+    //   .finally(() => {
+    //     setLoading(false);
+    //   });
   };
 
   const onSubmit = () => {
-    void signIn('password-custom', {
-      email,
-      code: otpValue,
-      flow: 'email-verification',
-    })
-      .then(() => {
-        clearOtp();
-        showToast({
-          title: 'Success',
-          subtitle: 'Your email has been verified. welcome to HospiceConnect',
-        });
-      })
-      .catch((e) => {
-        showToast({
-          title: 'Error',
-          subtitle:
-            'Failed to verify email. Check if your email or verification code is correct.',
-        });
-      });
+    // void signIn('password-custom', {
+    //   email,
+    //   code: otpValue,
+    //   flow: 'email-verification',
+    // })
+    //   .then(() => {
+    //     clearOtp();
+    //     showToast({
+    //       title: 'Success',
+    //       subtitle: 'Your email has been verified. welcome to HospiceConnect',
+    //     });
+    //   })
+    //   .catch((e) => {
+    //     showToast({
+    //       title: 'Error',
+    //       subtitle:
+    //         'Failed to verify email. Check if your email or verification code is correct.',
+    //     });
+    //   });
   };
 
   return (

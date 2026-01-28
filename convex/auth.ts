@@ -1,15 +1,15 @@
 import { expo } from '@better-auth/expo';
 import { createClient, type GenericCtx } from '@convex-dev/better-auth';
-import { convex } from '@convex-dev/better-auth/plugins';
+import { convex, crossDomain } from '@convex-dev/better-auth/plugins';
 import { betterAuth, type BetterAuthOptions } from 'better-auth';
 
 import type { DataModel } from './_generated/dataModel';
 
+import { requireActionCtx } from '@convex-dev/better-auth/utils';
 import { components } from './_generated/api';
 import { query } from './_generated/server';
 import authConfig from './auth.config';
 import authSchema from './betterAuth/schema';
-import { requireActionCtx } from '@convex-dev/better-auth/utils';
 import { sendResetPassword } from './sendEmail';
 
 const siteUrl = process.env.SITE_URL!;
@@ -39,6 +39,7 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
             'exp://localhost:*/*', // Trust localhost
             'http://localhost:3000',
             'http://localhost:3001',
+            'http://localhost:8082',
           ]
         : []),
     ],
@@ -66,13 +67,7 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
         enabled: true,
       },
     },
-    plugins: [
-      expo(),
-      convex({
-        authConfig,
-        jwksRotateOnTokenGenerationError: true,
-      }),
-    ],
+    plugins: [expo(), convex({ authConfig }), crossDomain({ siteUrl })],
     user: {
       additionalFields: {
         role: {

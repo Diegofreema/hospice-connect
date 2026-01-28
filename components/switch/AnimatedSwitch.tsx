@@ -9,7 +9,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import { AnimatedSwitchProps } from './AnimatedSwitch.types';
+import { type AnimatedSwitchProps } from './AnimatedSwitch.types';
 
 export const AnimatedSwitch: React.FC<AnimatedSwitchProps> = ({
   value,

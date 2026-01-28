@@ -20,7 +20,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { SymbolView } from "expo-symbols";
 import { BlurView } from "expo-blur";
-import { SearchBarProps } from "./SearchBar.types";
+import { type SearchBarProps } from "./SearchBar.types";
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 const AnimatedView = Animated.createAnimatedComponent(View);

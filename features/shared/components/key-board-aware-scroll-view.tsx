@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from 'react';
+import { type PropsWithChildren } from 'react';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 
 export const KeyboardAwareScrollViewComponent = ({

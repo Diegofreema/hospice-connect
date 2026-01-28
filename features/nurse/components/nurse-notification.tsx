@@ -8,7 +8,7 @@ import { Text } from '@/features/shared/components/text';
 import { View } from '@/features/shared/components/view';
 import { useAcceptDecline } from '@/features/shared/hooks/use-accept-decline';
 import { useMutation } from 'convex/react';
-import { FunctionReturnType } from 'convex/server';
+import { type FunctionReturnType } from 'convex/server';
 import { format } from 'date-fns';
 import { StyleSheet } from 'react-native-unistyles';
 

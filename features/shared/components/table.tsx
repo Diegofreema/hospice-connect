@@ -3,10 +3,10 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextStyle,
+  type TextStyle,
   TouchableOpacity,
   View,
-  ViewStyle,
+  type ViewStyle,
 } from 'react-native';
 
 // Type definitions

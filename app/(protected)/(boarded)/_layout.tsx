@@ -2,13 +2,11 @@ import { ChatWrapper } from '@/components/chat-wrapper';
 import { useAuth } from '@/components/context/auth';
 import { ChatContext } from '@/components/context/chat-context';
 import { Stack } from 'expo-router';
-import React from 'react';
 
 const BoardedLayout = () => {
   const { user } = useAuth();
 
   const isNurse = user?.role === 'nurse';
-  console.log('Board Layout', isNurse);
 
   return (
     <ChatWrapper>

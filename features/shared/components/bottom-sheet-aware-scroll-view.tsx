@@ -7,7 +7,7 @@ import type { BottomSheetScrollViewProps } from '@gorhom/bottom-sheet/src/compon
 import { memo } from 'react';
 import {
   KeyboardAwareScrollView,
-  KeyboardAwareScrollViewProps,
+  type KeyboardAwareScrollViewProps,
 } from 'react-native-keyboard-controller';
 import Reanimated from 'react-native-reanimated';
 

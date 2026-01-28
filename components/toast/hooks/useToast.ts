@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { ToastContextValue } from "../Toast.types";
+import { type ToastContextValue } from "../Toast.types";
 
 export const useToast = <T extends ToastContextValue>(
   ReactContext: React.Context<T>

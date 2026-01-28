@@ -1,5 +1,8 @@
 import { api } from '@/convex/_generated/api';
-import { Doc, Id } from '@/convex/_generated/dataModel';
+import {
+  type Doc,
+  type Id,
+} from '@/convex/_generated/dataModel';
 import { Button } from '@/features/shared/components/button';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 
@@ -44,7 +47,7 @@ export const SelectSchedule = ({ id, hospiceId, name, onClose }: Props) => {
   const availableSchedules = schedules.filter(
     (schedule) =>
       schedule.nurseId === nurseId &&
-      (schedule.status === 'booked' || schedule.status === 'on_going')
+      (schedule.status === 'booked' || schedule.status === 'on_going'),
   );
   const onSelect = (id: Id<'schedules'>) => {
     setSelectedIds((prev) => {
@@ -58,7 +61,7 @@ export const SelectSchedule = ({ id, hospiceId, name, onClose }: Props) => {
   const selectedSchedules = selectedIds
     .map((selectedId) => {
       return availableSchedules.find(
-        (schedule) => schedule._id === selectedId
+        (schedule) => schedule._id === selectedId,
       )!;
     })
     .filter((schedule) => schedule !== undefined);
@@ -67,7 +70,7 @@ export const SelectSchedule = ({ id, hospiceId, name, onClose }: Props) => {
     for (const selectedSchedule of selectedSchedules) {
       const endDate = selectedSchedule.endDate;
       const { hours, minutes } = convertTimeStringToDate2(
-        selectedSchedule.endTime
+        selectedSchedule.endTime,
       );
       const date = parse(endDate, 'dd-MM-yyyy', new Date());
       const fullDateTime = set(date, {
@@ -104,7 +107,7 @@ export const SelectSchedule = ({ id, hospiceId, name, onClose }: Props) => {
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to send schedule'
+        'Failed to send schedule',
       );
       showToast({
         title: 'Error',
@@ -118,8 +121,8 @@ export const SelectSchedule = ({ id, hospiceId, name, onClose }: Props) => {
   return (
     <BottomSheetFlatList
       data={schedules}
-      keyExtractor={(item) => item._id}
-      renderItem={({ item }) => (
+      keyExtractor={(item: Doc<'schedules'>) => item._id}
+      renderItem={({ item }: { item: Doc<'schedules'> }) => (
         <Schedule onSelect={onSelect} item={item} selectedIds={selectedIds} />
       )}
       contentContainerStyle={{ gap: 15, flexGrow: 1, paddingBottom: 50 }}

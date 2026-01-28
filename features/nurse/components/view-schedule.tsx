@@ -1,18 +1,22 @@
-import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
-import { useSelectAssignment } from "@/features/hospice/hooks/use-select-assignment";
-import { SmallLoader } from "@/features/shared/components/small-loader";
-import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
-import { useQuery } from "convex/react";
-import React from "react";
-import { ViewShiftCard } from "./view-schedule-card";
+import { api } from '@/convex/_generated/api';
+import { type Id } from '@/convex/_generated/dataModel';
+import { useSelectAssignment } from '@/features/hospice/hooks/use-select-assignment';
+import { SmallLoader } from '@/features/shared/components/small-loader';
+import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
+import { useQuery } from 'convex/react';
+import React from 'react';
+import { ViewShiftCard } from './view-schedule-card';
+import { type FunctionReturnType } from 'convex/server';
 
 type Props = {
   onClose: () => void;
-  nurseId: Id<"nurses">;
+  nurseId: Id<'nurses'>;
   onOpenSheetCancelSchedule: () => void;
 };
 
+type DataType = FunctionReturnType<
+  typeof api.shifts.getShiftsByOnlyAssignmentId
+>;
 export const ViewSchedule = ({
   nurseId,
   onClose,
@@ -21,7 +25,7 @@ export const ViewSchedule = ({
   const assignmentId = useSelectAssignment((state) => state.id);
   const data = useQuery(
     api.shifts.getShiftsByOnlyAssignmentId,
-    assignmentId ? { assignmentId } : "skip",
+    assignmentId ? { assignmentId } : 'skip',
   );
 
   if (data === undefined) {
@@ -33,8 +37,8 @@ export const ViewSchedule = ({
   return (
     <BottomSheetFlatList
       showsVerticalScrollIndicator={false}
-      data={data}
-      renderItem={({ item }) => (
+      data={data as DataType}
+      renderItem={({ item }: { item: DataType[number] }) => (
         <ViewShiftCard
           shift={item}
           onAcceptSchedule={onAcceptSchedule}
@@ -44,7 +48,7 @@ export const ViewSchedule = ({
         />
       )}
       style={{ marginTop: 20 }}
-      keyExtractor={(item) => item._id}
+      keyExtractor={(item: DataType[number]) => item._id}
       contentContainerStyle={{ gap: 20, paddingBottom: 100, flexGrow: 1 }}
     />
   );

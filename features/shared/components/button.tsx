@@ -1,10 +1,10 @@
-import { Icon } from '@tabler/icons-react-native';
+import { type Icon } from '@tabler/icons-react-native';
 import React, { forwardRef } from 'react';
 import {
   Text,
   TouchableOpacity,
-  TouchableOpacityProps,
-  View,
+  type TouchableOpacityProps,
+  type View,
 } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 

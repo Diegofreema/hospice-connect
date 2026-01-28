@@ -1,9 +1,9 @@
 import { useHospice } from '@/components/context/hospice-context';
 import { useToast } from '@/components/demos/toast';
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import { CreateAssignmentForm } from '@/features/hospice/components/create-assignment-form';
-import { CreateAssignmentValidator } from '@/features/hospice/validator';
+import { type CreateAssignmentValidator } from '@/features/hospice/validator';
 import { Wrapper } from '@/features/shared/components/wrapper';
 import {
   generateErrorMessage,
@@ -59,7 +59,7 @@ const CreateScreen = () => {
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to create assignment'
+        'Failed to create assignment',
       );
 
       showToast({

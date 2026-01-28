@@ -3,7 +3,7 @@ import { api } from '@/convex/_generated/api';
 import { useMutation, useQuery } from 'convex/react';
 
 import { useToast } from '@/components/demos/toast';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import { Button } from '@/features/shared/components/button';
 import CancelAssignmentModal from '@/features/shared/components/cancel-modal';
 import { SmallLoader } from '@/features/shared/components/small-loader';
@@ -20,7 +20,7 @@ type Props = {
   onRateNurse: () => void;
   onViewRouteSheet: (
     assignmentId: Id<'assignments'>,
-    nurseId: Id<'nurses'>
+    nurseId: Id<'nurses'>,
   ) => void;
 };
 
@@ -40,7 +40,7 @@ export const AssignmentSchedule = ({
     api.shifts.getShifts,
     assignmentId && hospice && hospice._id
       ? { assignmentId, hospiceId: hospice._id }
-      : 'skip'
+      : 'skip',
   );
   const onCancel = async (reason: string) => {
     if (!assignmentId || !hospice?._id) return;
@@ -62,7 +62,7 @@ export const AssignmentSchedule = ({
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to cancel assignment'
+        'Failed to cancel assignment',
       );
       showToast({
         title: 'Error',
@@ -93,7 +93,7 @@ export const AssignmentSchedule = ({
       <BottomSheetFlatList
         showsVerticalScrollIndicator={false}
         data={sortedShift}
-        renderItem={({ item }) => (
+        renderItem={({ item }: { item: (typeof sortedShift)[number] }) => (
           <ShiftCard
             shift={item}
             discipline={data.assignment?.discipline || ''}
@@ -103,7 +103,7 @@ export const AssignmentSchedule = ({
             onViewRouteSheet={onViewRouteSheet}
           />
         )}
-        keyExtractor={(item) => item._id}
+        keyExtractor={(item: (typeof sortedShift)[number]) => item._id}
         contentContainerStyle={{ gap: 20, paddingBottom: 100, flexGrow: 1 }}
         ListFooterComponent={
           showCancelButton && shiftsHasNurse ? (

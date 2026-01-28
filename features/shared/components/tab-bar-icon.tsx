@@ -1,4 +1,4 @@
-import { Icon } from "@tabler/icons-react-native";
+import { type Icon } from "@tabler/icons-react-native";
 import { View } from "react-native";
 import { Text } from "@/features/shared/components/text";
 import { StyleSheet } from "react-native-unistyles";

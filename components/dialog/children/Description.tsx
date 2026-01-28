@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
-import { DialogDescriptionProps } from "../Dialog.types";
+import { type DialogDescriptionProps } from "../Dialog.types";
 
 export const DialogDescription: React.FC<DialogDescriptionProps> = ({
   children,

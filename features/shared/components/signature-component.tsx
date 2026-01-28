@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react';
 import { View } from 'react-native';
-import Signature, { SignatureViewRef } from 'react-native-signature-canvas';
+import Signature, { type SignatureViewRef } from 'react-native-signature-canvas';
 import { StyleSheet } from 'react-native-unistyles';
 import { Button } from './button';
 type Props = {

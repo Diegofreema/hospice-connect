@@ -18,11 +18,11 @@ import {
 
 import { useToast } from '@/components/demos/toast';
 import { authClient } from '@/lib/auth-client';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { TouchableOpacity } from 'react-native';
 import { useUnistyles } from 'react-native-unistyles';
-import { RegisterSchema, registerSchema } from '../../validators';
+import { type RegisterSchema, registerSchema } from '../../validators';
 import { ControlInput } from './control-input';
 export const RegisterForm = () => {
   const [secured, setSecured] = useState(true);

@@ -1,10 +1,10 @@
 import { useAuth } from '@/components/context/auth';
 import { Text } from '@/features/shared/components/text';
 import { View } from '@/features/shared/components/view';
-import { Reaction, renderReaction, trimText } from '@/features/shared/utils';
+import { type Reaction, renderReaction, trimText } from '@/features/shared/utils';
 import {
   ChannelPreviewMessenger,
-  ChannelPreviewMessengerProps,
+  type ChannelPreviewMessengerProps,
 } from 'stream-chat-expo';
 import { ChannelPreviewCount } from './channel-preview-count';
 

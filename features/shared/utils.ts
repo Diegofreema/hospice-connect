@@ -1,9 +1,13 @@
 /* eslint-disable @typescript-eslint/no-empty-object-type */
-import { Doc, Id } from '@/convex/_generated/dataModel';
-import { scheduleStatus } from '@/convex/schema';
-import { ReactMutation } from 'convex/react';
-import { FunctionReference } from 'convex/server';
-import { ConvexError, Infer } from 'convex/values';
+import {
+  type Doc,
+  type Id,
+} from '@/convex/_generated/dataModel';
+import { type scheduleStatus } from '@/convex/schema';
+
+import { type ReactMutation } from 'convex/react';
+import { type FunctionReference } from 'convex/server';
+import { ConvexError, type Infer } from 'convex/values';
 import {
   addHours,
   addMinutes,
@@ -36,7 +40,7 @@ export const getFontSize = (baseSize: number) => {
 
 export const generateErrorMessage = (
   error: unknown,
-  message: string
+  message: string,
 ): string => {
   return error instanceof ConvexError
     ? error.data?.message || message
@@ -63,7 +67,7 @@ export const uploadProfilePicture = async (
   generateUploadUrl: ReactMutation<
     FunctionReference<'mutation', 'public', {}, string, string | undefined>
   >,
-  selectedImage?: string
+  selectedImage?: string,
 ): Promise<{ storageId: Id<'_storage'>; uploadUrl: string } | undefined> => {
   try {
     if (!selectedImage) return;
@@ -115,7 +119,7 @@ export const getScheduleStatusText = (status: Infer<typeof scheduleStatus>) => {
   }
 };
 export const getAssignmentStatusText = (
-  status: Infer<typeof scheduleStatus>
+  status: Infer<typeof scheduleStatus>,
 ) => {
   switch (status) {
     case 'available':
@@ -134,7 +138,7 @@ export const getAssignmentStatusText = (
 };
 
 export const getScheduleStatusAndColor = (
-  status: Infer<typeof scheduleStatus>
+  status: Infer<typeof scheduleStatus>,
 ) => {
   switch (status) {
     case 'completed':
@@ -181,7 +185,7 @@ export function convertTimeStringToDate(timeString: string, value?: string) {
     now.getMonth(),
     now.getDate(),
     hours24,
-    minutes
+    minutes,
   );
 }
 export function convertTimeStringToDate2(timeString: string, value?: string) {
@@ -333,7 +337,7 @@ export const calculateAge = (dob: Date): number => {
 };
 
 export const sortedArray = <T extends { _creationTime: number }>(
-  array: T[]
+  array: T[],
 ): T[] => {
   return [...array].sort((a, b) => {
     const dateA = new Date(a._creationTime);
@@ -344,10 +348,10 @@ export const sortedArray = <T extends { _creationTime: number }>(
 export const sortedArrayByAvailability = <
   T extends { available?: { available: boolean } },
 >(
-  array: T[]
+  array: T[],
 ): T[] => {
   return [...array].sort(
-    (a, b) => +!!b.available?.available - +!!a.available?.available
+    (a, b) => +!!b.available?.available - +!!a.available?.available,
   );
 };
 
@@ -368,25 +372,35 @@ export const renderReaction = (
   reaction?: Reaction,
   userId?: string,
   reactUserId?: string,
-  reactUserName?: string
+  reactUserName?: string,
 ) => {
   const isMyReaction = userId === reactUserId;
   if (!reaction) return '';
 
   if (reaction.type === 'like') {
-    return `${isMyReaction ? 'You reacted 👍 to ' : `${reactUserName} reacted 👍 to `}`;
+    return `${
+      isMyReaction ? 'You reacted 👍 to ' : `${reactUserName} reacted 👍 to `
+    }`;
   }
   if (reaction.type === 'love') {
-    return `${isMyReaction ? 'You reacted ❤️ to ' : `${reactUserName} reacted ❤️ to `}`;
+    return `${
+      isMyReaction ? 'You reacted ❤️ to ' : `${reactUserName} reacted ❤️ to `
+    }`;
   }
   if (reaction.type === 'haha') {
-    return `${isMyReaction ? 'You reacted 😂 to ' : `${reactUserName} reacted 😂 to `}`;
+    return `${
+      isMyReaction ? 'You reacted 😂 to ' : `${reactUserName} reacted 😂 to `
+    }`;
   }
   if (reaction.type === 'sad') {
-    return `${isMyReaction ? 'You reacted 😢 to ' : `${reactUserName} reacted 😢 to `}`;
+    return `${
+      isMyReaction ? 'You reacted 😢 to ' : `${reactUserName} reacted 😢 to `
+    }`;
   }
   if (reaction.type === 'wow') {
-    return `${isMyReaction ? 'You reacted 😲 to ' : `${reactUserName} reacted 😲 to `}`;
+    return `${
+      isMyReaction ? 'You reacted 😲 to ' : `${reactUserName} reacted 😲 to `
+    }`;
   }
   return '';
 };

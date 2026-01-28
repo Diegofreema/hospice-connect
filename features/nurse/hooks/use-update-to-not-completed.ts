@@ -1,12 +1,12 @@
-import { useCallback } from "react";
-import { useMutation } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import { useFocusEffect } from "expo-router";
-import { Id } from "@/convex/_generated/dataModel";
+import { useCallback } from 'react';
+import { useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
+import { useFocusEffect } from 'expo-router';
+import { type Id } from '@/convex/_generated/dataModel';
 
 type Props = {
-  nurseId: Id<"nurses">;
-  assignmentId: Id<"assignments">;
+  nurseId: Id<'nurses'>;
+  assignmentId: Id<'assignments'>;
 };
 
 export const useUpdateToNotCompleted = ({ nurseId, assignmentId }: Props) => {

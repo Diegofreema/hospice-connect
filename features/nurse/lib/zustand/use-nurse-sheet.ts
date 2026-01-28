@@ -1,4 +1,4 @@
-import { DayType } from '@/convex/helper';
+import { type DayType } from '@/convex/helper';
 import { create } from 'zustand';
 
 type Props = {

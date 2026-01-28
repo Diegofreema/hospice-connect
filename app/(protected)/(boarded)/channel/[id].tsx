@@ -16,7 +16,7 @@ import {
   Channel,
   MessageInput,
   MessageList,
-  SendButtonProps,
+  type SendButtonProps,
   useMessageInputContext,
 } from 'stream-chat-expo';
 

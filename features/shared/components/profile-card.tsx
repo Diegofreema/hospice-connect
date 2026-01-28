@@ -1,7 +1,7 @@
 import { Avatar } from '@/components/avatar/Avatar';
 import { SpinnerArc } from '@/components/loaders';
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 
 import { IconCamera, IconUpload } from '@tabler/icons-react-native';
 import { useMutation } from 'convex/react';
@@ -65,7 +65,7 @@ export const ProfileCard = ({
   const { showToast } = useToast();
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
+    const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       allowsEditing: true,
       aspect: [4, 3],

@@ -1,9 +1,9 @@
-import {useHospice} from '@/components/context/hospice-context';
-import {Id} from '@/convex/_generated/dataModel';
+import { useHospice } from '@/components/context/hospice-context';
+import { type Id } from '@/convex/_generated/dataModel';
 import FetchCaseRequest from '@/features/hospice/components/fetch-case-requests';
-import {BackButton} from '@/features/shared/components/back-button';
-import {Wrapper} from '@/features/shared/components/wrapper';
-import {useLocalSearchParams} from 'expo-router';
+import { BackButton } from '@/features/shared/components/back-button';
+import { Wrapper } from '@/features/shared/components/wrapper';
+import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 
 const CaseRequestScreen = () => {

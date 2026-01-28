@@ -1,4 +1,4 @@
-import { StyleProp, ViewStyle } from 'react-native';
+import { type StyleProp, type ViewStyle } from 'react-native';
 
 export type SegmentedControlItemProps = {
   value: string;

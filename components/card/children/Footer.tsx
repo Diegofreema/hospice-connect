@@ -2,8 +2,8 @@ import React from "react";
 import {
   View,
   StyleSheet,
-  StyleProp,
-  ViewStyle,
+  type StyleProp,
+  type ViewStyle,
   useWindowDimensions,
 } from "react-native";
 

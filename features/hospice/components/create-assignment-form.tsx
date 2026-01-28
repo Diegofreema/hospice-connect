@@ -12,7 +12,7 @@ import { calculateAge } from '@/features/shared/utils';
 import { useEffect } from 'react';
 import {
   createAssignmentValidator,
-  CreateAssignmentValidator,
+  type CreateAssignmentValidator,
 } from '../validator';
 const careLevel = [
   'Initial Evaluation',

@@ -4,11 +4,11 @@ import { Text } from '@/features/shared/components/text';
 import { View } from '../../shared/components/view';
 
 import { IconChevronRight } from '@tabler/icons-react-native';
-import { Href, router } from 'expo-router';
+import { type Href, router } from 'expo-router';
 import { openBrowserAsync } from 'expo-web-browser';
 import { FlatList, TouchableOpacity } from 'react-native';
 import { useUnistyles } from 'react-native-unistyles';
-import { LinkType } from '../types';
+import { type LinkType } from '../types';
 type Props = {
   links: LinkType[];
 };

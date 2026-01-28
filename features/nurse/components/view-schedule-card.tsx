@@ -1,10 +1,10 @@
 import { Badge } from '@/components/badge/Badge';
-import { BadgeVariant } from '@/components/badge/types';
+import { type BadgeVariant } from '@/components/badge/types';
 import { Card, CardFooter, CardHeader } from '@/components/card';
 import { useToast } from '@/components/demos/toast';
 import { PrivacyNoticeLink } from '@/components/privacy-notice/privacy-notice-link';
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import { useGetScheduleId } from '@/features/hospice/hooks/use-get-schedule-id';
 import { Text } from '@/features/shared/components/text';
 import { Stack } from '@/features/shared/components/v-stack';
@@ -18,7 +18,7 @@ import { useUpdateUpdateStatus } from '@/hooks/use-update-status';
 import { IconCircle } from '@tabler/icons-react-native';
 
 import { useMutation } from 'convex/react';
-import { FunctionReturnType } from 'convex/server';
+import { type FunctionReturnType } from 'convex/server';
 import { format, parse } from 'date-fns';
 import { Image } from 'expo-image';
 import { useState } from 'react';
@@ -51,7 +51,7 @@ export const ViewShiftCard = ({
   const statusInfo = getScheduleStatusAndColor(shift.status);
   const getScheduleId = useGetScheduleId((state) => state.setId);
   const sendCaseRequest = useMutation(
-    api.hospiceNotification.sendCaseRequestNotification
+    api.hospiceNotification.sendCaseRequestNotification,
   );
   const [sending, setSending] = useState(false);
   const { showToast } = useToast();
@@ -78,6 +78,7 @@ export const ViewShiftCard = ({
       await sendCaseRequest({
         nurseId,
         scheduleIds: [shift._id],
+        isHospice: false,
       });
       showToast({
         title: 'Success',
@@ -88,7 +89,7 @@ export const ViewShiftCard = ({
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to send case request'
+        'Failed to send case request',
       );
       showToast({
         title: 'Error',

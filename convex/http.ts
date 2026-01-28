@@ -1,6 +1,5 @@
 import { httpRouter } from 'convex/server';
 
-import { httpAction } from './_generated/server';
 // import { auth } from './auth';
 import { authComponent, createAuth } from './auth';
 // import { resend } from './sendEmail';
@@ -8,7 +7,7 @@ import { authComponent, createAuth } from './auth';
 const http = httpRouter();
 
 // auth.addHttpRoutes(http);
-authComponent.registerRoutes(http, createAuth);
+authComponent.registerRoutes(http, createAuth, { cors: true });
 // http.route({
 //   path: '/resend-webhook',
 //   method: 'POST',

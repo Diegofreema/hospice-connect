@@ -1,13 +1,13 @@
 import { useHospice } from '@/components/context/hospice-context';
-import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
 import { useMarkAsRead } from '@/features/hospice/hooks/use-mark-as-read';
 import { RoustSheetComponent } from '@/features/shared/components/route-sheet-component';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { Text } from '@/features/shared/components/text';
+import { api } from '@/convex/_generated/api';
+import { type Id } from '@/convex/_generated/dataModel';
 import { useQuery } from 'convex/react';
 import { useLocalSearchParams } from 'expo-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ScrollView } from 'react-native';
 import { ApproveRouteSheetModal } from './accept-notification';
 import { DeclineRouteSheetModal } from './delcine-route-sheet';
@@ -28,7 +28,7 @@ export const RouteSheetById = () => {
     api.routeSheets.getRouteSheetById,
     hospice && hospice._id
       ? { hospiceId: hospice._id, routeSheetId: id }
-      : 'skip'
+      : 'skip',
   );
 
   if (data === undefined) {

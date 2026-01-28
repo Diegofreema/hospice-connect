@@ -1,6 +1,6 @@
 import { Avatar } from '@/components/avatar/Avatar';
 import { Badge } from '@/components/badge/Badge';
-import { Href, router } from 'expo-router';
+import { type Href, router } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
 import { TouchableOpacity } from 'react-native';
 import { getFontSize } from '../utils';

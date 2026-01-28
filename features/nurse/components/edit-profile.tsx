@@ -19,7 +19,7 @@ import { format, parse } from 'date-fns';
 import { router } from 'expo-router';
 import { View } from 'react-native';
 import { disciplines, usStates } from '../data';
-import { createNurseValidator, CreateNurseValidator } from '../validators';
+import { createNurseValidator, type CreateNurseValidator } from '../validators';
 
 export const EditProfile = () => {
   const { nurse } = useNurse();
@@ -81,7 +81,9 @@ export const EditProfile = () => {
         data.lastName !== nurse?.name.split(' ')[1]
       ) {
         await authClient.updateUser({
-          name: `${data.firstName?.trim() || ''} ${data.lastName?.trim() || ''}`,
+          name: `${data.firstName?.trim() || ''} ${
+            data.lastName?.trim() || ''
+          }`,
         });
       }
       showToast({
@@ -96,7 +98,7 @@ export const EditProfile = () => {
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to update information'
+        'Failed to update information',
       );
 
       showToast({

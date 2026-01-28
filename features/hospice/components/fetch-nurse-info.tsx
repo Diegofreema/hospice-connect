@@ -1,6 +1,6 @@
 import { Avatar } from '@/components/avatar/Avatar';
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import { FlexText } from '@/features/shared/components/flex-text';
 import { LongInfo } from '@/features/shared/components/long-info';
 import { SmallLoader } from '@/features/shared/components/small-loader';

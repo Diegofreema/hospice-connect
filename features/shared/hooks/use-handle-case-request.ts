@@ -1,6 +1,6 @@
 import { useToast } from '@/components/demos/toast';
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import {
   convertTimeStringToDate2,
   generateErrorMessage,
@@ -29,7 +29,7 @@ export const useHandleCaseRequest = ({
   const declineCaseRequest = useMutation(api.schedules.declineCaseRequest);
   const schedule = useQuery(
     api.posts.getShift,
-    scheduleId ? { scheduleId } : 'skip'
+    scheduleId ? { scheduleId } : 'skip',
   );
   const acceptCaseRequest = useMutation(api.schedules.acceptCaseRequest);
   const onDecline = async () => {
@@ -53,7 +53,7 @@ export const useHandleCaseRequest = ({
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to decline case request'
+        'Failed to decline case request',
       );
       showToast({
         title: 'Error',
@@ -101,7 +101,7 @@ export const useHandleCaseRequest = ({
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to accept case request'
+        'Failed to accept case request',
       );
       showToast({
         title: 'Error',

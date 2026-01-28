@@ -4,7 +4,7 @@ import { useGetScheduleId } from '../../hospice/hooks/use-get-schedule-id';
 
 import { useToast } from '@/components/demos/toast';
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import BottomSheetKeyboardAwareScrollView from '@/features/shared/components/bottom-sheet-aware-scroll-view';
 import { Button } from '@/features/shared/components/button';
 import { CustomPressable } from '@/features/shared/components/custom-pressable';
@@ -24,7 +24,7 @@ type Props = {
 const CancelScheduleNurse = ({ onClose, nurseId }: Props) => {
   const id = useGetScheduleId((state) => state.id);
   const cancelRequest = useMutation(
-    api.hospiceNotification.cancelShiftNotification
+    api.hospiceNotification.cancelShiftNotification,
   );
   const [selected, setSelected] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -49,7 +49,7 @@ const CancelScheduleNurse = ({ onClose, nurseId }: Props) => {
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to send cancellation request'
+        'Failed to send cancellation request',
       );
       showToast({
         title: 'Error',

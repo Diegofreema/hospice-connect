@@ -1,9 +1,9 @@
 import { useNurse } from '@/components/context/nurse-context';
-import { DayType } from '@/convex/helper';
+import { type DayType } from '@/convex/helper';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 
 import { Stack } from '@/features/shared/components/v-stack';
-import BottomSheet from '@gorhom/bottom-sheet';
+import type BottomSheet from '@gorhom/bottom-sheet';
 import { useRef } from 'react';
 import { FlatList } from 'react-native';
 import { useNurseSheet } from '../lib/zustand/use-nurse-sheet';

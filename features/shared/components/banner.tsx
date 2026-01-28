@@ -1,11 +1,11 @@
 import React from 'react';
 import {
-  StyleProp,
+  type StyleProp,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  ViewStyle,
+  type ViewStyle,
 } from 'react-native';
 
 type BannerType = 'info' | 'success' | 'error' | 'warning';

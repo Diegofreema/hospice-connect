@@ -1,6 +1,6 @@
 import { useToast } from '@/components/demos/toast';
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import { useMutation, useQuery } from 'convex/react';
 import { isPast, parse, set } from 'date-fns';
 import { useState } from 'react';
@@ -20,12 +20,12 @@ export const useAcceptDecline = ({
 }: Props) => {
   const acceptAssignment = useMutation(api.posts.acceptAssignment);
   const sendReassignmentNotificationToHospice = useMutation(
-    api.assignments.sendReassignmentNotificationToHospice
+    api.assignments.sendReassignmentNotificationToHospice,
   );
   const declineAssignment = useMutation(api.posts.declineAssignment);
   const schedule = useQuery(
     api.posts.getShift,
-    scheduleId ? { scheduleId } : 'skip'
+    scheduleId ? { scheduleId } : 'skip',
   );
   const [processing, setProcessing] = useState(false);
   const { showToast } = useToast();
@@ -75,7 +75,7 @@ export const useAcceptDecline = ({
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to accept shift'
+        'Failed to accept shift',
       );
       showToast({
         title: 'Error',
@@ -103,7 +103,7 @@ export const useAcceptDecline = ({
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to decline shift'
+        'Failed to decline shift',
       );
       showToast({
         title: 'Error',

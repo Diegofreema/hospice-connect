@@ -8,7 +8,7 @@ import { Spacer } from '@/features/shared/components/spacer';
 
 import { Stack } from '@/features/shared/components/v-stack';
 import { disciplines, usStates } from '../../data';
-import { StepProps } from '../../validators';
+import { type StepProps } from '../../validators';
 
 export const License = ({ form }: StepProps) => {
   return (

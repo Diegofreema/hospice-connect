@@ -1,4 +1,4 @@
-import { Doc } from '@/convex/_generated/dataModel';
+import { type Doc } from '@/convex/_generated/dataModel';
 import { format } from 'date-fns';
 import { Image } from 'expo-image';
 import React from 'react';
@@ -34,6 +34,7 @@ type Props = {
   hideButtons?: boolean;
   showDebit?: boolean;
   date?: number;
+  commission?: number;
 };
 const headers = [
   'Date',
@@ -64,19 +65,25 @@ export const RoustSheetComponent = ({
   hideButtons,
   showDebit = true,
   date,
+  commission,
 }: Props) => {
   const totalHours = calculateTotalHours(shifts);
 
   const data = [
     ...shifts.map((shift) => [
-      ` ${reverseDateStringToMDY(shift.startDate)} - ${reverseDateStringToMDY(shift.endDate)}`,
+      ` ${reverseDateStringToMDY(shift.startDate)} - ${reverseDateStringToMDY(
+        shift.endDate,
+      )}`,
       patientName,
       careLevel,
       shift.startTime,
       shift.endTime,
       calculateTotalHours([shift]).toFixed(2),
       shift.rate.toFixed(2),
-      `$${(convertNumberToStringThenToNumber(calculateTotalHours([shift])) * shift.rate).toFixed(2)}`,
+      `$${(
+        convertNumberToStringThenToNumber(calculateTotalHours([shift])) *
+        shift.rate
+      ).toFixed(2)}`,
     ]),
   ];
   const totalPay = shifts.reduce(
@@ -84,7 +91,7 @@ export const RoustSheetComponent = ({
       acc +
       convertNumberToStringThenToNumber(calculateTotalHours([shift])) *
         shift.rate,
-    0
+    0,
   );
 
   return (
@@ -142,10 +149,10 @@ export const RoustSheetComponent = ({
         />
       )}
 
-      {showDebit && (
+      {showDebit && commission && (
         <Text size="normal" isBold textAlign="center">
-          By submitting I authorize HospiceConnect to charge 5% of the total pay
-          on my card
+          By submitting I authorize HospiceConnect to charge {commission}% of
+          the total pay on my card
         </Text>
       )}
     </View>

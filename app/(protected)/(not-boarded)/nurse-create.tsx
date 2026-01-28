@@ -1,12 +1,12 @@
 import { useAuth } from '@/components/context/auth';
 import { useToast } from '@/components/demos/toast';
-import { api } from '@/convex/_generated/api';
 import { License } from '@/features/nurse/components/step/license';
 import { PersonalInfo } from '@/features/nurse/components/step/personal-info';
 import {
   createNurseValidator,
-  CreateNurseValidator,
+  type CreateNurseValidator,
 } from '@/features/nurse/validators';
+import { api } from '@/convex/_generated/api';
 
 import { BackButton } from '@/features/shared/components/back-button';
 import { Button } from '@/features/shared/components/button';
@@ -24,10 +24,11 @@ import { authClient } from '@/lib/auth-client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from 'convex/react';
 import { format } from 'date-fns';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { FormErrorBanner } from '@/features/shared/components/form-error-banner';
 
 const STEPS = [
   { id: 1, title: 'Personal info', component: PersonalInfo },
@@ -88,8 +89,11 @@ const NurseCreate = () => {
     setCurrentStep((prev) => Math.max(prev - 1, 1));
   };
 
+  const errors = form.formState.errors;
+
   const onSubmit = async (data: CreateNurseValidator) => {
     const { licenseState, firstName, lastName, ...rest } = data;
+
     if (!user) {
       return;
     }
@@ -115,7 +119,7 @@ const NurseCreate = () => {
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to create healthcare professional'
+        'Failed to create healthcare professional',
       );
 
       showToast({
@@ -128,7 +132,9 @@ const NurseCreate = () => {
   const CurrentStepComponent = STEPS[currentStep - 1].component;
   return (
     <Wrapper>
+      <FormErrorBanner errors={errors} />
       <BackButton />
+
       <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
         <Text style={{ alignSelf: 'flex-end' }}>
           Step {currentStep} of {STEPS.length}

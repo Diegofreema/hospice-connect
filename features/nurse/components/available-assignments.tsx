@@ -1,11 +1,11 @@
 import { api } from '@/convex/_generated/api';
 
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { Stack } from '@/features/shared/components/v-stack';
 import { usePaginatedQuery } from 'convex/react';
 import { AssignmentsForNurses } from './assignments';
-import {sortedArray} from "@/features/shared/utils";
+import { sortedArray } from '@/features/shared/utils';
 
 type Props = {
   nurseId: Id<'nurses'>;
@@ -20,7 +20,7 @@ export const AvailableAssignments = ({
   const { loadMore, results, status } = usePaginatedQuery(
     api.assignments.availableAssignments,
     { nurseId, discipline: discipline },
-    { initialNumItems: 50 }
+    { initialNumItems: 50 },
   );
   if (status === 'LoadingFirstPage') {
     return <SmallLoader size={50} />;
@@ -33,7 +33,7 @@ export const AvailableAssignments = ({
   };
   const isLoadingMore = status === 'LoadingMore';
   // const isExhausted = status === 'Exhausted';
-   const sortedResults = sortedArray(results)
+  const sortedResults = sortedArray(results);
   return (
     <Stack flex={1}>
       <AssignmentsForNurses

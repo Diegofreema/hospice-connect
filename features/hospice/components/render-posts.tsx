@@ -3,14 +3,14 @@ import { SmallLoader } from '@/features/shared/components/small-loader';
 import { useHospice } from '@/components/context/hospice-context';
 import { Title } from '@/components/title/Title';
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import { CustomSheet } from '@/features/shared/components/custom-bottom-sheet';
 import { Text } from '@/features/shared/components/text';
 import { View } from '@/features/shared/components/view';
 import { Wrapper } from '@/features/shared/components/wrapper';
-import BottomSheet from '@gorhom/bottom-sheet';
+import type BottomSheet from '@gorhom/bottom-sheet';
 import { useQuery } from 'convex/react';
-import { FunctionReturnType } from 'convex/server';
+import { type FunctionReturnType } from 'convex/server';
 import { router } from 'expo-router';
 import { Fragment, useCallback, useRef } from 'react';
 import { FlatList, TouchableOpacity } from 'react-native';
@@ -43,7 +43,7 @@ export const RenderPosts = ({ posts, loadMore, loadingMore }: Props) => {
       ? {
           scheduleId,
         }
-      : 'skip'
+      : 'skip',
   );
   const { hospice } = useHospice();
   const clearSelected = useSelectAssignment((state) => state.clear);
@@ -79,13 +79,13 @@ export const RenderPosts = ({ posts, loadMore, loadingMore }: Props) => {
   const onViewRouteSheet = useCallback(
     (assignmentId: Id<'assignments'>, nurseId: Id<'nurses'>) => {
       router.push(
-        `/route-sheet-preview?assignmentId=${assignmentId}&nurseId=${nurseId}`
+        `/route-sheet-preview?assignmentId=${assignmentId}&nurseId=${nurseId}`,
       );
       console.log({ assignmentId, nurseId });
 
       bottomSheetRef.current?.close();
     },
-    []
+    [],
   );
   const onReOpenAssignment = useCallback(() => {
     bottomSheetRefReOpenAssignment.current?.expand();

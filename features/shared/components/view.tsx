@@ -1,9 +1,9 @@
-import React, { PropsWithChildren } from 'react';
+import React, { type PropsWithChildren } from 'react';
 import {
-  DimensionValue,
+  type DimensionValue,
   View as RNView,
-  StyleProp,
-  ViewStyle,
+  type StyleProp,
+  type ViewStyle,
 } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 

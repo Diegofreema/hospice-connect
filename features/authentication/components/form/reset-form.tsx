@@ -20,7 +20,7 @@ import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { TouchableOpacity, useWindowDimensions } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
-import { resetPasswordSchema, ResetPasswordSchema } from '../../validators';
+import { resetPasswordSchema, type ResetPasswordSchema } from '../../validators';
 import { ControlInput } from './control-input';
 export const ResetForm = ({ email }: { email: string }) => {
   const [secured, setSecured] = useState(true);

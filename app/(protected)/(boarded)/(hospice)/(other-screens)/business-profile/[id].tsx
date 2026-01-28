@@ -2,9 +2,10 @@ import { useHospice } from '@/components/context/hospice-context';
 import { useToast } from '@/components/demos/toast';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
+
 import { ControlInput } from '@/features/authentication/components/form/control-input';
 import { ControlSelect } from '@/features/authentication/components/form/control-select';
-import { UpdateProfileValidator } from '@/features/hospice/validator';
+import { type UpdateProfileValidator } from '@/features/hospice/validator';
 import { usStates } from '@/features/nurse/data';
 import { BackButton } from '@/features/shared/components/back-button';
 import { Button } from '@/features/shared/components/button';
@@ -55,7 +56,7 @@ const EditBusinessProfile = () => {
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to update information'
+        'Failed to update information',
       );
       showToast({
         title: 'Error',

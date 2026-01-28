@@ -14,7 +14,7 @@ import { FlexButtons } from '@/features/shared/components/flex-buttons';
 import { LongInfo } from '@/features/shared/components/long-info';
 import { useMessage } from '@/hooks/use-message';
 import { useQuery } from 'convex/react';
-import { FunctionReturnType } from 'convex/server';
+import { type FunctionReturnType } from 'convex/server';
 import { format, parse } from 'date-fns';
 import { router } from 'expo-router';
 import { StyleSheet } from 'react-native-unistyles';
@@ -69,7 +69,9 @@ export const CompletedCard = ({ item: post }: Props) => {
         <FlexText leftText="End date" rightText={format(endDate, 'MM/dd/yy')} />
         <FlexText
           leftText="Date of birth"
-          rightText={`${format(dob, 'MM/dd/yy')} (${calculateAge(dob).toString()})`}
+          rightText={`${format(dob, 'MM/dd/yy')} (${calculateAge(
+            dob,
+          ).toString()})`}
         />
         <FlexText leftText="Care level" rightText={post.careLevel} />
         <FlexText

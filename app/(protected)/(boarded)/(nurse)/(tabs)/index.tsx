@@ -11,7 +11,7 @@ import { ViewSchedule } from '@/features/nurse/components/view-schedule';
 import { AccountBrief } from '@/features/shared/components/account-brief';
 import { CustomSheet } from '@/features/shared/components/custom-bottom-sheet';
 import { View } from '@/features/shared/components/view';
-import BottomSheet from '@gorhom/bottom-sheet';
+import type BottomSheet from '@gorhom/bottom-sheet';
 
 import { useQuery } from 'convex/react';
 
@@ -23,7 +23,7 @@ export default function HomeScreen() {
   const { nurse } = useNurse();
   const unreadCount = useQuery(
     api.nurseNotifications.unreadMessagesCount,
-    nurse ? { nurseId: nurse._id } : 'skip'
+    nurse ? { nurseId: nurse._id } : 'skip',
   );
   const [selectedValue, setSelectedValue] = useState<Variants>('available');
   const bottomSheetRef = useRef<BottomSheet>(null);

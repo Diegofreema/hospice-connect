@@ -1,4 +1,4 @@
-import { LegendListRef } from '@legendapp/list';
+import { type LegendListRef } from '@legendapp/list';
 import { useEffect, useRef } from 'react';
 
 export const useScrollToTop = () => {

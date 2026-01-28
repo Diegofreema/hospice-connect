@@ -1,6 +1,6 @@
 import { Card, CardHeader } from '@/components/card';
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import { CustomPressable } from '@/features/shared/components/custom-pressable';
 import { FlexText } from '@/features/shared/components/flex-text';
 import { SmallLoader } from '@/features/shared/components/small-loader';
@@ -80,7 +80,7 @@ const FetchCaseRequest = ({
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to decline case request'
+        'Failed to decline case request',
       );
       showToast({
         title: 'Error',
@@ -110,7 +110,7 @@ const FetchCaseRequest = ({
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Failed to accept case request'
+        'Failed to accept case request',
       );
       showToast({
         title: 'Error',

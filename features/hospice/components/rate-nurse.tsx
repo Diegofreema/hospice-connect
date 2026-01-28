@@ -22,7 +22,7 @@ export const RateNurse = ({ onClose }: Props) => {
   const { showToast } = useToast();
   const shift = useQuery(
     api.shifts.getShift,
-    scheduleId ? { scheduleId } : 'skip'
+    scheduleId ? { scheduleId } : 'skip',
   );
   const onRate = async () => {
     if (!shift?.nurseId) return;

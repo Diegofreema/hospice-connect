@@ -1,7 +1,7 @@
 import { useHospice } from '@/components/context/hospice-context';
 import { useToast } from '@/components/demos/toast';
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import { type Id } from '@/convex/_generated/dataModel';
 import { FetchNurses } from '@/features/hospice/components/fetch-nurses';
 import { RateRange } from '@/features/hospice/components/rate-range';
 import { BackButton } from '@/features/shared/components/back-button';
@@ -11,7 +11,7 @@ import { SearchComponent } from '@/features/shared/components/search-component';
 import { Stack } from '@/features/shared/components/v-stack';
 import { Wrapper } from '@/features/shared/components/wrapper';
 import { generateErrorMessage } from '@/features/shared/utils';
-import BottomSheet from '@gorhom/bottom-sheet';
+import type BottomSheet from '@gorhom/bottom-sheet';
 import { IconFilter2 } from '@tabler/icons-react-native';
 import { useMutation } from 'convex/react';
 import { useLocalSearchParams } from 'expo-router';
@@ -28,7 +28,7 @@ export const Reassign = () => {
   }>();
   const [sending, setSending] = useState(false);
   const sendReassignmentNotification = useMutation(
-    api.assignments.sendReassignmentNotification
+    api.assignments.sendReassignmentNotification,
   );
   const [range, setRange] = useState({
     rate1: '5',
@@ -42,17 +42,13 @@ export const Reassign = () => {
     bottomSheetRef.current?.expand();
   };
   const onReassign = async () => {
-    console.log({ id, hospice, nurseId });
-
-    if (!hospice || !hospice?._id || !nurseId) return;
+    if (!hospice || !hospice?._id) return;
     console.log('Pressed');
     setSending(true);
     try {
       await sendReassignmentNotification({
         scheduleId: id,
         hospiceId: hospice._id,
-        nurseId,
-        hospiceName: hospice.businessName as string,
       });
       showToast({
         title: 'Success',
@@ -62,7 +58,7 @@ export const Reassign = () => {
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
-        'Error sending reassignment notification'
+        'Error sending reassignment notification',
       );
       showToast({
         title: 'Error',
