@@ -1,15 +1,10 @@
 export default function AdminLogin() {
   return (
-    <div
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'background',
-      }}
-    >
-      <p>Admin Login</p>
-      <p>Web admin portal - Login page coming soon</p>
+    <div className="flex-1 items-center justify-center bg-black">
+      <p className="text-blue-500 text-center">Admin Login</p>
+      <p className="text-center text-red-500">
+        Web admin portal - Login page coming soon
+      </p>
     </div>
   );
 }

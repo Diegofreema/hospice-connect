@@ -1,10 +1,9 @@
-import { ToastProvider } from '@/components/demos/toast';
-import Provider from '@/components/provider';
-import { ErrorComponent } from '@/features/shared/components/error';
-
 import { AnimatedView } from '@/components/animated-view';
 import { useAuth } from '@/components/context/auth';
 import { StackedModalProvider } from '@/components/demos/modal/modal-manager';
+import { ToastProvider } from '@/components/demos/toast';
+import Provider from '@/components/provider';
+import { ErrorComponent } from '@/features/shared/components/error';
 import { useAnimationStore } from '@/hooks/use-animation';
 import { useFonts } from 'expo-font';
 import {
@@ -13,6 +12,7 @@ import {
   usePathname,
   useSegments,
 } from 'expo-router';
+import '../global.css';
 
 import { useUpdate } from '@/hooks/use-update';
 import React from 'react';
