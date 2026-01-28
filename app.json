@@ -57,7 +57,8 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "The app accesses your photos"
+          "photosPermission": "$(PRODUCT_NAME) would like to use your device gallery to attach image in a message.",
+          "cameraPermission": "$(PRODUCT_NAME) would like to use your camera to share image in a message."
         }
       ],
       "react-native-edge-to-edge",
@@ -84,9 +85,7 @@
           "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
         }
       ],
-      [
-        "expo-build-properties"
-      ],
+      ["expo-build-properties"],
       "expo-background-task",
       "expo-font"
     ],

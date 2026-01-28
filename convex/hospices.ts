@@ -1,7 +1,11 @@
 import { ConvexError, v } from 'convex/values';
-import { Id } from './_generated/dataModel';
-import { mutation, query, QueryCtx } from './_generated/server';
+import { type Id } from './_generated/dataModel';
+import { mutation, query, type QueryCtx } from './_generated/server';
 import { getUserHelper } from './users';
+import {
+  handleHospiceCount,
+  handlePendingHospiceApprovalCount,
+} from './counter';
 
 export const createHospice = mutation({
   args: {
@@ -19,7 +23,7 @@ export const createHospice = mutation({
       throw new ConvexError({ message: 'Unauthorized' });
     }
 
-    return await ctx.db.insert('hospices', {
+    await ctx.db.insert('hospices', {
       address: args.address,
       businessName: args.businessName,
       licenseNumber: args.licenseNumber,
@@ -28,9 +32,11 @@ export const createHospice = mutation({
       userId: identity.subject,
       phoneNumber: args.phoneNumber,
       email: identity.email as string,
-      isApproved: false,
+      status: 'pending',
       zipcode: args.zipcode,
     });
+    await handleHospiceCount(ctx, 'inc');
+    await handlePendingHospiceApprovalCount(ctx, 'inc');
   },
 });
 
@@ -157,7 +163,7 @@ export const deleteHospice = mutation({
 
 export const getHospiceAndImage = async (
   ctx: QueryCtx,
-  hospiceId?: Id<'hospices'>
+  hospiceId?: Id<'hospices'>,
 ) => {
   if (!hospiceId) {
     return null;

@@ -1,12 +1,12 @@
 import { filter } from 'convex-helpers/server/filter';
-import { paginationOptsValidator, PaginationResult } from 'convex/server';
+import { paginationOptsValidator, type PaginationResult } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
-import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import { sendAvailableAssignmentNotificationToNurse } from './helper';
 import { getNurseDetails } from './nurses';
 import { getSchedulesByAssignmentIdHelper } from './schedules';
 import { shifts } from './schema';
+import { type InProgressShiftsType } from './types';
 
 export const getShifts = query({
   args: {
@@ -125,7 +125,7 @@ export const getInProgressShifts = query({
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
-      return {} as PaginationResult<Doc<'assignments'>>;
+      return {} as PaginationResult<InProgressShiftsType>;
     }
     // Get all assignments that are not completed
     const nursesNotCompletedAssignments = await ctx.db
@@ -147,7 +147,9 @@ export const getInProgressShifts = query({
           throw new ConvexError({ message: 'Assignment not found' });
         }
         const hospice = await ctx.db.get(assignment?.hospiceId);
-
+        if (!hospice) {
+          throw new ConvexError({ message: 'Hospice not found' });
+        }
         return {
           ...assignment,
           businessName: hospice?.businessName,
@@ -213,7 +215,9 @@ export const extendAssignment = mutation({
       ctx,
       assignment.discipline,
       assignment.state,
-      hospice
+      hospice,
+      null,
+      500
     );
   },
 });

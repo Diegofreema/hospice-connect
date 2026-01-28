@@ -1,8 +1,13 @@
-import { ConvexError, Infer } from 'convex/values';
-import { Doc, Id } from './_generated/dataModel';
-import { mutation, MutationCtx, QueryCtx } from './_generated/server';
+import { ConvexError, type Infer } from 'convex/values';
+import { type Doc, type Id } from './_generated/dataModel';
+import { mutation, type MutationCtx, type QueryCtx } from './_generated/server';
+
+import { type day, type DisciplineType } from './schema';
 import { parseDateTimeWallClock } from './actionHelper';
-import { day, DisciplineType } from './schema';
+import { filter } from 'convex-helpers/server/filter';
+import { authComponent } from './auth';
+import { components } from './_generated/api';
+import { type Id as BetterAuthId } from './betterAuth/_generated/dataModel';
 
 export const getImage = (ctx: QueryCtx, imageId?: Id<'_storage'>) => {
   return imageId ? ctx.storage.getUrl(imageId) : null;
@@ -17,7 +22,7 @@ export const generateUploadUrl = mutation(async (ctx) => {
 export const getAvailability = async (
   ctx: QueryCtx,
   nurseId: Id<'nurses'>,
-  day: string
+  day: string,
 ) => {
   const availabilities = await ctx.db
     .query('availabilities')
@@ -48,7 +53,7 @@ export function generateShifts(
   endDate: string, // e.g., '2025-10-02'
   openingShiftTime: string, // e.g., '08:00'
   status: string = 'open',
-  rate: number = 50
+  rate: number = 50,
 ): Shift[] {
   const shifts: Shift[] = [];
 
@@ -163,7 +168,7 @@ export function convertTimeStringToDate(timeString: string) {
     now.getMonth(),
     now.getDate(),
     hours24,
-    minutes
+    minutes,
   );
 }
 export function parseTimeString(timeString: string): {
@@ -268,7 +273,7 @@ export const doIntervalsOverlap = (
   start1: Date,
   end1: Date,
   start2: Date,
-  end2: Date
+  end2: Date,
 ): boolean => {
   return start1.getTime() < end2.getTime() && start2.getTime() < end1.getTime();
 };
@@ -280,7 +285,7 @@ export const checkIfNurseHasAShiftOnDateAndTime = async (
   endDate: string,
   startTime: string,
   endTime: string,
-  facilityTimezone: string
+  facilityTimezone: string,
 ) => {
   // Fetch all booked shifts for the nurse
   const shifts = await ctx.db
@@ -292,12 +297,12 @@ export const checkIfNurseHasAShiftOnDateAndTime = async (
   const newShiftStart = parseDateTimeWallClock(
     startDate,
     startTime,
-    facilityTimezone
+    facilityTimezone,
   );
   const newShiftEnd = parseDateTimeWallClock(
     endDate,
     endTime,
-    facilityTimezone
+    facilityTimezone,
   );
 
   // Validate that end time is after start time
@@ -311,12 +316,12 @@ export const checkIfNurseHasAShiftOnDateAndTime = async (
     const existingShiftStart = parseDateTimeWallClock(
       shift.startDate,
       shift.startTime,
-      facilityTimezone
+      facilityTimezone,
     );
     const existingShiftEnd = parseDateTimeWallClock(
       shift.endDate,
       shift.endTime,
-      facilityTimezone
+      facilityTimezone,
     );
 
     // Check if the intervals overlap
@@ -324,12 +329,14 @@ export const checkIfNurseHasAShiftOnDateAndTime = async (
       newShiftStart,
       newShiftEnd,
       existingShiftStart,
-      existingShiftEnd
+      existingShiftEnd,
     );
 
     if (hasConflict) {
       throw new ConvexError({
-        message: `You already has a shift from ${formatDate(shift.startDate)} ${shift.startTime} to ${formatDate(shift.endDate)} ${shift.endTime}`,
+        message: `You already has a shift from ${formatDate(shift.startDate)} ${
+          shift.startTime
+        } to ${formatDate(shift.endDate)} ${shift.endTime}`,
       });
     }
   }
@@ -355,8 +362,8 @@ export const checkIfNurseHasActiveShift = async ({
     .filter((q) =>
       q.or(
         q.eq(q.field('status'), 'booked'),
-        q.eq(q.field('status'), 'on_going')
-      )
+        q.eq(q.field('status'), 'on_going'),
+      ),
     )
     .collect();
 
@@ -364,12 +371,12 @@ export const checkIfNurseHasActiveShift = async ({
   const newShiftStart = parseDateTimeWallClock(
     shift.startDate,
     shift.startTime,
-    hospiceTimezone
+    hospiceTimezone,
   );
   const newShiftEnd = parseDateTimeWallClock(
     shift.endDate,
     shift.endTime,
-    hospiceTimezone
+    hospiceTimezone,
   );
 
   // Check each existing shift for conflicts
@@ -378,12 +385,12 @@ export const checkIfNurseHasActiveShift = async ({
     const existingShiftStart = parseDateTimeWallClock(
       existing.startDate,
       existing.startTime,
-      hospiceTimezone
+      hospiceTimezone,
     );
     const existingShiftEnd = parseDateTimeWallClock(
       existing.endDate,
       existing.endTime,
-      hospiceTimezone
+      hospiceTimezone,
     );
 
     // Check if the intervals overlap
@@ -391,7 +398,7 @@ export const checkIfNurseHasActiveShift = async ({
       newShiftStart,
       newShiftEnd,
       existingShiftStart,
-      existingShiftEnd
+      existingShiftEnd,
     );
 
     if (hasConflict) {
@@ -399,11 +406,9 @@ export const checkIfNurseHasActiveShift = async ({
         ? 'This healthcare professional already has a shift from'
         : 'You already have a shift from';
       throw new ConvexError({
-        message: `${message} ${formatDate(
-          existing.startDate
-        )} ${existing.startTime} to ${formatDate(existing.endDate)} ${
-          existing.endTime
-        }`,
+        message: `${message} ${formatDate(existing.startDate)} ${
+          existing.startTime
+        } to ${formatDate(existing.endDate)} ${existing.endTime}`,
       });
     }
   }
@@ -413,18 +418,18 @@ export const checkIfNotificationHasBeenSentBeforeAndNotInteractedWith = async (
   ctx: MutationCtx,
   nurseId: Id<'nurses'>,
   scheduleId: Id<'schedules'>,
-  type: 'admin' | 'assignment' | 'normal' | 'reassignment'
+  type: 'admin' | 'assignment' | 'normal' | 'reassignment',
 ) => {
   const notification = await ctx.db
     .query('nurseNotifications')
     .withIndex('nurseId_scheduleId', (q) =>
-      q.eq('nurseId', nurseId).eq('scheduleId', scheduleId).eq('type', type)
+      q.eq('nurseId', nurseId).eq('scheduleId', scheduleId).eq('type', type),
     )
     .filter((q) =>
       q.and(
         q.neq(q.field('status'), 'accepted'),
-        q.neq(q.field('status'), 'declined')
-      )
+        q.neq(q.field('status'), 'declined'),
+      ),
     )
     .first();
   return notification;
@@ -436,19 +441,22 @@ export const deleteAllOtherNotifications = async (
   hospiceNotificationId: Id<'hospiceNotifications'>,
   scheduleId: Id<'schedules'>,
   type: 'reassignment',
-  hospiceId: Id<'hospices'>
+  hospiceId: Id<'hospices'>,
 ) => {
   // find hospice notifications with the same scheduleId and type
   const hospiceNotifications = await ctx.db
     .query('hospiceNotifications')
     .withIndex('hospiceId_scheduleId', (q) =>
-      q.eq('hospiceId', hospiceId).eq('scheduleId', scheduleId).eq('type', type)
+      q
+        .eq('hospiceId', hospiceId)
+        .eq('scheduleId', scheduleId)
+        .eq('type', type),
     )
     .filter((q) =>
       q.and(
         q.neq(q.field('_id'), hospiceNotificationId),
-        q.neq(q.field('status'), 'declined')
-      )
+        q.neq(q.field('status'), 'declined'),
+      ),
     )
     .collect();
 
@@ -456,20 +464,20 @@ export const deleteAllOtherNotifications = async (
   const nurseNotifications = await ctx.db
     .query('nurseNotifications')
     .withIndex('scheduleId', (q) =>
-      q.eq('scheduleId', scheduleId).eq('type', type)
+      q.eq('scheduleId', scheduleId).eq('type', type),
     )
     .filter((q) =>
       q.and(
         q.neq(q.field('nurseId'), nurseId),
-        q.neq(q.field('status'), 'declined')
-      )
+        q.neq(q.field('status'), 'declined'),
+      ),
     )
     .collect();
 
   // delete both nurses and hospice notification in batches of 500 to avoid database overload
   const size = 500;
   const deleteInBatches = async (
-    notifications: Doc<'nurseNotifications'>[] | Doc<'hospiceNotifications'>[]
+    notifications: Doc<'nurseNotifications'>[] | Doc<'hospiceNotifications'>[],
   ) => {
     for (let i = 0; i < notifications.length; i += size) {
       const batch = notifications.slice(i, i + size);
@@ -479,7 +487,7 @@ export const deleteAllOtherNotifications = async (
           if (notification) {
             return ctx.db.delete(notification._id);
           }
-        })
+        }),
       );
     }
   };
@@ -493,29 +501,126 @@ export const sendAvailableAssignmentNotificationToNurse = async (
   ctx: MutationCtx,
   discipline: DisciplineType,
   state: string,
-  hospice: Doc<'hospices'>
+  hospice: Doc<'hospices'>,
+  cursor: string | null,
+  numItems: number,
 ) => {
-  const nurses = await ctx.db
+  const data = await ctx.db
     .query('nurses')
     .withIndex('by_discipline', (q) =>
-      q.eq('discipline', discipline).eq('stateOfRegistration', state)
+      q
+        .eq('discipline', discipline)
+        .eq('stateOfRegistration', state)
+        .eq('status', 'approved'),
     )
-    .collect();
-  const size = 500;
-  for (let i = 0; i < nurses.length; i += size) {
-    const batch = nurses.slice(i, i + size);
-    await Promise.all(
-      batch.map(async (n) => {
-        await ctx.db.insert('nurseNotifications', {
-          nurseId: n._id,
-          isRead: false,
-          description: `A new assignment matching your discipline has been posted by ${hospice.businessName}.`,
-          title: 'New Assignment Available',
-          type: 'normal',
-          hospiceId: hospice._id,
-          viewCount: 0,
-        });
-      })
+    .paginate({ cursor, numItems });
+  const { isDone, page, continueCursor } = data;
+  for (const n of page) {
+    await ctx.db.insert('nurseNotifications', {
+      nurseId: n._id,
+      isRead: false,
+      description: `A new assignment matching your discipline has been posted by ${hospice.businessName}.`,
+      title: 'New Assignment Available',
+      type: 'normal',
+      hospiceId: hospice._id,
+      viewCount: 0,
+    });
+  }
+
+  if (!isDone) {
+    await sendAvailableAssignmentNotificationToNurse(
+      ctx,
+      discipline,
+      state,
+      hospice,
+      continueCursor,
+      numItems,
     );
   }
+};
+
+export const listNursesAndHospicesWithinLast30Days = async (ctx: QueryCtx) => {
+  const now = Date.now();
+  const thirtyDaysAgo = now - 30 * 24 * 60 * 60 * 1000;
+  const recentNurses = await filter(
+    ctx.db.query('nurses').withIndex('by_creation_time'),
+    (nurse) => nurse._creationTime > thirtyDaysAgo,
+  ).collect();
+  const recentHospices = await filter(
+    ctx.db.query('hospices').withIndex('by_creation_time'),
+    (hospice) => hospice._creationTime > thirtyDaysAgo,
+  ).collect();
+  return {
+    recentNurses,
+    recentHospices,
+  };
+};
+
+export const getAssignmentStatusDataHelper = async (ctx: QueryCtx) => {
+  const stat = await ctx.db.query('stats').first();
+  const stats = stat || {
+    _creationTime: Date.now(),
+    totalNurses: 0,
+    totalHospices: 0,
+    totalUnApprovedNurses: 0,
+    totalUnApprovedHospices: 0,
+    totalApprovedNurses: 0,
+    totalApprovedHospices: 0,
+    totalSuspendedNurses: 0,
+    totalSuspendedHospices: 0,
+    totalAssignments: 0,
+    totalCompletedAssignments: 0,
+    totalEndedAssignments: 0,
+    totalActiveAssignments: 0,
+    totalRejectedNurses: 0,
+    totalRejectedHospices: 0,
+  };
+
+  return stats;
+};
+
+export const getUserHelperFn = async (ctx: QueryCtx | MutationCtx) => {
+  return authComponent.safeGetAuthUser(ctx);
+};
+export const getUserById = async (
+  ctx: QueryCtx | MutationCtx,
+  userId: BetterAuthId<'user'>,
+) => {
+  return ctx.runQuery(components.betterAuth.users.getUser, {
+    userId,
+  });
+};
+export const checkDurationOfNotSubmittedAssignment = (
+  numberOfDays: number,
+  nurseAssignment: Doc<'nurseAssignments'>,
+) => {
+  const now = Date.now();
+  const fiveDaysInMs = numberOfDays * 24 * 60 * 60 * 1000;
+
+  const completedAt = nurseAssignment.completedAt;
+  if (typeof completedAt !== 'number' || completedAt <= 0) {
+    return false;
+  }
+  const timeSinceCompletion = now - completedAt;
+  const isAtLeastFiveDaysOld = timeSinceCompletion >= fiveDaysInMs;
+
+  // Future dates shouldn't count (just in case)
+  const isNotInFuture = timeSinceCompletion >= 0;
+
+  return (
+    nurseAssignment.isCompleted &&
+    !nurseAssignment.isSubmitted &&
+    isNotInFuture &&
+    isAtLeastFiveDaysOld
+  );
+};
+
+export const getUserFromBetterAuthId = async (
+  ctx: QueryCtx | MutationCtx,
+  userId: BetterAuthId<'user'>,
+) => {
+  return await ctx.db
+    .query('users')
+    .withIndex('userId', (q) => q.eq('userId', userId))
+    .first();
 };

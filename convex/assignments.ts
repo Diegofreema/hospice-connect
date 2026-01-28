@@ -1,8 +1,7 @@
-import { getAuthUserId } from '@convex-dev/auth/server';
 import { filter } from 'convex-helpers/server/filter';
-import { paginationOptsValidator, PaginationResult } from 'convex/server';
+import { paginationOptsValidator, type PaginationResult } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
-import { Doc, Id } from './_generated/dataModel';
+import { type Doc, type Id } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import {
   checkIfNurseHasActiveShift,
@@ -11,8 +10,12 @@ import {
 } from './helper';
 import { getSchedulesByAssignmentIdHelper } from './schedules';
 import { careLevel, discipline, shifts } from './schema';
-import { AssignmentsWithHospicesType, AvailableAssignmentType } from './types';
+import {
+  type AssignmentsWithHospicesType,
+  type AvailableAssignmentType,
+} from './types';
 import { getUserHelper } from './users';
+import { handleUnSubmittedRouteSheetsCount } from './counter';
 
 export const availableAssignments = query({
   args: {
@@ -36,7 +39,7 @@ export const availableAssignments = query({
         q
           .eq('state', nurse.stateOfRegistration)
           .eq('status', 'available')
-          .eq('discipline', args.discipline)
+          .eq('discipline', args.discipline),
       )
       .paginate(args.paginationOpts);
     // ? getting schedules by assignment id
@@ -45,7 +48,7 @@ export const availableAssignments = query({
         const schedules = await ctx.db
           .query('schedules')
           .withIndex('by_assignment_id', (q) =>
-            q.eq('assignmentId', assignment._id)
+            q.eq('assignmentId', assignment._id),
           )
           .collect();
         const hospice = await ctx.db.get(assignment.hospiceId);
@@ -54,13 +57,13 @@ export const availableAssignments = query({
           schedules,
           hospice,
         };
-      })
+      }),
     );
     // ? filtering to return only assignments that all their shifts are available
     const availableAssignments = assignments.filter(
       (assignment) =>
         assignment.schedules.length > 0 &&
-        assignment.schedules.some((sch) => sch.status === 'available')
+        assignment.schedules.some((sch) => sch.status === 'available'),
     );
 
     return {
@@ -75,7 +78,7 @@ export const inProgressAssignments = query({
       v.literal('completed'),
       v.literal('not_covered'),
       v.literal('booked'),
-      v.literal('available')
+      v.literal('available'),
     ),
     paginationOpts: paginationOptsValidator,
     userId: v.string(),
@@ -100,13 +103,13 @@ export const inProgressAssignments = query({
       ctx.db
         .query('schedules')
         .withIndex('nurse', (q) => q.eq('nurseId', nurse._id)),
-      (schedule) => schedule.status !== 'completed'
+      (schedule) => schedule.status !== 'completed',
     ).paginate(args.paginationOpts);
 
     const schedulesWithUniqueAssignments = await Promise.all(
       schedules.page.map(async (schedule) => {
         return (await ctx.db.get(schedule.assignmentId)) as Doc<'assignments'>;
-      })
+      }),
     );
 
     const uniqueMap = new Map();
@@ -130,8 +133,8 @@ export const completedAssignments = query({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
       return {} as PaginationResult<AssignmentsWithHospicesType>;
     }
     const nurse = await ctx.db.get(args.nurseId);
@@ -142,7 +145,7 @@ export const completedAssignments = query({
     const completedNurseAssignments = await ctx.db
       .query('nurseAssignments')
       .withIndex('nurse_id', (q) =>
-        q.eq('nurseId', nurse._id).eq('isCompleted', true)
+        q.eq('nurseId', nurse._id).eq('isCompleted', true),
       )
       // .filter((q) => q.eq(q.field('endDate'), nurse.stateOfRegistration))
       .paginate(args.paginationOpts);
@@ -151,7 +154,7 @@ export const completedAssignments = query({
         const dateA = new Date(a._creationTime);
         const dateB = new Date(b._creationTime);
         return dateB.getTime() - dateA.getTime();
-      }
+      },
     );
 
     const assignments = await Promise.all(
@@ -161,20 +164,20 @@ export const completedAssignments = query({
           .withIndex('by_assignment_id', (q) =>
             q
               .eq('assignmentId', nurseAssignment.assignmentId)
-              .eq('nurseId', nurseAssignment.nurseId)
+              .eq('nurseId', nurseAssignment.nurseId),
           )
           .filter((q) => q.neq(q.field('isDeclined'), true))
           .first();
         const isSubmitted = !!routeSheet;
         const assignment = (await ctx.db.get(
-          nurseAssignment.assignmentId
+          nurseAssignment.assignmentId,
         )) as Doc<'assignments'>;
         return {
           ...assignment,
           isSubmitted,
           isApproved: !!routeSheet?.isApproved,
         };
-      })
+      }),
     );
 
     const assignmentsWithHospices = await Promise.all(
@@ -184,7 +187,7 @@ export const completedAssignments = query({
           ...assignment,
           hospice,
         };
-      })
+      }),
     );
 
     return {
@@ -263,7 +266,9 @@ export const createAssignment = mutation({
       ctx,
       args.discipline,
       args.state,
-      hospice
+      hospice,
+      null,
+      500,
     );
   },
 });
@@ -330,7 +335,9 @@ export const reopenAssignment = mutation({
       ctx,
       assignment.discipline,
       assignment.state,
-      hospice
+      hospice,
+      null,
+      500,
     );
   },
 });
@@ -352,7 +359,7 @@ export const getAssignment = query({
     const schedules = await ctx.db
       .query('schedules')
       .withIndex('by_assignment_id', (q) =>
-        q.eq('assignmentId', args.assignmentId)
+        q.eq('assignmentId', args.assignmentId),
       )
       .collect();
 
@@ -411,7 +418,7 @@ export const updateAssignment = mutation({
         .withIndex('by_discipline', (q) =>
           q
             .eq('discipline', args.discipline)
-            .eq('stateOfRegistration', args.state)
+            .eq('stateOfRegistration', args.state),
         )
         .collect();
       for (const nurse of nurses) {
@@ -431,7 +438,7 @@ export const updateAssignment = mutation({
       .withIndex('by_assignment_id', (q) => q.eq('assignmentId', assignmentId))
       .collect();
     const oldSchedulesHasNurse = oldSchedules.some(
-      (schedule) => schedule.nurseId
+      (schedule) => schedule.nurseId,
     );
     if (oldSchedulesHasNurse) {
       await ctx.db.patch(assignmentId, {
@@ -527,7 +534,7 @@ export const deleteAssignment = mutation({
     const schedules = await ctx.db
       .query('schedules')
       .withIndex('by_assignment_id', (q) =>
-        q.eq('assignmentId', args.assignmentId)
+        q.eq('assignmentId', args.assignmentId),
       )
       .collect();
     const assignmentHasStarted = schedules.some((schedule) => {
@@ -564,7 +571,7 @@ export const updateAssignmentStatus = mutation({
 
     const schedules = await getSchedulesByAssignmentIdHelper(
       ctx,
-      args.assignmentId
+      args.assignmentId,
     );
     // console.log({ first: schedules[0], last: schedules.at(-1) });
 
@@ -580,7 +587,7 @@ export const updateAssignmentStatus = mutation({
     if (schedules.length > 0) {
       const hasAvailable = schedules.some((s) => s.status === 'available');
       const hasBooked = schedules.some((s) =>
-        ['booked', 'on_going'].includes(s.status)
+        ['booked', 'on_going'].includes(s.status),
       );
 
       if (hasAvailable) {
@@ -622,10 +629,11 @@ export const updateAssignmentStatusToCompleted = mutation({
       .withIndex('assignmentId', (q) => q.eq('assignmentId', args.assignmentId))
       .collect();
     for (const nurseAssignment of nursesAssignments) {
-      await ctx.db.patch(nurseAssignment._id, {
+      await ctx.db.patch('nurseAssignments', nurseAssignment._id, {
         isCompleted: true,
         completedAt: Date.now(),
       });
+      await handleUnSubmittedRouteSheetsCount(ctx, 'inc');
     }
   },
 });
@@ -655,7 +663,7 @@ export const cancelAssignment = mutation({
     const schedules = await ctx.db
       .query('schedules')
       .withIndex('by_assignment_id', (q) =>
-        q.eq('assignmentId', args.assignmentId)
+        q.eq('assignmentId', args.assignmentId),
       )
       .collect();
 
@@ -669,7 +677,11 @@ export const cancelAssignment = mutation({
       return;
     }
 
-    const text = `${hospice.businessName} has ended the assignment for ${assignment.patientFirstName} ${assignment.patientLastName}. Reason: ${args.reason || 'No reason provided'}`;
+    const text = `${hospice.businessName} has ended the assignment for ${
+      assignment.patientFirstName
+    } ${assignment.patientLastName}. Reason: ${
+      args.reason || 'No reason provided'
+    }`;
 
     // === Step 1: Send ONE notification per nurse ===
     const notifiedNurses = new Set<string>();
@@ -773,7 +785,13 @@ export const reassignShift = mutation({
       hospiceId: assignment.hospiceId,
       nurseId: schedule.nurseId!,
       title: 'Schedule cancelled',
-      description: `${hospice.businessName} has cancelled your schedule for  ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
+      description: `${
+        hospice.businessName
+      } has cancelled your schedule for  ${formatDate(
+        schedule.startDate,
+      )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
+        schedule.endTime
+      }.`,
       type: 'normal',
       viewCount: 0,
       isRead: false,
@@ -788,7 +806,13 @@ export const reassignShift = mutation({
       type: 'assignment',
       title: 'Schedule accepted',
       scheduleId: args.shift,
-      description: `${nurse.name} (${nurse.discipline}) has accepted your case request for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
+      description: `${nurse.name} (${
+        nurse.discipline
+      }) has accepted your case request for ${formatDate(
+        schedule.startDate,
+      )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
+        schedule.endTime
+      }.`,
       nurseId: args.newNurseId,
       viewCount: 0,
     });
@@ -835,7 +859,7 @@ export const sendReassignmentNotification = mutation({
       .withIndex('by_discipline', (q) =>
         q
           .eq('discipline', assignment.discipline)
-          .eq('stateOfRegistration', assignment.state)
+          .eq('stateOfRegistration', assignment.state),
       )
       .filter((q) => q.neq(q.field('_id'), schedule.nurseId!))
       .collect();
@@ -856,12 +880,18 @@ export const sendReassignmentNotification = mutation({
             isRead: false,
             hospiceId: args.hospiceId,
             scheduleId: schedule._id,
-            description: `${hospice.businessName} has opened a shift for reassignment scheduled for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
+            description: `${
+              hospice.businessName
+            } has opened a shift for reassignment scheduled for ${formatDate(
+              schedule.startDate,
+            )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
+              schedule.endTime
+            }.`,
             title: 'ASAP schedule reassignment',
             type: 'reassignment',
             viewCount: 0,
-          })
-        )
+          }),
+        ),
       );
     }
   },
@@ -926,8 +956,8 @@ export const sendReassignmentNotificationToHospice = mutation({
           q.eq(q.field('type'), 'case_request'),
           q.eq(q.field('scheduleId'), args.scheduleId),
 
-          q.neq(q.field('status'), 'declined')
-        )
+          q.neq(q.field('status'), 'declined'),
+        ),
       )
       .first();
 
@@ -943,7 +973,11 @@ export const sendReassignmentNotificationToHospice = mutation({
       hospiceId: assignment.hospiceId,
       nurseId: nurse._id,
       type: 'reassignment',
-      description: `${nurse.name} (${nurse.discipline}) has submitted a case request for ${formatDate(shift.startDate)} to ${formatDate(shift.endDate)}: ${shift.startTime}-${shift.endTime}`,
+      description: `${nurse.name} (${
+        nurse.discipline
+      }) has submitted a case request for ${formatDate(
+        shift.startDate,
+      )} to ${formatDate(shift.endDate)}: ${shift.startTime}-${shift.endTime}`,
       scheduleId: args.scheduleId,
       title: 'Request for case reassignment',
       viewCount: 0,

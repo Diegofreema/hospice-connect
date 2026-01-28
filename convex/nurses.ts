@@ -1,11 +1,23 @@
 import { filter } from 'convex-helpers/server/filter';
 import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
-import { Id } from './_generated/dataModel';
-import { mutation, query, QueryCtx } from './_generated/server';
-import { getAvailability, getImage, getRatings } from './helper';
+import { type Id } from './_generated/dataModel';
+import {
+  mutation,
+  query,
+  type QueryCtx,
+  internalMutation,
+} from './_generated/server';
+import {
+  checkDurationOfNotSubmittedAssignment,
+  getAvailability,
+  getImage,
+  getRatings,
+} from './helper';
 import { discipline } from './schema';
 import { getUserHelper } from './users';
+import { handleNurseCount, handlePendingNurseApprovalCount } from './counter';
+import { internal } from './_generated/api';
 
 export const createNurse = mutation({
   args: {
@@ -19,6 +31,7 @@ export const createNurse = mutation({
     address: v.string(),
     zipCode: v.string(),
     nurseTimezone: v.string(),
+    email: v.string(),
   },
   handler: async (ctx, args) => {
     try {
@@ -30,7 +43,7 @@ export const createNurse = mutation({
 
       const nurseId = await ctx.db.insert('nurses', {
         ...args,
-        isApproved: false,
+        status: 'pending',
         userId: identity.subject,
         name: identity.name || '',
       });
@@ -52,6 +65,9 @@ export const createNurse = mutation({
         nurseId,
         days: formattedDays,
       });
+
+      await handlePendingNurseApprovalCount(ctx, 'inc');
+      await handleNurseCount(ctx, 'inc');
     } catch (error: any) {
       throw new ConvexError({ message: error.message });
     }
@@ -272,7 +288,7 @@ export const getNurses = query({
       v.literal('RN'),
       v.literal('LVN'),
       v.literal('HHA'),
-      v.literal('All')
+      v.literal('All'),
     ),
     todayToText: v.string(),
     paginationOpts: paginationOptsValidator,
@@ -300,7 +316,7 @@ export const getNurses = query({
         const available = await getAvailability(
           ctx,
           nurse._id,
-          args.todayToText
+          args.todayToText,
         );
         const ratings = await getRatings(ctx, nurse._id);
         return {
@@ -309,7 +325,7 @@ export const getNurses = query({
           available,
           ratings,
         };
-      })
+      }),
     );
     return {
       ...nurses,
@@ -370,7 +386,7 @@ export const searchNursesByFirstNameAndLastName = query({
         const available = await getAvailability(
           ctx,
           nurse._id,
-          args.todayToText
+          args.todayToText,
         );
         const ratings = await getRatings(ctx, nurse._id);
         return {
@@ -379,7 +395,7 @@ export const searchNursesByFirstNameAndLastName = query({
           available,
           ratings,
         };
-      })
+      }),
     );
 
     return nursesImage;
@@ -390,7 +406,7 @@ export const searchNursesByFirstNameAndLastName = query({
 
 export const getNurseDetails = async (
   ctx: QueryCtx,
-  nurseId?: Id<'nurses'>
+  nurseId?: Id<'nurses'>,
 ) => {
   if (!nurseId) {
     return null;
@@ -410,3 +426,121 @@ export const getNurseDetails = async (
     nurseUser,
   };
 };
+
+export const sendNotificationsToNursesOnFifthDay = internalMutation({
+  args: {
+    cursor: v.union(v.string(), v.null()),
+    numItems: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const data = await filter(
+      ctx.db.query('nurseAssignments'),
+      (nurseAssignment) => {
+        // five days since completed;
+
+        return checkDurationOfNotSubmittedAssignment(5, nurseAssignment);
+      },
+    ).paginate(args);
+
+    const { page, isDone, continueCursor } = data;
+
+    for (const assignment of page) {
+      await ctx.db.insert('nurseNotifications', {
+        nurseId: assignment.nurseId,
+        isRead: false,
+        description: `Complete and submit all outstanding route sheets to avoid account deactivation.`,
+        title: 'Outstanding route sheet',
+        type: 'normal',
+        viewCount: 0,
+      });
+    }
+
+    if (!isDone) {
+      await ctx.scheduler.runAfter(
+        0,
+        internal.nurses.sendNotificationsToNursesOnFifthDay,
+        {
+          cursor: continueCursor,
+          numItems: args.numItems,
+        },
+      );
+    }
+  },
+});
+export const sendNotificationsToNursesOnSixthDay = internalMutation({
+  args: {
+    cursor: v.union(v.string(), v.null()),
+    numItems: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const data = await filter(
+      ctx.db.query('nurseAssignments'),
+      (nurseAssignment) => {
+        return checkDurationOfNotSubmittedAssignment(6, nurseAssignment);
+      },
+    ).paginate(args);
+
+    const { page, isDone, continueCursor } = data;
+
+    for (const assignment of page) {
+      await ctx.db.insert('nurseNotifications', {
+        nurseId: assignment.nurseId,
+        isRead: false,
+        description: `Complete and submit all outstanding route sheets to avoid account deactivation.`,
+        title: 'Outstanding route sheet',
+        type: 'normal',
+        viewCount: 0,
+      });
+    }
+
+    if (!isDone) {
+      await ctx.scheduler.runAfter(
+        0,
+        internal.nurses.sendNotificationsToNursesOnSixthDay,
+        {
+          cursor: continueCursor,
+          numItems: args.numItems,
+        },
+      );
+    }
+  },
+});
+
+export const sendNotificationsToNursesAndSuspendAccount = internalMutation({
+  args: {
+    cursor: v.union(v.string(), v.null()),
+    numItems: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const data = await filter(
+      ctx.db.query('nurseAssignments'),
+      (nurseAssignment) => {
+        return checkDurationOfNotSubmittedAssignment(7, nurseAssignment);
+      },
+    ).paginate(args);
+
+    const { page, isDone, continueCursor } = data;
+
+    for (const assignment of page) {
+      await ctx.db.insert('nurseNotifications', {
+        nurseId: assignment.nurseId,
+        isRead: false,
+        description: `Complete and submit all outstanding route sheets to reactivate your account.`,
+        title: 'Account suspension',
+        type: 'normal',
+        viewCount: 0,
+      });
+    }
+
+    if (!isDone) {
+      await ctx.scheduler.runAfter(
+        0,
+        internal.nurses.sendNotificationsToNursesAndSuspendAccount,
+        {
+          cursor: continueCursor,
+          numItems: args.numItems,
+        },
+      );
+    }
+  },
+});

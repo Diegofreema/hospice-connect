@@ -25,7 +25,7 @@ export const VerifyEmail = ({ expires, code }: VerifyEmailProps) => (
         <Section style={header}>
           <div style={logoContainer}>
             <div style={logo}>
-              <Text style={logoText}>HospiceConnect</Text>
+              <Text style={logoText}>HC</Text>
             </div>
           </div>
           <Text style={headerSubtitle}>Account Creation</Text>

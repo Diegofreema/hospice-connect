@@ -10,13 +10,13 @@ import {
 } from '@react-email/components';
 
 interface ResetPasswordProps {
-  code: string;
+  url: string;
   expires: Date;
   userName?: string;
 }
 
 export const ResetPasswordEmail = ({
-  code,
+  url,
   expires,
   userName,
 }: ResetPasswordProps) => (
@@ -28,7 +28,7 @@ export const ResetPasswordEmail = ({
         <Section style={header}>
           <div style={logoContainer}>
             <div style={logo}>
-              <Text style={logoText}>HospiceConnect</Text>
+              <Text style={logoText}>HC</Text>
             </div>
           </div>
           <Text style={headerSubtitle}>Password Reset</Text>
@@ -46,13 +46,15 @@ export const ResetPasswordEmail = ({
           </Text>
 
           <Text style={text}>
-            If you made this request, please use the code below to reset your
-            password. If you didn&apos;t request a password reset, you can
+            If you made this request, please click on the link below to reset
+            your password. If you didn&apos;t request a password reset, you can
             safely ignore this email.
           </Text>
 
           {/* CTA Button */}
-          <Section style={buttonContainer}>{code}</Section>
+          <Section style={buttonContainer}>
+            <a href={url}>Reset link</a>
+          </Section>
 
           <Text style={text}>
             This password reset link will expire in{' '}

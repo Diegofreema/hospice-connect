@@ -1,44 +1,59 @@
 import { expo } from '@better-auth/expo';
-import {
-  AuthFunctions,
-  createClient,
-  type GenericCtx,
-} from '@convex-dev/better-auth';
+import { createClient, type GenericCtx } from '@convex-dev/better-auth';
 import { convex } from '@convex-dev/better-auth/plugins';
-import { requireActionCtx } from '@convex-dev/better-auth/utils';
-import { betterAuth } from 'better-auth';
-import { components, internal } from './_generated/api';
-import { DataModel } from './_generated/dataModel';
-import authSchema from './betterAuth/schema';
-import { sendResetPassword } from './sendEmail';
-const authFunctions: AuthFunctions = internal.auth;
+import { betterAuth, type BetterAuthOptions } from 'better-auth';
 
-// The component client has methods needed for integrating Convex with Better Auth,
-// as well as helper methods for general use.
+import type { DataModel } from './_generated/dataModel';
+
+import { components } from './_generated/api';
+import { query } from './_generated/server';
+import authConfig from './auth.config';
+import authSchema from './betterAuth/schema';
+import { requireActionCtx } from '@convex-dev/better-auth/utils';
+import { sendResetPassword } from './sendEmail';
+
+const siteUrl = process.env.SITE_URL!;
+const nativeAppUrl = process.env.NATIVE_APP_URL || 'hospice-connect://';
+
 export const authComponent = createClient<DataModel, typeof authSchema>(
   components.betterAuth,
   {
-    authFunctions,
-    triggers: {
-      user: {
-        onCreate: async (ctx, doc) => {},
-      },
-    },
     local: {
       schema: authSchema,
     },
-  }
+  },
 );
 
-export const createAuth = (
-  ctx: GenericCtx<DataModel>,
-  { optionsOnly } = { optionsOnly: false }
-) => {
-  return betterAuth({
-    // disable logging when createAuth is called just to generate options.
-    // this is not required, but there's a lot of noise in logs without it.
-    logger: {
-      disabled: optionsOnly,
+export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
+  return {
+    baseURL: siteUrl,
+    trustedOrigins: [
+      siteUrl,
+      nativeAppUrl,
+      ...(process.env.NODE_ENV === 'development'
+        ? [
+            'exp://*/*', // Trust all Expo development URLs
+            'exp://10.0.0.*:*/*', // Trust 10.0.0.x IP range
+            'exp://192.168.*.*:*/*', // Trust 192.168.x.x IP range
+            'exp://172.*.*.*:*/*', // Trust 172.x.x.x IP range
+            'exp://localhost:*/*', // Trust localhost
+            'http://localhost:3000',
+            'http://localhost:3001',
+          ]
+        : []),
+    ],
+    database: authComponent.adapter(ctx),
+    emailAndPassword: {
+      enabled: true,
+      requireEmailVerification: false,
+      sendResetPassword: async ({ user, url }) => {
+        await sendResetPassword(requireActionCtx(ctx), {
+          to: user.email,
+          url,
+          expires: Date.now() + 15 * 60 * 1000,
+          name: user.name,
+        });
+      },
     },
     socialProviders: {
       google: {
@@ -51,35 +66,12 @@ export const createAuth = (
         enabled: true,
       },
     },
-    trustedOrigins: [
-      'hospiceconnect://',
-      ...(process.env.NODE_ENV === 'development'
-        ? [
-            'exp://*/*', // Trust all Expo development URLs
-            'exp://10.0.0.*:*/*', // Trust 10.0.0.x IP range
-            'exp://192.168.*.*:*/*', // Trust 192.168.x.x IP range
-            'exp://172.*.*.*:*/*', // Trust 172.x.x.x IP range
-            'exp://localhost:*/*', // Trust localhost
-          ]
-        : []),
-    ],
-    database: authComponent.adapter(ctx),
-    // Configure simple, non-verified email/password to get started
-    emailAndPassword: {
-      enabled: true,
-      requireEmailVerification: false,
-      sendResetPassword: async ({ user, url, token }, request) => {
-        await sendResetPassword(requireActionCtx(ctx), {
-          to: user.email,
-          code: token,
-          expires: Date.now() + 15 * 60 * 1000,
-        });
-      },
-    },
     plugins: [
-      // The Expo and Convex plugins are required
       expo(),
-      convex(),
+      convex({
+        authConfig,
+        jwksRotateOnTokenGenerationError: true,
+      }),
     ],
     user: {
       additionalFields: {
@@ -99,9 +91,18 @@ export const createAuth = (
         },
       },
     },
-  });
+  } satisfies BetterAuthOptions;
 };
 
-// Example function for getting the current user
-// Feel free to edit, omit, etc.
-export const { onCreate, onUpdate, onDelete } = authComponent.triggersApi();
+export const createAuth = (ctx: GenericCtx<DataModel>) => {
+  return betterAuth(createAuthOptions(ctx));
+};
+
+export const getCurrentUser = query({
+  args: {},
+  handler: async (ctx) => {
+    return await authComponent.safeGetAuthUser(ctx);
+  },
+});
+
+export const { getAuthUser } = authComponent.clientApi();

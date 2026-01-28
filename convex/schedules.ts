@@ -1,6 +1,11 @@
 import { ConvexError, v } from 'convex/values';
-import { Id } from './_generated/dataModel';
-import { mutation, MutationCtx, query, QueryCtx } from './_generated/server';
+import { type Id } from './_generated/dataModel';
+import {
+  mutation,
+  type MutationCtx,
+  query,
+  type QueryCtx,
+} from './_generated/server';
 import {
   checkIfNurseHasActiveShift,
   deleteAllOtherNotifications,
@@ -58,7 +63,7 @@ export const cancelSchedule = mutation({
       const nurseAssignment = await ctx.db
         .query('nurseAssignments')
         .withIndex('assignmentId', (q) =>
-          q.eq('assignmentId', schedule.assignmentId).eq('nurseId', nurse._id)
+          q.eq('assignmentId', schedule.assignmentId).eq('nurseId', nurse._id),
         )
         .first();
       if (nurseAssignment) {
@@ -67,11 +72,11 @@ export const cancelSchedule = mutation({
           .withIndex('nurse_id', (q) =>
             q
               .eq('nurseId', nurseAssignment.nurseId)
-              .eq('assignmentId', nurseAssignment.assignmentId)
+              .eq('assignmentId', nurseAssignment.assignmentId),
           )
           .collect();
         const schedulesAfterFilter = schedules.filter(
-          (s) => s._id !== schedule._id
+          (s) => s._id !== schedule._id,
         );
         if (schedulesAfterFilter.length < 1) {
           await ctx.db.delete(nurseAssignment._id);
@@ -109,9 +114,13 @@ export const cancelSchedule = mutation({
       hospiceId: args.hospiceId,
       scheduleId: args.scheduleId,
       title: notificationTitle,
-      description: `${hospice.businessName} has ${notificationText} for ${formatDate(
-        schedule.startDate
-      )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
+      description: `${
+        hospice.businessName
+      } has ${notificationText} for ${formatDate(
+        schedule.startDate,
+      )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
+        schedule.endTime
+      }.`,
       type: 'normal',
       viewCount: 0,
     });
@@ -222,7 +231,13 @@ export const sendScheduleNotification = mutation({
         isRead: false,
         hospiceId: args.hospiceId,
         scheduleId: scheduleId,
-        description: `${args.hospiceName} has assigned you a schedule for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
+        description: `${
+          args.hospiceName
+        } has assigned you a schedule for ${formatDate(
+          schedule.startDate,
+        )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
+          schedule.endTime
+        }.`,
         title: 'Schedule assigned',
         type: 'assignment',
         viewCount: 0,
@@ -269,7 +284,13 @@ export const declineSchedule = mutation({
       isRead: false,
       hospiceId: args.hospiceId,
       scheduleId: args.scheduleId,
-      description: `${args.hospiceName} has declined your shift cancel request for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
+      description: `${
+        args.hospiceName
+      } has declined your shift cancel request for ${formatDate(
+        schedule.startDate,
+      )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
+        schedule.endTime
+      }.`,
       title: 'Cancel request declined',
       type: 'normal',
       viewCount: 0,
@@ -317,7 +338,13 @@ export const declineCaseRequest = mutation({
       isRead: false,
       hospiceId: args.hospiceId,
       scheduleId: args.scheduleId,
-      description: `${args.hospiceName} has declined your case request for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
+      description: `${
+        args.hospiceName
+      } has declined your case request for ${formatDate(
+        schedule.startDate,
+      )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
+        schedule.endTime
+      }.`,
       title: 'Case request declined',
       type: 'normal',
       viewCount: 0,
@@ -379,7 +406,7 @@ export const acceptCaseRequest = mutation({
     const nurseAssignmentExists = await ctx.db
       .query('nurseAssignments')
       .withIndex('assignmentId', (q) =>
-        q.eq('assignmentId', assignment._id).eq('nurseId', args.nurseId)
+        q.eq('assignmentId', assignment._id).eq('nurseId', args.nurseId),
       )
       .first();
     // If not, create a new nurseAssignment
@@ -388,6 +415,7 @@ export const acceptCaseRequest = mutation({
         isCompleted: false,
         nurseId: args.nurseId,
         assignmentId: assignment._id,
+        isSubmitted: false,
       });
     }
     // sends notification to nurse, that the case request has been accepted
@@ -396,7 +424,13 @@ export const acceptCaseRequest = mutation({
       isRead: false,
       hospiceId: args.hospiceId,
       scheduleId: args.scheduleId,
-      description: `${args.hospiceName} has approved your case request for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
+      description: `${
+        args.hospiceName
+      } has approved your case request for ${formatDate(
+        schedule.startDate,
+      )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
+        schedule.endTime
+      }.`,
       title: 'Case request accepted',
       type: 'normal',
       viewCount: 0,
@@ -419,7 +453,13 @@ export const acceptCaseRequest = mutation({
         hospiceId: assignment.hospiceId,
         nurseId: schedule.nurseId!,
         title: 'Schedule cancelled',
-        description: `${hospice.businessName} has cancelled your schedule for  ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
+        description: `${
+          hospice.businessName
+        } has cancelled your schedule for  ${formatDate(
+          schedule.startDate,
+        )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
+          schedule.endTime
+        }.`,
         type: 'normal',
         viewCount: 0,
         isRead: false,
@@ -434,7 +474,7 @@ export const acceptCaseRequest = mutation({
         notification._id,
         args.scheduleId,
         'reassignment',
-        args.hospiceId
+        args.hospiceId,
       );
     } else {
       if (schedule.status === 'booked') {
@@ -494,7 +534,7 @@ export const updateScheduleStatus = mutation({
     }
     const schedules = await getSchedulesByAssignmentIdHelper(
       ctx,
-      assignment._id
+      assignment._id,
     );
 
     const lastSchedule = schedules[schedules.length - 1];
@@ -532,7 +572,7 @@ export const fetchAvailableSchedules = query({
     return await ctx.db
       .query('schedules')
       .withIndex('by_assignment_id', (q) =>
-        q.eq('assignmentId', args.assignmentId).eq('status', 'available')
+        q.eq('assignmentId', args.assignmentId).eq('status', 'available'),
       )
       .collect();
   },
@@ -550,7 +590,7 @@ export const getSchedulesByAssignmentId = query({
     return await ctx.db
       .query('schedules')
       .withIndex('by_assignment_id', (q) =>
-        q.eq('assignmentId', args.assignmentId).eq('status', 'available')
+        q.eq('assignmentId', args.assignmentId).eq('status', 'available'),
       )
       .collect();
   },
@@ -618,7 +658,7 @@ export const getCaseRequest = query({
 
 export const getSchedulesByAssignmentIdHelper = async (
   ctx: QueryCtx | MutationCtx,
-  assignmentId: Id<'assignments'>
+  assignmentId: Id<'assignments'>,
 ) => {
   return await ctx.db
     .query('schedules')

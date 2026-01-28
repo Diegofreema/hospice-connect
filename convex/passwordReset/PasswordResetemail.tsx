@@ -16,103 +16,103 @@ interface ResetPasswordProps {
   userEmail?: string;
 }
 
-export const ResetPasswordTemplate = ({
-  userFirstName,
-  userEmail,
+// export const ResetPasswordTemplate = ({
+//   userFirstName,
+//   userEmail,
 
-  code,
-}: ResetPasswordProps) => (
-  <Html>
-    <Head />
-    <Preview>Reset your HospiceConnect account password</Preview>
-    <Body style={main}>
-      <Container style={container}>
-        {/* Header */}
-        <Section style={header}>
-          <div style={logoContainer}>
-            <div style={logo}>
-              <Text style={logoText}>HospiceConnect</Text>
-            </div>
-          </div>
-        </Section>
+//   code,
+// }: ResetPasswordProps) => (
+//   <Html>
+//     <Head />
+//     <Preview>Reset your HospiceConnect account password</Preview>
+//     <Body style={main}>
+//       <Container style={container}>
+//         {/* Header */}
+//         <Section style={header}>
+//           <div style={logoContainer}>
+//             <div style={logo}>
+//               <Text style={logoText}>HospiceConnect</Text>
+//             </div>
+//           </div>
+//         </Section>
 
-        {/* Main Content */}
-        <Section style={content}>
-          <Heading style={h1}>Reset Your Password</Heading>
+//         {/* Main Content */}
+//         <Section style={content}>
+//           <Heading style={h1}>Reset Your Password</Heading>
 
-          <Text style={text}>Hi {userFirstName || 'there'},</Text>
+//           <Text style={text}>Hi {userFirstName || 'there'},</Text>
 
-          <Text style={text}>
-            We received a request to reset the password for your HospiceConnect
-            account associated with ${userEmail}.
-          </Text>
+//           <Text style={text}>
+//             We received a request to reset the password for your HospiceConnect
+//             account associated with ${userEmail}.
+//           </Text>
 
-          <Text style={text}>
-            If you made this request, use the code below to reset your password:
-          </Text>
+//           <Text style={text}>
+//             If you made this request, use the code below to reset your password:
+//           </Text>
 
-          {/* CTA Button */}
-          <Heading className="text-xl font-bold mb-4">
-            Reset your password
-          </Heading>
-          <Text className="text-sm">
-            Please enter the following code on the password reset page.
-          </Text>
-          <Section className="text-center">
-            <Text className="font-semibold">Reset code</Text>
-            <Text className="font-bold text-4xl">{code}</Text>
-          </Section>
+//           {/* CTA Button */}
+//           <Heading className="text-xl font-bold mb-4">
+//             Reset your password
+//           </Heading>
+//           <Text className="text-sm">
+//             Please enter the following code on the password reset page.
+//           </Text>
+//           <Section className="text-center">
+//             <Text className="font-semibold">Reset code</Text>
+//             <Text className="font-bold text-4xl">{code}</Text>
+//           </Section>
 
-          {/* Tips */}
-          <Section style={tipsBox}>
-            <Text style={tipsTitle}>💡 Password Tips</Text>
-            <Text style={tipsText}>
-              When creating your new password, make sure it:
-            </Text>
-            <ul style={list}>
-              <li style={listItem}>Is at least 8 characters long</li>
-              <li style={listItem}>
-                Contains both uppercase and lowercase letters
-              </li>
-              <li style={listItem}>Includes at least one number</li>
-              <li style={listItem}>Has at least one special character</li>
-              <li style={listItem}>Is unique and not used on other accounts</li>
-            </ul>
-          </Section>
+//           {/* Tips */}
+//           <Section style={tipsBox}>
+//             <Text style={tipsTitle}>💡 Password Tips</Text>
+//             <Text style={tipsText}>
+//               When creating your new password, make sure it:
+//             </Text>
+//             <ul style={list}>
+//               <li style={listItem}>Is at least 8 characters long</li>
+//               <li style={listItem}>
+//                 Contains both uppercase and lowercase letters
+//               </li>
+//               <li style={listItem}>Includes at least one number</li>
+//               <li style={listItem}>Has at least one special character</li>
+//               <li style={listItem}>Is unique and not used on other accounts</li>
+//             </ul>
+//           </Section>
 
-          <Text style={text}>
-            If you continue to have trouble accessing your account, please
-            don&apos;t hesitate to contact our support team.
-          </Text>
+//           <Text style={text}>
+//             If you continue to have trouble accessing your account, please
+//             don&apos;t hesitate to contact our support team.
+//           </Text>
 
-          <Text style={signature}>
-            Best regards,
-            <br />
-            The HospiceConnect Team
-            <br />
-          </Text>
-        </Section>
+//           <Text style={signature}>
+//             Best regards,
+//             <br />
+//             The HospiceConnect Team
+//             <br />
+//           </Text>
+//         </Section>
 
-        {/* Footer */}
-        <Section style={footer}>
-          <Text style={footerText}>
-            This email was sent because a password reset was requested for your
-            HospiceConnect account.
-          </Text>
-          <Text style={footerText}>
-            If you did not make this request, you can safely ignore this email.
-          </Text>
-          <Text style={footerText}>
-            © {new Date().getFullYear()} HospiceConnect
-          </Text>
-          <Text style={footerText}>HospiceConnect Bridging The Gap!</Text>
-        </Section>
-      </Container>
-    </Body>
-  </Html>
-);
+//         {/* Footer */}
+//         <Section style={footer}>
+//           <Text style={footerText}>
+//             This email was sent because a password reset was requested for your
+//             HospiceConnect account.
+//           </Text>
+//           <Text style={footerText}>
+//             If you did not make this request, you can safely ignore this email.
+//           </Text>
+//           <Text style={footerText}>
+//             © {new Date().getFullYear()} HospiceConnect
+//           </Text>
+//           <Text style={footerText}>HospiceConnect Bridging The Gap!</Text>
+//         </Section>
+//       </Container>
+//     </Body>
+//   </Html>
+// );
 
-export default ResetPasswordTemplate;
+// export default ResetPasswordTemplate;
 
 // Styles
 const main = {

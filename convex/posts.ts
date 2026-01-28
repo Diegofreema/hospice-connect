@@ -1,4 +1,3 @@
-import { getAuthUserId } from '@convex-dev/auth/server';
 import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { mutation, query } from './_generated/server';
@@ -99,8 +98,8 @@ export const getShift = query({
     scheduleId: v.id('schedules'),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) return null;
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return null;
     return await ctx.db.get(args.scheduleId);
   },
 });
@@ -171,6 +170,7 @@ export const acceptAssignment = mutation({
         isCompleted: false,
         nurseId: args.nurseId,
         assignmentId: assignment._id,
+        isSubmitted: false,
       });
     }
     await ctx.db.patch(args.scheduleId, {
@@ -184,7 +184,13 @@ export const acceptAssignment = mutation({
       type: 'assignment',
       title: 'Schedule accepted',
       scheduleId: args.scheduleId,
-      description: `${nurse.name} (${nurse.discipline}) has accepted your case request for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
+      description: `${nurse.name} (${
+        nurse.discipline
+      }) has accepted your case request for ${formatDate(
+        schedule.startDate
+      )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
+        schedule.endTime
+      }.`,
       nurseId: args.nurseId,
       viewCount: 0,
     });
@@ -243,7 +249,13 @@ export const declineAssignment = mutation({
       type: 'assignment',
       title: 'Assignment Declined',
       scheduleId: args.scheduleId,
-      description: `${nurse.name} (${nurse.discipline}) has declined your case request for ${formatDate(schedule.startDate)} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${schedule.endTime}.`,
+      description: `${nurse.name} (${
+        nurse.discipline
+      }) has declined your case request for ${formatDate(
+        schedule.startDate
+      )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
+        schedule.endTime
+      }.`,
       nurseId: notification.nurseId,
       viewCount: 0,
     });

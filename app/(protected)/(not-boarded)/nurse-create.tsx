@@ -102,6 +102,7 @@ const NurseCreate = () => {
         phoneNumber: data.phoneNumber.trim(),
         rate: Number(data.rate),
         nurseTimezone: timezone(),
+        email: user.email,
       });
       await authClient.updateUser({
         isBoarded: true,

@@ -1,6 +1,5 @@
-import { authTables } from '@convex-dev/auth/server';
 import { defineSchema, defineTable } from 'convex/server';
-import { Infer, v } from 'convex/values';
+import { type Infer, v } from 'convex/values';
 export const scheduleStatus = v.union(
   v.literal('completed'),
   v.literal('not_covered'),
@@ -8,12 +7,12 @@ export const scheduleStatus = v.union(
   v.literal('on_going'),
   v.literal('available'),
   v.literal('cancelled'),
-  v.literal('ended')
+  v.literal('ended'),
 );
 export const discipline = v.union(
   v.literal('RN'),
   v.literal('LVN'),
-  v.literal('HHA')
+  v.literal('HHA'),
 );
 export type DisciplineType = Infer<typeof discipline>;
 export const careLevel = v.union(
@@ -23,8 +22,8 @@ export const careLevel = v.union(
     v.literal('Continuous Care'),
     v.literal('Supervision'),
     v.literal('Recertification'),
-    v.literal('Discharge')
-  )
+    v.literal('Discharge'),
+  ),
 );
 
 export const shifts = v.object({
@@ -40,22 +39,45 @@ export const hospiceSubscription = {
   stripePriceId: v.string(),
   stripeCurrentPeriodEnd: v.number(),
 };
+
+const stats = {
+  totalNurses: v.number(),
+  totalHospices: v.number(),
+  totalUnApprovedNurses: v.number(),
+  totalUnApprovedHospices: v.number(),
+  totalApprovedNurses: v.number(),
+  totalApprovedHospices: v.number(),
+  totalSuspendedNurses: v.number(),
+  totalSuspendedHospices: v.number(),
+  totalAssignments: v.number(),
+  totalCompletedAssignments: v.number(),
+  totalEndedAssignments: v.number(),
+  totalActiveAssignments: v.number(),
+  totalRejectedNurses: v.number(),
+  totalRejectedHospices: v.number(),
+};
 export const Nurse = {
   name: v.string(),
   gender: v.string(),
   phoneNumber: v.string(),
+  email: v.string(),
   licenseNumber: v.string(),
   stateOfRegistration: v.string(),
   dateOfBirth: v.optional(v.string()),
   discipline: discipline,
   rate: v.optional(v.number()),
   imageId: v.optional(v.id('_storage')),
-  isApproved: v.boolean(),
+
   userId: v.string(),
   address: v.optional(v.string()),
   zipCode: v.optional(v.string()),
   nurseTimezone: v.string(),
-  isSuspended: v.optional(v.boolean()),
+  status: v.union(
+    v.literal('pending'),
+    v.literal('approved'),
+    v.literal('rejected'),
+    v.literal('suspended'),
+  ),
 };
 const PendingNurse = {
   firstName: v.string(),
@@ -72,6 +94,7 @@ const NurseAssignments = {
   isCompleted: v.boolean(),
   assignmentId: v.id('assignments'),
   completedAt: v.optional(v.number()),
+  isSubmitted: v.boolean(),
 };
 
 export const Hospice = {
@@ -85,9 +108,13 @@ export const Hospice = {
   faxNumber: v.optional(v.string()),
   phoneNumber: v.string(),
   email: v.string(),
-  isApproved: v.boolean(),
+  status: v.union(
+    v.literal('pending'),
+    v.literal('approved'),
+    v.literal('rejected'),
+    v.literal('suspended'),
+  ),
   imageId: v.optional(v.id('_storage')),
-  isSuspended: v.optional(v.boolean()),
 };
 const PendingHospice = {
   address: v.string(),
@@ -122,7 +149,7 @@ export const Schedule = {
 export const gender = v.union(
   v.literal('male'),
   v.literal('female'),
-  v.literal('others')
+  v.literal('others'),
 );
 
 export const assignment = {
@@ -146,7 +173,7 @@ export const assignment = {
     v.literal('not_covered'),
     v.literal('booked'),
     v.literal('available'),
-    v.literal('ended')
+    v.literal('ended'),
   ),
   rate: v.number(),
   careLevel,
@@ -191,7 +218,7 @@ export const day = v.object({
     v.literal('Thursday'),
     v.literal('Friday'),
     v.literal('Saturday'),
-    v.literal('Sunday')
+    v.literal('Sunday'),
   ),
   startTime: v.optional(v.number()),
   endTime: v.optional(v.number()),
@@ -210,7 +237,7 @@ export const NurseNotification = {
     v.literal('assignment'),
     v.literal('normal'),
     v.literal('admin'),
-    v.literal('reassignment')
+    v.literal('reassignment'),
   ),
   title: v.string(),
   description: v.optional(v.string()),
@@ -228,7 +255,7 @@ export const HospiceNotification = {
     v.literal('cancel_request'),
     v.literal('admin'),
     v.literal('assignment'),
-    v.literal('reassignment')
+    v.literal('reassignment'),
   ),
   title: v.string(),
   description: v.optional(v.string()),
@@ -238,12 +265,28 @@ export const HospiceNotification = {
   status: v.optional(v.union(v.literal('accepted'), v.literal('declined'))),
   viewCount: v.number(),
 };
+export const adminNotification = {
+  isRead: v.boolean(),
+  title: v.string(),
+  description: v.optional(v.string()),
+  nurseId: v.optional(v.id('nurses')),
+  hospiceId: v.optional(v.id('hospices')),
+  type: v.union(v.literal('nurse'), v.literal('hospice')),
+  viewCount: v.number(),
+  sentBy: v.string(),
+};
 export default defineSchema({
-  ...authTables,
-  users: defineTable(User).index('email', ['email']),
+  users: defineTable(User)
+    .index('email', ['email'])
+    .index('userId', ['userId']),
   nurses: defineTable(Nurse)
     .index('userId', ['userId'])
-    .index('by_discipline', ['discipline', 'stateOfRegistration']),
+    .index('by_discipline', ['discipline', 'stateOfRegistration', 'status'])
+    .index('by_discipline_2', ['discipline'])
+    .index('by_status', ['status'])
+    .index('by_state', ['stateOfRegistration'])
+    .index('by_discipline_and_status', ['discipline', 'status'])
+    .index('by_state_and_status', ['stateOfRegistration', 'status']),
   hospices: defineTable(Hospice).index('userId', ['userId']),
   assignments: defineTable(assignment)
     .index('state', ['state', 'status', 'discipline'])
@@ -264,6 +307,7 @@ export default defineSchema({
       'hospiceId',
       'isApproved',
     ])
+    .index('approved', ['isApproved'])
     .index('is_approved', ['isApproved', 'assignmentId']),
   ratings: defineTable(Rating).index('nurseId', ['nurseId']),
   availabilities: defineTable(Availability).index('nurseId', ['nurseId']),
@@ -276,7 +320,7 @@ export default defineSchema({
     .index('hospiceId_scheduleId', ['hospiceId', 'scheduleId', 'type']),
   hospiceSubscriptions: defineTable(hospiceSubscription).index(
     'by_hospice_id',
-    ['hospiceId']
+    ['hospiceId'],
   ),
   pendingNurseProfile: defineTable(PendingNurse).index('by_nurse_id', [
     'nurseId',
@@ -287,4 +331,29 @@ export default defineSchema({
   nurseAssignments: defineTable(NurseAssignments)
     .index('nurse_id', ['nurseId', 'isCompleted', 'assignmentId'])
     .index('assignmentId', ['assignmentId', 'nurseId']),
+  activityLogs: defineTable({
+    userId: v.id('users'),
+    action: v.string(),
+    description: v.string(),
+    metadata: v.optional(v.any()),
+  }).index('by_user', ['userId']),
+  stats: defineTable(stats),
+  commission: defineTable({
+    commissionPercentage: v.number(),
+  }),
+  adminNotifications: defineTable(adminNotification),
+  accountDeletionRequests: defineTable({
+    userId: v.string(),
+    email: v.string(),
+    reason: v.optional(v.string()),
+    status: v.union(
+      v.literal('pending'),
+      v.literal('completed'),
+      v.literal('cancelled'),
+    ),
+    requestedAt: v.number(),
+    deletedAt: v.optional(v.number()),
+  })
+    .index('by_userId', ['userId'])
+    .index('by_status', ['status']),
 });

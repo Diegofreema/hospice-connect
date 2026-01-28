@@ -1,7 +1,7 @@
 import { Resend } from '@convex-dev/resend';
 import { pretty, render } from '@react-email/components';
 import { components, internal } from './_generated/api';
-import { ActionCtx } from './_generated/server';
+import { type ActionCtx } from './_generated/server';
 import { ResetPasswordEmail } from './emails/ResetPasswordEmail';
 import { VerifyEmail } from './emails/VerifyEmail';
 
@@ -57,19 +57,25 @@ export const sendResetPassword = async (
   ctx: ActionCtx,
   {
     to,
-    code,
+    url,
     expires,
+    name,
   }: {
     to: string;
-    code: string;
+    url: string;
     expires: number;
+    name: string;
   }
 ) => {
   await sendEmail(ctx, {
     to,
     subject: 'Reset your password',
     html: await render(
-      <ResetPasswordEmail code={code} expires={new Date(expires)} />
+      <ResetPasswordEmail
+        url={url}
+        expires={new Date(expires)}
+        userName={name}
+      />
     ),
   });
 };

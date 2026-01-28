@@ -1,33 +1,33 @@
-import Resend from '@auth/core/providers/resend';
-import { RandomReader, generateRandomString } from '@oslojs/crypto/random';
-import { Resend as ResendAPI } from 'resend';
+// import Resend from '@auth/core/providers/resend';
+// import { RandomReader, generateRandomString } from '@oslojs/crypto/random';
+// import { Resend as ResendAPI } from 'resend';
 
-export const ResendOTP = Resend({
-  id: 'resend-otp',
-  apiKey: process.env.AUTH_RESEND_KEY,
-  async generateVerificationToken() {
-    const random: RandomReader = {
-      read(bytes) {
-        crypto.getRandomValues(bytes);
-      },
-    };
+// export const ResendOTP = Resend({
+//   id: 'resend-otp',
+//   apiKey: process.env.AUTH_RESEND_KEY,
+//   async generateVerificationToken() {
+//     const random: RandomReader = {
+//       read(bytes) {
+//         crypto.getRandomValues(bytes);
+//       },
+//     };
 
-    const alphabet = '0123456789';
-    const length = 5;
-    return generateRandomString(random, alphabet, length);
-  },
-  async sendVerificationRequest({ identifier: email, provider, token }) {
-    const resend = new ResendAPI(provider.apiKey);
-    const { error } = await resend.emails.send({
-      from: 'HospiceConnect <innovate@learnfactory.com.ng>',
-      to: [email],
-      subject: `Verify your email`,
-      text: `Your verification code is ${token}`,
-    });
-    console.log({ error });
+//     const alphabet = '0123456789';
+//     const length = 5;
+//     return generateRandomString(random, alphabet, length);
+//   },
+//   async sendVerificationRequest({ identifier: email, provider, token }) {
+//     const resend = new ResendAPI(provider.apiKey);
+//     const { error } = await resend.emails.send({
+//       from: 'HospiceConnect <innovate@learnfactory.com.ng>',
+//       to: [email],
+//       subject: `Verify your email`,
+//       text: `Your verification code is ${token}`,
+//     });
+//     console.log({ error });
 
-    if (error) {
-      throw new Error('Could not send verification code');
-    }
-  },
-});
+//     if (error) {
+//       throw new Error('Could not send verification code');
+//     }
+//   },
+// });

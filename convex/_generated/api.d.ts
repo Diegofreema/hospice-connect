@@ -8,25 +8,33 @@
  * @module
  */
 
-import type * as ResendOTP from "../ResendOTP.js";
-import type * as ResendOTPPassword from "../ResendOTPPassword.js";
 import type * as actionHelper from "../actionHelper.js";
-import type * as actions from "../actions.js";
+import type * as activityLogs from "../activityLogs.js";
+import type * as adminAssignment from "../adminAssignment.js";
+import type * as adminHospices from "../adminHospices.js";
+import type * as adminNurses from "../adminNurses.js";
+import type * as adminRouteSheets from "../adminRouteSheets.js";
+import type * as adminSettings from "../adminSettings.js";
 import type * as assignments from "../assignments.js";
 import type * as auth from "../auth.js";
+import type * as counter from "../counter.js";
 import type * as crons from "../crons.js";
+import type * as dashboard from "../dashboard.js";
+import type * as deleteAccount from "../deleteAccount.js";
 import type * as emails_ResetPasswordEmail from "../emails/ResetPasswordEmail.js";
 import type * as emails_VerifyEmail from "../emails/VerifyEmail.js";
-import type * as errors from "../errors.js";
 import type * as handleEvent from "../handleEvent.js";
+import type * as healthCheck from "../healthCheck.js";
 import type * as helper from "../helper.js";
 import type * as hospiceNotification from "../hospiceNotification.js";
 import type * as hospices from "../hospices.js";
 import type * as http from "../http.js";
+import type * as notifications from "../notifications.js";
 import type * as nurseNotifications from "../nurseNotifications.js";
 import type * as nurses from "../nurses.js";
 import type * as passwordReset_PasswordResetemail from "../passwordReset/PasswordResetemail.js";
 import type * as posts from "../posts.js";
+import type * as privateData from "../privateData.js";
 import type * as routeSheets from "../routeSheets.js";
 import type * as schedules from "../schedules.js";
 import type * as sendEmail from "../sendEmail.js";
@@ -42,25 +50,33 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
-  ResendOTP: typeof ResendOTP;
-  ResendOTPPassword: typeof ResendOTPPassword;
   actionHelper: typeof actionHelper;
-  actions: typeof actions;
+  activityLogs: typeof activityLogs;
+  adminAssignment: typeof adminAssignment;
+  adminHospices: typeof adminHospices;
+  adminNurses: typeof adminNurses;
+  adminRouteSheets: typeof adminRouteSheets;
+  adminSettings: typeof adminSettings;
   assignments: typeof assignments;
   auth: typeof auth;
+  counter: typeof counter;
   crons: typeof crons;
+  dashboard: typeof dashboard;
+  deleteAccount: typeof deleteAccount;
   "emails/ResetPasswordEmail": typeof emails_ResetPasswordEmail;
   "emails/VerifyEmail": typeof emails_VerifyEmail;
-  errors: typeof errors;
   handleEvent: typeof handleEvent;
+  healthCheck: typeof healthCheck;
   helper: typeof helper;
   hospiceNotification: typeof hospiceNotification;
   hospices: typeof hospices;
   http: typeof http;
+  notifications: typeof notifications;
   nurseNotifications: typeof nurseNotifications;
   nurses: typeof nurses;
   "passwordReset/PasswordResetemail": typeof passwordReset_PasswordResetemail;
   posts: typeof posts;
+  privateData: typeof privateData;
   routeSheets: typeof routeSheets;
   schedules: typeof schedules;
   sendEmail: typeof sendEmail;
@@ -436,9 +452,33 @@ export declare const components: {
       updateSubscriptionQuantity: FunctionReference<
         "action",
         "internal",
-        { quantity: number; stripeSubscriptionId: string },
+        { apiKey: string; quantity: number; stripeSubscriptionId: string },
         null
       >;
+    };
+  };
+  shardedCounter: {
+    public: {
+      add: FunctionReference<
+        "mutation",
+        "internal",
+        { count: number; name: string; shard?: number; shards?: number },
+        number
+      >;
+      count: FunctionReference<"query", "internal", { name: string }, number>;
+      estimateCount: FunctionReference<
+        "query",
+        "internal",
+        { name: string; readFromShards?: number; shards?: number },
+        any
+      >;
+      rebalance: FunctionReference<
+        "mutation",
+        "internal",
+        { name: string; shards?: number },
+        any
+      >;
+      reset: FunctionReference<"mutation", "internal", { name: string }, any>;
     };
   };
   betterAuth: {
@@ -881,6 +921,7 @@ export declare const components: {
         "query",
         "internal",
         {
+          join?: any;
           limit?: number;
           model: "user" | "session" | "account" | "verification" | "jwks";
           offset?: number;
@@ -923,6 +964,7 @@ export declare const components: {
         "query",
         "internal",
         {
+          join?: any;
           model: "user" | "session" | "account" | "verification" | "jwks";
           select?: Array<string>;
           where?: Array<{
@@ -1408,6 +1450,27 @@ export declare const components: {
         any
       >;
     };
+    users: {
+      getUser: FunctionReference<
+        "query",
+        "internal",
+        { userId: string },
+        null | {
+          _creationTime: number;
+          _id: string;
+          createdAt: number;
+          email: string;
+          emailVerified: boolean;
+          image?: null | string;
+          isBoarded: boolean;
+          name: string;
+          role: string;
+          streamToken?: null | string;
+          updatedAt: number;
+          userId?: null | string;
+        }
+      >;
+    };
   };
   resend: {
     lib: {
@@ -1437,7 +1500,7 @@ export declare const components: {
           headers?: Array<{ name: string; value: string }>;
           replyTo?: Array<string>;
           subject: string;
-          to: string;
+          to: Array<string> | string;
         },
         string
       >;
@@ -1446,9 +1509,15 @@ export declare const components: {
         "internal",
         { emailId: string },
         {
+          bcc?: Array<string>;
+          bounced?: boolean;
+          cc?: Array<string>;
+          clicked?: boolean;
           complained: boolean;
           createdAt: number;
+          deliveryDelayed?: boolean;
           errorMessage?: string;
+          failed?: boolean;
           finalizedAt: number;
           from: string;
           headers?: Array<{ name: string; value: string }>;
@@ -1466,9 +1535,13 @@ export declare const components: {
             | "delivery_delayed"
             | "bounced"
             | "failed";
-          subject: string;
+          subject?: string;
+          template?: {
+            id: string;
+            variables?: Record<string, string | number>;
+          };
           text?: string;
-          to: string;
+          to: Array<string>;
         } | null
       >;
       getStatus: FunctionReference<
@@ -1476,8 +1549,12 @@ export declare const components: {
         "internal",
         { emailId: string },
         {
+          bounced: boolean;
+          clicked: boolean;
           complained: boolean;
+          deliveryDelayed: boolean;
           errorMessage: string | null;
+          failed: boolean;
           opened: boolean;
           status:
             | "waiting"
@@ -1500,6 +1577,8 @@ export declare const components: {
         "mutation",
         "internal",
         {
+          bcc?: Array<string>;
+          cc?: Array<string>;
           from: string;
           headers?: Array<{ name: string; value: string }>;
           html?: string;
@@ -1511,9 +1590,13 @@ export declare const components: {
             testMode: boolean;
           };
           replyTo?: Array<string>;
-          subject: string;
+          subject?: string;
+          template?: {
+            id: string;
+            variables?: Record<string, string | number>;
+          };
           text?: string;
-          to: string;
+          to: Array<string>;
         },
         string
       >;

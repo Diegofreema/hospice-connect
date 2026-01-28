@@ -1,5 +1,6 @@
 import { api } from '@/convex/_generated/api';
 import { SmallLoader } from '@/features/shared/components/small-loader';
+import { UnderReview } from '@/features/shared/components/under-review';
 import { useQuery } from 'convex/react';
 
 import { FunctionReturnType } from 'convex/server';
@@ -25,9 +26,9 @@ export const HospiceProvider = ({
     return <SmallLoader size={50} />;
   }
 
-  // if (!hospice?.approved) {
-  //   return <UnderReview />;
-  // }
+  if (!hospice?.approved) {
+    return <UnderReview />;
+  }
   if (hospice === null) {
     return;
   }

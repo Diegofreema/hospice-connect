@@ -6,7 +6,7 @@ import { internalMutation } from './_generated/server.js';
 const crons = cronJobs();
 crons.interval(
   'Remove old emails from the resend component',
-  { hours: 1 },
+  { hours: 24 },
   internal.crons.cleanupResend
 );
 
@@ -30,5 +30,35 @@ export const cleanupResend = internalMutation({
 //   { minutes: 2 }, // every minute
 //   internal.assignments.updateNursesAssignment
 // );
+
+crons.interval(
+  'send notification on 5th day',
+  { hours: 24 },
+  internal.nurses.sendNotificationsToNursesOnFifthDay,
+  {
+    numItems: 500,
+    cursor: null,
+  }
+);
+
+crons.interval(
+  'send notification on 6th day',
+  { hours: 24 },
+  internal.nurses.sendNotificationsToNursesOnSixthDay,
+  {
+    numItems: 500,
+    cursor: null,
+  }
+);
+
+crons.interval(
+  'send notification on 7th day and suspend account',
+  { hours: 24 },
+  internal.nurses.sendNotificationsToNursesAndSuspendAccount,
+  {
+    numItems: 500,
+    cursor: null,
+  }
+);
 
 export default crons;

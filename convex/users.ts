@@ -1,9 +1,9 @@
 import { v } from 'convex/values';
 import {
   internalMutation,
-  MutationCtx,
+  type MutationCtx,
   query,
-  QueryCtx,
+  type QueryCtx,
 } from './_generated/server';
 import { authComponent } from './auth';
 

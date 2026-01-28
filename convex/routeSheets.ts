@@ -1,5 +1,9 @@
 import { ConvexError, v } from 'convex/values';
 import { mutation, query } from './_generated/server';
+import {
+  handleUnApprovedSubmittedRouteSheets,
+  handleUnSubmittedRouteSheetsCount,
+} from './counter';
 
 export const nurseSubmittedRouteSheet = query({
   args: {
@@ -251,6 +255,23 @@ export const submitRouteSheet = mutation({
       await ctx.db.patch(scheduleId, { isSubmitted: true });
     }
     /// check if route sheet exists, then update it, if not, create a new one
+    const nurseAssignment = await ctx.db
+      .query('nurseAssignments')
+      .withIndex('assignmentId', (q) =>
+        q.eq('assignmentId', assignment._id).eq('nurseId', nurse._id)
+      )
+      .first();
+    if (!nurseAssignment) {
+      throw new ConvexError({
+        message: 'Healthcare professional assignment not found',
+      });
+    }
+
+    await ctx.db.patch('nurseAssignments', nurseAssignment._id, {
+      isSubmitted: true,
+    });
+    await handleUnSubmittedRouteSheetsCount(ctx, 'dec');
+    await handleUnApprovedSubmittedRouteSheets(ctx, 'inc');
 
     const routeSheetId = await ctx.db.insert('routeSheets', {
       ...args,
@@ -330,7 +351,11 @@ export const approveOrDeclineRouteSheet = mutation({
         hospiceId: hospice._id,
         viewCount: 0,
       });
+      await handleUnApprovedSubmittedRouteSheets(ctx, 'dec');
+      await handleUnSubmittedRouteSheetsCount(ctx, 'inc');
     } else {
+      await handleUnApprovedSubmittedRouteSheets(ctx, 'dec');
+      await handleUnSubmittedRouteSheetsCount(ctx, 'dec');
       await ctx.db.insert('nurseNotifications', {
         isRead: false,
         nurseId: routeSheet.nurseId,

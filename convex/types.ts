@@ -1,4 +1,4 @@
-import { Doc } from './_generated/dataModel';
+import { type Doc } from './_generated/dataModel';
 
 type AssignmentType = Doc<'assignments'> & {
   isApproved: boolean;
@@ -12,4 +12,9 @@ export type AvailableAssignmentType = AssignmentType & {
 
 export type AssignmentsWithHospicesType = AssignmentType & {
   hospice: Doc<'hospices'> | null;
+};
+
+export type InProgressShiftsType = Doc<'assignments'> & {
+  hospiceUserId: string;
+  businessName: string;
 };
