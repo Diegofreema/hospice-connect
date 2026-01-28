@@ -2,11 +2,11 @@ import { api } from '@/convex/_generated/api';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { useQuery } from 'convex/react';
 
+import { UnderReview } from '@/features/shared/components/under-review';
 import { type FunctionReturnType } from 'convex/server';
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
 import { useAuth } from './auth';
-import { UnderReview } from '@/features/shared/components/under-review';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -32,16 +32,6 @@ export const NurseProvider = ({ children }: { children: React.ReactNode }) => {
       <UnderReview
         title="Nurse rejected"
         description="Please contact the admin to resolve this issue"
-      />
-    );
-  }
-  const isAdmin = user?.role === 'admin';
-
-  if (isAdmin) {
-    return (
-      <UnderReview
-        title="Admin account"
-        description="Please use the web as an admin"
       />
     );
   }

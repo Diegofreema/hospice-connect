@@ -39,16 +39,7 @@ export const HospiceProvider = ({
       />
     );
   }
-  const isAdmin = user?.role === 'admin';
 
-  if (isAdmin) {
-    return (
-      <UnderReview
-        title="Admin account"
-        description="Please use the web as an admin"
-      />
-    );
-  }
   if (hospice === null) {
     return;
   }

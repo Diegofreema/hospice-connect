@@ -1,5 +1,6 @@
 import { useAuth } from '@/components/context/auth';
 import { ActionComponent } from '@/features/shared/components/action-component';
+import { UnderReview } from '@/features/shared/components/under-review';
 import { addEventListener } from '@react-native-community/netinfo';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -22,6 +23,16 @@ const ProtectedLayout = () => {
         imageUrl={require('@/assets/images/no-internet.png')}
         title={'Oops, No internet Connection'}
         description={'Please check your internet connection and try again'}
+      />
+    );
+  }
+  const isAdmin = user?.role === 'admin';
+
+  if (isAdmin) {
+    return (
+      <UnderReview
+        title="Admin account"
+        description="Please use the web as an admin"
       />
     );
   }
