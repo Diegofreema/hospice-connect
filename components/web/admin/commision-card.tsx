@@ -2,22 +2,23 @@
 
 import React from 'react';
 
-import { useState } from 'react';
+import { api } from '@/convex/_generated/api';
 import { useMutation, useQuery } from 'convex/react';
-import { api } from '@hospice-2/backend/convex/_generated/api';
-import { useAuth } from '@/lib/auth-context';
+import { useState } from 'react';
+
+import { useAuth } from '@/components/context/auth';
+import { Button } from '@/components/web/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { DollarSign, Loader2 } from 'lucide-react';
-import { generateErrorMessage } from '@/lib/utils';
+} from '@/components/web/ui/card';
+import { Input } from '@/components/web/ui/input';
+import { Label } from '@/components/web/ui/label';
+import { generateErrorMessage } from '@/features/shared/utils';
+import { DollarSign, Loader2 } from 'lucide-react-native';
 
 export function CommissionCard() {
   const { user } = useAuth();

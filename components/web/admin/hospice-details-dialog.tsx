@@ -1,18 +1,18 @@
 'use client';
 
-import { useQuery } from 'convex/react';
-import { api } from '@hospice-2/backend/convex/_generated/api';
+import { Badge } from '@/components/web/ui/badge';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import type { Id } from '@hospice-2/backend/convex/_generated/dataModel';
-import { Mail, Phone, MapPin, Globe, FileText } from 'lucide-react';
+} from '@/components/web/ui/dialog';
+import { Separator } from '@/components/web/ui/separator';
+import { api } from '@/convex/_generated/api';
+import type { Id } from '@/convex/_generated/dataModel';
+import { useQuery } from 'convex/react';
+import { FileText, Mail, MapPin, Phone } from 'lucide-react-native';
 
 interface HospiceDetailsDialogProps {
   hospiceId: Id<'hospices'>;

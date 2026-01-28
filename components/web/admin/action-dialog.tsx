@@ -8,8 +8,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
+} from '@/components/web/ui/alert-dialog';
 import type { PropsWithChildren } from 'react';
 
 type Props = {

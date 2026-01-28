@@ -21,7 +21,7 @@ const navigation = [
   { name: 'Nurses', href: '/admin/nurses', icon: Users },
   { name: 'Hospices', href: '/admin/hospices', icon: Building2 },
   { name: 'Assignments', href: '/admin/assignments', icon: Calendar },
-  { name: 'Route Sheets', href: '/admin/route-sheet', icon: ListCheck },
+  { name: 'Route Sheets', href: '/admin/route-sheets', icon: ListCheck },
   { name: 'Notifications', href: '/admin/notification', icon: BellDot },
   { name: 'Settings', href: '/admin/settings', icon: BellDot },
 
@@ -76,7 +76,7 @@ export function AdminSidebar() {
                   className={cn(
                     'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
                     isActive
-                      ? 'bg-primary text-primary-foreground'
+                      ? 'bg-black text-white'
                       : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
                   )}
                 >

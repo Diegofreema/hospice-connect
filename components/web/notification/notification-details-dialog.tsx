@@ -1,17 +1,17 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/web/ui/badge';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { api } from '@hospice-2/backend/convex/_generated/api';
-import type { Id } from '@hospice-2/backend/convex/_generated/dataModel';
+} from '@/components/web/ui/dialog';
+import { api } from '@/convex/_generated/api';
+import type { Id } from '@/convex/_generated/dataModel';
 import { useQuery } from 'convex/react';
-import { Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react-native';
 
 interface NotificationDetailsDialogProps {
   messageId: string | null;

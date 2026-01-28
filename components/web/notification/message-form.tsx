@@ -1,16 +1,16 @@
 'use client';
 
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/web/ui/checkbox';
+import { Input } from '@/components/web/ui/input';
+import { Label } from '@/components/web/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+} from '@/components/web/ui/select';
+import { Textarea } from '@/components/web/ui/textarea';
 
 type MessageType = 'notification' | 'news_alert' | 'announcement';
 

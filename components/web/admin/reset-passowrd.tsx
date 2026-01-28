@@ -2,13 +2,13 @@
 
 import type React from 'react';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Eye, EyeOff, Loader2, Lock } from 'lucide-react';
-import { useState } from 'react';
+import { Button } from '@/components/web/ui/button';
+import { Input } from '@/components/web/ui/input';
+import { Label } from '@/components/web/ui/label';
 import { authClient } from '@/lib/auth-client';
-import { toast } from 'sonner';
+import { Eye, EyeOff, Loader2, Lock } from 'lucide-react-native';
+import { useState } from 'react';
+import { toast } from 'sonner-native';
 
 interface ResetPasswordFormProps {
   token: string;

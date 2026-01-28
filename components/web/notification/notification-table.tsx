@@ -1,12 +1,13 @@
 'use client';
 
-import { LoadingComponent } from '@/components/loading-component';
-import { Button } from '@/components/ui/button';
-import { api } from '@hospice-2/backend/convex/_generated/api';
+import { Button } from '@/components/web/ui/button';
+import { api } from '@/convex/_generated/api';
 import { useMutation, usePaginatedQuery } from 'convex/react';
-import { LoaderCircle } from 'lucide-react';
+import { LoaderCircle } from 'lucide-react-native';
 import { useCallback, useState } from 'react';
-import { toast } from 'sonner';
+
+import { LoadingComponent } from '@/features/shared/components/loading';
+import { toast } from 'sonner-native';
 import { NotificationFilters } from './notification-filters';
 import { NotificationRow } from './notification-row';
 

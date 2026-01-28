@@ -2,16 +2,16 @@
 
 import { use, useState } from 'react';
 
-import { ResetPasswordForm } from '@/components/admin/reset-passowrd';
+import { ResetPasswordForm } from '@/components/web/admin/reset-passowrd';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { ArrowLeft, CheckCircle } from 'lucide-react';
-import Link from 'next/link';
+} from '@/components/web/ui/card';
+import { Link } from 'expo-router';
+import { ArrowLeft, CheckCircle } from 'lucide-react-native';
 
 export function ResetPasswordComponent({
   searchParams,

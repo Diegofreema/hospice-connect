@@ -1,13 +1,13 @@
 'use client';
 
+import { Label } from '@/components/web/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
+} from '@/components/web/ui/select';
 
 type NotificationType = 'all' | 'notification' | 'news_alert' | 'announcement';
 type ReadStatus = 'all' | 'read' | 'unread';

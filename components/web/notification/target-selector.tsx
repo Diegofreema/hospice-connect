@@ -1,16 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { Card } from '@/components/web/ui/card';
+import { Checkbox } from '@/components/web/ui/checkbox';
+import { Label } from '@/components/web/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Card } from '@/components/ui/card';
+} from '@/components/web/ui/select';
 
 type TargetType = 'all_nurses' | 'all_hospices' | 'by_state' | 'by_discipline';
 
@@ -122,7 +121,7 @@ export function TargetSelector({
                         onStatesChange?.([...selectedStates, state]);
                       } else {
                         onStatesChange?.(
-                          selectedStates.filter((s) => s !== state)
+                          selectedStates.filter((s) => s !== state),
                         );
                       }
                     }}
@@ -158,7 +157,7 @@ export function TargetSelector({
                         ]);
                       } else {
                         onDisciplinesChange?.(
-                          selectedDisciplines.filter((d) => d !== discipline)
+                          selectedDisciplines.filter((d) => d !== discipline),
                         );
                       }
                     }}

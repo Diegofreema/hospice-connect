@@ -1,20 +1,21 @@
 'use client';
 
-import { useState } from 'react';
-import { useMutation } from 'convex/react';
-import { api } from '@hospice-2/backend/convex/_generated/api';
+import { Button } from '@/components/web/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+} from '@/components/web/ui/dialog';
+import { api } from '@/convex/_generated/api';
+import { useMutation } from 'convex/react';
+import { useState } from 'react';
+
+import { Loader2 } from 'lucide-react-native';
+import { toast } from 'sonner-native';
 import { MessageForm } from './message-form';
 import { TargetSelector } from './target-selector';
-import { Loader2 } from 'lucide-react';
 
 type MessageType = 'notification' | 'news_alert' | 'announcement';
 type TargetType = 'all_nurses' | 'all_hospices' | 'by_state' | 'by_discipline';
@@ -40,7 +41,6 @@ export function NotificationComposerDialog({
   const [isLoading, setIsLoading] = useState(false);
 
   const sendMessage = useMutation(api.notifications.sendTargetedMessage);
-  const { toast } = useToast();
 
   const handleReset = () => {
     setMessageType('notification');
@@ -54,28 +54,22 @@ export function NotificationComposerDialog({
 
   const handleSend = async () => {
     if (!title.trim() || !content.trim()) {
-      toast({
-        title: 'Missing Information',
+      toast.error('Missing Information', {
         description: 'Please fill in title and content',
-        variant: 'destructive',
       });
       return;
     }
 
     if (targetType === 'by_state' && selectedStates.length === 0) {
-      toast({
-        title: 'Missing Selection',
+      toast.error('Missing Selection', {
         description: 'Please select at least one state',
-        variant: 'destructive',
       });
       return;
     }
 
     if (targetType === 'by_discipline' && selectedDisciplines.length === 0) {
-      toast({
-        title: 'Missing Selection',
+      toast.error('Missing Selection', {
         description: 'Please select at least one discipline',
-        variant: 'destructive',
       });
       return;
     }
@@ -104,8 +98,7 @@ export function NotificationComposerDialog({
           : undefined,
       });
 
-      toast({
-        title: 'Success',
+      toast.success('Success', {
         description: isScheduled
           ? 'Message scheduled successfully'
           : 'Message sent successfully',
@@ -116,10 +109,8 @@ export function NotificationComposerDialog({
       onMessageSent?.();
     } catch (error) {
       console.error('Failed to send message:', error);
-      toast({
-        title: 'Error',
+      toast.error('Error', {
         description: 'Failed to send message. Please try again.',
-        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);

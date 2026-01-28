@@ -1,27 +1,33 @@
 'use client';
 
-import { useState } from 'react';
-import { useMutation, usePaginatedQuery } from 'convex/react';
-import { api } from '@hospice-2/backend/convex/_generated/api';
-import type { Id } from '@hospice-2/backend/convex/_generated/dataModel';
-
-type IdType = Id<'nurses'> | Id<'hospices'>;
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/web/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
-import { LoaderCircle, Search, ArrowLeft, Send } from 'lucide-react';
+} from '@/components/web/ui/card';
+import { Checkbox } from '@/components/web/ui/checkbox';
+import { Input } from '@/components/web/ui/input';
+import { Label } from '@/components/web/ui/label';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/web/ui/tabs';
+import { Textarea } from '@/components/web/ui/textarea';
+import { api } from '@/convex/_generated/api';
+import type { Id } from '@/convex/_generated/dataModel';
+import { useMutation, usePaginatedQuery } from 'convex/react';
+import { useState } from 'react';
+import { toast } from 'sonner-native';
+
+type IdType = Id<'nurses'> | Id<'hospices'>;
+
+import { useRouter } from 'expo-router';
+import { ArrowLeft, LoaderCircle, Search, Send } from 'lucide-react-native';
 
 export function SendNotificationClient() {
   const router = useRouter();

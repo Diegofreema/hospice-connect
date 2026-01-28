@@ -1,10 +1,7 @@
-'use client';
-
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/web/ui/button';
+import type { Id } from '@/convex/_generated/dataModel';
 import { formatString } from '@/lib/utils';
-import type { Id } from '@hospice-2/backend/convex/_generated/dataModel';
-import { Eye, Trash2 } from 'lucide-react';
+import { Eye, Trash2 } from 'lucide-react-native';
 
 interface NotificationRowProps {
   id: Id<'adminNotifications'>;

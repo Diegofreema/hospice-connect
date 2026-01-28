@@ -2,20 +2,21 @@
 
 import type React from 'react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/web/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useAuth } from '@/lib/auth-context';
-import { api } from '@hospice-2/backend/convex/_generated/api';
+} from '@/components/web/ui/card';
+import { Input } from '@/components/web/ui/input';
+import { Label } from '@/components/web/ui/label';
+
+import { useAuth } from '@/components/context/auth';
+import { api } from '@/convex/_generated/api';
 import { useMutation } from 'convex/react';
-import { Loader2, User } from 'lucide-react';
+import { Loader2, User } from 'lucide-react-native';
 import { useState } from 'react';
 
 export function ProfileCard() {

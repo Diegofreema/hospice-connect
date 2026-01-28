@@ -1,7 +1,5 @@
-'use client';
-
-import { Badge } from '@/components/ui/badge';
-import { Mail, Phone, MapPin, Briefcase } from 'lucide-react';
+import { Badge } from '@/components/web/ui/badge';
+import { Briefcase, Mail, MapPin, Phone } from 'lucide-react-native';
 
 interface RecipientEntity {
   type: 'nurse' | 'hospice';

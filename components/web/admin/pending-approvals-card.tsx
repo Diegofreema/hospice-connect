@@ -1,21 +1,21 @@
 'use client';
 
-import { useState } from 'react';
-import { useMutation } from 'convex/react';
-import { api } from '@hospice-2/backend/convex/_generated/api';
+import { Badge } from '@/components/web/ui/badge';
+import { Button } from '@/components/web/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Check, X, Clock, ChevronDown, ChevronUp } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import type { Id } from '@hospice-2/backend/convex/_generated/dataModel';
-import type { ApprovalType } from '@/features/types';
+} from '@/components/web/ui/card';
+import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
+import { useMutation } from 'convex/react';
+import { Check, ChevronDown, ChevronUp, Clock, X } from 'lucide-react-native';
+import { useState } from 'react';
+import { toast } from 'sonner-native';
+import { ApprovalType } from '../types';
 
 interface PendingApprovalsCardProps {
   pendingItems: ApprovalType[];
@@ -34,7 +34,6 @@ export function PendingApprovalsCard({
   const rejectNurse = useMutation(api.adminNurses.rejectNurse);
   const approveHospice = useMutation(api.adminHospices.approveHospice);
   const rejectHospice = useMutation(api.adminHospices.rejectHospice);
-  const { toast } = useToast();
 
   const handleApprove = async (id: Id<'nurses'> | Id<'hospices'>) => {
     setLoading(true);
@@ -48,15 +47,12 @@ export function PendingApprovalsCard({
           pendingProfileId: id as Id<'hospices'>,
         });
       }
-      toast({
-        title: 'Approved',
+      toast.success('Approved', {
         description: `The ${type} profile has been approved successfully.`,
       });
     } catch (error) {
-      toast({
-        title: 'Error',
+      toast.error('Error', {
         description: `Failed to approve ${type} profile. Please try again.`,
-        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -75,16 +71,13 @@ export function PendingApprovalsCard({
           pendingProfileId: id as Id<'hospices'>,
         });
       }
-      toast({
-        title: 'Rejected',
+      toast.success('Rejected', {
         description: `The ${type} profile has been rejected.`,
       });
       onRefresh();
     } catch (error) {
-      toast({
-        title: 'Error',
+      toast.error('Error', {
         description: `Failed to reject ${type} profile. Please try again.`,
-        variant: 'destructive',
       });
     } finally {
       setLoading(false);

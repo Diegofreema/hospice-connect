@@ -2,23 +2,25 @@
 
 import type React from 'react';
 
-import { useState } from 'react';
+import { api } from '@/convex/_generated/api';
 import { useMutation } from 'convex/react';
-import { api } from '@hospice-2/backend/convex/_generated/api';
-import { useAuth } from '@/lib/auth-context';
+import { useState } from 'react';
+
+import { Button } from '@/components/web/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Lock, Loader2, Eye, EyeOff } from 'lucide-react';
-import { generateErrorMessage } from '@/lib/utils';
-import { toast } from 'sonner';
+} from '@/components/web/ui/card';
+import { Input } from '@/components/web/ui/input';
+import { Label } from '@/components/web/ui/label';
+import { Eye, EyeOff, Loader2, Lock } from 'lucide-react-native';
+
+import { useAuth } from '@/components/context/auth';
+import { generateErrorMessage } from '@/features/shared/utils';
+import { toast } from 'sonner-native';
 
 export function PasswordCard() {
   const { user } = useAuth();
