@@ -6,18 +6,16 @@ const AdminLayout = () => {
   const isAuthenticated = !!user;
 
   return (
-    <div>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Protected guard={!isAuthenticated}>
-          <Stack.Screen name="index" />
-          <Stack.Screen name="forgot-password" />
-          <Stack.Screen name="reset-password" />
-        </Stack.Protected>
-        <Stack.Protected guard={isAuthenticated}>
-          <Stack.Screen name="admin" />
-        </Stack.Protected>
-      </Stack>
-    </div>
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Protected guard={!isAuthenticated}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="forgot-password" />
+        <Stack.Screen name="reset-password" />
+      </Stack.Protected>
+      <Stack.Protected guard={isAuthenticated}>
+        <Stack.Screen name="admin" />
+      </Stack.Protected>
+    </Stack>
   );
 };
 

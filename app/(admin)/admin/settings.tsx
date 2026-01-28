@@ -1,15 +1,10 @@
-import { Text } from '@/features/shared/components/text';
-import { View } from '@/features/shared/components/view';
-
 export default function AdminSettings() {
   return (
-    <View flex={1} justifyContent="center" alignItems="center" bg="background">
-      <Text size="xxl" weight="bold">
-        Settings
-      </Text>
-      <Text size="md" mt="md" color="gray">
+    <div className="flex-1 justify-center items-center bg-background">
+      <p className="text-xxl font-bold">Settings</p>
+      <p className="text-md mt-md text-gray">
         Admin settings and configuration
-      </Text>
-    </View>
+      </p>
+    </div>
   );
 }

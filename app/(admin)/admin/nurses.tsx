@@ -3,16 +3,11 @@ import { View } from '@/features/shared/components/view';
 
 export default function AdminNurses() {
   return (
-    <View
-      flex={1}
-      justifyContent="center"
-      alignItems="center"
-      backgroundColor="background"
-    >
-      <Text size="normal">Nurses Management</Text>
-      <Text size="medium" color="gray">
-        View and manage all nurses
+    <View flex={1}>
+      <Text size="large" isBold>
+        Nurses Management
       </Text>
+      <Text color="gray">View and manage all nurses</Text>
     </View>
   );
 }

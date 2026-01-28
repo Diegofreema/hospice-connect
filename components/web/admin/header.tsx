@@ -1,7 +1,8 @@
 'use client';
 
-import { Bell, LogOut } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { LogOut } from 'lucide-react-native';
+import { Avatar, AvatarFallback } from '../ui/avatar';
+import { Button } from '../ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,13 +10,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { useAuth } from '@/lib/auth-context';
+} from '../ui/dropdown-menu';
+
+import { useAuth } from '@/components/context/auth';
 import { authClient } from '@/lib/auth-client';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
+import { toast } from 'sonner-native';
 
 export function AdminHeader() {
   const { user } = useAuth();

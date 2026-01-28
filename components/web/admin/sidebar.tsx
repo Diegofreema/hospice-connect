@@ -1,9 +1,8 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { Link, usePathname } from 'expo-router';
 import {
-  Activity,
   BellDot,
   Building2,
   Calendar,
@@ -12,9 +11,9 @@ import {
   Menu,
   Users,
   X,
-} from 'lucide-react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+} from 'lucide-react-native';
+import { Button } from '../ui/button';
+
 import { useState } from 'react';
 
 const navigation = [
