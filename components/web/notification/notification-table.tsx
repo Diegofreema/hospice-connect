@@ -6,7 +6,7 @@ import { useMutation, usePaginatedQuery } from 'convex/react';
 import { LoaderCircle } from 'lucide-react-native';
 import { useCallback, useState } from 'react';
 
-import { LoadingComponent } from '@/features/shared/components/loading';
+import { Loader } from '@/features/admin/shared/loader';
 import { toast } from 'sonner-native';
 import { NotificationFilters } from './notification-filters';
 import { NotificationRow } from './notification-row';
@@ -60,7 +60,7 @@ export function NotificationTable({
   );
 
   if (status === 'LoadingFirstPage') {
-    return <LoadingComponent />;
+    return <Loader message="Loading notifications" />;
   }
 
   const onLoadMore = () => {

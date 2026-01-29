@@ -1,18 +1,5 @@
-import { Text } from '@/features/shared/components/text';
-import { View } from '@/features/shared/components/view';
+import { RouteSheets } from '@/features/admin/route-sheet/components/route-sheets';
 
 export default function AdminRouteSheets() {
-  return (
-    <View
-      flex={1}
-      justifyContent="center"
-      alignItems="center"
-      backgroundColor="background"
-    >
-      <Text size="normal">Route Sheets</Text>
-      <Text size="medium" color="gray">
-        Manage and review route sheets
-      </Text>
-    </View>
-  );
+  return <RouteSheets />;
 }
