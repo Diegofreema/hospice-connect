@@ -1,3 +1,5 @@
+import '../global.css';
+
 import { AnimatedView } from '@/components/animated-view';
 import { useAuth } from '@/components/context/auth';
 import { StackedModalProvider } from '@/components/demos/modal/modal-manager';

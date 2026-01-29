@@ -149,6 +149,8 @@
     "sonner-native": "^0.21.1",
     "stream-chat-expo": "^8.5.0",
     "tailwind-merge": "^3.4.0",
+    "tailwindcss": "^4.1.18",
+    "uniwind": "^1.2.7",
     "use-debounce": "^10.0.6",
     "zeego": "^3.0.6",
     "zod": "^4.1.4",
