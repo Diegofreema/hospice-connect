@@ -12,7 +12,6 @@ import {
   usePathname,
   useSegments,
 } from 'expo-router';
-import '../global.css';
 
 import { useUpdate } from '@/hooks/use-update';
 import React from 'react';
@@ -76,7 +75,7 @@ const InitialRoute = () => {
   const segment = useSegments();
   const pathname = usePathname();
   const isWeb = Platform.OS === 'web';
-  console.log({ pathname, segment, isWeb });
+  console.log({ pathname, segment });
   const isAuthenticated = !!user;
 
   return (
