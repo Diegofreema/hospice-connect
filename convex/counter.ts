@@ -1,5 +1,5 @@
-import { components } from './_generated/api';
 import { ShardedCounter } from '@convex-dev/sharded-counter';
+import { components } from './_generated/api';
 import { type MutationCtx, type QueryCtx } from './_generated/server';
 
 const counter = new ShardedCounter(components.shardedCounter);
@@ -22,6 +22,46 @@ const unSubmittedRouteSheetsCount = counter.for('unSubmittedRouteSheetsCount');
 const unApprovedSubmittedRouteSheetsCount = counter.for(
   'unApprovedSubmittedRouteSheetsCount',
 );
+const pendingHospiceAccounts = counter.for('pendingHospiceAccounts');
+const pendingNurseAccounts = counter.for('pendingNurseAccounts');
+
+export const updateCount = async (ctx: MutationCtx) => {
+  await pendingHospiceAccounts.add(ctx, 5);
+  await pendingNurseAccounts.add(ctx, 14);
+};
+
+export const handlePendingHospiceAccounts = async (
+  ctx: MutationCtx,
+  action: 'inc' | 'dec',
+) => {
+  if (action === 'inc') {
+    await pendingHospiceAccounts.inc(ctx);
+  } else {
+    const count = await pendingHospiceAccounts.count(ctx);
+    if (count > 0) {
+      await pendingHospiceAccounts.dec(ctx);
+    }
+  }
+};
+export const getPendingHospiceAccounts = async (ctx: QueryCtx) => {
+  return await pendingHospiceAccounts.count(ctx);
+};
+export const handlePendingNurseAccounts = async (
+  ctx: MutationCtx,
+  action: 'inc' | 'dec',
+) => {
+  if (action === 'inc') {
+    await pendingNurseAccounts.inc(ctx);
+  } else {
+    const count = await pendingNurseAccounts.count(ctx);
+    if (count > 0) {
+      await pendingNurseAccounts.dec(ctx);
+    }
+  }
+};
+export const getPendingNurseAccounts = async (ctx: QueryCtx) => {
+  return await pendingNurseAccounts.count(ctx);
+};
 
 export const handleUnApprovedSubmittedRouteSheets = async (
   ctx: MutationCtx,

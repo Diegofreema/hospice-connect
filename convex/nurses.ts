@@ -1,13 +1,19 @@
 import { filter } from 'convex-helpers/server/filter';
 import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
+import { internal } from './_generated/api';
 import { type Id } from './_generated/dataModel';
 import {
+  internalMutation,
   mutation,
   query,
   type QueryCtx,
-  internalMutation,
 } from './_generated/server';
+import {
+  handleNurseCount,
+  handlePendingNurseAccounts,
+  handlePendingNurseApprovalCount,
+} from './counter';
 import {
   checkDurationOfNotSubmittedAssignment,
   getAvailability,
@@ -16,8 +22,6 @@ import {
 } from './helper';
 import { discipline } from './schema';
 import { getUserHelper } from './users';
-import { handleNurseCount, handlePendingNurseApprovalCount } from './counter';
-import { internal } from './_generated/api';
 
 export const createNurse = mutation({
   args: {
@@ -224,6 +228,7 @@ export const editNurse = mutation({
       isApproved: false,
       nurseId: args.nurseId,
     });
+    await handlePendingNurseAccounts(ctx, 'inc');
   },
 });
 

@@ -45,11 +45,11 @@ export function NotificationDetailsDialog({
 
   const getTargetLabel = (target: string) => {
     const labels: Record<string, string> = {
-      all_nurses: 'All Nurses',
+      all_nurses: 'All Healthcare professionals',
       all_hospices: 'All Hospices',
       by_state: 'By State',
       by_discipline: 'By Discipline',
-      selected_nurses: 'Selected Nurses',
+      selected_nurses: 'Selected Healthcare professionals',
       selected_hospices: 'Selected Hospices',
     };
     return labels[target] || target;

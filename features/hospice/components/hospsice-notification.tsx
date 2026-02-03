@@ -187,7 +187,7 @@ export const HospiceNotification = ({ notification }: Props) => {
                 size={60}
               />
               <View flex={1}>
-                <Text size="normal" isMedium>
+                <Text size="medium" isBold>
                   {notification.title}
                 </Text>
                 {notification.description && (

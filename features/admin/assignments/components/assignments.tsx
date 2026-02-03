@@ -85,7 +85,7 @@ export function Assignments() {
           Assignments & Schedules
         </h1>
         <p className="text-muted-foreground mt-1">
-          Manage nurse assignments and schedules
+          Manage healthcare professionals assignments and schedules
         </p>
       </div>
 
@@ -139,7 +139,7 @@ export function Assignments() {
         <CardHeader>
           <CardTitle>Assignments List</CardTitle>
           <CardDescription>
-            View and manage all nurse assignments
+            View and manage all healthcare professional's assignments
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

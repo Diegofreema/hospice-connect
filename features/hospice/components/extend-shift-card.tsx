@@ -62,7 +62,7 @@ export const ExtendShiftCard = ({ shift }: Props) => {
             </View>
             <View>
               <Text size="normal" isBold>
-                No nurse assigned
+                no staff assigned
               </Text>
 
               <Text size="normal" isBold>

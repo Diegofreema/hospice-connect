@@ -62,7 +62,7 @@ export const LatestShiftCard = ({ shift }: Props) => {
             <View>
               <CustomPressable onPress={onPressName}>
                 <Text size="normal" isBold>
-                  {shift.nurse?.name || 'No nurse assigned'}
+                  {shift.nurse?.name || 'no staff assigned'}
                 </Text>
               </CustomPressable>
               <Text size="normal" isBold>

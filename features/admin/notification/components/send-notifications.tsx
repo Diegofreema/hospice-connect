@@ -142,7 +142,8 @@ export function SendNotification() {
             Send New Notification
           </h1>
           <p className="text-muted-foreground mt-1">
-            Compose and send notifications to nurses or hospices
+            Compose and send notifications to Healthcare professionals or
+            hospices
           </p>
         </div>
       </div>
@@ -162,7 +163,9 @@ export function SendNotification() {
             >
               <div className="flex items-center justify-between gap-4 mb-4">
                 <TabsList className="grid w-full max-w-[200px] grid-cols-2">
-                  <TabsTrigger value="nurse">Nurses</TabsTrigger>
+                  <TabsTrigger value="nurse">
+                    Healthcare professionals
+                  </TabsTrigger>
                   <TabsTrigger value="hospice">Hospices</TabsTrigger>
                 </TabsList>
                 <div className="relative flex-1 max-w-xs">
@@ -198,7 +201,7 @@ export function SendNotification() {
                   {nurses.length === 0 &&
                     nurseStatus !== 'LoadingFirstPage' && (
                       <div className="text-center py-10 text-muted-foreground">
-                        No approved nurses found.
+                        No approved healthcare professionals found found.
                       </div>
                     )}
                   {nurses.map((nurse) => (
@@ -236,7 +239,7 @@ export function SendNotification() {
                         variant="outline"
                         onClick={() => loadMoreNurses(20)}
                       >
-                        Load More Nurses
+                        Load More
                       </Button>
                     )}
                   </div>

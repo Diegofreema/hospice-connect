@@ -73,13 +73,14 @@ export const NurseCard = ({ nurse, isAssigned, onAction, disabled }: Props) => {
             />
             <Text>{nurse.ratings ? nurse.ratings.toFixed(1) : 'N/A'}</Text>
           </View>
-          <Text>Discipline: {nurse.discipline}</Text>
-          {/* <Text>{nurse._id}</Text> */}
           <CustomPressable onPress={onPress}>
             <Text size={'medium'} isMedium style={{ flex: 1 }}>
               {name}
             </Text>
           </CustomPressable>
+          <Text>Discipline: {nurse.discipline}</Text>
+          {/* <Text>{nurse._id}</Text> */}
+
           <View
             justifyContent={'flex-start'}
             flexDirection="row"

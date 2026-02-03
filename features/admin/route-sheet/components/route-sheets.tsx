@@ -321,9 +321,9 @@ export function RouteSheets() {
         <TabsContent value="suspended" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Suspended Nurses</CardTitle>
+              <CardTitle>Suspended Healthcare professionals</CardTitle>
               <CardDescription>
-                Nurses suspended from accepting new shifts
+                Healthcare professionals suspended from accepting new shifts
               </CardDescription>
               {/* <div className="mt-4">
                 <Input

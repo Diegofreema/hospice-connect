@@ -6,6 +6,8 @@ import {
   BellDot,
   Building2,
   Calendar,
+  CheckCircle,
+  Cog,
   LayoutDashboard,
   ListCheck,
   Menu,
@@ -22,8 +24,13 @@ const navigation = [
   { name: 'Hospices', href: '/admin/hospices', icon: Building2 },
   { name: 'Assignments', href: '/admin/assignments', icon: Calendar },
   { name: 'Route Sheets', href: '/admin/route-sheets', icon: ListCheck },
+  {
+    name: 'Profile Updates',
+    href: '/admin/profile-updates',
+    icon: CheckCircle,
+  },
   { name: 'Notifications', href: '/admin/notification', icon: BellDot },
-  { name: 'Settings', href: '/admin/settings', icon: BellDot },
+  { name: 'Settings', href: '/admin/settings', icon: Cog },
 
   // { name: 'Activity Logs', href: '/admin/activity', icon: Activity },
 ];
@@ -66,7 +73,11 @@ export function AdminSidebar() {
           {/* Navigation */}
           <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto">
             {navigation.map((item) => {
-              const isActive = pathname === item.href;
+              let isActive = pathname === item.href;
+              // if pathname is at '/', set dashboard to active
+              if (pathname === '/') {
+                isActive = item.href === '/admin';
+              }
               return (
                 <Link
                   key={item.name}

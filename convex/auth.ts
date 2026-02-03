@@ -14,7 +14,8 @@ import { sendResetPassword } from './sendEmail';
 
 const siteUrl = process.env.SITE_URL!;
 const nativeAppUrl = process.env.NATIVE_APP_URL || 'hospice-connect://';
-
+const isDevelopment = process.env.NODE_ENV === 'development';
+const urlToUse = isDevelopment ? 'http://localhost:8081' : siteUrl;
 export const authComponent = createClient<DataModel, typeof authSchema>(
   components.betterAuth,
   {
@@ -26,11 +27,11 @@ export const authComponent = createClient<DataModel, typeof authSchema>(
 
 export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
   return {
-    baseURL: siteUrl,
+    baseURL: urlToUse,
     trustedOrigins: [
-      siteUrl,
+      urlToUse,
       nativeAppUrl,
-      ...(process.env.NODE_ENV === 'development'
+      ...(isDevelopment
         ? [
             'exp://*/*', // Trust all Expo development URLs
             'exp://10.0.0.*:*/*', // Trust 10.0.0.x IP range

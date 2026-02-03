@@ -10,9 +10,17 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/web/ui/card';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/web/ui/tabs';
 import { useRouter } from 'expo-router';
-import { Bell, Send } from 'lucide-react-native';
+import { Activity, Bell, Send } from 'lucide-react-native';
 import { useState } from 'react';
+import { ActivityNotificationDetails } from './activity-notification-detail';
+import { ActivityNotificationList } from './activity-notification-list';
 
 export function Notifications() {
   const router = useRouter();
@@ -21,9 +29,18 @@ export function Notifications() {
   >(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
+  const [selectedActivityNotification, setSelectedActivityNotification] =
+    useState<any>(null);
+  const [isActivityDetailsOpen, setIsActivityDetailsOpen] = useState(false);
+
   const handleViewNotification = (messageId: string) => {
     setSelectedNotificationId(messageId);
     setIsDetailsOpen(true);
+  };
+
+  const handleViewActivityNotification = (notification: any) => {
+    setSelectedActivityNotification(notification);
+    setIsActivityDetailsOpen(true);
   };
 
   return (
@@ -35,7 +52,8 @@ export function Notifications() {
             Notifications & Messaging
           </h1>
           <p className="text-muted-foreground mt-1">
-            Send and manage targeted notifications to nurses and hospices
+            Send and manage targeted notifications to Healthcare professionals
+            and hospices
           </p>
         </div>
         <Button
@@ -48,27 +66,68 @@ export function Notifications() {
         </Button>
       </div>
 
-      {/* Main Content Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Bell className="h-5 w-5" />
-            Notification History
-          </CardTitle>
-          <CardDescription>
-            View and manage all sent notifications with advanced filtering and
-            pagination
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <NotificationTable onNotificationClick={handleViewNotification} />
-        </CardContent>
-      </Card>
+      <Tabs defaultValue="sent" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="sent" className="flex items-center gap-2">
+            <Bell className="h-4 w-4" />
+            Sent Notifications
+          </TabsTrigger>
+          <TabsTrigger value="activities" className="flex items-center gap-2">
+            <Activity className="h-4 w-4" />
+            User Activities
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Sent Notifications Tab */}
+        <TabsContent value="sent" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bell className="h-5 w-5" />
+                Notification History
+              </CardTitle>
+              <CardDescription>
+                View and manage all sent notifications with advanced filtering
+                and pagination
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <NotificationTable onNotificationClick={handleViewNotification} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* User Activities Tab */}
+        <TabsContent value="activities" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Activity className="h-5 w-5" />
+                User Activities
+              </CardTitle>
+              <CardDescription>
+                View activities triggered by nurses and hospices such as profile
+                updates, registrations, and requests
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ActivityNotificationList
+                onNotificationClick={handleViewActivityNotification}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       <NotificationDetailsDialog
         messageId={selectedNotificationId}
         open={isDetailsOpen}
         onOpenChange={setIsDetailsOpen}
+      />
+      <ActivityNotificationDetails
+        notification={selectedActivityNotification}
+        open={isActivityDetailsOpen}
+        onOpenChange={setIsActivityDetailsOpen}
       />
     </div>
   );

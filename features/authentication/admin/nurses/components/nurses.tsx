@@ -37,10 +37,15 @@ import { ActionDialog } from '@/components/web/admin/action-dialog';
 import type { Id } from '@/convex/_generated/dataModel';
 import { type DisciplineType } from '@/convex/schema';
 import { usStates } from '@/lib/constants';
-import { formatString } from '@/lib/utils';
+import {
+  cn,
+  formatString,
+  generateStatusColor,
+  generateStatusText,
+} from '@/lib/utils';
 import { toast } from 'sonner-native';
+import { Status } from '../types';
 
-type Status = 'pending' | 'approved' | 'rejected' | 'suspended';
 export function Nurses() {
   const [searchQuery, setSearchQuery] = useState('');
   const [disciplineFilter, setDisciplineFilter] = useState<
@@ -74,7 +79,7 @@ export function Nurses() {
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent" />
-          <p className="mt-4 text-muted-foreground">Loading nurses...</p>
+          <p className="mt-4 text-muted-foreground">Loading...</p>
         </div>
       </div>
     );
@@ -104,14 +109,13 @@ export function Nurses() {
   ) => {
     try {
       await suspendNurse({ nurseId, isSuspended: !currentStatus });
-      toast.success(currentStatus ? 'Nurse Reactivated' : 'Nurse Suspended', {
-        description: currentStatus
-          ? 'The nurse account has been reactivated successfully.'
-          : 'The nurse account has been suspended successfully.',
+      toast.success(currentStatus ? 'Reactivated' : 'Suspended', {
+        description: `The healthcare professional account has been ${currentStatus ? 'reactivated' : 'suspended'} successfully.`,
       });
     } catch (error) {
       toast.error('Error', {
-        description: 'Failed to update nurse status. Please try again.',
+        description:
+          'Failed to update healthcare professional status. Please try again.',
       });
     }
   };
@@ -119,9 +123,11 @@ export function Nurses() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Nurses Management</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          Healthcare professional Management
+        </h1>
         <p className="text-muted-foreground mt-1">
-          Manage nurse profiles, approvals, and suspensions
+          Manage healthcare professional profiles, approvals, and suspensions
         </p>
       </div>
 
@@ -141,7 +147,7 @@ export function Nurses() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Nurses
+              Total healthcare professional
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -183,7 +189,7 @@ export function Nurses() {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle>Nurses List</CardTitle>
+          <CardTitle>healthcare professional List</CardTitle>
           <CardDescription>Search and filter nurse profiles</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -267,7 +273,7 @@ export function Nurses() {
                       colSpan={7}
                       className="text-center text-muted-foreground py-8"
                     >
-                      No nurses found matching your filters.
+                      No healthcare professional found matching your filters.
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -283,13 +289,12 @@ export function Nurses() {
                       </TableCell>
 
                       <TableCell>
-                        {nurse.status === 'suspended' ? (
-                          <Badge variant="destructive">Suspended</Badge>
-                        ) : nurse.status === 'approved' ? (
-                          <Badge variant="default">Approved</Badge>
-                        ) : (
-                          <Badge variant="secondary">Pending</Badge>
-                        )}
+                        <Badge
+                          variant="secondary"
+                          className={generateStatusColor(nurse.status)}
+                        >
+                          {generateStatusText(nurse.status)}
+                        </Badge>
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
@@ -321,11 +326,11 @@ export function Nurses() {
                               }
                             >
                               <Button
-                                variant={
+                                className={cn(
                                   nurse.status === 'suspended'
-                                    ? 'default'
-                                    : 'destructive'
-                                }
+                                    ? 'bg-red-500'
+                                    : 'bg-green-500',
+                                )}
                                 size="icon"
                                 title={
                                   nurse.status === 'suspended'
@@ -355,7 +360,7 @@ export function Nurses() {
                 >
                   {paginationStatus === 'CanLoadMore'
                     ? 'Load More'
-                    : 'No More Nurses'}
+                    : 'No More healthcare professional'}
                 </Button>
               </TableFooter>
             </Table>

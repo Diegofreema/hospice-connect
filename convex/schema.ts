@@ -67,7 +67,6 @@ export const Nurse = {
   discipline: discipline,
   rate: v.optional(v.number()),
   imageId: v.optional(v.id('_storage')),
-
   userId: v.string(),
   address: v.optional(v.string()),
   zipCode: v.optional(v.string()),
@@ -322,12 +321,12 @@ export default defineSchema({
     'by_hospice_id',
     ['hospiceId'],
   ),
-  pendingNurseProfile: defineTable(PendingNurse).index('by_nurse_id', [
-    'nurseId',
-  ]),
-  pendingHospiceProfile: defineTable(PendingHospice).index('by_hospice_id', [
-    'hospiceId',
-  ]),
+  pendingNurseProfile: defineTable(PendingNurse)
+    .index('by_nurse_id', ['nurseId'])
+    .index('isApproved', ['isApproved']),
+  pendingHospiceProfile: defineTable(PendingHospice)
+    .index('by_hospice_id', ['hospiceId'])
+    .index('isApproved', ['isApproved']),
   nurseAssignments: defineTable(NurseAssignments)
     .index('nurse_id', ['nurseId', 'isCompleted', 'assignmentId'])
     .index('assignmentId', ['assignmentId', 'nurseId']),
@@ -356,4 +355,14 @@ export default defineSchema({
   })
     .index('by_userId', ['userId'])
     .index('by_status', ['status']),
+  adminActivityNotifications: defineTable({
+    title: v.string(),
+    description: v.string(),
+    entityId: v.optional(v.string()),
+    metadata: v.optional(v.any()),
+    isRead: v.boolean(),
+    nurseId: v.optional(v.id('nurses')),
+    hospiceId: v.optional(v.id('hospices')),
+    type: v.union(v.literal('nurse'), v.literal('hospice')),
+  }).index('by_isRead', ['isRead']),
 });

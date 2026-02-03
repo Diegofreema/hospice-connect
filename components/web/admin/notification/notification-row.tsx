@@ -1,10 +1,9 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/web/ui/button';
+import type { Id } from '@/convex/_generated/dataModel';
 import { formatString } from '@/lib/utils';
-import type { Id } from '@hospice-2/backend/convex/_generated/dataModel';
-import { Eye, Trash2 } from 'lucide-react';
+import { Eye, Trash2 } from 'lucide-react-native';
 
 interface NotificationRowProps {
   id: Id<'adminNotifications'>;
@@ -43,18 +42,6 @@ export function NotificationRow({
       default:
         return 'bg-gray-500/10 text-gray-700 dark:text-gray-400';
     }
-  };
-
-  const getTargetLabel = (target: string) => {
-    const labels: Record<string, string> = {
-      all_nurses: 'All Nurses',
-      all_hospices: 'All Hospices',
-      by_state: 'By State',
-      by_discipline: 'By Discipline',
-      selected_nurses: 'Selected Nurses',
-      selected_hospices: 'Selected Hospices',
-    };
-    return labels[target] || target;
   };
 
   return (

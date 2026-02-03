@@ -1,3 +1,4 @@
+import '@/unistyles';
 import '../global.css';
 
 import { AnimatedView } from '@/components/animated-view';

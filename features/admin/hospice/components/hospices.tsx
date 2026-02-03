@@ -41,6 +41,7 @@ import { ActionDialog } from '@/components/web/admin/action-dialog';
 import { HospiceDetailsDialog } from '@/components/web/admin/hospice-details-dialog';
 import { PendingApprovalsCard } from '@/components/web/admin/pending-approvals-card';
 import type { Id } from '@/convex/_generated/dataModel';
+import { changeFirstLetterToCapital } from '@/features/shared/utils';
 import { usStates } from '@/lib/constants';
 import { toast } from 'sonner-native';
 import { Loader } from '../../shared/loader';
@@ -203,7 +204,7 @@ export function Hospices() {
                 <SelectItem value="all">All States</SelectItem>
                 {usStates.map((state) => (
                   <SelectItem key={state.value} value={state.value}>
-                    {state.label}
+                    {changeFirstLetterToCapital(state.label)}
                   </SelectItem>
                 ))}
               </SelectContent>

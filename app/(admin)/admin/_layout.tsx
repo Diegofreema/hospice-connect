@@ -4,7 +4,7 @@ import { Slot } from 'expo-router';
 const AdminDashboardLayout = () => {
   return (
     <AdminLayout>
-      <Slot />
+      <Slot initialRouteName="index" />
     </AdminLayout>
   );
 };

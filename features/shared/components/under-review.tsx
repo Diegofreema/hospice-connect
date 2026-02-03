@@ -15,7 +15,7 @@ type Props = {
 };
 export const UnderReview = ({
   title = 'Account Under Review',
-  description = 'We are currently verifying your information. You will be contacted shortly',
+  description = 'We are currently verifying your information. Please check back shortly',
 }: Props) => {
   const [loading, setLoading] = useState(false);
   const onLogout = async () => {

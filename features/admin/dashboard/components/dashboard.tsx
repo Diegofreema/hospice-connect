@@ -60,7 +60,7 @@ export function AdminDashboard() {
       {/* Stats Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          title="Total Nurses"
+          title="Total healthcare professionals"
           value={stats.nurses.total}
           description={`${stats.nurses.approved} approved`}
           icon={Users}
@@ -100,14 +100,15 @@ export function AdminDashboard() {
           <CardHeader>
             <CardTitle>New Accounts</CardTitle>
             <CardDescription>
-              Nurses and hospices created over the last 30 days
+              Healthcare professionals and hospices created over the last 30
+              days
             </CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer
               config={{
                 nurses: {
-                  label: 'Nurses',
+                  label: 'Healthcare professionals',
                   color: 'hsl(var(--chart-1))',
                 },
                 hospices: {
@@ -139,10 +140,10 @@ export function AdminDashboard() {
                   <Legend />
                   <Line
                     type="monotone"
-                    dataKey="nurses"
+                    dataKey="healthcare-professionals"
                     stroke="hsl(var(--chart-1))"
                     strokeWidth={2}
-                    name="Nurses"
+                    name="Healthcare professionals"
                   />
                   <Line
                     type="monotone"
@@ -215,8 +216,8 @@ export function AdminDashboard() {
               {stats.nurses.suspended + stats.hospices.suspended}
             </div>
             <p className="text-xs text-muted-foreground">
-              {stats.nurses.suspended} nurses, {stats.hospices.suspended}{' '}
-              hospices
+              {stats.nurses.suspended} healthcare professionals,{' '}
+              {stats.hospices.suspended} hospices
             </p>
           </CardContent>
         </Card>
@@ -249,7 +250,9 @@ export function AdminDashboard() {
                 : 0}
               %
             </div>
-            <p className="text-xs text-muted-foreground">For nurse accounts</p>
+            <p className="text-xs text-muted-foreground">
+              For healthcare professionals accounts
+            </p>
           </CardContent>
         </Card>
       </div>

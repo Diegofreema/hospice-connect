@@ -10,6 +10,7 @@
 
 import type * as actionHelper from "../actionHelper.js";
 import type * as activityLogs from "../activityLogs.js";
+import type * as adminActivityNotifications from "../adminActivityNotifications.js";
 import type * as adminAssignment from "../adminAssignment.js";
 import type * as adminHospices from "../adminHospices.js";
 import type * as adminNurses from "../adminNurses.js";
@@ -35,6 +36,7 @@ import type * as nurses from "../nurses.js";
 import type * as passwordReset_PasswordResetemail from "../passwordReset/PasswordResetemail.js";
 import type * as posts from "../posts.js";
 import type * as privateData from "../privateData.js";
+import type * as profileUpdates from "../profileUpdates.js";
 import type * as routeSheets from "../routeSheets.js";
 import type * as schedules from "../schedules.js";
 import type * as sendEmail from "../sendEmail.js";
@@ -52,6 +54,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   actionHelper: typeof actionHelper;
   activityLogs: typeof activityLogs;
+  adminActivityNotifications: typeof adminActivityNotifications;
   adminAssignment: typeof adminAssignment;
   adminHospices: typeof adminHospices;
   adminNurses: typeof adminNurses;
@@ -77,6 +80,7 @@ declare const fullApi: ApiFromModules<{
   "passwordReset/PasswordResetemail": typeof passwordReset_PasswordResetemail;
   posts: typeof posts;
   privateData: typeof privateData;
+  profileUpdates: typeof profileUpdates;
   routeSheets: typeof routeSheets;
   schedules: typeof schedules;
   sendEmail: typeof sendEmail;
