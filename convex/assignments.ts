@@ -4,6 +4,13 @@ import { ConvexError, v } from 'convex/values';
 import { type Doc, type Id } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import {
+  handleActiveAssignmentsCount,
+  handleAssignmentsCount,
+  handleCompletedAssignmentCount,
+  handleEndedAssignmentCount,
+  handleUnSubmittedRouteSheetsCount,
+} from './counter';
+import {
   checkIfNurseHasActiveShift,
   formatDate,
   sendAvailableAssignmentNotificationToNurse,
@@ -15,7 +22,6 @@ import {
   type AvailableAssignmentType,
 } from './types';
 import { getUserHelper } from './users';
-import { handleUnSubmittedRouteSheetsCount } from './counter';
 
 export const availableAssignments = query({
   args: {
@@ -270,6 +276,9 @@ export const createAssignment = mutation({
       null,
       500,
     );
+
+    await handleAssignmentsCount(ctx, 'inc');
+    await handleActiveAssignmentsCount(ctx, 'inc');
   },
 });
 
@@ -339,6 +348,8 @@ export const reopenAssignment = mutation({
       null,
       500,
     );
+    await handleAssignmentsCount(ctx, 'inc');
+    await handleActiveAssignmentsCount(ctx, 'inc');
   },
 });
 
@@ -549,6 +560,8 @@ export const deleteAssignment = mutation({
     }
 
     await ctx.db.delete(args.assignmentId);
+    await handleAssignmentsCount(ctx, 'dec');
+    await handleActiveAssignmentsCount(ctx, 'dec');
   },
 });
 
@@ -635,6 +648,9 @@ export const updateAssignmentStatusToCompleted = mutation({
       });
       await handleUnSubmittedRouteSheetsCount(ctx, 'inc');
     }
+
+    await handleActiveAssignmentsCount(ctx, 'dec');
+    await handleCompletedAssignmentCount(ctx, 'inc');
   },
 });
 
@@ -730,6 +746,8 @@ export const cancelAssignment = mutation({
       status: 'ended',
       canceledAt: args.cancelledAt,
     });
+    await handleActiveAssignmentsCount(ctx, 'dec');
+    await handleEndedAssignmentCount(ctx, 'inc');
   },
 });
 

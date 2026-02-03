@@ -43,6 +43,10 @@ import { PendingApprovalsCard } from '@/components/web/admin/pending-approvals-c
 import type { Id } from '@/convex/_generated/dataModel';
 import { changeFirstLetterToCapital } from '@/features/shared/utils';
 import { usStates } from '@/lib/constants';
+import {
+  generateStatusColorAndBackgroundColor,
+  generateStatusText,
+} from '@/lib/utils';
 import { toast } from 'sonner-native';
 import { Loader } from '../../shared/loader';
 
@@ -249,15 +253,13 @@ export function Hospices() {
                     <TableCell>{hospice.state}</TableCell>
                     <TableCell>{hospice.licenseNumber}</TableCell>
                     <TableCell>
-                      {hospice.status === 'suspended' ? (
-                        <Badge variant="secondary">Suspended</Badge>
-                      ) : hospice.status === 'approved' ? (
-                        <Badge variant="default">Approved</Badge>
-                      ) : hospice.status === 'pending' ? (
-                        <Badge variant="outline">Pending</Badge>
-                      ) : (
-                        <Badge variant="destructive">Rejected</Badge>
-                      )}
+                      <Badge
+                        className={generateStatusColorAndBackgroundColor(
+                          hospice.status,
+                        )}
+                      >
+                        {generateStatusText(hospice.status)}
+                      </Badge>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
@@ -270,31 +272,6 @@ export function Hospices() {
                           <Eye className="h-4 w-4" />
                         </Button>
                         {hospice.status !== 'pending' && (
-                          // <Button
-                          //   variant={
-                          //     hospice.status === 'suspended'
-                          //       ? 'default'
-                          //       : 'destructive'
-                          //   }
-                          //   size="icon"
-                          //   onClick={() =>
-                          //     handleSuspendToggle(
-                          //       hospice._id,
-                          //       hospice.status === 'suspended'
-                          //     )
-                          //   }
-                          //   title={
-                          //     hospice.status === 'suspended'
-                          //       ? 'Reactivate'
-                          //       : 'Suspend'
-                          //   }
-                          // >
-                          //   {hospice.status === 'suspended' ? (
-                          //     <Building2Check className="h-4 w-4" />
-                          //   ) : (
-                          //     <Building2 className="h-4 w-4" />
-                          //   )}
-                          // </Button>
                           <ActionDialog
                             title={
                               hospice.status === 'suspended'

@@ -12,19 +12,35 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const generateStatusColor = (status: Status) => {
+export const generateStatusColorAndBackgroundColor = (status: Status) => {
   switch (status) {
     case 'pending':
-      return 'text-yellow-500';
+      return 'text-yellow-500 bg-yellow-50';
     case 'approved':
-      return 'text-green-500';
+      return 'text-green-500 bg-green-50';
     case 'rejected':
-      return 'text-red-500';
+      return 'text-red-500 bg-red-50';
     default:
-      return 'text-gray-500';
+      return 'text-gray-500 bg-gray-50';
   }
 };
 
+export const getScheduleStatusAndColor = (status: string) => {
+  switch (status) {
+    case 'completed':
+      return 'text-green-500 bg-green-50';
+    case 'booked':
+      return 'text-purple-500 bg-purple-50';
+    case 'on_going':
+      return 'text-blue-500 bg-blue-50';
+    case 'not_covered':
+    case 'cancelled':
+    case 'ended':
+      return 'text-red-500 bg-red-50';
+    default:
+      return 'text-yellow-500 bg-yellow-50';
+  }
+};
 export const generateStatusText = (status: Status) => {
   switch (status) {
     case 'pending':

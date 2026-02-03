@@ -1,7 +1,11 @@
 import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { mutation, query } from './_generated/server';
-import { getPendingHospiceAccounts, getPendingNurseAccounts } from './counter';
+import {
+  getPendingHospiceAccounts,
+  getPendingNurseAccounts,
+  updateCount,
+} from './counter';
 import { getUserHelperFn } from './helper';
 
 // Get pending nurse profile updates
@@ -272,8 +276,8 @@ export const rejectHospiceUpdate = mutation({
   },
 });
 
-// export const updateCountMutation = mutation({
-//   handler: async (ctx) => {
-//     await updateCount(ctx);
-//   },
-// });
+export const updateCountMutation = mutation({
+  handler: async (ctx) => {
+    await updateCount(ctx);
+  },
+});

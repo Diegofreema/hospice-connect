@@ -27,7 +27,10 @@ import {
   TableRow,
 } from '@/components/web/ui/table';
 import { api } from '@/convex/_generated/api';
+import { getAssignmentStatusText } from '@/features/shared/utils';
+import { getScheduleStatusAndColor } from '@/lib/utils';
 import { usePaginatedQuery, useQuery } from 'convex/react';
+import { format, parse } from 'date-fns';
 import { Search } from 'lucide-react-native';
 import { useState } from 'react';
 import { Loader } from '../../shared/loader';
@@ -59,24 +62,12 @@ export function Assignments() {
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'available':
-        return <Badge variant="secondary">Staff needed</Badge>;
-      case 'booked':
-        return <Badge variant="default">Fully staffed</Badge>;
-      case 'completed':
-        return (
-          <Badge className="bg-chart-1 text-primary-foreground">
-            Completed
-          </Badge>
-        );
-      case 'ended':
-        return <Badge variant="destructive">Ended</Badge>;
-      default:
-        return <Badge variant="secondary">{status}</Badge>;
-    }
-  };
+  console.log(
+    results.map((r) => ({
+      start: r.startDate,
+      end: r.endDate,
+    })),
+  );
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -145,13 +136,13 @@ export function Assignments() {
         <CardContent className="space-y-4">
           {/* Search and Filters */}
           <div className="flex flex-col gap-4 md:flex-row">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <div className="relative flex-1 flex items-center space-x-2 border rounded-md px-2">
+              <Search className=" text-muted-foreground" size={20} />
               <Input
                 placeholder="Search by patient..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
+                className="flex-1 border-0"
               />
             </div>
             <Select
@@ -205,14 +196,32 @@ export function Assignments() {
 
                       <TableCell>{assignment.hospiceName}</TableCell>
                       <TableCell>
-                        {new Date(assignment.startDate).toLocaleDateString()}
+                        {format(
+                          parse(assignment.startDate, 'dd-MM-yyyy', new Date()),
+                          'MM-dd-yyyy',
+                        )}
                       </TableCell>
                       <TableCell>
                         {assignment.endDate
-                          ? new Date(assignment.endDate).toLocaleDateString()
+                          ? format(
+                              parse(
+                                assignment.endDate,
+                                'dd-MM-yyyy',
+                                new Date(),
+                              ),
+                              'MM-dd-yyyy',
+                            )
                           : 'Ongoing'}
                       </TableCell>
-                      <TableCell>{getStatusBadge(assignment.status)}</TableCell>
+                      <TableCell>
+                        <Badge
+                          className={getScheduleStatusAndColor(
+                            assignment.status,
+                          )}
+                        >
+                          {getAssignmentStatusText(assignment.status)}
+                        </Badge>
+                      </TableCell>
                     </TableRow>
                   ))
                 )}

@@ -26,8 +26,8 @@ const pendingHospiceAccounts = counter.for('pendingHospiceAccounts');
 const pendingNurseAccounts = counter.for('pendingNurseAccounts');
 
 export const updateCount = async (ctx: MutationCtx) => {
-  await pendingHospiceAccounts.add(ctx, 5);
-  await pendingNurseAccounts.add(ctx, 14);
+  await pendingHospiceAccounts.reset(ctx);
+  await pendingNurseAccounts.reset(ctx);
 };
 
 export const handlePendingHospiceAccounts = async (

@@ -40,7 +40,7 @@ import { usStates } from '@/lib/constants';
 import {
   cn,
   formatString,
-  generateStatusColor,
+  generateStatusColorAndBackgroundColor,
   generateStatusText,
 } from '@/lib/utils';
 import { toast } from 'sonner-native';
@@ -56,7 +56,7 @@ export function Nurses() {
   const [selectedNurseId, setSelectedNurseId] = useState<Id<'nurses'> | null>(
     null,
   );
-  const [status, setStatus] = useState<Status>('approved');
+  const [status, setStatus] = useState<Status | 'all'>('all');
 
   const {
     results: nurses,
@@ -244,6 +244,7 @@ export function Nurses() {
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="all">All</SelectItem>
                 <SelectItem value="approved">Approved</SelectItem>
                 <SelectItem value="suspended">Suspended</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
@@ -291,7 +292,9 @@ export function Nurses() {
                       <TableCell>
                         <Badge
                           variant="secondary"
-                          className={generateStatusColor(nurse.status)}
+                          className={generateStatusColorAndBackgroundColor(
+                            nurse.status,
+                          )}
                         >
                           {generateStatusText(nurse.status)}
                         </Badge>
