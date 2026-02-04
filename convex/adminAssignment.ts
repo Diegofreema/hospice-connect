@@ -2,7 +2,13 @@ import { filter } from 'convex-helpers/server/filter';
 import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { query } from './_generated/server';
-import { getAssignmentStatusDataHelper, getUserHelperFn } from './helper';
+import {
+  getActiveAssignmentsCount,
+  getAssignmentsCount,
+  getCompletedAssignmentsCount,
+  getEndedAssignmentsCount,
+} from './counter';
+import { getUserHelperFn } from './helper';
 
 // Get all assignments
 export const getAssignments = query({
@@ -86,13 +92,12 @@ export const getAssignmentStats = query({
         message: 'Only admin and super admin can access this data',
       });
     }
-    const stats = await getAssignmentStatusDataHelper(ctx);
 
     return {
-      total: stats.totalAssignments,
-      completed: stats.totalCompletedAssignments,
-      ended: stats.totalEndedAssignments,
-      active: stats.totalActiveAssignments,
+      total: await getAssignmentsCount(ctx),
+      completed: await getCompletedAssignmentsCount(ctx),
+      ended: await getEndedAssignmentsCount(ctx),
+      active: await getActiveAssignmentsCount(ctx),
     };
   },
 });

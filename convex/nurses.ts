@@ -10,6 +10,9 @@ import {
   type QueryCtx,
 } from './_generated/server';
 import {
+  assignmentsCount,
+  completedAssignmentsCount,
+  endedAssignmentsCount,
   handleNurseCount,
   handlePendingNurseAccounts,
   handlePendingNurseApprovalCount,
@@ -75,6 +78,16 @@ export const createNurse = mutation({
     } catch (error: any) {
       throw new ConvexError({ message: error.message });
     }
+  },
+});
+
+export const updateCountPending = internalMutation({
+  args: {},
+  handler: async (ctx, args) => {
+    await handlePendingNurseApprovalCount(ctx, 'inc');
+    await assignmentsCount.add(ctx, 6);
+    await endedAssignmentsCount.add(ctx, 1);
+    await completedAssignmentsCount.add(ctx, 5);
   },
 });
 

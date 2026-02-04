@@ -7,7 +7,7 @@ const crons = cronJobs();
 crons.interval(
   'Remove old emails from the resend component',
   { hours: 24 },
-  internal.crons.cleanupResend
+  internal.crons.cleanupResend,
 );
 
 const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
@@ -21,7 +21,7 @@ export const cleanupResend = internalMutation({
       0,
       components.resend.lib.cleanupAbandonedEmails,
       // These generally indicate a bug, so keep them around for longer.
-      { olderThan: 4 * ONE_WEEK_MS }
+      { olderThan: 4 * ONE_WEEK_MS },
     );
   },
 });
@@ -38,7 +38,7 @@ crons.interval(
   {
     numItems: 500,
     cursor: null,
-  }
+  },
 );
 
 crons.interval(
@@ -48,7 +48,7 @@ crons.interval(
   {
     numItems: 500,
     cursor: null,
-  }
+  },
 );
 
 crons.interval(
@@ -58,7 +58,13 @@ crons.interval(
   {
     numItems: 500,
     cursor: null,
-  }
+  },
 );
+
+// crons.interval(
+//   'update count pending',
+//   { minutes: 1 },
+//   internal.nurses.updateCountPending,
+// );
 
 export default crons;

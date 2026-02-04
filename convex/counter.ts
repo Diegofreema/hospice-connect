@@ -12,10 +12,12 @@ const suspendedNursesCount = counter.for('suspendedNursesCount');
 const suspendedHospicesCount = counter.for('suspendedHospicesCount');
 const pendingNurseApprovalCount = counter.for('pendingNurseApprovalCount');
 const pendingHospiceApprovalCount = counter.for('pendingHospiceApprovalCount');
-const activeAssignmentsCount = counter.for('activeAssignmentsCount');
-const assignmentsCount = counter.for('assignmentsCount');
-const endedAssignmentsCount = counter.for('endedAssignmentsCount');
-const completedAssignmentsCount = counter.for('completedAssignmentsCount');
+export const activeAssignmentsCount = counter.for('activeAssignmentsCount');
+export const assignmentsCount = counter.for('assignmentsCount');
+export const endedAssignmentsCount = counter.for('endedAssignmentsCount');
+export const completedAssignmentsCount = counter.for(
+  'completedAssignmentsCount',
+);
 const rejectedNurseCount = counter.for('rejectedNurseCount');
 const rejectedHospiceCount = counter.for('rejectedHospiceCount');
 const unSubmittedRouteSheetsCount = counter.for('unSubmittedRouteSheetsCount');
@@ -298,6 +300,7 @@ export const handlePendingNurseApprovalCount = async (
     }
   }
 };
+
 export const getPendingNurseApprovalCount = async (ctx: QueryCtx) => {
   return await pendingNurseApprovalCount.count(ctx);
 };
