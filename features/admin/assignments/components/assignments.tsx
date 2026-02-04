@@ -27,7 +27,10 @@ import {
   TableRow,
 } from '@/components/web/ui/table';
 import { api } from '@/convex/_generated/api';
-import { getAssignmentStatusText } from '@/features/shared/utils';
+import {
+  getAssignmentStatusText,
+  getColorsForDiscipline,
+} from '@/features/shared/utils';
 import { getScheduleStatusAndColor } from '@/lib/utils';
 import { usePaginatedQuery, useQuery } from 'convex/react';
 import { format, parse } from 'date-fns';
@@ -169,11 +172,12 @@ export function Assignments() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Patient</TableHead>
-                  <TableHead>Hospice</TableHead>
-                  <TableHead>Start Date</TableHead>
-                  <TableHead>End Date</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead className="font-bold">Hospice</TableHead>
+                  <TableHead className="font-bold">Patient</TableHead>
+                  <TableHead className="font-bold">Discipline</TableHead>
+                  <TableHead className="font-bold">Start Date</TableHead>
+                  <TableHead className="font-bold">End Date</TableHead>
+                  <TableHead className="font-bold">Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -189,12 +193,20 @@ export function Assignments() {
                 ) : (
                   results.map((assignment) => (
                     <TableRow key={assignment._id}>
+                      <TableCell>{assignment.hospiceName}</TableCell>
                       <TableCell className="font-medium">
                         {assignment.patientFirstName}{' '}
                         {assignment.patientLastName}
                       </TableCell>
-
-                      <TableCell>{assignment.hospiceName}</TableCell>
+                      <TableCell>
+                        <Badge
+                          className={getColorsForDiscipline(
+                            assignment.discipline,
+                          )}
+                        >
+                          {assignment.discipline}
+                        </Badge>
+                      </TableCell>
                       <TableCell>
                         {format(
                           parse(assignment.startDate, 'dd-MM-yyyy', new Date()),

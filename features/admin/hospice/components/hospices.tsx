@@ -191,13 +191,13 @@ export function Hospices() {
         <CardContent className="space-y-4">
           {/* Search and Filters */}
           <div className="flex flex-col gap-4 md:flex-row">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <div className="relative flex-1 flex items-center border rounded-md pl-2">
+              <Search className="" size={20} />
               <Input
                 placeholder="Search by name or email..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
+                className="pl-9 flex-1 bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0"
               />
             </div>
             <Select value={stateFilter} onValueChange={setStateFilter}>
@@ -236,13 +236,15 @@ export function Hospices() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>S/N</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Location</TableHead>
-                  <TableHead>License</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="font-bold">S/N</TableHead>
+                  <TableHead className="font-bold">Name</TableHead>
+                  <TableHead className="font-bold">Email</TableHead>
+                  <TableHead className="font-bold">Location</TableHead>
+                  <TableHead className="font-bold">License</TableHead>
+                  <TableHead className="font-bold">Status</TableHead>
+                  <TableHead className="text-right font-bold">
+                    Actions
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

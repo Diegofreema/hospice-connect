@@ -258,14 +258,16 @@ export function Nurses() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>S/N</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Discipline</TableHead>
-                  <TableHead>State</TableHead>
+                  <TableHead className="font-bold">S/N</TableHead>
+                  <TableHead className="font-bold">Name</TableHead>
+                  <TableHead className="font-bold">Email</TableHead>
+                  <TableHead className="font-bold">Discipline</TableHead>
+                  <TableHead className="font-bold">State</TableHead>
 
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="font-bold">Status</TableHead>
+                  <TableHead className="text-right font-bold">
+                    Actions
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

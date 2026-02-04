@@ -1,8 +1,5 @@
 import { api } from '@/convex/_generated/api';
-import {
-  type Doc,
-  type Id,
-} from '@/convex/_generated/dataModel';
+import { type Doc, type Id } from '@/convex/_generated/dataModel';
 import { Button } from '@/features/shared/components/button';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 
@@ -129,7 +126,11 @@ export const SelectSchedule = ({ id, hospiceId, name, onClose }: Props) => {
       style={{ flex: 1, marginTop: 20 }}
       showsVerticalScrollIndicator={false}
       ListFooterComponent={
-        <Button title="Schedule" onPress={onSend} disabled={loading} />
+        <Button
+          title="Schedule"
+          onPress={onSend}
+          disabled={loading || selectedIds.length === 0}
+        />
       }
       ListFooterComponentStyle={{ marginTop: 'auto', marginBottom: 15 }}
       ListEmptyComponent={

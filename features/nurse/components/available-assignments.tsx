@@ -2,26 +2,38 @@ import { api } from '@/convex/_generated/api';
 
 import { type Id } from '@/convex/_generated/dataModel';
 import { SmallLoader } from '@/features/shared/components/small-loader';
+import { UnderReview } from '@/features/shared/components/under-review';
 import { Stack } from '@/features/shared/components/v-stack';
+import { sortedArray } from '@/features/shared/utils';
 import { usePaginatedQuery } from 'convex/react';
 import { AssignmentsForNurses } from './assignments';
-import { sortedArray } from '@/features/shared/utils';
 
 type Props = {
   nurseId: Id<'nurses'>;
   discipline: 'RN' | 'LVN' | 'HHA';
   onOpenSheet: () => void;
+  isSuspended: boolean;
 };
 export const AvailableAssignments = ({
   nurseId,
   onOpenSheet,
   discipline,
+  isSuspended,
 }: Props) => {
   const { loadMore, results, status } = usePaginatedQuery(
     api.assignments.availableAssignments,
     { nurseId, discipline: discipline },
     { initialNumItems: 50 },
   );
+
+  if (isSuspended) {
+    return (
+      <UnderReview
+        title="Account suspended"
+        description="Please submit your outstanding Route Sheet(s) to reactivate your account"
+      />
+    );
+  }
   if (status === 'LoadingFirstPage') {
     return <SmallLoader size={50} />;
   }

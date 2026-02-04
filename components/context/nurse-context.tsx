@@ -12,6 +12,7 @@ WebBrowser.maybeCompleteAuthSession();
 
 const AuthContext = React.createContext({
   nurse: null as FunctionReturnType<typeof api.nurses.getNurseById> | null,
+  isSuspended: false,
 });
 
 export const NurseProvider = ({ children }: { children: React.ReactNode }) => {
@@ -43,6 +44,7 @@ export const NurseProvider = ({ children }: { children: React.ReactNode }) => {
     <AuthContext.Provider
       value={{
         nurse,
+        isSuspended: nurse?.status === 'suspended',
       }}
     >
       {children}

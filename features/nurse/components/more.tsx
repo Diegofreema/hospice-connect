@@ -14,7 +14,7 @@ import { type LinkType } from '../types';
 import { MoreLinks } from './more-links';
 
 export const More = () => {
-  const { nurse } = useNurse();
+  const { nurse, isSuspended } = useNurse();
   if (nurse === null) return null;
   const name = nurse.name;
   return (
@@ -22,7 +22,7 @@ export const More = () => {
       <Spacer height={30} />
       <AccountBrief data={{ name, image: nurse.image as string }} />
       <Spacer height={30} />
-      <MoreLinks links={links} />
+      <MoreLinks links={links} isSuspended={isSuspended} />
     </View>
   );
 };

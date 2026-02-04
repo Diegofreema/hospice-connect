@@ -11,9 +11,10 @@ import { useUnistyles } from 'react-native-unistyles';
 import { type LinkType } from '../types';
 type Props = {
   links: LinkType[];
+  isSuspended?: boolean;
 };
 
-export const MoreLinks = ({ links }: Props) => {
+export const MoreLinks = ({ links, isSuspended }: Props) => {
   const { theme } = useUnistyles();
   const onPress = async (link: Href, type: 'external' | 'internal') => {
     if (type === 'external') {
@@ -33,8 +34,12 @@ export const MoreLinks = ({ links }: Props) => {
           'Terms of Service',
         ].includes(item.label);
         const type = isExternal ? 'external' : 'internal';
+        const disabled = isSuspended && item.label === 'Availability';
         return (
-          <TouchableOpacity onPress={() => onPress(item.link, type)}>
+          <TouchableOpacity
+            disabled={disabled}
+            onPress={() => onPress(item.link, type)}
+          >
             <View
               flexDirection={'row'}
               alignItems={'center'}

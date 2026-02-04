@@ -1,9 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-object-type */
-import {
-  type Doc,
-  type Id,
-} from '@/convex/_generated/dataModel';
-import { type scheduleStatus } from '@/convex/schema';
+import { type Doc, type Id } from '@/convex/_generated/dataModel';
+import { discipline, type scheduleStatus } from '@/convex/schema';
 
 import { type ReactMutation } from 'convex/react';
 import { type FunctionReference } from 'convex/server';
@@ -136,7 +133,19 @@ export const getAssignmentStatusText = (
       return 'Not Covered';
   }
 };
+export const getColorsForDiscipline = (value: Infer<typeof discipline>) => {
+  switch (value) {
+    case 'RN':
+      return 'text-orange-500 bg-orange-100';
+    case 'LVN':
+      return 'text-blue-500 bg-blue-100';
+    case 'HHA':
+      return 'text-yellow-500 bg-yellow-100';
 
+    default:
+      return 'text-gray-500 bg-gray-100';
+  }
+};
 export const getScheduleStatusAndColor = (
   status: Infer<typeof scheduleStatus>,
 ) => {

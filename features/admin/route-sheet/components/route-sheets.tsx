@@ -1,5 +1,3 @@
-'use client';
-
 import { Badge } from '@/components/web/ui/badge';
 import { Button } from '@/components/web/ui/button';
 import {
@@ -27,6 +25,7 @@ import {
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
 
+import { getColorsForDiscipline } from '@/features/shared/utils';
 import { useMutation, usePaginatedQuery, useQuery } from 'convex/react';
 import { format, formatDistanceToNow } from 'date-fns';
 import {
@@ -179,24 +178,36 @@ export function RouteSheets() {
               <div className="overflow-x-auto">
                 <Table className="gap-4">
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>Nurse Name</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Discipline</TableHead>
-                      <TableHead>Completed Date</TableHead>
-                      <TableHead>Overdue</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                    <TableRow className="font-bold">
+                      <TableHead className="font-bold">S/N</TableHead>
+                      <TableHead className="font-bold">Nurse Name</TableHead>
+                      <TableHead className="font-bold">Email</TableHead>
+                      <TableHead className="font-bold">Discipline</TableHead>
+                      <TableHead className="font-bold">
+                        Completed Date
+                      </TableHead>
+                      <TableHead className="font-bold">Overdue</TableHead>
+                      <TableHead className="text-right font-bold">
+                        Actions
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {unSubmittedSheets?.map((sheet) => (
+                    {unSubmittedSheets?.map((sheet, index) => (
                       <TableRow key={sheet._id}>
+                        <TableCell>{index + 1}</TableCell>
                         <TableCell className="font-medium">
                           {sheet.nurse.name}
                         </TableCell>
                         <TableCell>{sheet.nurse.email}</TableCell>
                         <TableCell>
-                          <Badge>{sheet.nurse.discipline}</Badge>
+                          <Badge
+                            className={getColorsForDiscipline(
+                              sheet.nurse.discipline,
+                            )}
+                          >
+                            {sheet.nurse.discipline}
+                          </Badge>
                         </TableCell>
                         {sheet.completedAt && (
                           <TableCell>
@@ -211,17 +222,31 @@ export function RouteSheets() {
                         )}
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
-                            <Button
-                              size="sm"
-                              onClick={() =>
-                                handleSuspendNurse(sheet.nurse._id)
-                              }
-                              className="gap-2"
-                              disabled={loading}
-                            >
-                              <CheckCircle className="h-4 w-4" />
-                              Suspend
-                            </Button>
+                            {sheet.nurse.status === 'suspended' ? (
+                              <Button
+                                size="sm"
+                                onClick={() =>
+                                  handleReactivateNurse(sheet.nurse._id)
+                                }
+                                className="gap-2 bg-green-500 hover:bg-green-600 "
+                                disabled={loading}
+                              >
+                                <CheckCircle className="h-4 w-4" />
+                                Reactivate
+                              </Button>
+                            ) : (
+                              <Button
+                                size="sm"
+                                onClick={() =>
+                                  handleSuspendNurse(sheet.nurse._id)
+                                }
+                                className="gap-2 bg-red-500 hover:bg-red-600"
+                                disabled={loading}
+                              >
+                                <CheckCircle className="h-4 w-4" />
+                                Suspend
+                              </Button>
+                            )}
                           </div>
                         </TableCell>
                       </TableRow>
@@ -254,18 +279,24 @@ export function RouteSheets() {
                 <Table className="gap-4">
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Hospice Name</TableHead>
-                      <TableHead>Nurse Name</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Discipline</TableHead>
-                      <TableHead>Submitted Date</TableHead>
-                      <TableHead>Overdue</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                      <TableHead className="font-bold">S/N</TableHead>
+                      <TableHead className="font-bold">Hospice Name</TableHead>
+                      <TableHead className="font-bold">Nurse Name</TableHead>
+                      <TableHead className="font-bold">Email</TableHead>
+                      <TableHead className="font-bold">Discipline</TableHead>
+                      <TableHead className="font-bold">
+                        Submitted Date
+                      </TableHead>
+                      <TableHead className="font-bold">Overdue</TableHead>
+                      <TableHead className="text-right font-bold">
+                        Actions
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {unApprovedSheets?.map((sheet) => (
+                    {unApprovedSheets?.map((sheet, index) => (
                       <TableRow key={sheet._id}>
+                        <TableCell>{index + 1}</TableCell>
                         <TableCell className="font-medium">
                           {sheet.hospice.businessName}
                         </TableCell>
@@ -274,7 +305,13 @@ export function RouteSheets() {
                         </TableCell>
                         <TableCell>{sheet.nurse.email}</TableCell>
                         <TableCell>
-                          <Badge>{sheet.nurse.discipline}</Badge>
+                          <Badge
+                            className={getColorsForDiscipline(
+                              sheet.nurse.discipline,
+                            )}
+                          >
+                            {sheet.nurse.discipline}
+                          </Badge>
                         </TableCell>
                         <TableCell>
                           {format(sheet._creationTime, 'MM/dd/yyyy')}
@@ -338,26 +375,36 @@ export function RouteSheets() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Discipline</TableHead>
-                      <TableHead className="text-right">Action</TableHead>
+                      <TableHead className="font-bold">S/N</TableHead>
+                      <TableHead className="font-bold">Name</TableHead>
+                      <TableHead className="font-bold">Email</TableHead>
+                      <TableHead className="font-bold">Discipline</TableHead>
+                      <TableHead className="text-right font-bold">
+                        Action
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {suspendedNurses?.map((nurse) => (
+                    {suspendedNurses?.map((nurse, index) => (
                       <TableRow key={nurse._id}>
+                        <TableCell>{index + 1}</TableCell>
                         <TableCell className="font-medium">
                           {nurse.name}
                         </TableCell>
                         <TableCell>{nurse.email}</TableCell>
-                        <TableCell>{nurse.discipline}</TableCell>
+                        <TableCell>
+                          <Badge
+                            className={getColorsForDiscipline(nurse.discipline)}
+                          >
+                            {nurse.discipline}
+                          </Badge>
+                        </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
                             <Button
                               size="sm"
                               onClick={() => handleReactivateNurse(nurse._id)}
-                              className="gap-2"
+                              className="gap-2 bg-green-500 hover:bg-green-600"
                               disabled={loading}
                             >
                               <CheckCircle className="h-4 w-4" />
