@@ -11,7 +11,12 @@ import {
 import { Separator } from '@/components/web/ui/separator';
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
+import {
+  generateStatusColorAndBackgroundColor,
+  generateStatusText,
+} from '@/lib/utils';
 import { useQuery } from 'convex/react';
+import { format } from 'date-fns';
 import { FileText, Mail, MapPin, Phone } from 'lucide-react-native';
 
 interface HospiceDetailsDialogProps {
@@ -41,13 +46,11 @@ export function HospiceDetailsDialog({
         <div className="space-y-6">
           {/* Status */}
           <div className="flex items-center gap-2">
-            {isSuspended ? (
-              <Badge variant="destructive">Suspended</Badge>
-            ) : isApproved ? (
-              <Badge variant="default">Approved</Badge>
-            ) : (
-              <Badge variant="secondary">Pending</Badge>
-            )}
+            <Badge
+              className={generateStatusColorAndBackgroundColor(hospice.status)}
+            >
+              {generateStatusText(hospice.status)}
+            </Badge>
           </div>
 
           <Separator />
@@ -70,19 +73,6 @@ export function HospiceDetailsDialog({
                   {hospice.address}, {hospice.state} {hospice.zipcode}
                 </span>
               </div>
-              {/* {hospice.website && (
-                <div className="flex items-center gap-2 text-sm">
-                  <Globe className="h-4 w-4 text-muted-foreground" />
-                  <a
-                    href={hospice.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline"
-                  >
-                    {hospice.website}
-                  </a>
-                </div>
-              )} */}
             </div>
           </div>
 
@@ -100,17 +90,6 @@ export function HospiceDetailsDialog({
             </div>
           </div>
 
-          {/* Description */}
-          {/* {hospice. && (
-            <>
-              <Separator />
-              <div>
-                <h3 className="font-semibold mb-2 text-lg">Description</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{hospice.description}</p>
-              </div>
-            </>
-          )} */}
-
           <Separator />
 
           {/* Account Details */}
@@ -120,7 +99,7 @@ export function HospiceDetailsDialog({
               <div>
                 <p className="text-muted-foreground">Created</p>
                 <p className="font-medium">
-                  {new Date(hospice._creationTime).toLocaleDateString()}
+                  {format(new Date(hospice._creationTime), 'MM/dd/yyyy')}
                 </p>
               </div>
             </div>

@@ -244,6 +244,7 @@ export const NurseNotification = {
   scheduleId: v.optional(v.id('schedules')),
   status: v.optional(v.union(v.literal('accepted'), v.literal('declined'))),
   viewCount: v.number(),
+  adminNotificationId: v.optional(v.id('adminNotifications')),
 };
 export const HospiceNotification = {
   hospiceId: v.id('hospices'),
@@ -263,6 +264,7 @@ export const HospiceNotification = {
   nurseId: v.optional(v.id('nurses')),
   status: v.optional(v.union(v.literal('accepted'), v.literal('declined'))),
   viewCount: v.number(),
+  adminNotificationId: v.optional(v.id('adminNotifications')),
 };
 export const adminNotification = {
   isRead: v.boolean(),
@@ -313,10 +315,12 @@ export default defineSchema({
   nurseNotifications: defineTable(NurseNotification)
     .index('by_nurseId', ['nurseId', 'isRead'])
     .index('nurseId_scheduleId', ['nurseId', 'scheduleId', 'type'])
-    .index('scheduleId', ['scheduleId', 'type']),
+    .index('scheduleId', ['scheduleId', 'type'])
+    .index('by_admin_notification_id', ['adminNotificationId']),
   hospiceNotifications: defineTable(HospiceNotification)
     .index('by_hospice_id', ['hospiceId', 'isRead'])
-    .index('hospiceId_scheduleId', ['hospiceId', 'scheduleId', 'type']),
+    .index('hospiceId_scheduleId', ['hospiceId', 'scheduleId', 'type'])
+    .index('by_admin_notification_id', ['adminNotificationId']),
   hospiceSubscriptions: defineTable(hospiceSubscription).index(
     'by_hospice_id',
     ['hospiceId'],

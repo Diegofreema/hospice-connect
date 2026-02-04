@@ -15,6 +15,7 @@ import {
 } from '@/components/web/ui/chart';
 import { api } from '@/convex/_generated/api';
 import { useQuery } from 'convex/react';
+import { format } from 'date-fns';
 import {
   AlertCircle,
   Building2,
@@ -136,14 +137,22 @@ export function AdminDashboard() {
                     fontSize={12}
                   />
                   <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        labelFormatter={(value) =>
+                          format(new Date(value), 'MM/dd/yyyy')
+                        }
+                      />
+                    }
+                  />
                   <Legend />
                   <Line
                     type="monotone"
-                    dataKey="healthcare-professionals"
+                    dataKey="nurses"
                     stroke="hsl(var(--chart-1))"
                     strokeWidth={2}
-                    name="Healthcare professionals"
+                    name="Healthcare Prof..."
                   />
                   <Line
                     type="monotone"

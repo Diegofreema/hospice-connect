@@ -44,6 +44,7 @@ import type { Id } from '@/convex/_generated/dataModel';
 import { changeFirstLetterToCapital } from '@/features/shared/utils';
 import { usStates } from '@/lib/constants';
 import {
+  cn,
   generateStatusColorAndBackgroundColor,
   generateStatusText,
 } from '@/lib/utils';
@@ -235,6 +236,7 @@ export function Hospices() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>S/N</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Location</TableHead>
@@ -244,8 +246,9 @@ export function Hospices() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {hospices.map((hospice) => (
+                {hospices.map((hospice, index) => (
                   <TableRow key={hospice._id}>
+                    <TableCell className="font-medium">{index + 1}</TableCell>
                     <TableCell className="font-medium">
                       {hospice.businessName}
                     </TableCell>
@@ -271,7 +274,7 @@ export function Hospices() {
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
-                        {hospice.status !== 'pending' && (
+                        {hospice.status !== 'pending' ? (
                           <ActionDialog
                             title={
                               hospice.status === 'suspended'
@@ -291,11 +294,11 @@ export function Hospices() {
                             }
                           >
                             <Button
-                              variant={
+                              className={cn(
                                 hospice.status === 'suspended'
-                                  ? 'default'
-                                  : 'destructive'
-                              }
+                                  ? 'bg-green-500 hover:bg-green-600'
+                                  : 'bg-red-500 hover:bg-red-600',
+                              )}
                               size="icon"
                               title={
                                 hospice.status === 'suspended'
@@ -310,6 +313,10 @@ export function Hospices() {
                               )}
                             </Button>
                           </ActionDialog>
+                        ) : (
+                          <Button className=" cursor-not-allowed" disabled>
+                            <Building2 className="h-4 w-4" />
+                          </Button>
                         )}
                       </div>
                     </TableCell>

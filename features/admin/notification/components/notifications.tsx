@@ -35,7 +35,8 @@ export function Notifications() {
 
   const handleViewNotification = (messageId: string) => {
     setSelectedNotificationId(messageId);
-    setIsDetailsOpen(true);
+    router.push(`/admin/notification/${messageId}`);
+    // setIsDetailsOpen(true);
   };
 
   const handleViewActivityNotification = (notification: any) => {

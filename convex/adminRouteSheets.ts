@@ -116,7 +116,7 @@ export const notifyHospice = mutation({
       hospiceId: args.hospice,
       title: 'Unapproved Route Sheets',
       description:
-        'Please you have unapproved route sheets. Please approve them ASAP',
+        'You have unapproved route sheet(s). Please kindly approve them ASAP',
       type: 'admin',
       viewCount: 0,
       isRead: false,
@@ -160,8 +160,8 @@ export const getUnSubmittedRouteSheets = query({
       .filter((q) =>
         q.and(
           q.eq(q.field('isCompleted'), true),
-          q.neq(q.field('isSubmitted'), false)
-        )
+          q.neq(q.field('isSubmitted'), false),
+        ),
       )
       .paginate(args.paginationOpts);
 
@@ -239,9 +239,8 @@ export const getRouteSheetStats = query({
 
     const suspendedNursesCount = await getSuspendedNursesCount(ctx);
 
-    const unSubmittedRouteSheetsCount = await getUnSubmittedRouteSheetCount(
-      ctx
-    );
+    const unSubmittedRouteSheetsCount =
+      await getUnSubmittedRouteSheetCount(ctx);
     const unApprovedSubmittedRouteSheetsCount =
       await getUnApprovedSubmittedRouteSheetCount(ctx);
     return {

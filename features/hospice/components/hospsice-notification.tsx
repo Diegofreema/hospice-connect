@@ -15,6 +15,7 @@ import { useState } from 'react';
 
 import { useHandleCaseRequest } from '@/features/shared/hooks/use-handle-case-request';
 import { type FunctionReturnType } from 'convex/server';
+import { Image } from 'expo-image';
 import { StyleSheet } from 'react-native-unistyles';
 import { useMarkAsRead } from '../hooks/use-mark-as-read';
 
@@ -168,6 +169,7 @@ export const HospiceNotification = ({ notification }: Props) => {
     'reassignment',
   ].includes(notification.type);
   const notInteracted = !isDeclined && !isAccepted;
+  const isAdminNotification = notification.type === 'admin';
   return (
     <CustomPressable onPress={onPress}>
       <Card style={styles.card(notification.isRead)}>
@@ -179,13 +181,21 @@ export const HospiceNotification = ({ notification }: Props) => {
             alignItems="center"
           >
             <View flexDirection="row" gap="md" alignItems="center" flex={1}>
-              <Avatar
-                image={{
-                  uri: notification.nurse?.image || '',
-                  name: notification.nurse?.nurseUser?.name || 'UNKNOWN',
-                }}
-                size={60}
-              />
+              {isAdminNotification ? (
+                <Image
+                  source={require('@/assets/images/icon.png')}
+                  style={{ width: 60, height: 60, borderRadius: 60 }}
+                  contentFit="cover"
+                />
+              ) : (
+                <Avatar
+                  image={{
+                    uri: notification.nurse?.image || '',
+                    name: notification.nurse?.nurseUser?.name || 'UNKNOWN',
+                  }}
+                  size={60}
+                />
+              )}
               <View flex={1}>
                 <Text size="medium" isBold>
                   {notification.title}

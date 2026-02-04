@@ -7,10 +7,8 @@ export function Settings() {
     <div className="space-y-8 p-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-50">
-          Account Settings
-        </h1>
-        <p className="mt-2 text-neutral-600 dark:text-neutral-400">
+        <h1 className="text-3xl font-bold text-black">Account Settings</h1>
+        <p className="mt-2 text-black">
           Manage your profile, security, and commission settings
         </p>
       </div>

@@ -1,10 +1,10 @@
-import { paginationOptsValidator } from 'convex/server';
-import { query, mutation } from './_generated/server';
-import { ConvexError, v } from 'convex/values';
-import { getUserById, getUserHelperFn } from './helper';
 import { filter } from 'convex-helpers/server/filter';
-import { type Id as BetterAuthId } from './betterAuth/_generated/dataModel';
+import { paginationOptsValidator } from 'convex/server';
+import { ConvexError, v } from 'convex/values';
 import { type Id } from './_generated/dataModel';
+import { mutation, query } from './_generated/server';
+import { type Id as BetterAuthId } from './betterAuth/_generated/dataModel';
+import { getUserById, getUserHelperFn } from './helper';
 // Send notification to nurse
 export const sendNurseNotification = mutation({
   args: {
@@ -250,6 +250,7 @@ export const sendNotifications = mutation({
             type: 'admin',
             isRead: false,
             viewCount: 0,
+            adminNotificationId,
           });
         }),
       );
@@ -263,11 +264,76 @@ export const sendNotifications = mutation({
             type: 'admin',
             isRead: false,
             viewCount: 0,
+            adminNotificationId,
           });
         }),
       );
     }
 
     return adminNotificationId;
+  },
+});
+
+// Get recipients for a specific admin notification
+export const getNotificationRecipients = query({
+  args: {
+    messageId: v.id('adminNotifications'),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    const user = await getUserHelperFn(ctx);
+    if (user?.role !== 'admin' && user?.role !== 'super_admin') {
+      throw new ConvexError({
+        message: 'Only admin and super admin can access this data',
+      });
+    }
+
+    const notification = await ctx.db.get(args.messageId);
+    if (!notification) {
+      throw new ConvexError({
+        message: 'Notification not found',
+      });
+    }
+
+    let results;
+    if (notification.type === 'nurse') {
+      results = await ctx.db
+        .query('nurseNotifications')
+        .withIndex('by_admin_notification_id', (q) =>
+          q.eq('adminNotificationId', args.messageId),
+        )
+        .paginate(args.paginationOpts);
+
+      const enrichedPage = await Promise.all(
+        results.page.map(async (record) => {
+          const nurse = await ctx.db.get(record.nurseId);
+          return {
+            ...record,
+            recipientName: nurse?.name || 'Unknown',
+            recipientEmail: nurse?.email || 'Unknown',
+          };
+        }),
+      );
+      return { ...results, page: enrichedPage };
+    } else {
+      results = await ctx.db
+        .query('hospiceNotifications')
+        .withIndex('by_admin_notification_id', (q) =>
+          q.eq('adminNotificationId', args.messageId),
+        )
+        .paginate(args.paginationOpts);
+
+      const enrichedPage = await Promise.all(
+        results.page.map(async (record) => {
+          const hospice = await ctx.db.get(record.hospiceId);
+          return {
+            ...record,
+            recipientName: hospice?.businessName || 'Unknown',
+            recipientEmail: hospice?.email || 'Unknown',
+          };
+        }),
+      );
+      return { ...results, page: enrichedPage };
+    }
   },
 });

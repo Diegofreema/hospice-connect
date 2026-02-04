@@ -134,7 +134,7 @@ export function PendingApprovalsCard({
                   <Button
                     size="sm"
                     onClick={() => handleApprove(item.id)}
-                    className="gap-1"
+                    className="gap-1 bg-green-500"
                     disabled={loading}
                   >
                     <Check className="h-4 w-4" />
@@ -142,9 +142,8 @@ export function PendingApprovalsCard({
                   </Button>
                   <Button
                     size="sm"
-                    variant="destructive"
                     onClick={() => handleReject(item.id)}
-                    className="gap-1"
+                    className="gap-1 bg-red-500"
                     disabled={loading}
                   >
                     <X className="h-4 w-4" />

@@ -10,6 +10,13 @@ import { Checkbox } from '@/components/web/ui/checkbox';
 import { Input } from '@/components/web/ui/input';
 import { Label } from '@/components/web/ui/label';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/web/ui/select';
+import {
   Tabs,
   TabsContent,
   TabsList,
@@ -18,15 +25,22 @@ import {
 import { Textarea } from '@/components/web/ui/textarea';
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
+import { disciplines } from '@/features/nurse/data';
 import { useMutation, usePaginatedQuery } from 'convex/react';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, LoaderCircle, Search, Send } from 'lucide-react-native';
+import {
+  ArrowLeft,
+  Filter,
+  LoaderCircle,
+  Search,
+  Send,
+} from 'lucide-react-native';
 import { useState } from 'react';
 import { toast } from 'sonner-native';
 import { Loader } from '../../shared/loader';
 
 type IdType = Id<'nurses'> | Id<'hospices'>;
-
+type DisciplineType = 'RN' | 'LVN' | 'HHA' | 'all';
 export function SendNotification() {
   const router = useRouter();
   const [targetType, setTargetType] = useState<'nurse' | 'hospice'>('nurse');
@@ -34,7 +48,7 @@ export function SendNotification() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-
+  const [discipline, setDiscipline] = useState<DisciplineType>('all');
   const sendNotification = useMutation(api.notifications.sendNotifications);
 
   const {
@@ -45,7 +59,7 @@ export function SendNotification() {
     api.adminNurses.getNurses,
     {
       status: 'approved',
-      discipline: 'all',
+      discipline,
       state: 'all',
       searchQuery: targetType === 'nurse' ? searchQuery : undefined,
     },
@@ -162,7 +176,7 @@ export function SendNotification() {
               className="w-full mt-4"
             >
               <div className="flex items-center justify-between gap-4 mb-4">
-                <TabsList className="grid w-full max-w-[200px] grid-cols-2">
+                <TabsList className="grid w-full max-w-[320px] grid-cols-2">
                   <TabsTrigger value="nurse">
                     Healthcare professionals
                   </TabsTrigger>
@@ -197,6 +211,28 @@ export function SendNotification() {
               </div>
 
               <TabsContent value="nurse" className="mt-0 flex-1 overflow-auto">
+                <Select
+                  value={discipline}
+                  onValueChange={(value: DisciplineType) =>
+                    setDiscipline(value)
+                  }
+                >
+                  <SelectTrigger className="w-full md:w-45">
+                    <Filter className="mr-2 h-4 w-4" />
+                    <SelectValue placeholder="Discipline" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Disciplines</SelectItem>
+                    {disciplines.map((discipline) => (
+                      <SelectItem
+                        key={discipline.value}
+                        value={discipline.value}
+                      >
+                        {discipline.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <div className="space-y-1">
                   {nurses.length === 0 &&
                     nurseStatus !== 'LoadingFirstPage' && (

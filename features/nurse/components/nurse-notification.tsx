@@ -10,6 +10,7 @@ import { useAcceptDecline } from '@/features/shared/hooks/use-accept-decline';
 import { useMutation } from 'convex/react';
 import { type FunctionReturnType } from 'convex/server';
 import { format } from 'date-fns';
+import { Image } from 'expo-image';
 import { StyleSheet } from 'react-native-unistyles';
 
 type Props = {
@@ -53,6 +54,8 @@ export const NurseNotification = ({ notification }: Props) => {
   const isReassignment = notification.type === 'reassignment';
   const isAssignmentOrReassignment =
     notification.type === 'assignment' || notification.type === 'reassignment';
+
+  const isAdminNotification = notification.type === 'admin';
   return (
     <Card style={styles.card(notification.isRead)}>
       <CardHeader>
@@ -63,13 +66,21 @@ export const NurseNotification = ({ notification }: Props) => {
           alignItems="center"
         >
           <View flexDirection="row" gap="md" alignItems="center" flex={1}>
-            <Avatar
-              image={{
-                uri: notification.hospice?.image || '',
-                name: notification.hospice?.businessName,
-              }}
-              size={60}
-            />
+            {isAdminNotification ? (
+              <Image
+                source={require('@/assets/images/icon.png')}
+                style={{ width: 60, height: 60, borderRadius: 60 }}
+                contentFit="cover"
+              />
+            ) : (
+              <Avatar
+                image={{
+                  uri: notification.hospice?.image || '',
+                  name: notification.hospice?.businessName,
+                }}
+                size={60}
+              />
+            )}
             <View flex={1}>
               <Text size="medium" isBold>
                 {notification.title}

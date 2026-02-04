@@ -96,7 +96,7 @@ export function CommissionCard() {
               <Label className="text-xs font-semibold uppercase tracking-wide">
                 Current Commission
               </Label>
-              <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+              <p className="text-2xl font-bold text-black">
                 {commissionQuery ? `${commissionQuery}%` : 'Not set'}
               </p>
             </div>

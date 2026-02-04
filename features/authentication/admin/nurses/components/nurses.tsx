@@ -189,19 +189,19 @@ export function Nurses() {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle>healthcare professional List</CardTitle>
+          <CardTitle>Healthcare professional list</CardTitle>
           <CardDescription>Search and filter nurse profiles</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Search and Filters */}
           <div className="flex flex-col gap-4 md:flex-row">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <div className="relative flex-1 flex gap-3 pl-2 rounded-md border border-input items-center">
+              <Search className="" />
               <Input
                 placeholder="Search by name or email..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
+                className="pl-9 border-0 shadow-none flex-1 bg-transparent"
               />
             </div>
             <Select
@@ -258,6 +258,7 @@ export function Nurses() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>S/N</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Discipline</TableHead>
@@ -278,8 +279,9 @@ export function Nurses() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  nurses.map((nurse) => (
+                  nurses.map((nurse, index) => (
                     <TableRow key={nurse._id}>
+                      <TableCell className="font-medium">{index + 1}</TableCell>
                       <TableCell className="font-medium">
                         {nurse.name}
                       </TableCell>
@@ -309,7 +311,7 @@ export function Nurses() {
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          {nurse.status !== 'pending' && (
+                          {nurse.status !== 'pending' ? (
                             <ActionDialog
                               title={
                                 nurse.status === 'suspended'
@@ -331,8 +333,8 @@ export function Nurses() {
                               <Button
                                 className={cn(
                                   nurse.status === 'suspended'
-                                    ? 'bg-red-500'
-                                    : 'bg-green-500',
+                                    ? 'bg-green-500'
+                                    : 'bg-red-500',
                                 )}
                                 size="icon"
                                 title={
@@ -348,6 +350,14 @@ export function Nurses() {
                                 )}
                               </Button>
                             </ActionDialog>
+                          ) : (
+                            <Button
+                              className=" cursor-not-allowed"
+                              disabled
+                              size="icon"
+                            >
+                              <UserX className="h-4 w-4" />
+                            </Button>
                           )}
                         </div>
                       </TableCell>

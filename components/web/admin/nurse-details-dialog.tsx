@@ -11,7 +11,12 @@ import {
 import { Separator } from '@/components/web/ui/separator';
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
+import {
+  generateStatusColorAndBackgroundColor,
+  generateStatusText,
+} from '@/lib/utils';
 import { useQuery } from 'convex/react';
+import { format } from 'date-fns';
 import { Mail, MapPin, Phone } from 'lucide-react-native';
 
 interface NurseDetailsDialogProps {
@@ -42,13 +47,11 @@ export function NurseDetailsDialog({
         <div className="space-y-6">
           {/* Status */}
           <div className="flex items-center gap-2">
-            {isSuspended ? (
-              <Badge variant="destructive">Suspended</Badge>
-            ) : isApproved ? (
-              <Badge variant="default">Approved</Badge>
-            ) : (
-              <Badge variant="secondary">Pending</Badge>
-            )}
+            <Badge
+              className={generateStatusColorAndBackgroundColor(nurse.status)}
+            >
+              {generateStatusText(nurse.status)}
+            </Badge>
           </div>
 
           <Separator />
@@ -113,7 +116,7 @@ export function NurseDetailsDialog({
               <div>
                 <p className="text-muted-foreground">Created</p>
                 <p className="font-medium">
-                  {new Date(nurse._creationTime).toLocaleDateString()}
+                  {format(new Date(nurse._creationTime), 'MM/dd/yyyy')}
                 </p>
               </div>
             </div>
