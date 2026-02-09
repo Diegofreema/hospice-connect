@@ -226,7 +226,6 @@ export const editNurse = mutation({
       address: args.address,
       phoneNumber: args.phoneNumber,
       zipCode: args.zipCode,
-      dateOfBirth: args.dateOfBirth,
     });
 
     await ctx.db.insert('pendingNurseProfile', {
@@ -237,6 +236,7 @@ export const editNurse = mutation({
       discipline: args.discipline,
       isApproved: false,
       nurseId: args.nurseId,
+      dateOfBirth: args.dateOfBirth,
     });
     await ctx.db.insert('adminActivityNotifications', {
       description: `New Nurse Profile Update Request from ${nurse.name}`,
@@ -330,7 +330,12 @@ export const getNurses = query({
         (nurse.rate || 0) >= minRange && (nurse.rate || 0) <= maxRange;
       // Apply nurseId filter
       const matchesNurseId = !args.nurseId || nurse._id !== args.nurseId;
-      return matchesDiscipline && matchesRange && matchesNurseId;
+      return (
+        matchesDiscipline &&
+        matchesRange &&
+        matchesNurseId &&
+        nurse.status === 'approved'
+      );
     }).paginate(args.paginationOpts);
     const nursesImage = await Promise.all(
       nurses.page.map(async (nurse) => {

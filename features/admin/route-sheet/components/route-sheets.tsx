@@ -142,6 +142,9 @@ export function RouteSheets() {
       loadMoreUnApproved(25);
     }
   };
+
+  console.log({ unApprovedSheets });
+
   return (
     <div className="space-y-6">
       <div>
@@ -161,6 +164,10 @@ export function RouteSheets() {
             <AlertTriangle className="h-4 w-4" />
             Unapproved ({routSheetStats.unApprovedSubmittedRouteSheetsCount})
           </TabsTrigger>
+          {/* <TabsTrigger value="approved" className="gap-2">
+            <AlertTriangle className="h-4 w-4" />
+            Approved ({routSheetStats.approvedSubmittedRouteSheetsCount})
+          </TabsTrigger> */}
           <TabsTrigger value="suspended" className="gap-2">
             <AlertCircle className="h-4 w-4" />
             Suspended ({routSheetStats.suspendedNursesCount})
@@ -193,6 +200,13 @@ export function RouteSheets() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
+                    {unSubmittedSheets?.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={8} className="text-center">
+                          No unsubmitted route sheets
+                        </TableCell>
+                      </TableRow>
+                    )}
                     {unSubmittedSheets?.map((sheet, index) => (
                       <TableRow key={sheet._id}>
                         <TableCell>{index + 1}</TableCell>
@@ -294,6 +308,13 @@ export function RouteSheets() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
+                    {unApprovedSheets?.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={8} className="text-center">
+                          No unapproved route sheets
+                        </TableCell>
+                      </TableRow>
+                    )}
                     {unApprovedSheets?.map((sheet, index) => (
                       <TableRow key={sheet._id}>
                         <TableCell>{index + 1}</TableCell>
@@ -385,6 +406,13 @@ export function RouteSheets() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
+                    {suspendedNurses?.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={8} className="text-center">
+                          No suspended nurses
+                        </TableCell>
+                      </TableRow>
+                    )}
                     {suspendedNurses?.map((nurse, index) => (
                       <TableRow key={nurse._id}>
                         <TableCell>{index + 1}</TableCell>

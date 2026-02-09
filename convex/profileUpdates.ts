@@ -150,7 +150,7 @@ export const approveNurseUpdate = mutation({
       discipline: pending.discipline,
       licenseNumber: pending.licenseNumber,
       stateOfRegistration: pending.stateOfRegistration,
-      zipCode: pending.zipCode,
+      dateOfBirth: pending.dateOfBirth,
     });
 
     // Update pending profile status

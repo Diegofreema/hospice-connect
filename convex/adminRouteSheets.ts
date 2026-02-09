@@ -200,6 +200,7 @@ export const getUnApprovedSubmittedRouteSheets = query({
     const unApprovedRouteSheets = await ctx.db
       .query('routeSheets')
       .withIndex('approved', (q) => q.eq('isApproved', false))
+      .filter((q) => q.eq(q.field('isDeclined'), false))
       .paginate(args.paginationOpts);
 
     const unApprovedRouteSheetsWithNursesAndHospices =

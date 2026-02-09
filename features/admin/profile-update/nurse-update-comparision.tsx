@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from '@/components/web/ui/card';
 import type { Doc } from '@/convex/_generated/dataModel';
+import { changeFirstLetterToCapital } from '@/features/shared/utils';
 import { FieldDiff } from './field-diff';
 
 interface NurseUpdateComparisonProps {
@@ -44,6 +45,11 @@ export function NurseUpdateComparison({
                 original={currentProfile?.name.split(' ')[1]}
                 updated={pendingProfile.lastName}
               />
+              <FieldDiff
+                label="Date of Birth"
+                original={currentProfile?.dateOfBirth}
+                updated={pendingProfile.dateOfBirth}
+              />
             </div>
           </div>
 
@@ -64,8 +70,12 @@ export function NurseUpdateComparison({
               />
               <FieldDiff
                 label="License State"
-                original={currentProfile?.stateOfRegistration}
-                updated={pendingProfile.stateOfRegistration}
+                original={changeFirstLetterToCapital(
+                  currentProfile?.stateOfRegistration || '',
+                )}
+                updated={changeFirstLetterToCapital(
+                  pendingProfile.stateOfRegistration,
+                )}
               />
             </div>
           </div>
@@ -77,14 +87,12 @@ export function NurseUpdateComparison({
             <div className="space-y-2 border-l-2 border-muted pl-3">
               <FieldDiff
                 label="State"
-                original={currentProfile?.stateOfRegistration}
-                updated={pendingProfile.stateOfRegistration}
-              />
-
-              <FieldDiff
-                label="Zip Code"
-                original={currentProfile?.zipCode}
-                updated={pendingProfile.zipCode}
+                original={changeFirstLetterToCapital(
+                  currentProfile?.stateOfRegistration || '',
+                )}
+                updated={changeFirstLetterToCapital(
+                  pendingProfile.stateOfRegistration,
+                )}
               />
             </div>
           </div>

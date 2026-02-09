@@ -306,7 +306,6 @@ export const approveOrDeclineRouteSheet = mutation({
     const [hospice, routeSheet, notification] = await Promise.all([
       ctx.db.get('hospices', args.hospiceId),
       ctx.db.get('routeSheets', args.routeSheetId),
-
       ctx.db.get('hospiceNotifications', args.notificationId),
     ]);
     if (!hospice) {

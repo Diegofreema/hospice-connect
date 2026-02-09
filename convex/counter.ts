@@ -24,10 +24,8 @@ const unSubmittedRouteSheetsCount = counter.for('unSubmittedRouteSheetsCount');
 const unApprovedSubmittedRouteSheetsCount = counter.for(
   'unApprovedSubmittedRouteSheetsCount',
 );
-const pendingHospiceAccountsUpdate = counter.for(
-  'pendingHospiceAccountsUpdate',
-);
-const pendingNurseAccountsUpdate = counter.for('pendingNurseAccountsUpdate');
+const pendingHospiceAccountsUpdate = counter.for('pendingHospiceAccounts');
+const pendingNurseAccountsUpdate = counter.for('pendingNurseAccounts');
 
 export const updateCount = async (ctx: MutationCtx) => {
   await pendingHospiceAccountsUpdate.reset(ctx);

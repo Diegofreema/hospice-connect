@@ -255,7 +255,9 @@ export function Hospices() {
                       {hospice.businessName}
                     </TableCell>
                     <TableCell>{hospice.email}</TableCell>
-                    <TableCell>{hospice.state}</TableCell>
+                    <TableCell>
+                      {changeFirstLetterToCapital(hospice.state)}
+                    </TableCell>
                     <TableCell>{hospice.licenseNumber}</TableCell>
                     <TableCell>
                       <Badge
