@@ -89,7 +89,8 @@ export function ProfileUpdates() {
           Profile Update Approvals
         </h1>
         <p className="text-muted-foreground mt-2">
-          Review and approve pending profile updates from nurses and hospices
+          Review and approve pending profile updates from healthcare
+          professionals and hospices
         </p>
       </div>
 
@@ -110,7 +111,7 @@ export function ProfileUpdates() {
       <Tabs defaultValue="nurses" className="w-full">
         <TabsList>
           <TabsTrigger value="nurses">
-            Nurse Updates ({pendingNurse})
+            Healthcare Professional Updates ({pendingNurse})
           </TabsTrigger>
           <TabsTrigger value="hospices">
             Hospice Updates ({pendingHospice})

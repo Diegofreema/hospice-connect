@@ -42,7 +42,9 @@ export function UpdateList({
         <CardContent className="py-8">
           <div className="text-center">
             <p className="text-muted-foreground">
-              No pending {type} profile updates at this time.
+              No pending{' '}
+              {type === 'nurse' ? 'healthcare professional' : 'hospice'} profile
+              updates at this time.
             </p>
           </div>
         </CardContent>
@@ -54,7 +56,8 @@ export function UpdateList({
     <Card>
       <CardHeader>
         <CardTitle>
-          Pending {type === 'nurse' ? 'Nurse' : 'Hospice'} Profile Updates
+          Pending {type === 'nurse' ? 'Healthcare Professional' : 'Hospice'}{' '}
+          Profile Updates
         </CardTitle>
         <CardDescription>
           {updates.length} update{updates.length !== 1 ? 's' : ''} waiting for

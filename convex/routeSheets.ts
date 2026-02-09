@@ -29,14 +29,14 @@ export const nurseSubmittedRouteSheet = query({
     const schedules = await ctx.db
       .query('schedules')
       .withIndex('nurse_id', (q) =>
-        q.eq('nurseId', nurse._id).eq('assignmentId', assignment._id)
+        q.eq('nurseId', nurse._id).eq('assignmentId', assignment._id),
       )
       .filter((q) =>
         q.or(
           q.eq(q.field('status'), 'cancelled'),
           q.eq(q.field('status'), 'completed'),
-          q.eq(q.field('status'), 'ended')
-        )
+          q.eq(q.field('status'), 'ended'),
+        ),
       )
       .collect();
     if (schedules.length === 0) {
@@ -77,7 +77,7 @@ export const getDetailsForRouteSheet = query({
       .query('schedules')
       .withIndex(
         'nurse_id',
-        (q) => q.eq('nurseId', nurse._id).eq('assignmentId', assignment._id)
+        (q) => q.eq('nurseId', nurse._id).eq('assignmentId', assignment._id),
         // .eq('status', 'completed')
         // .eq('isSubmitted', false)
       )
@@ -87,9 +87,9 @@ export const getDetailsForRouteSheet = query({
           q.or(
             q.eq(q.field('status'), 'cancelled'),
             q.eq(q.field('status'), 'completed'),
-            q.eq(q.field('status'), 'ended')
-          )
-        )
+            q.eq(q.field('status'), 'ended'),
+          ),
+        ),
       )
       .collect();
 
@@ -133,7 +133,7 @@ export const getRouteSheet = query({
     const routeSheet = await ctx.db
       .query('routeSheets')
       .withIndex('by_assignment_id', (q) =>
-        q.eq('assignmentId', assignment._id).eq('nurseId', nurse._id)
+        q.eq('assignmentId', assignment._id).eq('nurseId', nurse._id),
       )
       .filter((q) => q.eq(q.field('isApproved'), true))
       .first();
@@ -141,7 +141,7 @@ export const getRouteSheet = query({
       throw new ConvexError({ message: 'Route sheet not found' });
     }
     const schedules = await Promise.all(
-      routeSheet.scheduleIds.map((scheduleId) => ctx.db.get(scheduleId))
+      routeSheet.scheduleIds.map((scheduleId) => ctx.db.get(scheduleId)),
     );
     const schedulesNotNull = schedules.filter((schedule) => schedule !== null);
     return {
@@ -189,7 +189,7 @@ export const getRouteSheetById = query({
       throw new ConvexError({ message: 'Assignment not found' });
     }
     const schedules = await Promise.all(
-      routeSheet.scheduleIds.map((scheduleId) => ctx.db.get(scheduleId))
+      routeSheet.scheduleIds.map((scheduleId) => ctx.db.get(scheduleId)),
     );
     const schedulesNotNull = schedules.filter((schedule) => schedule !== null);
     return {
@@ -258,7 +258,7 @@ export const submitRouteSheet = mutation({
     const nurseAssignment = await ctx.db
       .query('nurseAssignments')
       .withIndex('assignmentId', (q) =>
-        q.eq('assignmentId', assignment._id).eq('nurseId', nurse._id)
+        q.eq('assignmentId', assignment._id).eq('nurseId', nurse._id),
       )
       .first();
     if (!nurseAssignment) {
@@ -303,13 +303,16 @@ export const approveOrDeclineRouteSheet = mutation({
     if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
     }
+    const [hospice, routeSheet, notification] = await Promise.all([
+      ctx.db.get('hospices', args.hospiceId),
+      ctx.db.get('routeSheets', args.routeSheetId),
 
-    const hospice = await ctx.db.get(args.hospiceId);
+      ctx.db.get('hospiceNotifications', args.notificationId),
+    ]);
     if (!hospice) {
       throw new ConvexError({ message: 'Hospice not found' });
     }
 
-    const routeSheet = await ctx.db.get(args.routeSheetId);
     if (!routeSheet) {
       throw new ConvexError({ message: 'Route sheet not found' });
     }
@@ -317,13 +320,21 @@ export const approveOrDeclineRouteSheet = mutation({
     if (!assignment) {
       throw new ConvexError({ message: 'Assignment not found' });
     }
-    const notification = await ctx.db.get(args.notificationId);
     if (!notification) {
       throw new ConvexError({ message: 'Notification not found' });
     }
 
     if (routeSheet.hospiceId !== hospice._id) {
       throw new ConvexError({ message: 'Unauthorized' });
+    }
+    const nurseAssignment = await ctx.db
+      .query('nurseAssignments')
+      .withIndex('assignmentId', (q) =>
+        q.eq('assignmentId', assignment._id).eq('nurseId', routeSheet.nurseId),
+      )
+      .first();
+    if (!nurseAssignment) {
+      throw new ConvexError({ message: 'Nurse assignment not found' });
     }
     const text = args.isApproved
       ? ''
@@ -342,6 +353,10 @@ export const approveOrDeclineRouteSheet = mutation({
         status: 'declined',
       });
 
+      await ctx.db.patch('nurseAssignments', nurseAssignment._id, {
+        isSubmitted: false,
+      });
+
       await ctx.db.insert('nurseNotifications', {
         isRead: false,
         nurseId: routeSheet.nurseId,
@@ -351,11 +366,15 @@ export const approveOrDeclineRouteSheet = mutation({
         hospiceId: hospice._id,
         viewCount: 0,
       });
+
       await handleUnApprovedSubmittedRouteSheets(ctx, 'dec');
       await handleUnSubmittedRouteSheetsCount(ctx, 'inc');
     } else {
       await handleUnApprovedSubmittedRouteSheets(ctx, 'dec');
       await handleUnSubmittedRouteSheetsCount(ctx, 'dec');
+      await ctx.db.patch('routeSheets', args.routeSheetId, {
+        isApproved: true,
+      });
       await ctx.db.insert('nurseNotifications', {
         isRead: false,
         nurseId: routeSheet.nurseId,

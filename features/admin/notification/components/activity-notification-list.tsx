@@ -1,6 +1,6 @@
 import { api } from '@/convex/_generated/api';
 import { useMutation, usePaginatedQuery } from 'convex/react';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { Button } from '@/components/web/ui/button';
 import { Loader2 } from 'lucide-react-native';
@@ -27,7 +27,9 @@ export function ActivityNotificationList({
   const [activityType, setActivityType] = useState<ActivityType>('all');
   const [isRead, setIsRead] = useState<ReadStatus>('all');
   const [deletingId, setDeletingId] = useState<string | null>(null);
-
+  const markAllAsRead = useMutation(
+    api.adminActivityNotifications.markAllActivityNotificationsAsRead,
+  );
   const { results, status, loadMore, isLoading } = usePaginatedQuery(
     api.adminActivityNotifications.getAdminActivityNotifications,
     {
@@ -89,6 +91,18 @@ export function ActivityNotificationList({
     setActivityType('all');
     setIsRead('all');
   };
+
+  useEffect(() => {
+    const handleMarkAllAsRead = async () => {
+      await markAllAsRead({
+        cursor: null,
+        numItems: 100,
+      });
+    };
+    if (status !== 'LoadingFirstPage' && results.length > 0) {
+      handleMarkAllAsRead();
+    }
+  }, [markAllAsRead, results, status]);
 
   if (!results || results.length === 0) {
     return (

@@ -13,7 +13,7 @@ import {
   handleApproveHospiceCount,
   handleApproveNurseCount,
   handleNurseCount,
-  handlePendingNurseAccounts,
+  handlePendingNurseAccountsUpdate,
   handlePendingNurseApprovalCount,
 } from './counter';
 import {
@@ -238,7 +238,14 @@ export const editNurse = mutation({
       isApproved: false,
       nurseId: args.nurseId,
     });
-    await handlePendingNurseAccounts(ctx, 'inc');
+    await ctx.db.insert('adminActivityNotifications', {
+      description: `New Nurse Profile Update Request from ${nurse.name}`,
+      type: 'nurse',
+      isRead: false,
+      title: 'New Nurse Profile Update Request',
+      nurseId: args.nurseId,
+    });
+    await handlePendingNurseAccountsUpdate(ctx, 'inc');
   },
 });
 

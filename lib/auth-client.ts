@@ -1,4 +1,3 @@
-import { auth } from '@/convex/betterAuth/auth';
 import { expoClient } from '@better-auth/expo/client';
 import {
   convexClient,
@@ -12,7 +11,24 @@ import { Platform } from 'react-native';
 export const authClient = createAuthClient({
   baseURL: process.env.EXPO_PUBLIC_CONVEX_SITE_URL,
   plugins: [
-    inferAdditionalFields<typeof auth>(),
+    inferAdditionalFields({
+      user: {
+        role: {
+          required: true,
+          defaultValue: 'nurse',
+          type: 'string',
+        },
+        isBoarded: {
+          type: 'boolean',
+          defaultValue: false,
+          required: true,
+        },
+        streamToken: {
+          type: 'string',
+          required: false,
+        },
+      },
+    }),
     convexClient(),
     // @ts-ignore
     ...(Platform.OS === 'web'

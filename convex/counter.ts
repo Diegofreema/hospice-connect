@@ -24,45 +24,47 @@ const unSubmittedRouteSheetsCount = counter.for('unSubmittedRouteSheetsCount');
 const unApprovedSubmittedRouteSheetsCount = counter.for(
   'unApprovedSubmittedRouteSheetsCount',
 );
-const pendingHospiceAccounts = counter.for('pendingHospiceAccounts');
-const pendingNurseAccounts = counter.for('pendingNurseAccounts');
+const pendingHospiceAccountsUpdate = counter.for(
+  'pendingHospiceAccountsUpdate',
+);
+const pendingNurseAccountsUpdate = counter.for('pendingNurseAccountsUpdate');
 
 export const updateCount = async (ctx: MutationCtx) => {
-  await pendingHospiceAccounts.reset(ctx);
-  await pendingNurseAccounts.reset(ctx);
+  await pendingHospiceAccountsUpdate.reset(ctx);
+  await pendingNurseAccountsUpdate.reset(ctx);
 };
 
-export const handlePendingHospiceAccounts = async (
+export const handlePendingHospiceAccountsUpdate = async (
   ctx: MutationCtx,
   action: 'inc' | 'dec',
 ) => {
   if (action === 'inc') {
-    await pendingHospiceAccounts.inc(ctx);
+    await pendingHospiceAccountsUpdate.inc(ctx);
   } else {
-    const count = await pendingHospiceAccounts.count(ctx);
+    const count = await pendingHospiceAccountsUpdate.count(ctx);
     if (count > 0) {
-      await pendingHospiceAccounts.dec(ctx);
+      await pendingHospiceAccountsUpdate.dec(ctx);
     }
   }
 };
-export const getPendingHospiceAccounts = async (ctx: QueryCtx) => {
-  return await pendingHospiceAccounts.count(ctx);
+export const getPendingHospiceAccountsUpdate = async (ctx: QueryCtx) => {
+  return await pendingHospiceAccountsUpdate.count(ctx);
 };
-export const handlePendingNurseAccounts = async (
+export const handlePendingNurseAccountsUpdate = async (
   ctx: MutationCtx,
   action: 'inc' | 'dec',
 ) => {
   if (action === 'inc') {
-    await pendingNurseAccounts.inc(ctx);
+    await pendingNurseAccountsUpdate.inc(ctx);
   } else {
-    const count = await pendingNurseAccounts.count(ctx);
+    const count = await pendingNurseAccountsUpdate.count(ctx);
     if (count > 0) {
-      await pendingNurseAccounts.dec(ctx);
+      await pendingNurseAccountsUpdate.dec(ctx);
     }
   }
 };
-export const getPendingNurseAccounts = async (ctx: QueryCtx) => {
-  return await pendingNurseAccounts.count(ctx);
+export const getPendingNurseAccountsUpdate = async (ctx: QueryCtx) => {
+  return await pendingNurseAccountsUpdate.count(ctx);
 };
 
 export const handleUnApprovedSubmittedRouteSheets = async (

@@ -87,6 +87,7 @@ const PendingNurse = {
   isApproved: v.boolean(),
   zipCode: v.optional(v.string()),
   nurseId: v.id('nurses'),
+  dateOfBirth: v.optional(v.string()),
 };
 const NurseAssignments = {
   nurseId: v.id('nurses'),

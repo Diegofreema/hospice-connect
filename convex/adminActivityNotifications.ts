@@ -1,6 +1,7 @@
 import { filter } from 'convex-helpers/server/filter';
 import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
+import { api } from './_generated/api';
 import { mutation, query } from './_generated/server';
 import { getUserHelperFn } from './helper';
 
@@ -66,6 +67,23 @@ export const getAdminActivityNotifications = query({
   },
 });
 
+// get admin activity notifications count
+export const hasAdminActivityHaveUnreadNotifications = query({
+  handler: async (ctx) => {
+    const user = await getUserHelperFn(ctx);
+    if (user?.role !== 'admin' && user?.role !== 'super_admin') {
+      throw new ConvexError({
+        message: 'Only admin and super admin can access this data',
+      });
+    }
+    const count = await filter(
+      ctx.db.query('adminActivityNotifications'),
+      (adminActivityNotification) => !adminActivityNotification.isRead,
+    ).take(20);
+    return count.length;
+  },
+});
+
 // Mark activity notification as read
 export const markActivityNotificationAsRead = mutation({
   args: {
@@ -85,14 +103,34 @@ export const markActivityNotificationAsRead = mutation({
 
 // Mark all activity notifications as read
 export const markAllActivityNotificationsAsRead = mutation({
-  handler: async (ctx) => {
-    const notifications = await ctx.db
-      .query('adminActivityNotifications')
-      .collect();
-    await Promise.all(
-      notifications.map((notif) => ctx.db.patch(notif._id, { isRead: true })),
-    );
-    return { success: true, count: notifications.length };
+  args: {
+    cursor: v.union(v.null(), v.string()),
+    numItems: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const data = await filter(
+      ctx.db.query('adminActivityNotifications'),
+      (notification) => !notification.isRead,
+    ).paginate({
+      cursor: args.cursor,
+      numItems: args.numItems,
+    });
+    const { page, isDone, continueCursor } = data;
+
+    for (const notification of page) {
+      await ctx.db.patch(notification._id, { isRead: true });
+    }
+    if (!isDone) {
+      await ctx.scheduler.runAfter(
+        0,
+        api.adminActivityNotifications.markAllActivityNotificationsAsRead,
+        {
+          cursor: continueCursor,
+          numItems: args.numItems,
+        },
+      );
+    }
+    return { success: true };
   },
 });
 

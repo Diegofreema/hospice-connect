@@ -2,8 +2,10 @@ import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { mutation, query } from './_generated/server';
 import {
-  getPendingHospiceAccounts,
-  getPendingNurseAccounts,
+  getPendingHospiceAccountsUpdate,
+  getPendingNurseAccountsUpdate,
+  handlePendingHospiceAccountsUpdate,
+  handlePendingNurseAccountsUpdate,
   updateCount,
 } from './counter';
 import { getUserHelperFn } from './helper';
@@ -59,8 +61,8 @@ export const getTotalPendingProfileUpdate = query({
         message: 'Only admin and super admin can access this data',
       });
     }
-    const nursePending = await getPendingNurseAccounts(ctx);
-    const hospicePending = await getPendingHospiceAccounts(ctx);
+    const nursePending = await getPendingNurseAccountsUpdate(ctx);
+    const hospicePending = await getPendingHospiceAccountsUpdate(ctx);
     return {
       nursePending,
       hospicePending,
@@ -162,6 +164,7 @@ export const approveNurseUpdate = mutation({
       isRead: false,
       viewCount: 0,
     });
+    await handlePendingNurseAccountsUpdate(ctx, 'dec');
   },
 });
 
@@ -195,6 +198,7 @@ export const rejectNurseUpdate = mutation({
       isRead: false,
       viewCount: 0,
     });
+    await handlePendingNurseAccountsUpdate(ctx, 'dec');
   },
 });
 
@@ -242,6 +246,7 @@ export const approveHospiceUpdate = mutation({
       isRead: false,
       viewCount: 0,
     });
+    await handlePendingHospiceAccountsUpdate(ctx, 'dec');
   },
 });
 
@@ -273,6 +278,7 @@ export const rejectHospiceUpdate = mutation({
       isRead: false,
       viewCount: 0,
     });
+    await handlePendingHospiceAccountsUpdate(ctx, 'dec');
   },
 });
 

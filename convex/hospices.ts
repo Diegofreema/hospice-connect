@@ -1,11 +1,11 @@
 import { ConvexError, v } from 'convex/values';
 import { type Id } from './_generated/dataModel';
 import { mutation, query, type QueryCtx } from './_generated/server';
-import { getUserHelper } from './users';
 import {
   handleHospiceCount,
   handlePendingHospiceApprovalCount,
 } from './counter';
+import { getUserHelper } from './users';
 
 export const createHospice = mutation({
   args: {
@@ -129,6 +129,14 @@ export const updateHospiceProfile = mutation({
       throw new ConvexError({ message: 'Unauthorized' });
     }
 
+    await handlePendingHospiceApprovalCount(ctx, 'inc');
+    await ctx.db.insert('adminActivityNotifications', {
+      description: `New Hospice Profile Update Request from ${hospice.businessName}`,
+      type: 'hospice',
+      isRead: false,
+      title: 'New Hospice Profile Update Request',
+      hospiceId: args.hospiceId,
+    });
     return await ctx.db.insert('pendingHospiceProfile', {
       address: args.address,
       businessName: args.businessName,

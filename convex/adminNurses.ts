@@ -25,14 +25,14 @@ export const getNurses = query({
       v.literal('approved'),
       v.literal('rejected'),
       v.literal('suspended'),
-      v.literal('all')
+      v.literal('all'),
     ),
     searchQuery: v.optional(v.string()),
     discipline: v.union(
       v.literal('RN'),
       v.literal('LVN'),
       v.literal('HHA'),
-      v.literal('all')
+      v.literal('all'),
     ),
   },
   handler: async (ctx, args) => {
@@ -149,6 +149,16 @@ export const suspendNurse = mutation({
     });
     await handleSuspendedNurseCount(ctx, args.isSuspended ? 'inc' : 'dec');
     await handleApproveNurseCount(ctx, args.isSuspended ? 'dec' : 'inc');
+    await ctx.db.insert('nurseNotifications', {
+      nurseId: args.nurseId,
+      title: args.isSuspended ? 'Account Suspended' : 'Account Restored',
+      description: args.isSuspended
+        ? 'Your account has been suspended'
+        : 'Your account has been restored',
+      type: 'admin',
+      isRead: false,
+      viewCount: 0,
+    });
   },
 });
 

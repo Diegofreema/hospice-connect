@@ -16,6 +16,8 @@ import {
 } from 'lucide-react-native';
 import { Button } from '../ui/button';
 
+import { api } from '@/convex/_generated/api';
+import { useQuery } from 'convex/react';
 import { useState } from 'react';
 
 const navigation = [
@@ -38,7 +40,11 @@ const navigation = [
 export function AdminSidebar() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
+  const hasUnreadNotifications = useQuery(
+    api.adminActivityNotifications.hasAdminActivityHaveUnreadNotifications,
+  );
+  const hasUnread = !!hasUnreadNotifications;
+  const unreadCount = hasUnreadNotifications || 0;
   return (
     <>
       {/* Mobile menu button */}
@@ -78,6 +84,8 @@ export function AdminSidebar() {
               if (pathname === '/') {
                 isActive = item.href === '/admin';
               }
+
+              const isNotificationPage = item.name === 'Notifications';
               return (
                 <Link
                   key={item.name}
@@ -92,7 +100,12 @@ export function AdminSidebar() {
                   )}
                 >
                   <item.icon className="h-5 w-5" />
-                  {item.name}
+                  {item.name}{' '}
+                  {isNotificationPage && hasUnread && (
+                    <span className=" text-xs text-black bg-white rounded-full  px-2 py-1 inline-block">
+                      {unreadCount}
+                    </span>
+                  )}
                 </Link>
               );
             })}

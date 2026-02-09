@@ -1,12 +1,12 @@
 import { useAuth } from '@/components/context/auth';
 import { useToast } from '@/components/demos/toast';
+import { api } from '@/convex/_generated/api';
 import { License } from '@/features/nurse/components/step/license';
 import { PersonalInfo } from '@/features/nurse/components/step/personal-info';
 import {
   createNurseValidator,
   type CreateNurseValidator,
 } from '@/features/nurse/validators';
-import { api } from '@/convex/_generated/api';
 
 import { BackButton } from '@/features/shared/components/back-button';
 import { Button } from '@/features/shared/components/button';
@@ -21,6 +21,7 @@ import {
 } from '@/features/shared/utils';
 import { authClient } from '@/lib/auth-client';
 
+import { FormErrorBanner } from '@/features/shared/components/form-error-banner';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from 'convex/react';
 import { format } from 'date-fns';
@@ -28,7 +29,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
-import { FormErrorBanner } from '@/features/shared/components/form-error-banner';
 
 const STEPS = [
   { id: 1, title: 'Personal info', component: PersonalInfo },
@@ -59,7 +59,6 @@ const NurseCreate = () => {
       case 1:
         return [
           'phoneNumber',
-
           'gender',
           'dateOfBirth',
           'rate',
@@ -135,7 +134,10 @@ const NurseCreate = () => {
       <FormErrorBanner errors={errors} />
       <BackButton />
 
-      <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
+      <KeyboardAwareScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 100 }}
+      >
         <Text style={{ alignSelf: 'flex-end' }}>
           Step {currentStep} of {STEPS.length}
         </Text>

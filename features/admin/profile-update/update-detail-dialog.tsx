@@ -134,7 +134,7 @@ export function UpdateDetailsDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 pr-4">
+        <ScrollArea className="h-[calc(100vh-20rem)] pr-4">
           <div className="space-y-6 py-4">
             {type === 'nurse' ? (
               <NurseUpdateComparison

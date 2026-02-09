@@ -16,6 +16,8 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/web/ui/tabs';
+import { api } from '@/convex/_generated/api';
+import { useQuery } from 'convex/react';
 import { useRouter } from 'expo-router';
 import { Activity, Bell, Send } from 'lucide-react-native';
 import { useState } from 'react';
@@ -28,7 +30,11 @@ export function Notifications() {
     string | null
   >(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-
+  const hasUnreadNotifications = useQuery(
+    api.adminActivityNotifications.hasAdminActivityHaveUnreadNotifications,
+  );
+  const hasUnread = !!hasUnreadNotifications;
+  const unreadCount = hasUnreadNotifications || 0;
   const [selectedActivityNotification, setSelectedActivityNotification] =
     useState<any>(null);
   const [isActivityDetailsOpen, setIsActivityDetailsOpen] = useState(false);
@@ -75,7 +81,12 @@ export function Notifications() {
           </TabsTrigger>
           <TabsTrigger value="activities" className="flex items-center gap-2">
             <Activity className="h-4 w-4" />
-            User Activities
+            User Activities{' '}
+            {hasUnread && (
+              <span className=" text-xs text-black bg-white rounded-full  px-2 py-1 inline-block">
+                {unreadCount}
+              </span>
+            )}
           </TabsTrigger>
         </TabsList>
 
