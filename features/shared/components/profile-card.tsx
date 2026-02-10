@@ -2,12 +2,13 @@ import { Avatar } from '@/components/avatar/Avatar';
 import { SpinnerArc } from '@/components/loaders';
 import { api } from '@/convex/_generated/api';
 import { type Id } from '@/convex/_generated/dataModel';
-
+import { savePendingRoute } from '@/hooks/use-pending-image-redirect';
 import { IconCamera, IconUpload } from '@tabler/icons-react-native';
 import { useMutation } from 'convex/react';
 import * as ImagePicker from 'expo-image-picker';
-import { useState } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { usePathname } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { Alert, TouchableOpacity, View } from 'react-native';
 import {
   changeFirstLetterToCapital,
   formatPhoneNumber,
@@ -57,23 +58,62 @@ export const ProfileCard = ({
   const formattedRate = rate ? `$${rate}/hr` : '';
 
   const [image, setImage] = useState<string | null>(null);
+  const pathname = usePathname();
   const { theme } = useUnistyles();
   const [uploading, setUploading] = useState(false);
   const generateUploadUrl = useMutation(api.helper.generateUploadUrl);
   const updateImage = useMutation(api.nurses.updateNurseProfilePicture);
   const updateHospiceImage = useMutation(api.hospices.updateHospiceImage);
   const { showToast } = useToast();
-  const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 0.5,
-    });
 
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
+  // Handle pending image picker results after Android Activity restart
+  useEffect(() => {
+    const checkPendingResult = async () => {
+      try {
+        const result = await ImagePicker.getPendingResultAsync();
+        if (
+          result &&
+          'canceled' in result &&
+          !result.canceled &&
+          result.assets?.[0]?.uri
+        ) {
+          setImage(result.assets[0].uri);
+        }
+      } catch (error) {
+        console.error('Error getting pending image result:', error);
+      }
+    };
+    checkPendingResult();
+  }, []);
+
+  const pickImage = async () => {
+    try {
+      const permissionResult =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (!permissionResult.granted) {
+        Alert.alert(
+          'Permission required',
+          'Permission to access the media library is required.',
+        );
+        return;
+      }
+
+      // Save current route in case Android destroys the Activity
+      await savePendingRoute(pathname);
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        quality: 0.5,
+        legacy: true,
+      });
+      console.log('result', result);
+
+      if (!result.canceled && result.assets?.[0]?.uri) {
+        setImage(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Error picking image:', error);
     }
   };
 

@@ -58,7 +58,8 @@
         "expo-image-picker",
         {
           "photosPermission": "$(PRODUCT_NAME) would like to use your device gallery to attach image in a message.",
-          "cameraPermission": "$(PRODUCT_NAME) would like to use your camera to share image in a message."
+          "cameraPermission": "$(PRODUCT_NAME) would like to use your camera to share image in a message.",
+          "legacyImagePickerMode": true
         }
       ],
       "react-native-edge-to-edge",

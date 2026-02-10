@@ -16,6 +16,7 @@ import {
   useSegments,
 } from 'expo-router';
 
+import { usePendingImageRedirect } from '@/hooks/use-pending-image-redirect';
 import { useUpdate } from '@/hooks/use-update';
 import React from 'react';
 import { Platform, View } from 'react-native';
@@ -80,6 +81,9 @@ const InitialRoute = () => {
   const isWeb = Platform.OS === 'web';
   console.log({ pathname, segment });
   const isAuthenticated = !!user;
+
+  // Check for pending image picker results after Activity restart
+  usePendingImageRedirect();
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
