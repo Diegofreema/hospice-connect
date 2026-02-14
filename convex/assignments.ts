@@ -739,6 +739,7 @@ export const cancelAssignment = mutation({
         isCompleted: true,
         completedAt: args.cancelledAt,
       });
+      await handleUnSubmittedRouteSheetsCount(ctx, 'inc');
     }
     // === Step 3: Update assignment ===
     await ctx.db.patch(assignment._id, {

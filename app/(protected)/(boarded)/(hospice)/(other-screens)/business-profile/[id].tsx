@@ -14,6 +14,7 @@ import { View } from '@/features/shared/components/view';
 import { Wrapper } from '@/features/shared/components/wrapper';
 import { generateErrorMessage } from '@/features/shared/utils';
 import { useMutation } from 'convex/react';
+import { router } from 'expo-router';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -51,8 +52,10 @@ const EditBusinessProfile = () => {
       });
       showToast({
         title: 'Success',
-        subtitle: 'Awaiting approval to reflect',
+        subtitle: "Awaiting admin's approval to reflect",
+        autodismiss: true,
       });
+      router.back();
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
@@ -61,6 +64,7 @@ const EditBusinessProfile = () => {
       showToast({
         title: 'Error',
         subtitle: errorMessage,
+        autodismiss: true,
       });
     }
   };

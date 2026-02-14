@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Button } from '@/components/web/ui/button';
 import { Loader2 } from 'lucide-react-native';
 import { toast } from 'sonner-native';
+import { Loader } from '../../shared/loader';
 import { ActivityNotificationFilters } from './activity-notification-filters';
 import { ActivityNotificationRow } from './activity-notification-row';
 
@@ -103,6 +104,10 @@ export function ActivityNotificationList({
       handleMarkAllAsRead();
     }
   }, [markAllAsRead, results, status]);
+
+  if (status === 'LoadingFirstPage') {
+    return <Loader message="Loading activities..." />;
+  }
 
   if (!results || results.length === 0) {
     return (

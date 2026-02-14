@@ -61,14 +61,16 @@ export default function RootLayout() {
   }
 
   return (
-    <Provider>
-      <View style={styles.container}>
-        <KeyboardProvider>
-          <InitialRoute />
-          <Toaster />
-        </KeyboardProvider>
-      </View>
-    </Provider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Provider>
+        <View style={styles.container}>
+          <KeyboardProvider>
+            <InitialRoute />
+            <Toaster />
+          </KeyboardProvider>
+        </View>
+      </Provider>
+    </GestureHandlerRootView>
   );
 }
 
@@ -86,36 +88,34 @@ const InitialRoute = () => {
   usePendingImageRedirect();
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <ToastProvider>
-        <StackedModalProvider>
-          <Stack
-            screenOptions={{
-              headerStyle: {
-                backgroundColor: theme.colors.background,
-              },
-              headerTitleStyle: {
-                color: theme.colors.typography,
-              },
-              headerTintColor: theme.colors.typography,
-              headerShown: false,
-            }}
-          >
-            <Stack.Protected guard={isWeb}>
-              <Stack.Screen name="(admin)" />
+    <ToastProvider>
+      <StackedModalProvider>
+        <Stack
+          screenOptions={{
+            headerStyle: {
+              backgroundColor: theme.colors.background,
+            },
+            headerTitleStyle: {
+              color: theme.colors.typography,
+            },
+            headerTintColor: theme.colors.typography,
+            headerShown: false,
+          }}
+        >
+          <Stack.Protected guard={isWeb}>
+            <Stack.Screen name="(admin)" />
+          </Stack.Protected>
+          <Stack.Protected guard={!isWeb}>
+            <Stack.Protected guard={isAuthenticated}>
+              <Stack.Screen name="(protected)" />
             </Stack.Protected>
-            <Stack.Protected guard={!isWeb}>
-              <Stack.Protected guard={isAuthenticated}>
-                <Stack.Screen name="(protected)" />
-              </Stack.Protected>
-              <Stack.Protected guard={!isAuthenticated}>
-                <Stack.Screen name="(public)" />
-              </Stack.Protected>
+            <Stack.Protected guard={!isAuthenticated}>
+              <Stack.Screen name="(public)" />
             </Stack.Protected>
-          </Stack>
-        </StackedModalProvider>
-      </ToastProvider>
-    </GestureHandlerRootView>
+          </Stack.Protected>
+        </Stack>
+      </StackedModalProvider>
+    </ToastProvider>
   );
 };
 const styles = StyleSheet.create((theme) => ({

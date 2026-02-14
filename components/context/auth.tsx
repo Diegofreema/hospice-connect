@@ -1,5 +1,4 @@
 import { ErrorComponent } from '@/features/shared/components/error';
-import { SmallLoader } from '@/features/shared/components/small-loader';
 import { authClient } from '@/lib/auth-client';
 import { createContext, useContext } from 'react';
 
@@ -18,6 +17,7 @@ type User = {
 };
 const AuthContext = createContext({
   user: null as User | null,
+  isPending: false,
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -27,14 +27,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return <ErrorComponent text={error.message} refetch={refetch} />;
   }
 
-  if (isPending) {
-    return <SmallLoader size={50} />;
-  }
-
   return (
     <AuthContext.Provider
       value={{
-        user: session?.user as User,
+        user: (session?.user as User) || null,
+        isPending,
       }}
     >
       {children}

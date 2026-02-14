@@ -5,11 +5,11 @@ import { format } from 'date-fns';
 import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { ScrollView } from 'react-native';
+import * as Progress from 'react-native-progress';
 import { useDownloadOrPrint } from '../hooks/use-download';
 import { calculateTotalHours } from '../utils';
 import { RoustSheetComponent } from './route-sheet-component';
 import { SmallLoader } from './small-loader';
-
 export const ViewRouteSheet = () => {
   const { assignmentId, nurseId } = useLocalSearchParams<{
     nurseId: Id<'nurses'>;
@@ -257,9 +257,10 @@ export const ViewRouteSheet = () => {
 </body>
 </html>
   `;
-  const { exportViewToPdf, loading, printToFile } = useDownloadOrPrint({
-    htmlContent,
-  });
+  const { exportViewToPdf, loading, printToFile, progress, uri } =
+    useDownloadOrPrint({
+      htmlContent,
+    });
   if (data === undefined) {
     return <SmallLoader size={50} />;
   }
@@ -271,6 +272,7 @@ export const ViewRouteSheet = () => {
     await printToFile();
   };
   const hasSubmitted = !!routeSheet?._id;
+  console.log(uri);
 
   return (
     <ScrollView
@@ -300,6 +302,7 @@ export const ViewRouteSheet = () => {
         disabled={loading}
         showDebit={!hasSubmitted}
       />
+      {progress > 0 && <Progress.Bar progress={progress} width={null} />}
     </ScrollView>
   );
 };

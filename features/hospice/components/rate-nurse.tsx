@@ -59,7 +59,7 @@ export const RateNurse = ({ onClose }: Props) => {
         </View>
         <View>
           <Text size="normal" isBold>
-            {shift.nurse?.name || 'no staff assigned'}
+            {shift.nurse?.name || 'No staff assigned'}
           </Text>
           <Text size="normal" isBold>
             {format(shift.startDate, 'PPP')} - {format(shift.endDate, 'PPP')}

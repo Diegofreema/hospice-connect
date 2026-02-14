@@ -68,7 +68,6 @@ export function UpdateDetailsDialog({
       }
       onOpenChange(false);
       onApprovalComplete();
-      toast.success('Profile update approved successfully');
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,
@@ -97,7 +96,6 @@ export function UpdateDetailsDialog({
       }
       onOpenChange(false);
       onApprovalComplete();
-      toast.success('Profile update rejected successfully');
     } catch (error) {
       const errorMessage = generateErrorMessage(
         error,

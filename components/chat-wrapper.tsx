@@ -1,5 +1,4 @@
 import { chatApiKey } from '@/chat-config';
-import { SmallLoader } from '@/features/shared/components/small-loader';
 import { useUnread } from '@/features/shared/hooks/use-unread';
 import axios from 'axios';
 import { type PropsWithChildren, useCallback, useEffect } from 'react';
@@ -15,7 +14,7 @@ export const ChatWrapper = ({ children }: PropsWithChildren) => {
         name: user?.name,
         email: user?.email,
         id: user?.id,
-      }
+      },
     );
 
     return response.token;
@@ -106,10 +105,6 @@ export const ChatWrapper = ({ children }: PropsWithChildren) => {
     };
   }, [setUnreadCount, client]);
 
-  if (!client) {
-    return <SmallLoader size={50} />;
-  }
-
   const chatTheme = {
     channelPreview: {
       container: {
@@ -120,7 +115,7 @@ export const ChatWrapper = ({ children }: PropsWithChildren) => {
 
   return (
     <OverlayProvider value={{ style: chatTheme }}>
-      <Chat client={client}>{children}</Chat>
+      {client ? <Chat client={client}>{children}</Chat> : children}
     </OverlayProvider>
   );
 };

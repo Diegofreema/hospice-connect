@@ -3,6 +3,7 @@ import { type Id } from './_generated/dataModel';
 import { mutation, query, type QueryCtx } from './_generated/server';
 import {
   handleHospiceCount,
+  handlePendingHospiceAccountsUpdate,
   handlePendingHospiceApprovalCount,
 } from './counter';
 import { getUserHelper } from './users';
@@ -129,7 +130,7 @@ export const updateHospiceProfile = mutation({
       throw new ConvexError({ message: 'Unauthorized' });
     }
 
-    await handlePendingHospiceApprovalCount(ctx, 'inc');
+    await handlePendingHospiceAccountsUpdate(ctx, 'inc');
     await ctx.db.insert('adminActivityNotifications', {
       description: `New Hospice Profile Update Request from ${hospice.businessName}`,
       type: 'hospice',

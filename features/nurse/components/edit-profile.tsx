@@ -75,7 +75,9 @@ export const EditProfile = () => {
         data.lastName !== nurse?.name.split(' ')[1] ||
         data.discipline !== nurse?.discipline ||
         data.email !== nurse.email ||
-        data.licenseState !== nurse.stateOfRegistration;
+        data.licenseState !== nurse.stateOfRegistration ||
+        format(data.dateOfBirth || new Date(), 'PPP') !== nurse.dateOfBirth;
+
       if (
         data.firstName !== nurse?.name.split(' ')[0] ||
         data.lastName !== nurse?.name.split(' ')[1]
@@ -89,7 +91,7 @@ export const EditProfile = () => {
       showToast({
         title: 'Success',
         subtitle: fieldsChanged
-          ? 'Pending admin approval'
+          ? "Awaiting admin's approval to reflect"
           : 'Profile updated successfully',
         autodismiss: true,
       });

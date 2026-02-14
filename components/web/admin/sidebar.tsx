@@ -22,7 +22,7 @@ import { useState } from 'react';
 
 const navigation = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-  { name: 'Nurses', href: '/admin/nurses', icon: Users },
+  { name: 'Healthcare Professionals', href: '/admin/nurses', icon: Users },
   { name: 'Hospices', href: '/admin/hospices', icon: Building2 },
   { name: 'Assignments', href: '/admin/assignments', icon: Calendar },
   { name: 'Route Sheets', href: '/admin/route-sheets', icon: ListCheck },
@@ -102,7 +102,7 @@ export function AdminSidebar() {
                   <item.icon className="h-5 w-5" />
                   {item.name}{' '}
                   {isNotificationPage && hasUnread && (
-                    <span className=" text-xs text-black bg-white rounded-full  px-2 py-1 inline-block">
+                    <span className=" text-xs text-white bg-red-500 rounded-full  px-2 py-1 inline-block">
                       {unreadCount}
                     </span>
                   )}

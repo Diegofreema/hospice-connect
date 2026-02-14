@@ -169,7 +169,7 @@ export const ShiftCard = ({
             <View>
               <CustomPressable onPress={onPressName}>
                 <Text size="normal" isBold>
-                  {shift.nurse?.name || 'no staff assigned'}
+                  {shift.nurse?.name || 'No staff assigned'}
                 </Text>
               </CustomPressable>
               <Text size="normal" isBold>

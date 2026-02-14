@@ -1,93 +1,48 @@
 import { useToast } from '@/components/demos/toast';
-import * as FileSystem from 'expo-file-system';
-import * as MediaLibrary from 'expo-media-library';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { useState } from 'react';
-import { Alert, Platform } from 'react-native';
 
-export const requestPermissions = async () => {
-  if (Platform.OS === 'android') {
-    const { status } = await MediaLibrary.requestPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert(
-        'Permission Required',
-        'Please grant media library permission to save PDF files.'
-      );
-      return false;
-    }
-  }
-  return true;
-};
-
-const savePDFToDevice = async (uri: string, filename: string) => {
+// Force reload: Switch to Sharing to avoid SAF/copyAsync errors on Android
+const savePDFToDevice = async (
+  uri: string,
+  filename: string, // Kept for consistency, though sharing handles filename via UTI/title differently
+  onProgress?: (progress: number) => void,
+): Promise<boolean> => {
   try {
-    const hasPermission = await requestPermissions();
-    if (!hasPermission) return;
+    if (onProgress) onProgress(0.5);
 
-    if (Platform.OS === 'ios') {
-      // iOS: Use sharing
-      await Sharing.shareAsync(uri, {
-        mimeType: 'application/pdf',
-        dialogTitle: 'Save PDF',
-        UTI: 'com.adobe.pdf',
-      });
-    } else {
-      // Android: Use Storage Access Framework
-      const permissions =
-        await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+    // Unified logic: Use Sharing for both iOS and Android
+    // This avoids the "To protect your privacy" error on Android SAF
+    // and lets the user choose "Save to..." or their File Manager app
+    await Sharing.shareAsync(uri, {
+      mimeType: 'application/pdf',
+      dialogTitle: `Save ${filename}`,
+      UTI: 'com.adobe.pdf',
+    });
 
-      if (permissions.granted) {
-        // Read the file as base64
-        const base64Data = await FileSystem.readAsStringAsync(uri, {
-          encoding: FileSystem.EncodingType.Base64,
-        });
-
-        // Create and write to the file in the selected directory
-        await FileSystem.StorageAccessFramework.createFileAsync(
-          permissions.directoryUri,
-          filename,
-          'application/pdf'
-        )
-          .then(async (newUri) => {
-            await FileSystem.writeAsStringAsync(newUri, base64Data, {
-              encoding: FileSystem.EncodingType.Base64,
-            });
-
-            Alert.alert('Success', `PDF saved as ${filename}`, [
-              {
-                text: 'Share',
-                onPress: () => Sharing.shareAsync(uri),
-              },
-              { text: 'OK' },
-            ]);
-          })
-          .catch((error) => {
-            console.error('Error creating file:', error);
-            Alert.alert('Error', 'Failed to save PDF. Please try again.');
-          });
-      } else {
-        // Fallback to sharing if permissions not granted
-        await Sharing.shareAsync(uri, {
-          mimeType: 'application/pdf',
-          dialogTitle: 'Save PDF',
-        });
-      }
-    }
+    if (onProgress) onProgress(1);
+    return true;
   } catch (error) {
-    console.error('Error saving PDF:', error);
-    Alert.alert('Error', 'Failed to save PDF. Please try again.');
+    console.error('Error sharing/saving PDF:', error);
+    // Alert is handled by caller usually or implicit in share failure
+    return false;
   }
 };
+
 type Props = {
   htmlContent: string;
 };
+
 export const useDownloadOrPrint = ({ htmlContent }: Props) => {
   const [loading, setLoading] = useState(false);
-
+  const [progress, setProgress] = useState(0);
   const { showToast } = useToast();
+  const [uri, setUri] = useState<string | null>(null);
+
   const exportViewToPdf = async () => {
     setLoading(true);
+    setProgress(0);
     try {
       const { uri } = await Print.printToFileAsync({
         html: htmlContent,
@@ -95,24 +50,34 @@ export const useDownloadOrPrint = ({ htmlContent }: Props) => {
         width: 612,
         height: 792,
       });
+      setUri(uri);
+      setProgress(0.1);
+
       const fileName = `route-sheet-${Date.now()}.pdf`;
-      await savePDFToDevice(uri, fileName);
-      showToast({
-        title: 'Success',
-        subtitle: 'PDF saved successfully',
-        autodismiss: true,
-      });
+
+      // Use the unified sharing approach
+      const saved = await savePDFToDevice(uri, fileName, setProgress);
+
+      if (saved) {
+        showToast({
+          title: 'Success',
+          subtitle: 'PDF ready to save/share',
+          autodismiss: true,
+        });
+      }
     } catch (error) {
       console.log(error);
       showToast({
         title: 'Error',
-        subtitle: 'Failed to save PDF',
+        subtitle: 'Failed to generate PDF',
         autodismiss: true,
       });
     } finally {
       setLoading(false);
+      setTimeout(() => setProgress(0), 1000);
     }
   };
+
   const printToFile = async () => {
     // On iOS/android prints the given html. On web prints the HTML from the current page.
     const { uri } = await Print.printToFileAsync({ html: htmlContent });
@@ -124,5 +89,7 @@ export const useDownloadOrPrint = ({ htmlContent }: Props) => {
     loading,
     exportViewToPdf,
     printToFile,
+    progress,
+    uri,
   };
 };

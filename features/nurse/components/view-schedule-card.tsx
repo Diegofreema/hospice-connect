@@ -102,7 +102,7 @@ export const ViewShiftCard = ({
   };
 
   const isMine = shift.nurseId === nurseId;
-  const name = shift.nurseId ? `${shift?.nurse?.name} ` : 'no staff assigned';
+  const name = shift.nurseId ? `${shift?.nurse?.name} ` : 'No staff assigned';
   return (
     <Card style={styles.card}>
       <CardHeader style={{ gap: 10 }}>

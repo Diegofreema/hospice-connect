@@ -7,7 +7,7 @@ import { IconCamera, IconUpload } from '@tabler/icons-react-native';
 import { useMutation } from 'convex/react';
 import * as ImagePicker from 'expo-image-picker';
 import { usePathname } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Alert, TouchableOpacity, View } from 'react-native';
 import {
   changeFirstLetterToCapital,
@@ -65,26 +65,6 @@ export const ProfileCard = ({
   const updateImage = useMutation(api.nurses.updateNurseProfilePicture);
   const updateHospiceImage = useMutation(api.hospices.updateHospiceImage);
   const { showToast } = useToast();
-
-  // Handle pending image picker results after Android Activity restart
-  useEffect(() => {
-    const checkPendingResult = async () => {
-      try {
-        const result = await ImagePicker.getPendingResultAsync();
-        if (
-          result &&
-          'canceled' in result &&
-          !result.canceled &&
-          result.assets?.[0]?.uri
-        ) {
-          setImage(result.assets[0].uri);
-        }
-      } catch (error) {
-        console.error('Error getting pending image result:', error);
-      }
-    };
-    checkPendingResult();
-  }, []);
 
   const pickImage = async () => {
     try {

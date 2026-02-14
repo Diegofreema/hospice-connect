@@ -36,7 +36,7 @@ export function ApprovalActions({
       await onApprove();
       toast.success(`Profile update for ${name} approved successfully.`);
     } catch (error) {
-      toast.error(`Failed to approve profile update. Please try again.`);
+      console.log(error);
     } finally {
       setIsSubmitting(false);
     }
@@ -55,7 +55,7 @@ export function ApprovalActions({
       setShowRejectDialog(false);
       setRejectionReason('');
     } catch (error) {
-      toast.error(`Failed to reject profile update. Please try again.`);
+      console.log(error);
     } finally {
       setIsSubmitting(false);
     }

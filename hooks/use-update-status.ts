@@ -65,7 +65,7 @@ export const useUpdateUpdateStatus = ({
         const now = new Date();
 
         // Check if shift has ended (current time is past shift end)
-        // AND there's no staff assigned AND status is not already 'not_covered'
+        // AND there's No staff assigned AND status is not already 'not_covered'
         if (
           !nurseId &&
           status !== 'not_covered' &&

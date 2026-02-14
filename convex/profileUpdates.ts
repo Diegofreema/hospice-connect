@@ -1,6 +1,7 @@
 import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
-import { mutation, query } from './_generated/server';
+import { internal } from './_generated/api';
+import { internalMutation, mutation, query } from './_generated/server';
 import {
   getPendingHospiceAccountsUpdate,
   getPendingNurseAccountsUpdate,
@@ -84,8 +85,7 @@ export const getNurseUpdateDetails = query({
       'pendingNurseProfile',
       args.pendingProfileId,
     );
-    if (!pendingProfile)
-      throw new ConvexError({ message: 'Pending profile not found' });
+    if (!pendingProfile) return null;
 
     const currentProfile = await ctx.db.get('nurses', pendingProfile.nurseId);
     if (!currentProfile)
@@ -109,8 +109,7 @@ export const getHospiceUpdateDetails = query({
       'pendingHospiceProfile',
       args.pendingProfileId,
     );
-    if (!pendingProfile)
-      throw new ConvexError({ message: 'Pending profile not found' });
+    if (!pendingProfile) return null;
 
     const currentProfile = await ctx.db.get(
       'hospices',
@@ -153,9 +152,6 @@ export const approveNurseUpdate = mutation({
       dateOfBirth: pending.dateOfBirth,
     });
 
-    // Update pending profile status
-    await ctx.db.delete('pendingNurseProfile', args.pendingProfileId);
-
     await ctx.db.insert('nurseNotifications', {
       nurseId: pending.nurseId,
       type: 'normal',
@@ -165,6 +161,30 @@ export const approveNurseUpdate = mutation({
       viewCount: 0,
     });
     await handlePendingNurseAccountsUpdate(ctx, 'dec');
+
+    await ctx.scheduler.runAfter(
+      0,
+      internal.profileUpdates.onDeletePendingNurseProfile,
+      { pendingProfileId: args.pendingProfileId },
+    );
+  },
+});
+
+export const onDeletePendingNurseProfile = internalMutation({
+  args: {
+    pendingProfileId: v.id('pendingNurseProfile'),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.delete('pendingNurseProfile', args.pendingProfileId);
+  },
+});
+
+export const onDeletePendingHospiceProfile = internalMutation({
+  args: {
+    pendingProfileId: v.id('pendingHospiceProfile'),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.delete('pendingHospiceProfile', args.pendingProfileId);
   },
 });
 
@@ -188,8 +208,6 @@ export const rejectNurseUpdate = mutation({
     if (!pending)
       throw new ConvexError({ message: 'Pending profile not found' });
 
-    // Update pending profile status
-    await ctx.db.delete('pendingNurseProfile', args.pendingProfileId);
     await ctx.db.insert('nurseNotifications', {
       nurseId: pending.nurseId,
       type: 'normal',
@@ -199,6 +217,12 @@ export const rejectNurseUpdate = mutation({
       viewCount: 0,
     });
     await handlePendingNurseAccountsUpdate(ctx, 'dec');
+    // Update pending profile status
+    await ctx.scheduler.runAfter(
+      0,
+      internal.profileUpdates.onDeletePendingNurseProfile,
+      { pendingProfileId: args.pendingProfileId },
+    );
   },
 });
 
@@ -235,9 +259,6 @@ export const approveHospiceUpdate = mutation({
       faxNumber: pending.faxNumber,
     });
 
-    // Update pending profile status
-    await ctx.db.delete('pendingHospiceProfile', args.pendingProfileId);
-
     await ctx.db.insert('hospiceNotifications', {
       hospiceId: pending.hospiceId,
       type: 'admin',
@@ -247,6 +268,11 @@ export const approveHospiceUpdate = mutation({
       viewCount: 0,
     });
     await handlePendingHospiceAccountsUpdate(ctx, 'dec');
+    await ctx.scheduler.runAfter(
+      0,
+      internal.profileUpdates.onDeletePendingHospiceProfile,
+      { pendingProfileId: args.pendingProfileId },
+    );
   },
 });
 
@@ -267,9 +293,6 @@ export const rejectHospiceUpdate = mutation({
     if (!pending)
       throw new ConvexError({ message: 'Pending profile not found' });
 
-    // Update pending profile status
-    await ctx.db.delete('pendingHospiceProfile', args.pendingProfileId);
-
     await ctx.db.insert('hospiceNotifications', {
       hospiceId: pending.hospiceId,
       type: 'admin',
@@ -279,6 +302,11 @@ export const rejectHospiceUpdate = mutation({
       viewCount: 0,
     });
     await handlePendingHospiceAccountsUpdate(ctx, 'dec');
+    await ctx.scheduler.runAfter(
+      0,
+      internal.profileUpdates.onDeletePendingHospiceProfile,
+      { pendingProfileId: args.pendingProfileId },
+    );
   },
 });
 
