@@ -21,6 +21,7 @@ import { useQuery } from 'convex/react';
 import { useRouter } from 'expo-router';
 import { Activity, Bell, Send } from 'lucide-react-native';
 import { useState } from 'react';
+import { ActivityNotification } from '../types';
 import { ActivityNotificationDetails } from './activity-notification-detail';
 import { ActivityNotificationList } from './activity-notification-list';
 
@@ -36,7 +37,7 @@ export function Notifications() {
   const hasUnread = !!hasUnreadNotifications;
   const unreadCount = hasUnreadNotifications || 0;
   const [selectedActivityNotification, setSelectedActivityNotification] =
-    useState<any>(null);
+    useState<ActivityNotification | null>(null);
   const [isActivityDetailsOpen, setIsActivityDetailsOpen] = useState(false);
 
   const handleViewNotification = (messageId: string) => {

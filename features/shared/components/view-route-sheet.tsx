@@ -240,7 +240,7 @@ export const ViewRouteSheet = () => {
     <div class="signature-section">
       <img src="${
         data?.routeSheet.signature
-      }" class="signature-image" alt="Signature">
+      }" class="signature-image" alt="Signature" width="200" height="100">
        <p class="text-normal"><strong>Date:</strong> ${
          data?.routeSheet &&
          format(data?.routeSheet._creationTime, 'MM/dd/yy HH:mm')

@@ -110,7 +110,9 @@ export const getAdminNotifications = query({
         if (args.isRead === 'unread') return !adminNotification.isRead;
         return adminNotification.isRead;
       },
-    ).paginate(args.paginationOpts);
+    )
+      .order('desc')
+      .paginate(args.paginationOpts);
 
     const notificationsWithReceiver = await Promise.all(
       notifications.page.map(async (notification) => {

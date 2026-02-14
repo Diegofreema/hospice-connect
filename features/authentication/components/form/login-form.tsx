@@ -43,11 +43,9 @@ export const LoginForm = () => {
       email: data.email,
       password: data.password,
       fetchOptions: {
-        onSuccess: async ({ data }) => {
-          const { user } = data;
-
+        onSuccess: async () => {
           toast.success('Success', {
-            description: `Welcome back  ${user.name}`,
+            description: `Welcome back`,
             position: 'bottom-center',
           });
           reset();

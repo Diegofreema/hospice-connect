@@ -31,7 +31,9 @@ export const getAdminActivityNotifications = query({
         }
         return true;
       },
-    ).paginate(args.paginationOpts);
+    )
+      .order('desc')
+      .paginate(args.paginationOpts);
 
     const resultsWithProfile = await Promise.all(
       results.page.map(async (adminActivityNotification) => {

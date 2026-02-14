@@ -8,21 +8,10 @@ import {
 } from '@/components/web/ui/dialog';
 import { formatDistanceToNow } from 'date-fns';
 import { Clock, User } from 'lucide-react-native';
+import { ActivityNotification } from '../types';
 
 interface ActivityNotificationDetailsProps {
-  notification: {
-    _id: string;
-    activityType: string;
-    title: string;
-    description: string;
-    isRead: boolean;
-    createdAt: number;
-    triggerUser?: {
-      name?: string;
-      email?: string;
-    } | null;
-    metadata?: any;
-  } | null;
+  notification: ActivityNotification | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -63,7 +52,7 @@ export function ActivityNotificationDetails({
 }: ActivityNotificationDetailsProps) {
   if (!notification) return null;
 
-  const config = activityTypeConfig[notification.activityType] || {
+  const config = activityTypeConfig[notification.type] || {
     label: 'Activity',
     variant: 'outline' as const,
   };
@@ -92,9 +81,13 @@ export function ActivityNotificationDetails({
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium">Triggered by</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  {notification.triggerUser?.name ||
-                    notification.triggerUser?.email ||
-                    'Unknown user'}
+                  {notification.relatedEntity
+                    ? 'businessName' in notification.relatedEntity
+                      ? notification.relatedEntity.businessName
+                      : 'name' in notification.relatedEntity
+                        ? notification.relatedEntity.name
+                        : 'Unknown user'
+                    : 'Unknown user'}
                 </p>
               </div>
             </div>
@@ -105,7 +98,7 @@ export function ActivityNotificationDetails({
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium">Time</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  {formatDistanceToNow(new Date(notification.createdAt), {
+                  {formatDistanceToNow(new Date(notification._creationTime), {
                     addSuffix: true,
                   })}
                 </p>

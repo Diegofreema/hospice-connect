@@ -370,7 +370,7 @@ export const approveOrDeclineRouteSheet = mutation({
       await handleUnSubmittedRouteSheetsCount(ctx, 'inc');
     } else {
       await handleUnApprovedSubmittedRouteSheets(ctx, 'dec');
-      await handleUnSubmittedRouteSheetsCount(ctx, 'dec');
+
       await ctx.db.patch('routeSheets', args.routeSheetId, {
         isApproved: true,
       });

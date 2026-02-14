@@ -111,9 +111,8 @@ export function ActivityNotificationRow({
 
   return (
     <div
-      onClick={onClick}
       className={cn(
-        'flex items-start gap-4 p-4 border-b hover:bg-muted/50 transition-colors cursor-pointer',
+        'flex items-start gap-4 p-4 border-b hover:bg-muted/50 transition-colors',
         !notification.isRead && 'bg-muted/30',
       )}
     >
@@ -164,13 +163,14 @@ export function ActivityNotificationRow({
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </Button>
         )}
+
         <Button
           variant="ghost"
           size="sm"
           onClick={handleDelete}
           title="Delete notification"
         >
-          <Trash2 className="h-4 w-4 text-muted-foreground hover:text-red-600" />
+          <Trash2 className="h-4 w-4 text-red-600" />
         </Button>
       </div>
     </div>

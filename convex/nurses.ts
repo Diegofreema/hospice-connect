@@ -10,11 +10,10 @@ import {
   type QueryCtx,
 } from './_generated/server';
 import {
-  handleApproveHospiceCount,
-  handleApproveNurseCount,
   handleNurseCount,
   handlePendingNurseAccountsUpdate,
   handlePendingNurseApprovalCount,
+  updateCount,
 } from './counter';
 import {
   checkDurationOfNotSubmittedAssignment,
@@ -83,8 +82,7 @@ export const createNurse = mutation({
 export const updateCountPending = internalMutation({
   args: {},
   handler: async (ctx, args) => {
-    await handleApproveNurseCount(ctx, 'inc');
-    await handleApproveHospiceCount(ctx, 'dec');
+    await updateCount(ctx);
   },
 });
 
@@ -209,6 +207,7 @@ export const editNurse = mutation({
     nurseId: v.id('nurses'),
     zipCode: v.optional(v.string()),
     dateOfBirth: v.optional(v.string()),
+    adminApproval: v.boolean(),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -228,24 +227,26 @@ export const editNurse = mutation({
       zipCode: args.zipCode,
     });
 
-    await ctx.db.insert('pendingNurseProfile', {
-      firstName: args.firstName,
-      lastName: args.lastName,
-      licenseNumber: args.licenseNumber,
-      stateOfRegistration: args.stateOfRegistration,
-      discipline: args.discipline,
-      isApproved: false,
-      nurseId: args.nurseId,
-      dateOfBirth: args.dateOfBirth,
-    });
-    await ctx.db.insert('adminActivityNotifications', {
-      description: `New Nurse Profile Update Request from ${nurse.name}`,
-      type: 'nurse',
-      isRead: false,
-      title: 'New Nurse Profile Update Request',
-      nurseId: args.nurseId,
-    });
-    await handlePendingNurseAccountsUpdate(ctx, 'inc');
+    if (args.adminApproval) {
+      await ctx.db.insert('pendingNurseProfile', {
+        firstName: args.firstName,
+        lastName: args.lastName,
+        licenseNumber: args.licenseNumber,
+        stateOfRegistration: args.stateOfRegistration,
+        discipline: args.discipline,
+        isApproved: false,
+        nurseId: args.nurseId,
+        dateOfBirth: args.dateOfBirth,
+      });
+      await ctx.db.insert('adminActivityNotifications', {
+        description: `New Nurse Profile Update Request from ${nurse.name}`,
+        type: 'nurse',
+        isRead: false,
+        title: 'New Nurse Profile Update Request',
+        nurseId: args.nurseId,
+      });
+      await handlePendingNurseAccountsUpdate(ctx, 'inc');
+    }
   },
 });
 

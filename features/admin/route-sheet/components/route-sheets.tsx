@@ -187,6 +187,7 @@ export function RouteSheets() {
                   <TableHeader>
                     <TableRow className="font-bold">
                       <TableHead className="font-bold">S/N</TableHead>
+                      <TableHead className="font-bold">Hospice</TableHead>
                       <TableHead className="font-bold">Nurse Name</TableHead>
                       <TableHead className="font-bold">Email</TableHead>
                       <TableHead className="font-bold">Discipline</TableHead>
@@ -210,6 +211,9 @@ export function RouteSheets() {
                     {unSubmittedSheets?.map((sheet, index) => (
                       <TableRow key={sheet._id}>
                         <TableCell>{index + 1}</TableCell>
+                        <TableCell className="font-medium">
+                          {sheet.hospice.businessName}
+                        </TableCell>
                         <TableCell className="font-medium">
                           {sheet.nurse.name}
                         </TableCell>

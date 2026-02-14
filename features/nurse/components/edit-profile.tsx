@@ -57,6 +57,13 @@ export const EditProfile = () => {
     if (!nurse) return;
 
     try {
+      const fieldsChanged =
+        data.firstName !== nurse?.name.split(' ')[0] ||
+        data.lastName !== nurse?.name.split(' ')[1] ||
+        data.discipline !== nurse?.discipline ||
+        data.email !== nurse.email ||
+        data.licenseState !== nurse.stateOfRegistration ||
+        format(data.dateOfBirth || new Date(), 'PPP') !== nurse.dateOfBirth;
       await updateNurse({
         nurseId: nurse?._id,
         address: data.address?.trim(),
@@ -69,14 +76,8 @@ export const EditProfile = () => {
         licenseNumber: data.licenseNumber.trim(),
         zipCode: data.zipCode,
         dateOfBirth: format(data?.dateOfBirth || new Date(), 'PPP'),
+        adminApproval: fieldsChanged,
       });
-      const fieldsChanged =
-        data.firstName !== nurse?.name.split(' ')[0] ||
-        data.lastName !== nurse?.name.split(' ')[1] ||
-        data.discipline !== nurse?.discipline ||
-        data.email !== nurse.email ||
-        data.licenseState !== nurse.stateOfRegistration ||
-        format(data.dateOfBirth || new Date(), 'PPP') !== nurse.dateOfBirth;
 
       if (
         data.firstName !== nurse?.name.split(' ')[0] ||

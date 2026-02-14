@@ -1,6 +1,8 @@
+import { filter } from 'convex-helpers/server/filter';
 import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
-import { mutation, query } from './_generated/server';
+import { Id } from './_generated/dataModel';
+import { mutation, query, QueryCtx } from './_generated/server';
 import {
   getSuspendedNursesCount,
   getUnApprovedSubmittedRouteSheetCount,
@@ -155,19 +157,20 @@ export const getUnSubmittedRouteSheets = query({
       });
     }
 
-    const completedAndNotSubmittedAssignments = await ctx.db
-      .query('nurseAssignments')
-      .filter((q) =>
-        q.and(
-          q.eq(q.field('isCompleted'), true),
-          q.neq(q.field('isSubmitted'), false),
-        ),
-      )
-      .paginate(args.paginationOpts);
+    const completedAndNotSubmittedAssignments = await filter(
+      ctx.db.query('nurseAssignments'),
+      (nurseAssignment) =>
+        nurseAssignment.isCompleted && !nurseAssignment.isSubmitted,
+    ).paginate(args.paginationOpts);
 
-    const completedAndNotSubmittedAssignmentsWithNurses =
-      completedAndNotSubmittedAssignments.page.map(async (c) => {
+    const sortByCompletedAt = completedAndNotSubmittedAssignments.page.sort(
+      (a, b) => (b.completedAt || 0) - (a.completedAt || 0),
+    );
+
+    const completedAndNotSubmittedAssignmentsWithNurses = sortByCompletedAt.map(
+      async (c) => {
         const nurse = await ctx.db.get('nurses', c.nurseId);
+        const hospice = await getHospiceByAssignmentId(ctx, c.assignmentId);
         if (!nurse) {
           throw new ConvexError({
             message: 'Nurse not found',
@@ -176,8 +179,10 @@ export const getUnSubmittedRouteSheets = query({
         return {
           ...c,
           nurse,
+          hospice,
         };
-      });
+      },
+    );
 
     return {
       ...completedAndNotSubmittedAssignments,
@@ -197,11 +202,10 @@ export const getUnApprovedSubmittedRouteSheets = query({
       });
     }
 
-    const unApprovedRouteSheets = await ctx.db
-      .query('routeSheets')
-      .withIndex('approved', (q) => q.eq('isApproved', false))
-      .filter((q) => q.eq(q.field('isDeclined'), false))
-      .paginate(args.paginationOpts);
+    const unApprovedRouteSheets = await filter(
+      ctx.db.query('routeSheets'),
+      (routeSheet) => !routeSheet.isApproved && !routeSheet.isDeclined,
+    ).paginate(args.paginationOpts);
 
     const unApprovedRouteSheetsWithNursesAndHospices =
       unApprovedRouteSheets.page.map(async (c) => {
@@ -251,3 +255,24 @@ export const getRouteSheetStats = query({
     };
   },
 });
+
+// helper
+
+const getHospiceByAssignmentId = async (
+  ctx: QueryCtx,
+  assignmentId: Id<'assignments'>,
+) => {
+  const assignment = await ctx.db.get('assignments', assignmentId);
+  if (!assignment) {
+    throw new ConvexError({
+      message: 'Assignment not found',
+    });
+  }
+  const hospice = await ctx.db.get('hospices', assignment.hospiceId);
+  if (!hospice) {
+    throw new ConvexError({
+      message: 'Hospice not found',
+    });
+  }
+  return hospice;
+};

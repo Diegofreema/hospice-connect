@@ -6,6 +6,7 @@ import { Button } from '@/components/web/ui/button';
 import { Loader2 } from 'lucide-react-native';
 import { toast } from 'sonner-native';
 import { Loader } from '../../shared/loader';
+import { ActivityNotification } from '../types';
 import { ActivityNotificationFilters } from './activity-notification-filters';
 import { ActivityNotificationRow } from './activity-notification-row';
 
@@ -19,7 +20,7 @@ type ActivityType =
 type ReadStatus = 'all' | 'read' | 'unread';
 
 interface ActivityNotificationListProps {
-  onNotificationClick?: (notification: any) => void;
+  onNotificationClick?: (notification: ActivityNotification) => void;
 }
 
 export function ActivityNotificationList({

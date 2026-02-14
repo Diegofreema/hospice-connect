@@ -154,7 +154,7 @@ export const approveNurseUpdate = mutation({
 
     await ctx.db.insert('nurseNotifications', {
       nurseId: pending.nurseId,
-      type: 'normal',
+      type: 'admin',
       title: 'Profile Update Approved',
       description: `Your profile update has been approved.`,
       isRead: false,
@@ -210,7 +210,7 @@ export const rejectNurseUpdate = mutation({
 
     await ctx.db.insert('nurseNotifications', {
       nurseId: pending.nurseId,
-      type: 'normal',
+      type: 'admin',
       title: 'Profile Update Rejected',
       description: `Your profile update has been rejected. Reason: ${args.reason}`,
       isRead: false,
