@@ -73,8 +73,15 @@ export const approveHospice = mutation({
         message: 'Hospice not found',
       });
     }
+
+    // If hospice was previously rejected, decrease rejected count
+    if (hospice.status === 'rejected') {
+      await handleRejectedHospiceCount(ctx, 'dec');
+    }
+
     await ctx.db.patch(args.pendingProfileId, {
       status: 'approved',
+      rejectedReason: undefined,
     });
     await handlePendingHospiceApprovalCount(ctx, 'dec');
     await handleApproveHospiceCount(ctx, 'inc');
@@ -83,7 +90,7 @@ export const approveHospice = mutation({
 
 // Reject hospice
 export const rejectHospice = mutation({
-  args: { pendingProfileId: v.id('hospices') },
+  args: { pendingProfileId: v.id('hospices'), rejectedReason: v.string() },
   handler: async (ctx, args) => {
     const user = await getUserHelperFn(ctx);
     if (user?.role !== 'admin' && user?.role !== 'super_admin') {
@@ -99,6 +106,7 @@ export const rejectHospice = mutation({
     }
     await ctx.db.patch(args.pendingProfileId, {
       status: 'rejected',
+      rejectedReason: args.rejectedReason,
     });
     await handlePendingHospiceApprovalCount(ctx, 'dec');
     await handleRejectedHospiceCount(ctx, 'inc');

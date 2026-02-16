@@ -200,18 +200,18 @@ export const ViewRouteSheet = () => {
              .map(
                (shift) => `
         <tr>
-          <td> ${shift?.startDate} - ${shift?.endDate}</td>
+          <td> ${reverseDateStringToMDY(shift?.startDate)} - ${reverseDateStringToMDY(shift?.endDate)}</td>
           <td>${data?.assignment.patientFirstName} ${
             data?.assignment.patientLastName
           }</td>
           <td>${data?.assignment.careLevel}</td>
-          <td>${reverseDateStringToMDY(shift.startTime)}</td>
-          <td>${reverseDateStringToMDY(shift.endTime)}</td>
+          <td>${shift.startTime}</td>
+          <td>${shift.endTime}</td>
           <td>${calculateTotalHours([shift]).toFixed(2)}</td>
-          <td>${data?.assignment.rate.toFixed(2)}</td>
-          <td>$${(
-            calculateTotalHours([shift]) * data?.assignment.rate || 0
-          ).toFixed(2)}</td>
+          <td>${shift.rate.toFixed(2)}</td>
+          <td>$${(calculateTotalHours([shift]) * shift.rate || 0).toFixed(
+            2,
+          )}</td>
         </tr>
       `,
              )
@@ -261,16 +261,19 @@ export const ViewRouteSheet = () => {
     useDownloadOrPrint({
       htmlContent,
     });
+
   if (data === undefined) {
     return <SmallLoader size={50} />;
   }
   const { assignment, nurse, routeSheet, schedules } = data;
+
   const onDownload = async () => {
     await exportViewToPdf();
   };
   const onPrint = async () => {
     await printToFile();
   };
+
   const hasSubmitted = !!routeSheet?._id;
   console.log(uri);
 

@@ -228,26 +228,30 @@ export function calculateTotalHours(shifts: Doc<'schedules'>[]) {
     const startDateObj = parse(shift.startDate, 'dd-MM-yyyy', new Date());
     const startParts = convertTimeStringToDate2(shift.startTime);
     startDateObj.setHours(startParts.hours, startParts.minutes, 0, 0);
-    // Check if shift times were edited
-    if (shift.isEdited) {
-      const endDateObj = parse(shift.endDate, 'dd-MM-yyyy', new Date());
-      const endParts = convertTimeStringToDate2(shift.endTime);
-      endDateObj.setHours(endParts.hours, endParts.minutes, 0, 0);
-      let hours = (endDateObj.getTime() - startDateObj.getTime()) / 3600000;
-      if (hours < 0) {
-        hours += 24;
-      }
-      totalHours += hours;
-      continue;
-    }
 
-    // Check for cancellation first (applies to all shifts, edited or not)
+    // Check for cancellation
     if (shift.canceledAt) {
       const canceledDate = new Date(shift.canceledAt);
+
+      // If shift was edited, calculate based on start and end time even if canceled
+      if (shift.isEdited) {
+        const endDateObj = parse(shift.endDate, 'dd-MM-yyyy', new Date());
+        const endParts = convertTimeStringToDate2(shift.endTime);
+        endDateObj.setHours(endParts.hours, endParts.minutes, 0, 0);
+
+        let hours = (endDateObj.getTime() - startDateObj.getTime()) / 3600000;
+        if (hours < 0) {
+          hours += 24;
+        }
+        totalHours += hours;
+        continue;
+      }
+
       // If canceled before or at shift start, no hours worked
       if (canceledDate.getTime() <= startDateObj.getTime()) {
         continue;
       }
+
       // Calculate hours from start to cancellation
       const diff = (canceledDate.getTime() - startDateObj.getTime()) / 3600000;
       totalHours += diff;
@@ -265,6 +269,19 @@ export function calculateTotalHours(shifts: Doc<'schedules'>[]) {
       const diff =
         (reassignedDate.getTime() - startDateObj.getTime()) / 3600000;
       totalHours += diff;
+      continue;
+    }
+
+    // Check if shift times were edited
+    if (shift.isEdited) {
+      const endDateObj = parse(shift.endDate, 'dd-MM-yyyy', new Date());
+      const endParts = convertTimeStringToDate2(shift.endTime);
+      endDateObj.setHours(endParts.hours, endParts.minutes, 0, 0);
+      let hours = (endDateObj.getTime() - startDateObj.getTime()) / 3600000;
+      if (hours < 0) {
+        hours += 24;
+      }
+      totalHours += hours;
       continue;
     }
 

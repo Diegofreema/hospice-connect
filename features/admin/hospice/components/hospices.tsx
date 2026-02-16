@@ -131,7 +131,7 @@ export function Hospices() {
       )}
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-5">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -177,6 +177,18 @@ export function Hospices() {
           <CardContent>
             <div className="text-2xl font-bold">
               {hospiceStats.pendingHospices}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Rejected
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {hospiceStats.rejectedHospices}
             </div>
           </CardContent>
         </Card>
@@ -311,15 +323,15 @@ export function Hospices() {
                               }
                             >
                               {hospice.status === 'suspended' ? (
-                                <Building2Check className="h-4 w-4" />
+                                <Building2Check className="h-4 w-4 text-white" />
                               ) : (
-                                <Building2 className="h-4 w-4" />
+                                <Building2 className="h-4 w-4 text-white" />
                               )}
                             </Button>
                           </ActionDialog>
                         ) : (
                           <Button className=" cursor-not-allowed" disabled>
-                            <Building2 className="h-4 w-4" />
+                            <Building2 className="h-4 w-4 text-white" />
                           </Button>
                         )}
                       </div>

@@ -95,8 +95,15 @@ export const approveNurse = mutation({
         message: 'Nurse not found',
       });
     }
+
+    // If nurse was previously rejected, decrease rejected count
+    if (nurse.status === 'rejected') {
+      await handleRejectedNurseCount(ctx, 'dec');
+    }
+
     await ctx.db.patch(args.pendingProfileId, {
       status: 'approved',
+      rejectedReason: undefined,
     });
     await handlePendingNurseApprovalCount(ctx, 'dec');
     await handleApproveNurseCount(ctx, 'inc');
@@ -105,7 +112,7 @@ export const approveNurse = mutation({
 
 // Reject nurse
 export const rejectNurse = mutation({
-  args: { pendingProfileId: v.id('nurses') },
+  args: { pendingProfileId: v.id('nurses'), rejectedReason: v.string() },
   handler: async (ctx, args) => {
     const user = await getUserHelperFn(ctx);
     if (user?.role !== 'admin' && user?.role !== 'super_admin') {
@@ -122,6 +129,7 @@ export const rejectNurse = mutation({
     }
     await ctx.db.patch(args.pendingProfileId, {
       status: 'rejected',
+      rejectedReason: args.rejectedReason,
     });
     await handlePendingNurseApprovalCount(ctx, 'dec');
     await handleRejectedNurseCount(ctx, 'inc');

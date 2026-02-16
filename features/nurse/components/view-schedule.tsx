@@ -4,9 +4,9 @@ import { useSelectAssignment } from '@/features/hospice/hooks/use-select-assignm
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { useQuery } from 'convex/react';
+import { type FunctionReturnType } from 'convex/server';
 import React from 'react';
 import { ViewShiftCard } from './view-schedule-card';
-import { type FunctionReturnType } from 'convex/server';
 
 type Props = {
   onClose: () => void;
@@ -33,11 +33,24 @@ export const ViewSchedule = ({
   }
   if (data === null) return null;
 
+  // Sort shifts so canceled ones appear at the bottom
+  const sortedData = [...(data as DataType)].sort((a, b) => {
+    // If both are canceled or both are not canceled, maintain original order
+    if (a.status === 'cancelled' && b.status === 'cancelled') return 0;
+    if (a.status !== 'cancelled' && b.status !== 'cancelled') return 0;
+
+    // Move canceled shifts to the bottom
+    if (a.status === 'cancelled') return 1;
+    if (b.status === 'cancelled') return -1;
+
+    return 0;
+  });
+
   const onAcceptSchedule = () => {};
   return (
     <BottomSheetFlatList
       showsVerticalScrollIndicator={false}
-      data={data as DataType}
+      data={sortedData}
       renderItem={({ item }: { item: DataType[number] }) => (
         <ViewShiftCard
           shift={item}

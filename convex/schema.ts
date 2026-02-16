@@ -77,6 +77,7 @@ export const Nurse = {
     v.literal('rejected'),
     v.literal('suspended'),
   ),
+  rejectedReason: v.optional(v.string()),
 };
 const PendingNurse = {
   firstName: v.string(),
@@ -114,6 +115,7 @@ export const Hospice = {
     v.literal('suspended'),
   ),
   imageId: v.optional(v.id('_storage')),
+  rejectedReason: v.optional(v.string()),
 };
 const PendingHospice = {
   address: v.string(),

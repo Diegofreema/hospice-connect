@@ -143,7 +143,7 @@ export function Nurses() {
       )}
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-5">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -182,6 +182,16 @@ export function Nurses() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.pendingNurses}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Rejected
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.rejectedNurses}</div>
           </CardContent>
         </Card>
       </div>
@@ -346,9 +356,9 @@ export function Nurses() {
                                 }
                               >
                                 {nurse.status === 'suspended' ? (
-                                  <UserCheck className="h-4 w-4" />
+                                  <UserCheck className="h-4 w-4 text-white" />
                                 ) : (
-                                  <UserX className="h-4 w-4" />
+                                  <UserX className="h-4 w-4 text-white" />
                                 )}
                               </Button>
                             </ActionDialog>
