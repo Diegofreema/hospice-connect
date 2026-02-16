@@ -73,6 +73,13 @@ export const createNurse = mutation({
 
       await handlePendingNurseApprovalCount(ctx, 'inc');
       await handleNurseCount(ctx, 'inc');
+      await ctx.db.insert('adminActivityNotifications', {
+        description: `${identity.name} has created a new nurse account`,
+        type: 'nurse',
+        isRead: false,
+        title: 'New Nurse account created',
+        nurseId: nurseId,
+      });
     } catch (error: any) {
       throw new ConvexError({ message: error.message });
     }

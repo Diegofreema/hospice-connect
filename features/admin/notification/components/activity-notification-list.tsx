@@ -7,7 +7,6 @@ import { Loader2 } from 'lucide-react-native';
 import { toast } from 'sonner-native';
 import { Loader } from '../../shared/loader';
 import { ActivityNotification } from '../types';
-import { ActivityNotificationFilters } from './activity-notification-filters';
 import { ActivityNotificationRow } from './activity-notification-row';
 
 type ActivityType =
@@ -28,7 +27,7 @@ export function ActivityNotificationList({
 }: ActivityNotificationListProps) {
   const [activityType, setActivityType] = useState<ActivityType>('all');
   const [isRead, setIsRead] = useState<ReadStatus>('all');
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<boolean>(false);
   const markAllAsRead = useMutation(
     api.adminActivityNotifications.markAllActivityNotificationsAsRead,
   );
@@ -49,12 +48,7 @@ export function ActivityNotificationList({
 
   const handleDelete = useCallback(
     async (notificationId: string) => {
-      if (
-        !confirm('Are you sure you want to delete this activity notification?')
-      )
-        return;
-
-      setDeletingId(notificationId);
+      setDeleting(true);
       try {
         await deleteNotification({ notificationId: notificationId as any });
         toast('Success', {
@@ -65,7 +59,7 @@ export function ActivityNotificationList({
           description: 'Failed to delete activity notification',
         });
       } finally {
-        setDeletingId(null);
+        setDeleting(false);
       }
     },
     [deleteNotification, toast],
@@ -129,14 +123,14 @@ export function ActivityNotificationList({
 
   return (
     <div className="border rounded-lg">
-      <ActivityNotificationFilters
+      {/* <ActivityNotificationFilters
         activityType={activityType}
         isRead={isRead}
         onActivityTypeChange={(type) => setActivityType(type as ActivityType)}
         onIsReadChange={(status) => setIsRead(status as ReadStatus)}
         hasActiveFilters={hasActiveFilters}
         onClearFilters={handleClearFilters}
-      />
+      /> */}
 
       {/* Notifications List */}
       <div className="divide-y">

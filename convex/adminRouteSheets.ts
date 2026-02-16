@@ -49,7 +49,7 @@ export const suspendNurseFromShifts = mutation({
       title: 'Account Suspended',
       description:
         'Please submit your outstanding Route Sheet(s) to reactivate your account',
-      type: 'normal',
+      type: 'admin',
       viewCount: 0,
       isRead: false,
     });
@@ -88,7 +88,7 @@ export const reactivateNurse = mutation({
       nurseId: args.nurseId,
       title: 'Account Reactivated',
       description: 'Your account has been reactivated',
-      type: 'normal',
+      type: 'admin',
       viewCount: 0,
       isRead: false,
     });

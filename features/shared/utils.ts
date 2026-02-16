@@ -228,8 +228,8 @@ export function calculateTotalHours(shifts: Doc<'schedules'>[]) {
     const startDateObj = parse(shift.startDate, 'dd-MM-yyyy', new Date());
     const startParts = convertTimeStringToDate2(shift.startTime);
     startDateObj.setHours(startParts.hours, startParts.minutes, 0, 0);
-
-    if (shift.isTimeEdited) {
+    // Check if shift times were edited
+    if (shift.isEdited) {
       const endDateObj = parse(shift.endDate, 'dd-MM-yyyy', new Date());
       const endParts = convertTimeStringToDate2(shift.endTime);
       endDateObj.setHours(endParts.hours, endParts.minutes, 0, 0);
@@ -241,26 +241,34 @@ export function calculateTotalHours(shifts: Doc<'schedules'>[]) {
       continue;
     }
 
+    // Check for cancellation first (applies to all shifts, edited or not)
     if (shift.canceledAt) {
       const canceledDate = new Date(shift.canceledAt);
+      // If canceled before or at shift start, no hours worked
       if (canceledDate.getTime() <= startDateObj.getTime()) {
         continue;
       }
+      // Calculate hours from start to cancellation
       const diff = (canceledDate.getTime() - startDateObj.getTime()) / 3600000;
-      totalHours += diff < 0 ? 0 : diff;
-      continue;
-    }
-    if (shift.reassignedAt) {
-      const reassignedDate = new Date(shift.reassignedAt);
-      if (reassignedDate.getTime() <= startDateObj.getTime()) {
-        continue;
-      }
-      const diff =
-        (reassignedDate.getTime() - startDateObj.getTime()) / 3600000;
-      totalHours += diff < 0 ? 0 : diff;
+      totalHours += diff;
       continue;
     }
 
+    // Check for reassignment (applies to all shifts, edited or not)
+    if (shift.reassignedAt) {
+      const reassignedDate = new Date(shift.reassignedAt);
+      // If reassigned before or at shift start, no hours worked
+      if (reassignedDate.getTime() <= startDateObj.getTime()) {
+        continue;
+      }
+      // Calculate hours from start to reassignment
+      const diff =
+        (reassignedDate.getTime() - startDateObj.getTime()) / 3600000;
+      totalHours += diff;
+      continue;
+    }
+
+    // Default calculation for non-edited, non-terminated shifts
     const endDateObj = parse(shift.endDate, 'dd-MM-yyyy', new Date());
     const endParts = convertTimeStringToDate2(shift.endTime);
     endDateObj.setHours(endParts.hours, endParts.minutes, 0, 0);

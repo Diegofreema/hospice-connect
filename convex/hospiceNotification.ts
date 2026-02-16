@@ -12,7 +12,7 @@ export const unreadMessagesCount = query({
     const notifications = await ctx.db
       .query('hospiceNotifications')
       .withIndex('by_hospice_id', (q) =>
-        q.eq('hospiceId', hospiceId).eq('isRead', false)
+        q.eq('hospiceId', hospiceId).eq('isRead', false),
       )
       .filter((q) => q.lt(q.field('viewCount'), 1))
       .collect();
@@ -41,7 +41,7 @@ export const getNotifications = query({
           ...notification,
           nurse,
         };
-      })
+      }),
     );
     return {
       ...notifications,
@@ -87,7 +87,7 @@ export const markNotificationAsRead = mutation({
     const notifications = await ctx.db
       .query('hospiceNotifications')
       .withIndex('by_hospice_id', (q) =>
-        q.eq('hospiceId', hospice._id).eq('isRead', false)
+        q.eq('hospiceId', hospice._id).eq('isRead', false),
       )
       .collect();
     if (notifications.length === 0) {
@@ -147,7 +147,7 @@ export const cancelShiftNotification = mutation({
       title: `${nurse.name} (${
         nurse.discipline
       }) submitted cancel request for ${formatDate(
-        shift.startDate
+        shift.startDate,
       )} to ${formatDate(shift.endDate)}: ${shift.startTime}-${shift.endTime}`,
       viewCount: 0,
     });
@@ -207,8 +207,8 @@ export const sendCaseRequestNotification = mutation({
             q.eq(q.field('type'), 'case_request'),
             q.eq(q.field('scheduleId'), scheduleId),
 
-            q.neq(q.field('status'), 'declined')
-          )
+            q.neq(q.field('status'), 'declined'),
+          ),
         )
         .first();
 
@@ -221,15 +221,13 @@ export const sendCaseRequestNotification = mutation({
         hospiceId: assignment.hospiceId,
         nurseId: nurse._id,
         type: 'case_request',
-        description: '',
-        scheduleId: scheduleId,
-        title: `${nurse.name} (${
-          nurse.discipline
-        }) has submitted a case request for ${formatDate(
-          shift.startDate
+        description: `has submitted a case request for ${formatDate(
+          shift.startDate,
         )} to ${formatDate(shift.endDate)}: ${shift.startTime}-${
           shift.endTime
         }`,
+        scheduleId: scheduleId,
+        title: `${nurse.name} (${nurse.discipline}) `,
         viewCount: 0,
       });
     }

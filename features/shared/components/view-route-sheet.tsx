@@ -7,7 +7,7 @@ import React from 'react';
 import { ScrollView } from 'react-native';
 import * as Progress from 'react-native-progress';
 import { useDownloadOrPrint } from '../hooks/use-download';
-import { calculateTotalHours } from '../utils';
+import { calculateTotalHours, reverseDateStringToMDY } from '../utils';
 import { RoustSheetComponent } from './route-sheet-component';
 import { SmallLoader } from './small-loader';
 export const ViewRouteSheet = () => {
@@ -205,8 +205,8 @@ export const ViewRouteSheet = () => {
             data?.assignment.patientLastName
           }</td>
           <td>${data?.assignment.careLevel}</td>
-          <td>${shift.startTime}</td>
-          <td>${shift.endTime}</td>
+          <td>${reverseDateStringToMDY(shift.startTime)}</td>
+          <td>${reverseDateStringToMDY(shift.endTime)}</td>
           <td>${calculateTotalHours([shift]).toFixed(2)}</td>
           <td>${data?.assignment.rate.toFixed(2)}</td>
           <td>$${(

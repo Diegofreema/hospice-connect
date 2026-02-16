@@ -6,10 +6,11 @@ import { mutation, query } from './_generated/server';
 import { getUserHelperFn } from './helper';
 
 // Get paginated admin activity notifications from user actions
+
 export const getAdminActivityNotifications = query({
   args: {
     paginationOpts: paginationOptsValidator,
-
+    activityType: v.optional(v.union(v.literal('nurse'), v.literal('hospice'))),
     isRead: v.optional(
       v.union(v.literal('all'), v.literal('read'), v.literal('unread')),
     ),

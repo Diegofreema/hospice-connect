@@ -24,7 +24,7 @@ export const createHospice = mutation({
       throw new ConvexError({ message: 'Unauthorized' });
     }
 
-    await ctx.db.insert('hospices', {
+    const hospiceId = await ctx.db.insert('hospices', {
       address: args.address,
       businessName: args.businessName,
       licenseNumber: args.licenseNumber,
@@ -38,6 +38,13 @@ export const createHospice = mutation({
     });
     await handleHospiceCount(ctx, 'inc');
     await handlePendingHospiceApprovalCount(ctx, 'inc');
+    await ctx.db.insert('adminActivityNotifications', {
+      description: `${args.businessName} has created a new hospice account`,
+      type: 'hospice',
+      isRead: false,
+      title: 'New Hospice account created',
+      hospiceId: hospiceId,
+    });
   },
 });
 

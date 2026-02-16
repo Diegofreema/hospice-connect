@@ -1,7 +1,17 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/web/ui/alert-dialog';
 import { Button } from '@/components/web/ui/button';
 import { api } from '@/convex/_generated/api';
 import { cn } from '@/lib/utils';
@@ -62,6 +72,8 @@ export function ActivityNotificationRow({
   onMarkRead,
   onClick,
 }: ActivityNotificationRowProps) {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
   // Derive visual config based on title and type
   const getConfigKey = () => {
     const title = notification.title.toLowerCase();
@@ -85,9 +97,14 @@ export function ActivityNotificationRow({
     color: 'text-gray-600',
   };
 
-  const handleDelete = (e: React.MouseEvent) => {
+  const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    setShowDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = () => {
     onDelete(notification._id);
+    setShowDeleteDialog(false);
   };
 
   const handleMarkRead = (e: React.MouseEvent) => {
@@ -167,12 +184,34 @@ export function ActivityNotificationRow({
         <Button
           variant="ghost"
           size="sm"
-          onClick={handleDelete}
+          onClick={handleDeleteClick}
           title="Delete notification"
         >
           <Trash2 className="h-4 w-4 text-red-600" />
         </Button>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Notification</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this activity notification? This
+              action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

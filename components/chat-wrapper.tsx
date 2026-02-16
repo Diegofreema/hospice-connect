@@ -1,4 +1,5 @@
 import { chatApiKey } from '@/chat-config';
+import { LoadingComponent } from '@/features/shared/components/loading';
 import { useUnread } from '@/features/shared/hooks/use-unread';
 import axios from 'axios';
 import { type PropsWithChildren, useCallback, useEffect } from 'react';
@@ -19,53 +20,7 @@ export const ChatWrapper = ({ children }: PropsWithChildren) => {
 
     return response.token;
   }, [user]);
-  // useEffect(() => {
-  //   // Skip if user is not authenticated
-  //   if (!user?.id || !user?.name || !user?.streamToken) {
-  //     return;
-  //   }
 
-  //   /**
-  //    * Connect the current user to Stream Chat using their ID and token
-  //    */
-  //   const connectUser = async () => {
-  //     try {
-  //       await client.connectUser(
-  //         {
-  //           id: user.id,
-  //           name: user.name,
-  //         },
-  //         user.streamToken
-  //       );
-  //       setIsReady(true);
-  //     } catch (err) {
-  //       const { data: response } = await axios.post(
-  //         `https://hospice-connect-web.vercel.app/api/token`,
-  //         {
-  //           name: user?.name,
-  //           email: user?.email,
-  //           id: user?.id,
-  //         }
-  //       );
-
-  //       await authClient.updateUser({
-  //         streamToken: response.token,
-  //       });
-  //       console.log('connectUser error', err);
-  //     }
-  //   };
-
-  //   connectUser();
-
-  //   // Cleanup function to disconnect user when component unmounts
-  //   // or when authentication state changes
-  //   return () => {
-  //     if (isReady) {
-  //       client.disconnectUser();
-  //     }
-  //     setIsReady(false);
-  //   };
-  // }, [user?.id, user?.name, user?.streamToken, isReady, user?.email]);
   const setUnreadCount = useUnread((state) => state.setUnread);
 
   const client = useCreateChatClient({
@@ -113,9 +68,13 @@ export const ChatWrapper = ({ children }: PropsWithChildren) => {
     },
   };
 
+  if (!client) {
+    return <LoadingComponent />;
+  }
+
   return (
     <OverlayProvider value={{ style: chatTheme }}>
-      {client ? <Chat client={client}>{children}</Chat> : children}
+      <Chat client={client}>{children}</Chat>
     </OverlayProvider>
   );
 };
