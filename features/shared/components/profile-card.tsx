@@ -9,7 +9,7 @@ import { useMutation } from 'convex/react';
 import * as ImagePicker from 'expo-image-picker';
 import { usePathname } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, Platform, TouchableOpacity, View } from 'react-native';
+import { Platform, TouchableOpacity, View } from 'react-native';
 import {
   changeFirstLetterToCapital,
   formatPhoneNumber,
@@ -108,26 +108,15 @@ export const ProfileCard = ({
 
   const pickImage = async () => {
     try {
-      const permissionResult =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-      if (!permissionResult.granted) {
-        Alert.alert(
-          'Permission required',
-          'Permission to access the media library is required.',
-        );
-        return;
-      }
-
       // Save current route in case Android destroys the Activity
       await savePendingRoute(pathname);
 
+      // Modern photo picker doesn't require explicit permission requests
+      // Users grant access on a per-image basis through the system picker
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ['images'],
         quality: 0.5,
-        legacy: true,
         allowsMultipleSelection: false,
-        shape: 'oval',
       });
 
       if (!result.canceled) {

@@ -20,7 +20,12 @@
     },
     "production": {
       "autoIncrement": true,
-      "channel": "production"
+      "channel": "production",
+      "env": {
+        "EXPO_PUBLIC_CONVEX_URL": "https://pastel-albatross-709.convex.cloud",
+        "EXPO_PUBLIC_CONVEX_SITE_URL": "https://pastel-albatross-709.convex.site",
+        "EXPO_PUBLIC_CHAT_API_KEY": "jeagup93jged"
+      }
     }
   },
   "submit": {

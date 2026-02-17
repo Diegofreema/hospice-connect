@@ -9,6 +9,7 @@ import { Spacer } from '@/features/shared/components/spacer';
 
 import { Wrapper } from '@/features/shared/components/wrapper';
 import { router } from 'expo-router';
+import { Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useUnistyles } from 'react-native-unistyles';
 
@@ -36,7 +37,7 @@ const LoginScreen = () => {
         <LoginForm />
         <DividerWithText />
 
-        <GoogleButton />
+        {Platform.OS === 'android' && <GoogleButton />}
 
         <PrivacyTermsLink />
       </KeyboardAwareScrollView>

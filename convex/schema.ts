@@ -78,6 +78,7 @@ export const Nurse = {
     v.literal('suspended'),
   ),
   rejectedReason: v.optional(v.string()),
+  stripeCustomerId: v.optional(v.string()),
 };
 const PendingNurse = {
   firstName: v.string(),
@@ -278,6 +279,17 @@ export const adminNotification = {
   viewCount: v.number(),
   sentBy: v.string(),
 };
+
+const NursePaymentMethod = {
+  nurseId: v.id('nurses'),
+  stripeCustomerId: v.string(),
+  stripePaymentMethodId: v.string(),
+  last4: v.string(),
+  brand: v.string(),
+  expMonth: v.number(),
+  expYear: v.number(),
+  isDefault: v.boolean(),
+};
 export default defineSchema({
   users: defineTable(User)
     .index('email', ['email'])
@@ -371,4 +383,7 @@ export default defineSchema({
     hospiceId: v.optional(v.id('hospices')),
     type: v.union(v.literal('nurse'), v.literal('hospice')),
   }).index('by_isRead', ['isRead']),
+  nursePaymentMethods: defineTable(NursePaymentMethod)
+    .index('by_nurse', ['nurseId'])
+    .index('by_stripe_customer', ['stripeCustomerId']),
 });
