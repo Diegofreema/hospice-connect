@@ -2,7 +2,7 @@ import { filter } from 'convex-helpers/server/filter';
 import { paginationOptsValidator, type PaginationResult } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { type Doc, type Id } from './_generated/dataModel';
-import { mutation, query } from './_generated/server';
+import { mutation, MutationCtx, query } from './_generated/server';
 import {
   handleActiveAssignmentsCount,
   handleAssignmentsCount,
@@ -16,7 +16,7 @@ import {
   sendAvailableAssignmentNotificationToNurse,
 } from './helper';
 import { getSchedulesByAssignmentIdHelper } from './schedules';
-import { careLevel, discipline, shifts } from './schema';
+import { careLevel, discipline, type DisciplineType, shifts } from './schema';
 import {
   type AssignmentsWithHospicesType,
   type AvailableAssignmentType,
@@ -856,7 +856,7 @@ export const sendReassignmentNotification = mutation({
       ctx.db.get(args.hospiceId),
       ctx.db.get(args.scheduleId),
     ]);
-    if (!schedule) {
+    if (!schedule || !schedule.nurseId) {
       throw new ConvexError({ message: 'Schedule not found' });
     }
     if (!hospice) {
@@ -872,47 +872,22 @@ export const sendReassignmentNotification = mutation({
       });
     }
 
-    // find nurses that are within that state and match the discipline
-    const nurses = await ctx.db
-      .query('nurses')
-      .withIndex('by_discipline', (q) =>
-        q
-          .eq('discipline', assignment.discipline)
-          .eq('stateOfRegistration', assignment.state),
-      )
-      .filter((q) => q.neq(q.field('_id'), schedule.nurseId!))
-      .collect();
+    await sendReassignmentNotificationToNurses(
+      assignment.discipline,
+      assignment.state,
+      schedule.nurseId,
+      args.scheduleId,
+      args.hospiceId,
+      hospice.businessName,
+      schedule.startDate,
+      schedule.endDate,
+      schedule.startTime,
+      schedule.endTime,
+      null,
+      100,
 
-    if (nurses.length === 0) {
-      throw new ConvexError({
-        message: 'No nurses available for this discipline and state',
-      });
-    }
-
-    const size = 500;
-    for (let i = 0; i < nurses.length; i += size) {
-      const batch = nurses.slice(i, i + size);
-      await Promise.all(
-        batch.map((nurse) =>
-          ctx.db.insert('nurseNotifications', {
-            nurseId: nurse._id,
-            isRead: false,
-            hospiceId: args.hospiceId,
-            scheduleId: schedule._id,
-            description: `${
-              hospice.businessName
-            } has opened a shift for reassignment scheduled for ${formatDate(
-              schedule.startDate,
-            )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
-              schedule.endTime
-            }.`,
-            title: 'ASAP schedule reassignment',
-            type: 'reassignment',
-            viewCount: 0,
-          }),
-        ),
-      );
-    }
+      ctx,
+    );
   },
 });
 
@@ -1003,3 +978,69 @@ export const sendReassignmentNotificationToHospice = mutation({
     });
   },
 });
+
+export const sendReassignmentNotificationToNurses = async (
+  discipline: DisciplineType,
+  state: string,
+  nurseId: Id<'nurses'>,
+  scheduleId: Id<'schedules'>,
+  hospiceId: Id<'hospices'>,
+  businessName: string,
+  startDate: string,
+  endDate: string,
+  startTime: string,
+  endTime: string,
+  cursor: string | null,
+  numItems: number,
+  ctx: MutationCtx,
+) => {
+  // find nurses that are within that state and match the discipline
+  const data = await filter(
+    ctx.db
+      .query('nurses')
+      .withIndex('by_discipline', (q) =>
+        q.eq('discipline', discipline).eq('stateOfRegistration', state),
+      ),
+    (nurse) => nurse._id !== nurseId,
+  ).paginate({ cursor, numItems });
+
+  const { isDone, page, continueCursor } = data;
+  if (page.length === 0) {
+    return;
+  }
+
+  for (const nurse of page) {
+    ctx.db.insert('nurseNotifications', {
+      nurseId: nurse._id,
+      isRead: false,
+      hospiceId,
+      scheduleId,
+      description: `${
+        businessName
+      } has opened a shift for reassignment scheduled for ${formatDate(
+        startDate,
+      )} to ${formatDate(endDate)}; ${startTime} - ${endTime}.`,
+      title: 'ASAP schedule reassignment',
+      type: 'reassignment',
+      viewCount: 0,
+    });
+  }
+
+  if (!isDone) {
+    await sendReassignmentNotificationToNurses(
+      discipline,
+      state,
+      nurseId,
+      scheduleId,
+      hospiceId,
+      businessName,
+      startDate,
+      endDate,
+      startTime,
+      endTime,
+      continueCursor,
+      numItems,
+      ctx,
+    );
+  }
+};

@@ -35,7 +35,7 @@ const LoginScreen = () => {
         </Subtitle>
         <Spacer height={30} />
         <LoginForm />
-        <DividerWithText />
+        {Platform.OS === 'android' && <DividerWithText />}
 
         {Platform.OS === 'android' && <GoogleButton />}
 

@@ -12,6 +12,7 @@ import {
   getScheduleStatusText,
 } from '@/features/shared/utils';
 
+import { Avatar } from '@/components/avatar/Avatar';
 import { useHospice } from '@/components/context/hospice-context';
 import { useToast } from '@/components/demos/toast';
 import { type Id } from '@/convex/_generated/dataModel';
@@ -21,7 +22,6 @@ import { IconCircle } from '@tabler/icons-react-native';
 import { useMutation } from 'convex/react';
 import { type FunctionReturnType } from 'convex/server';
 import { format, parse } from 'date-fns';
-import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Alert, useWindowDimensions, View } from 'react-native';
@@ -164,7 +164,13 @@ export const ShiftCard = ({
         <View style={styles.innerContainer}>
           <View style={styles.header}>
             <View style={styles.imageContainer(size)}>
-              <Image style={styles.image} source={shift.nurse?.image} />
+              <Avatar
+                image={{
+                  uri: shift.nurse?.image || '',
+                  name: shift.nurse?.name || '',
+                }}
+                size={size}
+              />
             </View>
             <View>
               <CustomPressable onPress={onPressName}>
@@ -262,7 +268,6 @@ const styles = StyleSheet.create((theme) => ({
     height: size,
     borderRadius: 10,
     overflow: 'hidden',
-    backgroundColor: theme.colors.grey,
   }),
   image: {
     width: '100%',

@@ -49,7 +49,7 @@ export const createAssignmentValidator = z
       ],
       {
         error: 'Care level is required',
-      }
+      },
     ),
   })
   .refine(
@@ -65,7 +65,7 @@ export const createAssignmentValidator = z
     {
       message: 'End date cannot be before start date',
       path: ['endDate'],
-    }
+    },
   )
   .refine(
     (data) => {
@@ -80,7 +80,7 @@ export const createAssignmentValidator = z
     {
       message: 'Start date of this assignment cannot be in the past',
       path: ['startDate'],
-    }
+    },
   )
   .refine(
     (data) => {
@@ -93,7 +93,7 @@ export const createAssignmentValidator = z
     {
       message: 'Please specify your gender',
       path: ['customGender'],
-    }
+    },
   );
 export const reopenAssignmentValidator = z
   .object({
@@ -117,7 +117,7 @@ export const reopenAssignmentValidator = z
     {
       message: 'End date cannot be before start date',
       path: ['endDate'],
-    }
+    },
   )
   .refine(
     (data) => {
@@ -132,7 +132,7 @@ export const reopenAssignmentValidator = z
     {
       message: 'Start date of this assignment cannot be in the past',
       path: ['startDate'],
-    }
+    },
   );
 
 export const editScheduleValidator = z
@@ -157,7 +157,7 @@ export const editScheduleValidator = z
     {
       message: 'End date cannot be before start date',
       path: ['endDate'],
-    }
+    },
   );
 
 export const updateProfileValidator = z.object({

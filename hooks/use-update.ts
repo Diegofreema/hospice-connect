@@ -2,42 +2,20 @@ import * as Updates from 'expo-updates';
 import { useEffect } from 'react';
 
 export const useUpdate = () => {
-  const { isUpdateAvailable, isUpdatePending } = Updates.useUpdates();
-
   useEffect(() => {
-    const fetchUpdate = async () => {
+    async function onFetchUpdateAsync() {
       try {
-        console.log('Fetching latest Expo update...');
-        await Updates.fetchUpdateAsync();
-        // After successful fetch, the update becomes "pending"
-        // Expo will set isUpdatePending to true automatically
-      } catch (error) {
-        console.error('Error fetching latest Expo update:', error);
-        // Optional: alert user or send to error tracking
-        // Alert.alert('Update Error', 'Failed to check for updates.');
-      }
-    };
-    if (isUpdateAvailable) fetchUpdate();
-  }, [isUpdateAvailable, isUpdatePending]);
+        const update = await Updates.checkForUpdateAsync();
 
-  // Separate effect for reloading when update is ready
-  useEffect(() => {
-    const reloadApp = async () => {
-      try {
-        await Updates.reloadAsync({
-          reloadScreenOptions: {
-            fade: true,
-            backgroundColor: '#fff',
-            image: require('@/assets/images/hospice.png'),
-          },
-        });
+        if (update.isAvailable) {
+          await Updates.fetchUpdateAsync();
+          await Updates.reloadAsync();
+        }
       } catch (error) {
-        console.error('Error reloading app with new update:', error);
+        // You can also add an alert() to see the error message in case of an error when fetching updates.
+        console.log(error);
       }
-    };
-
-    if (isUpdatePending) {
-      reloadApp();
     }
-  }, [isUpdatePending]);
+    void onFetchUpdateAsync();
+  }, []);
 };

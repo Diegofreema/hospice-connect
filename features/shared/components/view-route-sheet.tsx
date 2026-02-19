@@ -7,7 +7,12 @@ import React from 'react';
 import { ScrollView } from 'react-native';
 import * as Progress from 'react-native-progress';
 import { useDownloadOrPrint } from '../hooks/use-download';
-import { calculateTotalHours, reverseDateStringToMDY } from '../utils';
+import {
+  abbreviateCareLevel,
+  calculateTotalHours,
+  convertNumberToStringThenToNumber,
+  reverseDateStringToMDYShort,
+} from '../utils';
 import { RoustSheetComponent } from './route-sheet-component';
 import { SmallLoader } from './small-loader';
 export const ViewRouteSheet = () => {
@@ -70,16 +75,16 @@ export const ViewRouteSheet = () => {
     }
 
     .text-medium {
-      font-size: 18px;
+      font-size: 20px;
     }
 
     .text-small {
-      font-size: 14px;
+      font-size: 16px;
       color: #666;
     }
 
     .text-normal {
-      font-size: 16px;
+      font-size: 18px;
     }
 
     .flex-text {
@@ -103,18 +108,18 @@ export const ViewRouteSheet = () => {
 
     th, td {
       border: 1px solid #ddd;
-      padding: 12px;
+      padding: 8px;
       text-align: left;
     }
 
     th {
       background-color: #f5f5f5;
       font-weight: bold;
-      font-size: 14px;
+      font-size: 16px;
     }
 
     td {
-      font-size: 14px;
+      font-size: 16px;
     }
 
     .totals-row {
@@ -145,21 +150,50 @@ export const ViewRouteSheet = () => {
       margin-top: 8px;
     }
 
+    .date-column {
+      white-space: nowrap;
+    }
+
     @media print {
       body {
-        padding: 20px;
+        padding: 0;
       }
 
       .container {
-        gap: 24px;
-      }
-
-      .header-section {
         gap: 16px;
       }
 
+      .header-section {
+        gap: 12px;
+      }
+
+      table {
+        width: 100%;
+        page-break-inside: auto;
+      }
+
+      tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+      }
+
+      th, td {
+        padding: 4px 6px;
+        font-size: 10px;
+      }
+
+      .logo {
+        width: 60px;
+        height: 60px;
+      }
+
+      h1 { font-size: 14px; }
+      p { font-size: 10px; }
+      span { font-size: 10px; }
+      
       @page {
-        margin: 1cm;
+        margin: 0.5cm;
+        size: auto; 
       }
     }
   </style>
@@ -185,7 +219,7 @@ export const ViewRouteSheet = () => {
       <table>
         <thead>
           <tr>
-            <th>Date</th>
+            <th class="date-column">Date</th>
             <th>Patient Name</th>
             <th>Care level</th>
             <th>Time in</th>
@@ -200,11 +234,11 @@ export const ViewRouteSheet = () => {
              .map(
                (shift) => `
         <tr>
-          <td> ${reverseDateStringToMDY(shift?.startDate)} - ${reverseDateStringToMDY(shift?.endDate)}</td>
+          <td class="date-column"> ${reverseDateStringToMDYShort(shift?.startDate)} - ${reverseDateStringToMDYShort(shift?.endDate)}</td>
           <td>${data?.assignment.patientFirstName} ${
             data?.assignment.patientLastName
           }</td>
-          <td>${data?.assignment.careLevel}</td>
+          <td>${abbreviateCareLevel(data?.assignment.careLevel)}</td>
           <td>${shift.startTime}</td>
           <td>${shift.endTime}</td>
           <td>${calculateTotalHours([shift]).toFixed(2)}</td>
@@ -225,10 +259,15 @@ export const ViewRouteSheet = () => {
       <p class="text-medium text-bold">Total hours: ${calculateTotalHours(
         data?.schedules || [],
       ).toFixed(2)}</p>
-      <p class="text-medium text-bold">Total pay: $${(
-        Number(calculateTotalHours(data?.schedules || []).toFixed(2)) *
-        (data?.assignment.rate || 0)
-      ).toFixed(2)}</p>
+      <p class="text-medium text-bold">Total pay: $${data?.schedules
+        .reduce(
+          (acc, shift) =>
+            acc +
+            convertNumberToStringThenToNumber(calculateTotalHours([shift])) *
+              shift.rate,
+          0,
+        )
+        .toFixed(2)}</p>
     </div>
 
     <!-- Certification Text -->
@@ -275,7 +314,6 @@ export const ViewRouteSheet = () => {
   };
 
   const hasSubmitted = !!routeSheet?._id;
-  console.log(uri);
 
   return (
     <ScrollView

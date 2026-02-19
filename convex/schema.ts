@@ -148,6 +148,8 @@ export const Schedule = {
   isTimeEdited: v.optional(v.boolean()),
 };
 
+export type ScheduleType = typeof Schedule;
+
 export const gender = v.union(
   v.literal('male'),
   v.literal('female'),

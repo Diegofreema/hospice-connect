@@ -229,71 +229,72 @@ export function calculateTotalHours(shifts: Doc<'schedules'>[]) {
     const startParts = convertTimeStringToDate2(shift.startTime);
     startDateObj.setHours(startParts.hours, startParts.minutes, 0, 0);
 
-    // Check for cancellation
+    // ── Time was edited → always use startTime to endTime ─────────────────
+    if (shift.isTimeEdited || shift.isEdited) {
+      // If cancelled before the shift start → 0 hrs
+      if (shift.canceledAt) {
+        const canceledDate = new Date(shift.canceledAt);
+        if (canceledDate.getTime() <= startDateObj.getTime()) {
+          continue;
+        }
+      }
+
+      const endDateObj = parse(shift.endDate, 'dd-MM-yyyy', new Date());
+      const endParts = convertTimeStringToDate2(shift.endTime);
+      endDateObj.setHours(endParts.hours, endParts.minutes, 0, 0);
+      let hours = (endDateObj.getTime() - startDateObj.getTime()) / 3600000;
+      if (hours < 0) hours += 24;
+      totalHours += hours;
+      continue;
+    }
+
+    // ── Cancelled (not edited) ───────────────────────────────────────────────
     if (shift.canceledAt) {
       const canceledDate = new Date(shift.canceledAt);
 
-      // If shift was edited, calculate based on start and end time even if canceled
-      if (shift.isEdited) {
-        const endDateObj = parse(shift.endDate, 'dd-MM-yyyy', new Date());
-        const endParts = convertTimeStringToDate2(shift.endTime);
-        endDateObj.setHours(endParts.hours, endParts.minutes, 0, 0);
-
-        let hours = (endDateObj.getTime() - startDateObj.getTime()) / 3600000;
-        if (hours < 0) {
-          hours += 24;
+      // If also reassigned and cancellation happened before (or at) reassignment → 0 hrs
+      if (shift.reassignedAt) {
+        const reassignedDate = new Date(shift.reassignedAt);
+        if (canceledDate.getTime() <= reassignedDate.getTime()) {
+          continue;
         }
-        totalHours += hours;
-        continue;
       }
 
-      // If canceled before or at shift start, no hours worked
+      // Cancelled at or before shift start → 0 hrs
       if (canceledDate.getTime() <= startDateObj.getTime()) {
         continue;
       }
 
-      // Calculate hours from start to cancellation
+      // Cancelled after start → hours from start to cancellation
       const diff = (canceledDate.getTime() - startDateObj.getTime()) / 3600000;
       totalHours += diff;
       continue;
     }
 
-    // Check for reassignment (applies to all shifts, edited or not)
+    // ── Reassigned (not edited) ──────────────────────────────────────────────
     if (shift.reassignedAt) {
       const reassignedDate = new Date(shift.reassignedAt);
-      // If reassigned before or at shift start, no hours worked
-      if (reassignedDate.getTime() <= startDateObj.getTime()) {
+      const endDateObj = parse(shift.endDate, 'dd-MM-yyyy', new Date());
+      const endParts = convertTimeStringToDate2(shift.endTime);
+      endDateObj.setHours(endParts.hours, endParts.minutes, 0, 0);
+
+      // Reassigned after end → 0 hrs
+      if (reassignedDate.getTime() >= endDateObj.getTime()) {
         continue;
       }
-      // Calculate hours from start to reassignment
-      const diff =
-        (reassignedDate.getTime() - startDateObj.getTime()) / 3600000;
+
+      let diff = (endDateObj.getTime() - reassignedDate.getTime()) / 3600000;
+      if (diff < 0) diff += 24;
       totalHours += diff;
       continue;
     }
 
-    // Check if shift times were edited
-    if (shift.isEdited) {
-      const endDateObj = parse(shift.endDate, 'dd-MM-yyyy', new Date());
-      const endParts = convertTimeStringToDate2(shift.endTime);
-      endDateObj.setHours(endParts.hours, endParts.minutes, 0, 0);
-      let hours = (endDateObj.getTime() - startDateObj.getTime()) / 3600000;
-      if (hours < 0) {
-        hours += 24;
-      }
-      totalHours += hours;
-      continue;
-    }
-
-    // Default calculation for non-edited, non-terminated shifts
+    // ── Default (normal shift) ────────────────────────────────────────────────
     const endDateObj = parse(shift.endDate, 'dd-MM-yyyy', new Date());
     const endParts = convertTimeStringToDate2(shift.endTime);
     endDateObj.setHours(endParts.hours, endParts.minutes, 0, 0);
-
     let hours = (endDateObj.getTime() - startDateObj.getTime()) / 3600000;
-    if (hours < 0) {
-      hours += 24;
-    }
+    if (hours < 0) hours += 24;
     totalHours += hours;
   }
 
@@ -398,6 +399,11 @@ export const reverseDateStringToMDY = (dateString: string) => {
   return `${month}-${day}-${year}`;
 };
 
+export const reverseDateStringToMDYShort = (dateString: string) => {
+  const [day, month, year] = dateString.split('-');
+  return `${month}-${day}-${year.slice(-2)}`;
+};
+
 export type Reaction = {
   type: 'like' | 'love' | 'haha' | 'sad' | 'wow';
 };
@@ -457,3 +463,38 @@ export const convertNumberToStringThenToNumber = (num: number) =>
 
 export const timeIsBeforeOrSameTime = (time1: number, time2: number) =>
   time1 <= time2;
+
+export const abbreviateCareLevel = (
+  careLevel:
+    | 'Initial Evaluation'
+    | 'Follow Up'
+    | 'Continuous Care'
+    | 'Supervision'
+    | 'Recertification'
+    | 'Discharge',
+) => {
+  let abbr = '';
+
+  switch (careLevel) {
+    case 'Initial Evaluation':
+      abbr = 'Initial Eval';
+      break;
+    case 'Follow Up':
+      abbr = 'Follow Up';
+      break;
+    case 'Continuous Care':
+      abbr = 'Cont. Care';
+      break;
+    case 'Supervision':
+      abbr = 'Supervision';
+      break;
+    case 'Recertification':
+      abbr = 'Recert.';
+      break;
+    case 'Discharge':
+      abbr = 'Discharge';
+      break;
+  }
+
+  return abbr;
+};
