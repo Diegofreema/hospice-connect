@@ -485,7 +485,7 @@ export const sendNotificationsToNursesOnFifthDay = internalMutation({
         isRead: false,
         description: `Complete and submit all outstanding route sheets to avoid account deactivation.`,
         title: 'Outstanding route sheet',
-        type: 'normal',
+        type: 'admin',
         viewCount: 0,
       });
     }
@@ -523,7 +523,7 @@ export const sendNotificationsToNursesOnSixthDay = internalMutation({
         isRead: false,
         description: `Complete and submit all outstanding route sheets to avoid account deactivation.`,
         title: 'Outstanding route sheet',
-        type: 'normal',
+        type: 'admin',
         viewCount: 0,
       });
     }
@@ -562,7 +562,7 @@ export const sendNotificationsToNursesAndSuspendAccount = internalMutation({
         isRead: false,
         description: `Complete and submit all outstanding route sheets to reactivate your account.`,
         title: 'Account suspension',
-        type: 'normal',
+        type: 'admin',
         viewCount: 0,
       });
     }

@@ -208,67 +208,73 @@ export function RouteSheets() {
                         </TableCell>
                       </TableRow>
                     )}
-                    {unSubmittedSheets?.map((sheet, index) => (
-                      <TableRow key={sheet._id}>
-                        <TableCell>{index + 1}</TableCell>
-                        <TableCell className="font-medium">
-                          {sheet.hospice.businessName}
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          {sheet.nurse.name}
-                        </TableCell>
-                        <TableCell>{sheet.nurse.email}</TableCell>
-                        <TableCell>
-                          <Badge
-                            className={getColorsForDiscipline(
-                              sheet.nurse.discipline,
-                            )}
-                          >
-                            {sheet.nurse.discipline}
-                          </Badge>
-                        </TableCell>
-                        {sheet.completedAt && (
-                          <TableCell>
-                            {format(sheet.completedAt, 'MM/dd/yyyy')}
+                    {[...(unSubmittedSheets ?? [])]
+                      .sort((a, b) => {
+                        if (!a.completedAt) return 1;
+                        if (!b.completedAt) return -1;
+                        return a.completedAt - b.completedAt;
+                      })
+                      .map((sheet, index) => (
+                        <TableRow key={sheet._id}>
+                          <TableCell>{index + 1}</TableCell>
+                          <TableCell className="font-medium">
+                            {sheet.hospice.businessName}
                           </TableCell>
-                        )}
-                        {/* overdue days */}
-                        {sheet.completedAt && (
-                          <TableCell>
-                            {formatDistanceToNow(sheet.completedAt)}
+                          <TableCell className="font-medium">
+                            {sheet.nurse.name}
                           </TableCell>
-                        )}
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            {sheet.nurse.status === 'suspended' ? (
-                              <Button
-                                size="sm"
-                                onClick={() =>
-                                  handleReactivateNurse(sheet.nurse._id)
-                                }
-                                className="gap-2 bg-green-500 hover:bg-green-600 "
-                                disabled={loading}
-                              >
-                                <CheckCircle className="h-4 w-4" />
-                                Reactivate
-                              </Button>
-                            ) : (
-                              <Button
-                                size="sm"
-                                onClick={() =>
-                                  handleSuspendNurse(sheet.nurse._id)
-                                }
-                                className="gap-2 bg-red-500 hover:bg-red-600"
-                                disabled={loading}
-                              >
-                                <CheckCircle className="h-4 w-4" />
-                                Suspend
-                              </Button>
-                            )}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                          <TableCell>{sheet.nurse.email}</TableCell>
+                          <TableCell>
+                            <Badge
+                              className={getColorsForDiscipline(
+                                sheet.nurse.discipline,
+                              )}
+                            >
+                              {sheet.nurse.discipline}
+                            </Badge>
+                          </TableCell>
+                          {sheet.completedAt && (
+                            <TableCell>
+                              {format(sheet.completedAt, 'MM/dd/yyyy')}
+                            </TableCell>
+                          )}
+                          {/* overdue days */}
+                          {sheet.completedAt && (
+                            <TableCell>
+                              {formatDistanceToNow(sheet.completedAt)}
+                            </TableCell>
+                          )}
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-2">
+                              {sheet.nurse.status === 'suspended' ? (
+                                <Button
+                                  size="sm"
+                                  onClick={() =>
+                                    handleReactivateNurse(sheet.nurse._id)
+                                  }
+                                  className="gap-2 bg-green-500 hover:bg-green-600 "
+                                  disabled={loading}
+                                >
+                                  <CheckCircle className="h-4 w-4" />
+                                  Reactivate
+                                </Button>
+                              ) : (
+                                <Button
+                                  size="sm"
+                                  onClick={() =>
+                                    handleSuspendNurse(sheet.nurse._id)
+                                  }
+                                  className="gap-2 bg-red-500 hover:bg-red-600"
+                                  disabled={loading}
+                                >
+                                  <CheckCircle className="h-4 w-4" />
+                                  Suspend
+                                </Button>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
                   </TableBody>
                   {unSubmittedStatus === 'CanLoadMore' && (
                     <TableFooter>
