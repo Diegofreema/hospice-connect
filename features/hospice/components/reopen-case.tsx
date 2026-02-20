@@ -12,12 +12,12 @@ import { format } from 'date-fns';
 import React from 'react';
 
 import { ControlledDatePicker } from '@/features/authentication/components/form/control-date-picker';
+import { ControlInput } from '@/features/authentication/components/form/control-input';
 import { ControlSelect } from '@/features/authentication/components/form/control-select';
+import BottomSheetKeyboardAwareScrollView from '@/features/shared/components/bottom-sheet-aware-scroll-view';
 import { FlexButtons } from '@/features/shared/components/flex-buttons';
-import { BottomSheetView } from '@gorhom/bottom-sheet';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSelectAssignment } from '../hooks/use-select-assignment';
 import {
@@ -69,6 +69,7 @@ export const ReopenCase = ({ onClose }: Props) => {
         shifts,
         discipline: data.discipline,
         hospiceTimezone,
+        rate: Number(data.rate),
       });
       showToast({
         title: 'Success',
@@ -88,51 +89,54 @@ export const ReopenCase = ({ onClose }: Props) => {
     }
   };
   return (
-    <BottomSheetView>
-      <KeyboardAwareScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ gap: 10, paddingBottom: bottom }}
-      >
-        <ControlledDatePicker
-          control={control}
-          errors={errors}
-          name="startDate"
-          label="Start date"
-        />
-        <ControlledDatePicker
-          control={control}
-          errors={errors}
-          name="endDate"
-          label="End date"
-        />
-        <ControlledDatePicker
-          control={control}
-          errors={errors}
-          name="openShift"
-          label="Open shift"
-          mode="time"
-        />
-        <ControlSelect
-          control={control}
-          errors={errors}
-          name="discipline"
-          label="Discipline needed"
-          placeholder="Select discipline"
-          items={[
-            { label: 'RN', value: 'RN' },
-            { label: 'LVN', value: 'LVN' },
-            { label: 'HHA', value: 'HHA' },
-          ]}
-        />
-        <FlexButtons
-          onPress={handleSubmit(onSubmit)}
-          onCancel={onClose}
-          buttonText2="Reopen"
-          buttonText="Cancel"
-          disabled2={isSubmitting}
-          disabled={isSubmitting}
-        />
-      </KeyboardAwareScrollView>
-    </BottomSheetView>
+    <BottomSheetKeyboardAwareScrollView showsVerticalScrollIndicator={false}>
+      <ControlledDatePicker
+        control={control}
+        errors={errors}
+        name="startDate"
+        label="Start date"
+      />
+      <ControlledDatePicker
+        control={control}
+        errors={errors}
+        name="endDate"
+        label="End date"
+      />
+      <ControlledDatePicker
+        control={control}
+        errors={errors}
+        name="openShift"
+        label="Open shift"
+        mode="time"
+      />
+      <ControlSelect
+        control={control}
+        errors={errors}
+        name="discipline"
+        label="Discipline needed"
+        placeholder="Select discipline"
+        items={[
+          { label: 'RN', value: 'RN' },
+          { label: 'LVN', value: 'LVN' },
+          { label: 'HHA', value: 'HHA' },
+        ]}
+      />
+      <ControlInput
+        control={control}
+        errors={errors}
+        name="rate"
+        label="Rate"
+        placeholder="Enter rate/hour"
+        keyboardType="numeric"
+      />
+      <FlexButtons
+        onPress={handleSubmit(onSubmit)}
+        onCancel={onClose}
+        buttonText2="Reopen"
+        buttonText="Cancel"
+        disabled2={isSubmitting}
+        disabled={isSubmitting}
+      />
+    </BottomSheetKeyboardAwareScrollView>
   );
 };

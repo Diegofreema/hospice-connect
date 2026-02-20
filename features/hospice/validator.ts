@@ -103,6 +103,7 @@ export const reopenAssignmentValidator = z
     discipline: z.enum(['RN', 'LVN', 'HHA'], {
       error: 'Discipline is required',
     }),
+    rate: z.string().min(1, 'Rate is required'),
   })
   .refine(
     (data) => {

@@ -292,6 +292,7 @@ export const reopenAssignment = mutation({
     assignmentId: v.id('assignments'),
     discipline: discipline,
     hospiceTimezone: v.string(),
+    rate: v.number(),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -317,7 +318,7 @@ export const reopenAssignment = mutation({
       gender: assignment.gender,
       patientLastName: assignment.patientLastName,
       phoneNumber: assignment.phoneNumber,
-      rate: assignment.rate,
+      rate: args.rate,
       startDate: args.startDate,
       state: assignment.state,
       openShift: args.openShift,
@@ -335,14 +336,14 @@ export const reopenAssignment = mutation({
         endTime: shift.endShift,
         startDate: shift.start,
         startTime: shift.startShift,
-        rate: assignment.rate,
+        rate: args.rate,
         status: 'available',
         isSubmitted: false,
       });
     }
     await sendAvailableAssignmentNotificationToNurse(
       ctx,
-      assignment.discipline,
+      args.discipline,
       assignment.state,
       hospice,
       null,
