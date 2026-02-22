@@ -251,7 +251,7 @@ export function Hospices() {
                   <TableHead className="font-bold">S/N</TableHead>
                   <TableHead className="font-bold">Name</TableHead>
                   <TableHead className="font-bold">Email</TableHead>
-                  <TableHead className="font-bold">Location</TableHead>
+                  <TableHead className="font-bold">State</TableHead>
                   <TableHead className="font-bold">License</TableHead>
                   <TableHead className="font-bold">Status</TableHead>
                   <TableHead className="text-right font-bold">

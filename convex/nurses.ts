@@ -502,9 +502,8 @@ export const sendNotificationsToNursesOnFifthDay = internalMutation({
     const data = await filter(
       ctx.db.query('nurseAssignments'),
       (nurseAssignment) => {
-        // five days since completed;
-
-        return checkDurationOfNotSubmittedAssignment(5, nurseAssignment);
+        // Exactly on day 5 (>= 5 days AND < 6 days since completion)
+        return checkDurationOfNotSubmittedAssignment(5, nurseAssignment, 6);
       },
     ).paginate(args);
 
@@ -542,7 +541,8 @@ export const sendNotificationsToNursesOnSixthDay = internalMutation({
     const data = await filter(
       ctx.db.query('nurseAssignments'),
       (nurseAssignment) => {
-        return checkDurationOfNotSubmittedAssignment(6, nurseAssignment);
+        // Exactly on day 6 (>= 6 days AND < 7 days since completion)
+        return checkDurationOfNotSubmittedAssignment(6, nurseAssignment, 7);
       },
     ).paginate(args);
 
@@ -581,6 +581,7 @@ export const sendNotificationsToNursesAndSuspendAccount = internalMutation({
     const data = await filter(
       ctx.db.query('nurseAssignments'),
       (nurseAssignment) => {
+        // Exactly on day 7+ (>= 7 days, no upper bound — also suspends account)
         return checkDurationOfNotSubmittedAssignment(7, nurseAssignment);
       },
     ).paginate(args);
@@ -595,6 +596,9 @@ export const sendNotificationsToNursesAndSuspendAccount = internalMutation({
         title: 'Account suspension',
         type: 'admin',
         viewCount: 0,
+      });
+      await ctx.db.patch('nurses', assignment.nurseId, {
+        status: 'suspended',
       });
     }
 

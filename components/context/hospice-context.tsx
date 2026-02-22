@@ -1,6 +1,9 @@
 import { api } from '@/convex/_generated/api';
+import { Paywall } from '@/features/hospice/components/paywall';
+import { ErrorComponent } from '@/features/shared/components/error';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { UnderReview } from '@/features/shared/components/under-review';
+import { useGetCustomerRC } from '@/hooks/rc/use-get-customer-rc';
 import { useQuery } from 'convex/react';
 
 import { type FunctionReturnType } from 'convex/server';
@@ -21,19 +24,19 @@ export const HospiceProvider = ({
   children: React.ReactNode;
 }) => {
   const hospice = useQuery(api.hospices.getHospiceByUserId);
-  // const {
-  //   data: customerInfo,
-  //   isPending,
-  //   isError,
-  //   refetch,
-  // } = useGetCustomerRC();
-  if (hospice === undefined) {
+  const {
+    data: customerInfo,
+    isPending,
+    isError,
+    refetch,
+  } = useGetCustomerRC();
+  if (hospice === undefined || isPending) {
     return <SmallLoader size={50} />;
   }
 
-  // if (isError) {
-  //   return <ErrorComponent refetch={refetch} text="Something went wrong" />;
-  // }
+  if (isError) {
+    return <ErrorComponent refetch={refetch} text="Something went wrong" />;
+  }
 
   if (hospice?.status === 'pending') {
     return <UnderReview />;
@@ -51,9 +54,9 @@ export const HospiceProvider = ({
     return;
   }
 
-  // if (customerInfo?.activeSubscriptions.length === 0) {
-  //   return <Paywall />;
-  // }
+  if (customerInfo?.activeSubscriptions?.length === 0) {
+    return <Paywall />;
+  }
   return (
     <AuthContext.Provider
       value={{

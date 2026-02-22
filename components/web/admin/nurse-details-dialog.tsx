@@ -11,6 +11,7 @@ import {
 import { Separator } from '@/components/web/ui/separator';
 import { api } from '@/convex/_generated/api';
 import type { Id } from '@/convex/_generated/dataModel';
+import { changeFirstLetterToCapital } from '@/features/shared/utils';
 import {
   generateStatusColorAndBackgroundColor,
   generateStatusText,
@@ -93,6 +94,14 @@ export function NurseDetailsDialog({
               <div>
                 <p className="text-sm text-muted-foreground">License Number</p>
                 <p className="font-medium">{nurse.licenseNumber}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">
+                  State of Registration
+                </p>
+                <p className="font-medium">
+                  {changeFirstLetterToCapital(nurse.stateOfRegistration)}
+                </p>
               </div>
             </div>
           </div>

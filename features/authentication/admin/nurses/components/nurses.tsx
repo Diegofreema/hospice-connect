@@ -273,7 +273,6 @@ export function Nurses() {
                   <TableHead className="font-bold">Email</TableHead>
                   <TableHead className="font-bold">Discipline</TableHead>
                   <TableHead className="font-bold">State</TableHead>
-
                   <TableHead className="font-bold">Status</TableHead>
                   <TableHead className="text-right font-bold">
                     Actions

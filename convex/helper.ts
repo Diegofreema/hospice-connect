@@ -2,12 +2,12 @@ import { ConvexError, type Infer } from 'convex/values';
 import { type Doc, type Id } from './_generated/dataModel';
 import { mutation, type MutationCtx, type QueryCtx } from './_generated/server';
 
-import { type day, type DisciplineType } from './schema';
-import { parseDateTimeWallClock } from './actionHelper';
 import { filter } from 'convex-helpers/server/filter';
-import { authComponent } from './auth';
 import { components } from './_generated/api';
+import { parseDateTimeWallClock } from './actionHelper';
+import { authComponent } from './auth';
 import { type Id as BetterAuthId } from './betterAuth/_generated/dataModel';
+import { type day, type DisciplineType } from './schema';
 
 export const getImage = (ctx: QueryCtx, imageId?: Id<'_storage'>) => {
   return imageId ? ctx.storage.getUrl(imageId) : null;
@@ -593,25 +593,34 @@ export const getUserById = async (
 export const checkDurationOfNotSubmittedAssignment = (
   numberOfDays: number,
   nurseAssignment: Doc<'nurseAssignments'>,
+  maxNumberOfDays?: number,
 ) => {
   const now = Date.now();
-  const fiveDaysInMs = numberOfDays * 24 * 60 * 60 * 1000;
+  const DAY_MS = 24 * 60 * 60 * 1000;
+  const minMs = numberOfDays * DAY_MS;
 
   const completedAt = nurseAssignment.completedAt;
   if (typeof completedAt !== 'number' || completedAt <= 0) {
     return false;
   }
   const timeSinceCompletion = now - completedAt;
-  const isAtLeastFiveDaysOld = timeSinceCompletion >= fiveDaysInMs;
 
   // Future dates shouldn't count (just in case)
-  const isNotInFuture = timeSinceCompletion >= 0;
+  if (timeSinceCompletion < 0) return false;
+
+  const hasReachedMinDay = timeSinceCompletion >= minMs;
+  // If maxNumberOfDays is provided, enforce an upper bound so the window
+  // covers only exactly that day (e.g. day 5 only, not day 5+6+7)
+  const hasNotReachedMaxDay =
+    maxNumberOfDays === undefined
+      ? true
+      : timeSinceCompletion < maxNumberOfDays * DAY_MS;
 
   return (
     nurseAssignment.isCompleted &&
     !nurseAssignment.isSubmitted &&
-    isNotInFuture &&
-    isAtLeastFiveDaysOld
+    hasReachedMinDay &&
+    hasNotReachedMaxDay
   );
 };
 
