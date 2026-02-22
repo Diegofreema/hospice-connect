@@ -7,6 +7,7 @@ import {
   internalMutation,
   mutation,
   query,
+  type QueryCtx as QCtx,
   type QueryCtx,
 } from './_generated/server';
 import {
@@ -23,6 +24,19 @@ import {
 } from './helper';
 import { discipline } from './schema';
 import { getUserHelper } from './users';
+
+// Returns true if the nurse's userId has a pending deletion request
+const isNursePendingDeletion = async (
+  ctx: QCtx,
+  userId: string,
+): Promise<boolean> => {
+  const pending = await ctx.db
+    .query('accountDeletionRequests')
+    .withIndex('by_userId', (q) => q.eq('userId', userId))
+    .filter((q) => q.eq(q.field('status'), 'pending'))
+    .first();
+  return !!pending;
+};
 
 export const createNurse = mutation({
   args: {
@@ -345,8 +359,16 @@ export const getNurses = query({
         nurse.status === 'approved'
       );
     }).paginate(args.paginationOpts);
-    const nursesImage = await Promise.all(
+    // Exclude nurses with a pending deletion request
+    const nursesFiltered = await Promise.all(
       nurses.page.map(async (nurse) => {
+        const pendingDeletion = await isNursePendingDeletion(ctx, nurse.userId);
+        return pendingDeletion ? null : nurse;
+      }),
+    ).then((results) => results.filter(Boolean) as typeof nurses.page);
+
+    const nursesImage = await Promise.all(
+      nursesFiltered.map(async (nurse) => {
         const image = await getImage(ctx, nurse.imageId);
         const available = await getAvailability(
           ctx,
@@ -415,8 +437,17 @@ export const searchNursesByFirstNameAndLastName = query({
       }
       return nurse.name.toLowerCase().includes(args.name.toLowerCase());
     }).take(30);
-    const nursesImage = await Promise.all(
+
+    // Exclude nurses with a pending deletion request
+    const nursesFiltered = await Promise.all(
       nurses.map(async (nurse) => {
+        const pendingDeletion = await isNursePendingDeletion(ctx, nurse.userId);
+        return pendingDeletion ? null : nurse;
+      }),
+    ).then((results) => results.filter(Boolean) as typeof nurses);
+
+    const nursesImage = await Promise.all(
+      nursesFiltered.map(async (nurse) => {
         const image = await getImage(ctx, nurse.imageId);
         const available = await getAvailability(
           ctx,

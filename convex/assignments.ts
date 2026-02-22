@@ -2,7 +2,12 @@ import { filter } from 'convex-helpers/server/filter';
 import { paginationOptsValidator, type PaginationResult } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { type Doc, type Id } from './_generated/dataModel';
-import { mutation, MutationCtx, query } from './_generated/server';
+import {
+  mutation,
+  MutationCtx,
+  type MutationCtx as MutCtx,
+  query,
+} from './_generated/server';
 import {
   handleActiveAssignmentsCount,
   handleAssignmentsCount,
@@ -22,6 +27,21 @@ import {
   type AvailableAssignmentType,
 } from './types';
 import { getUserHelper } from './users';
+
+// Guard: throws if the hospice's account has a pending deletion request
+const isHospicePendingDeletion = async (ctx: MutCtx, userId: string) => {
+  const pending = await ctx.db
+    .query('accountDeletionRequests')
+    .withIndex('by_userId', (q) => q.eq('userId', userId))
+    .filter((q) => q.eq(q.field('status'), 'pending'))
+    .first();
+  if (pending) {
+    throw new ConvexError({
+      message:
+        'Your account is scheduled for deletion. You cannot create or reopen assignments.',
+    });
+  }
+};
 
 export const availableAssignments = query({
   args: {
@@ -233,6 +253,7 @@ export const createAssignment = mutation({
     if (!hospice) {
       throw new ConvexError({ message: 'Hospice not found' });
     }
+    await isHospicePendingDeletion(ctx, hospice.userId);
 
     const assignmentId = await ctx.db.insert('assignments', {
       notes: args.additionalNotes,
@@ -303,6 +324,7 @@ export const reopenAssignment = mutation({
     if (!hospice) {
       throw new ConvexError({ message: 'Hospice not found' });
     }
+    await isHospicePendingDeletion(ctx, hospice.userId);
     const assignment = await ctx.db.get(args.assignmentId);
     if (!assignment) {
       throw new ConvexError({ message: 'Assignment not found' });

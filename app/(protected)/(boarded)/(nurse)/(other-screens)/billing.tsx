@@ -19,7 +19,7 @@ const BillingScreen = () => {
     return null;
   }
 
-  return <Billings nurseId={nurse._id} />;
+  return <Billings />;
 };
 
 export default BillingScreen;

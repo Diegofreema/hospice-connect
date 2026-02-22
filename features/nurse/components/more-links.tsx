@@ -35,6 +35,7 @@ export const MoreLinks = ({ links, isSuspended }: Props) => {
         ].includes(item.label);
         const type = isExternal ? 'external' : 'internal';
         const disabled = isSuspended && item.label === 'Availability';
+        const isDeleteAccount = item.label === 'Delete Account';
         return (
           <TouchableOpacity
             disabled={disabled}
@@ -50,20 +51,26 @@ export const MoreLinks = ({ links, isSuspended }: Props) => {
                 <View
                   borderRadius={'full'}
                   p={'lg'}
-                  backgroundColor={theme.colors.lightBlue}
+                  backgroundColor={
+                    isDeleteAccount
+                      ? 'rgba(255, 0, 0, 0.1)'
+                      : theme.colors.lightBlue
+                  }
                 >
                   <TabBarIcon
                     icon={item.icon}
                     size={24}
-                    color={theme.colors.blue}
+                    color={isDeleteAccount ? 'red' : theme.colors.blue}
                   />
                 </View>
-                <Text size="normal">{item.label}</Text>
+                <Text size="normal" color={isDeleteAccount ? 'red' : 'black'}>
+                  {item.label}
+                </Text>
               </View>
               <TabBarIcon
                 icon={IconChevronRight}
                 size={25}
-                color={theme.colors.blue}
+                color={isDeleteAccount ? 'red' : theme.colors.blue}
               />
             </View>
           </TouchableOpacity>

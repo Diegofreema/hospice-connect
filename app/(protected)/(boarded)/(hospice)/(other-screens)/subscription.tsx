@@ -1,11 +1,14 @@
+import { Subscriptions } from '@/features/hospice/components/subscriptions';
+import { BackButton } from '@/features/shared/components/back-button';
+import { Wrapper } from '@/features/shared/components/wrapper';
 import React from 'react';
-import { Text, View } from 'react-native';
 
 const SubscriptionScreen = () => {
   return (
-    <View>
-      <Text>SubscriptionScreen</Text>
-    </View>
+    <Wrapper>
+      <BackButton title="Subscription" marginTop={0} />
+      <Subscriptions />
+    </Wrapper>
   );
 };
 

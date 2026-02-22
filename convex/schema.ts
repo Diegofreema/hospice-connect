@@ -156,6 +156,10 @@ export const gender = v.union(
   v.literal('others'),
 );
 
+export const deleteAccount = {
+  userId: v.string(),
+  reason: v.string(),
+};
 export const assignment = {
   hospiceId: v.id('hospices'),
   assignedTo: v.optional(v.id('nurses')),
@@ -388,4 +392,5 @@ export default defineSchema({
   nursePaymentMethods: defineTable(NursePaymentMethod)
     .index('by_nurse', ['nurseId'])
     .index('by_stripe_customer', ['stripeCustomerId']),
+  deleteAccount: defineTable(deleteAccount).index('by_userId', ['userId']),
 });

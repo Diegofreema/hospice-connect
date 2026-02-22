@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import Purchases from 'react-native-purchases';
+import Purchases, { CustomerInfo } from 'react-native-purchases';
 export const useGetCustomerRC = () => {
   const getCustomerRC = async () => {
     try {
@@ -7,6 +7,7 @@ export const useGetCustomerRC = () => {
       return customerInfo;
     } catch (error) {
       console.log(error);
+      return {} as CustomerInfo;
     }
   };
   return useQuery({

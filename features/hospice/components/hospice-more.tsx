@@ -10,6 +10,7 @@ import {
   IconHeadset,
   IconShieldBolt,
   IconShieldCheck,
+  IconTrash,
 } from '@tabler/icons-react-native';
 
 export const HospiceMore = () => {
@@ -55,5 +56,10 @@ const links: LinkType[] = [
     label: 'Terms of Service',
     icon: IconShieldBolt,
     link: 'https://hospice-connect-web.vercel.app/terms',
+  },
+  {
+    label: 'Delete Account',
+    icon: IconTrash,
+    link: '/delete-account',
   },
 ];
