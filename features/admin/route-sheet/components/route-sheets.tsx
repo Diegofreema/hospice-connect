@@ -244,7 +244,7 @@ export function RouteSheets() {
                               {formatDistanceToNow(sheet.completedAt)}
                             </TableCell>
                           )}
-                          <TableCell className="text-right">
+                          <TableCell className="text-right text-white">
                             <div className="flex justify-end gap-2">
                               {sheet.nurse.status === 'suspended' ? (
                                 <Button
