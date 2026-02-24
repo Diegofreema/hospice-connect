@@ -1,6 +1,7 @@
 import { ErrorComponent } from '@/features/shared/components/error';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { useGetOfferings } from '@/hooks/rc/use-get-offerings';
+import { authClient } from '@/lib/auth-client';
 import {
   IconCheck,
   IconClipboardHeart,
@@ -351,6 +352,14 @@ export const Paywall = () => {
             </Text>
           )}
         </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => authClient.signOut()}
+          style={styles.logoutBtn}
+        >
+          <Text style={[styles.logoutText, { color: theme.colors.textGrey }]}>
+            Log out
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -530,5 +539,14 @@ const styles = StyleSheet.create(() => ({
     color: '#fff',
     fontSize: 16,
     fontFamily: 'PublicSansBold',
+  },
+  logoutBtn: {
+    alignItems: 'center' as const,
+    paddingVertical: 10,
+    marginTop: 2,
+  },
+  logoutText: {
+    fontSize: 14,
+    fontFamily: 'PublicSansRegular',
   },
 }));

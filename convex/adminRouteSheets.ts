@@ -1,4 +1,3 @@
-import { filter } from 'convex-helpers/server/filter';
 import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { Id } from './_generated/dataModel';
@@ -157,11 +156,12 @@ export const getUnSubmittedRouteSheets = query({
       });
     }
 
-    const completedAndNotSubmittedAssignments = await filter(
-      ctx.db.query('nurseAssignments'),
-      (nurseAssignment) =>
-        nurseAssignment.isCompleted && !nurseAssignment.isSubmitted,
-    ).paginate(args.paginationOpts);
+    const completedAndNotSubmittedAssignments = await ctx.db
+      .query('nurseAssignments')
+      .withIndex('by_completed_submitted', (q) =>
+        q.eq('isCompleted', true).eq('isSubmitted', false),
+      )
+      .paginate(args.paginationOpts);
 
     const sortByCompletedAt = completedAndNotSubmittedAssignments.page.sort(
       (a, b) => (b.completedAt || 0) - (a.completedAt || 0),
@@ -202,10 +202,10 @@ export const getUnApprovedSubmittedRouteSheets = query({
       });
     }
 
-    const unApprovedRouteSheets = await filter(
-      ctx.db.query('routeSheets'),
-      (routeSheet) => !routeSheet.isApproved && !routeSheet.isDeclined,
-    ).paginate(args.paginationOpts);
+    const unApprovedRouteSheets = await ctx.db
+      .query('routeSheets')
+      .withIndex('approved', (q) => q.eq('status', 'pending'))
+      .paginate(args.paginationOpts);
 
     const unApprovedRouteSheetsWithNursesAndHospices =
       unApprovedRouteSheets.page.map(async (c) => {

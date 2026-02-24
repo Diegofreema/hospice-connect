@@ -34,7 +34,7 @@ export const getShifts = query({
 
     const schedules = await getSchedulesByAssignmentIdHelper(
       ctx,
-      args.assignmentId
+      args.assignmentId,
     );
 
     const shifts = schedules.map(async (schedule) => {
@@ -43,11 +43,11 @@ export const getShifts = query({
         ctx.db
           .query('routeSheets')
           .withIndex('is_approved', (q) =>
-            q.eq('isApproved', true).eq('assignmentId', args.assignmentId)
+            q.eq('status', 'approved').eq('assignmentId', args.assignmentId),
           ),
-        (q) => q.scheduleIds.includes(schedule._id)
+        (q) => q.scheduleIds.includes(schedule._id),
       ).first();
-      const isRouteSheetApproved = !!routeSheet?.isApproved;
+      const isRouteSheetApproved = routeSheet?.status === 'approved';
       return {
         ...schedule,
         nurse,
@@ -79,7 +79,7 @@ export const getShiftsByOnlyAssignmentId = query({
 
     const schedules = await getSchedulesByAssignmentIdHelper(
       ctx,
-      args.assignmentId
+      args.assignmentId,
     );
 
     const shifts = schedules.map(async (schedule) => {
@@ -133,8 +133,8 @@ export const getInProgressShifts = query({
       .filter((q) =>
         q.and(
           q.eq(q.field('nurseId'), args.nurseId),
-          q.eq(q.field('isCompleted'), false)
-        )
+          q.eq(q.field('isCompleted'), false),
+        ),
       )
       .order('desc')
       .paginate(args.paginationOpts);
@@ -155,7 +155,7 @@ export const getInProgressShifts = query({
           businessName: hospice?.businessName,
           hospiceUserId: hospice?.userId!,
         };
-      })
+      }),
     );
 
     return {
@@ -217,7 +217,7 @@ export const extendAssignment = mutation({
       assignment.state,
       hospice,
       null,
-      500
+      500,
     );
   },
 });

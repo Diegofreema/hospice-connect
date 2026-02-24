@@ -1,5 +1,4 @@
 import { api } from '@/convex/_generated/api';
-import { Paywall } from '@/features/hospice/components/paywall';
 import { ErrorComponent } from '@/features/shared/components/error';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { UnderReview } from '@/features/shared/components/under-review';
@@ -54,9 +53,9 @@ export const HospiceProvider = ({
     return;
   }
 
-  if (customerInfo?.activeSubscriptions?.length === 0) {
-    return <Paywall />;
-  }
+  // if (customerInfo?.activeSubscriptions?.length === 0) {
+  //   return <Paywall />;
+  // }
   return (
     <AuthContext.Provider
       value={{

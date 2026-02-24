@@ -18,7 +18,6 @@ import BottomSheetKeyboardAwareScrollView from '@/features/shared/components/bot
 import { FlexButtons } from '@/features/shared/components/flex-buttons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSelectAssignment } from '../hooks/use-select-assignment';
 import {
   reopenAssignmentValidator,
@@ -33,7 +32,7 @@ export const ReopenCase = ({ onClose }: Props) => {
   const id = useSelectAssignment((state) => state.id);
   const { showToast } = useToast();
   const { hospice } = useHospice();
-  const { bottom } = useSafeAreaInsets();
+
   const reopenCase = useMutation(api.assignments.reopenAssignment);
   const hospiceTimezone = timezone();
   const {

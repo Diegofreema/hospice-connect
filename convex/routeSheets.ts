@@ -1,8 +1,9 @@
 import { ConvexError, v } from 'convex/values';
-import { mutation, query } from './_generated/server';
+import { internalMutation, mutation, query } from './_generated/server';
 import {
   handleUnApprovedSubmittedRouteSheets,
   handleUnSubmittedRouteSheetsCount,
+  updateCount,
 } from './counter';
 
 export const nurseSubmittedRouteSheet = query({
@@ -135,7 +136,7 @@ export const getRouteSheet = query({
       .withIndex('by_assignment_id', (q) =>
         q.eq('assignmentId', assignment._id).eq('nurseId', nurse._id),
       )
-      .filter((q) => q.eq(q.field('isApproved'), true))
+      .filter((q) => q.eq(q.field('status'), 'approved'))
       .first();
     if (!routeSheet) {
       throw new ConvexError({ message: 'Route sheet not found' });
@@ -275,7 +276,7 @@ export const submitRouteSheet = mutation({
 
     const routeSheetId = await ctx.db.insert('routeSheets', {
       ...args,
-      isApproved: false,
+      status: 'pending',
     });
     await ctx.db.insert('hospiceNotifications', {
       hospiceId: args.hospiceId,
@@ -315,7 +316,7 @@ export const approveOrDeclineRouteSheet = mutation({
     if (!routeSheet) {
       throw new ConvexError({ message: 'Route sheet not found' });
     }
-    const assignment = await ctx.db.get(routeSheet.assignmentId);
+    const assignment = await ctx.db.get('assignments', routeSheet.assignmentId);
     if (!assignment) {
       throw new ConvexError({ message: 'Assignment not found' });
     }
@@ -339,16 +340,15 @@ export const approveOrDeclineRouteSheet = mutation({
       ? ''
       : `Reason: ${args.reason || 'N/A'}, Please resubmit shortly.`;
 
-    await ctx.db.patch(args.routeSheetId, {
-      isApproved: args.isApproved,
+    await ctx.db.patch('routeSheets', args.routeSheetId, {
       isSeen: true,
-      isDeclined: !args.isApproved,
+      status: args.isApproved ? 'approved' : 'declined',
     });
     if (!args.isApproved) {
       for (const scheduleId of routeSheet.scheduleIds) {
-        await ctx.db.patch(scheduleId, { isSubmitted: false });
+        await ctx.db.patch('schedules', scheduleId, { isSubmitted: false });
       }
-      await ctx.db.patch(notification._id, {
+      await ctx.db.patch('hospiceNotifications', notification._id, {
         status: 'declined',
       });
 
@@ -371,9 +371,6 @@ export const approveOrDeclineRouteSheet = mutation({
     } else {
       await handleUnApprovedSubmittedRouteSheets(ctx, 'dec');
 
-      await ctx.db.patch('routeSheets', args.routeSheetId, {
-        isApproved: true,
-      });
       await ctx.db.insert('nurseNotifications', {
         isRead: false,
         nurseId: routeSheet.nurseId,
@@ -387,5 +384,11 @@ export const approveOrDeclineRouteSheet = mutation({
         status: 'accepted',
       });
     }
+  },
+});
+
+export const updateRouteSheetStatus = internalMutation({
+  handler: async (ctx) => {
+    await updateCount(ctx);
   },
 });

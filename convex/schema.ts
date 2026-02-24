@@ -194,8 +194,10 @@ export const routeSheet = {
   hospiceId: v.id('hospices'),
   scheduleIds: v.array(v.id('schedules')),
   assignmentId: v.id('assignments'),
-  isApproved: v.boolean(),
-  isDeclined: v.optional(v.boolean()),
+  status: v.optional(
+    v.union(v.literal('pending'), v.literal('approved'), v.literal('declined')),
+  ),
+
   isSeen: v.optional(v.boolean()),
   signature: v.string(),
   comment: v.optional(v.string()),
@@ -326,10 +328,10 @@ export default defineSchema({
       'assignmentId',
       'nurseId',
       'hospiceId',
-      'isApproved',
+      'status',
     ])
-    .index('approved', ['isApproved'])
-    .index('is_approved', ['isApproved', 'assignmentId']),
+    .index('approved', ['status'])
+    .index('is_approved', ['status', 'assignmentId']),
   ratings: defineTable(Rating).index('nurseId', ['nurseId']),
   availabilities: defineTable(Availability).index('nurseId', ['nurseId']),
   nurseNotifications: defineTable(NurseNotification)
@@ -353,7 +355,8 @@ export default defineSchema({
     .index('isApproved', ['isApproved']),
   nurseAssignments: defineTable(NurseAssignments)
     .index('nurse_id', ['nurseId', 'isCompleted', 'assignmentId'])
-    .index('assignmentId', ['assignmentId', 'nurseId']),
+    .index('assignmentId', ['assignmentId', 'nurseId'])
+    .index('by_completed_submitted', ['isCompleted', 'isSubmitted']),
   activityLogs: defineTable({
     userId: v.id('users'),
     action: v.string(),

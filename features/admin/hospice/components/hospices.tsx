@@ -41,7 +41,10 @@ import { ActionDialog } from '@/components/web/admin/action-dialog';
 import { HospiceDetailsDialog } from '@/components/web/admin/hospice-details-dialog';
 import { PendingApprovalsCard } from '@/components/web/admin/pending-approvals-card';
 import type { Id } from '@/convex/_generated/dataModel';
-import { changeFirstLetterToCapital } from '@/features/shared/utils';
+import {
+  changeFirstLetterToCapital,
+  generateErrorMessage,
+} from '@/features/shared/utils';
 import { usStates } from '@/lib/constants';
 import {
   cn,
@@ -102,8 +105,12 @@ export function Hospices() {
           : 'The hospice account has been suspended successfully.',
       });
     } catch (error) {
+      const errorMessage = generateErrorMessage(
+        error,
+        'Failed to update hospice status',
+      );
       toast('Error', {
-        description: 'Failed to update hospice status. Please try again.',
+        description: errorMessage,
       });
     }
   };

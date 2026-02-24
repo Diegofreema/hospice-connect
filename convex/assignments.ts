@@ -192,7 +192,7 @@ export const completedAssignments = query({
               .eq('assignmentId', nurseAssignment.assignmentId)
               .eq('nurseId', nurseAssignment.nurseId),
           )
-          .filter((q) => q.neq(q.field('isDeclined'), true))
+          .filter((q) => q.neq(q.field('status'), 'declined'))
           .first();
         const isSubmitted = !!routeSheet;
         const assignment = (await ctx.db.get(
@@ -201,7 +201,7 @@ export const completedAssignments = query({
         return {
           ...assignment,
           isSubmitted,
-          isApproved: !!routeSheet?.isApproved,
+          isApproved: routeSheet?.status === 'approved',
         };
       }),
     );
