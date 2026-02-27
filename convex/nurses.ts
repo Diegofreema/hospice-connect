@@ -11,9 +11,11 @@ import {
   type QueryCtx,
 } from './_generated/server';
 import {
+  handleApproveNurseCount,
   handleNurseCount,
   handlePendingNurseAccountsUpdate,
   handlePendingNurseApprovalCount,
+  handleSuspendedNurseCount,
   updateCount,
 } from './counter';
 import {
@@ -593,13 +595,15 @@ export const sendNotificationsToNursesAndSuspendAccount = internalMutation({
         nurseId: assignment.nurseId,
         isRead: false,
         description: `Complete and submit all outstanding route sheets to reactivate your account.`,
-        title: 'Account suspension',
+        title: 'Account suspended',
         type: 'admin',
         viewCount: 0,
       });
       await ctx.db.patch('nurses', assignment.nurseId, {
         status: 'suspended',
       });
+      await handleSuspendedNurseCount(ctx, 'inc');
+      await handleApproveNurseCount(ctx, 'dec');
     }
 
     if (!isDone) {

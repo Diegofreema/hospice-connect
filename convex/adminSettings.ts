@@ -1,7 +1,7 @@
-import { mutation, query } from './_generated/server';
 import { ConvexError, v } from 'convex/values';
-import { getUserHelperFn } from './helper';
+import { internalQuery, mutation, query } from './_generated/server';
 import { authComponent, createAuth } from './auth';
+import { getUserHelperFn } from './helper';
 
 // Get admin profile with commission info
 
@@ -78,7 +78,7 @@ export const updateAdminCommission = mutation({
 
 export const getCommission = query({
   args: {},
-  handler: async (ctx, args) => {
+  handler: async (ctx, _args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new ConvexError({
@@ -86,7 +86,15 @@ export const getCommission = query({
       });
     }
     const commission = await ctx.db.query('commission').first();
+    return commission?.commissionPercentage || 0;
+  },
+});
 
+/** Internal version — callable from internalAction without auth check */
+export const getCommissionInternal = internalQuery({
+  args: {},
+  handler: async (ctx) => {
+    const commission = await ctx.db.query('commission').first();
     return commission?.commissionPercentage || 0;
   },
 });

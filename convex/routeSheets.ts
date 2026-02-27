@@ -1,10 +1,14 @@
 import { ConvexError, v } from 'convex/values';
+import { internal } from './_generated/api';
 import { internalMutation, mutation, query } from './_generated/server';
 import {
+  handleApproveNurseCount,
+  handleSuspendedNurseCount,
   handleUnApprovedSubmittedRouteSheets,
   handleUnSubmittedRouteSheetsCount,
   updateCount,
 } from './counter';
+import { checkDurationOfNotSubmittedAssignment } from './helper';
 
 export const nurseSubmittedRouteSheet = query({
   args: {
@@ -255,7 +259,7 @@ export const submitRouteSheet = mutation({
 
       await ctx.db.patch(scheduleId, { isSubmitted: true });
     }
-    /// check if route sheet exists, then update it, if not, create a new one
+
     const nurseAssignment = await ctx.db
       .query('nurseAssignments')
       .withIndex('assignmentId', (q) =>
@@ -271,6 +275,7 @@ export const submitRouteSheet = mutation({
     await ctx.db.patch('nurseAssignments', nurseAssignment._id, {
       isSubmitted: true,
     });
+
     await handleUnSubmittedRouteSheetsCount(ctx, 'dec');
     await handleUnApprovedSubmittedRouteSheets(ctx, 'inc');
 
@@ -288,6 +293,46 @@ export const submitRouteSheet = mutation({
       routeSheetId,
       viewCount: 0,
     });
+
+    // ── Auto-reactivation check ───────────────────────────────────────────
+    // If the nurse is suspended, check whether this submission clears all
+    // overdue assignments. If no 7-day-overdue unsubmitted assignments remain,
+    // restore their account to 'approved'.
+    if (nurse.status === 'suspended') {
+      const allAssignments = await ctx.db
+        .query('nurseAssignments')
+        .withIndex('nurse_id_is_submitted', (q) =>
+          q
+            .eq('nurseId', args.nurseId)
+            .eq('isCompleted', true)
+            .eq('isSubmitted', false),
+        )
+        .collect();
+
+      const stillOverdue = allAssignments.some(
+        (a) =>
+          // Exclude the assignment just submitted
+          a._id !== nurseAssignment._id &&
+          checkDurationOfNotSubmittedAssignment(7, a),
+      );
+
+      if (!stillOverdue) {
+        // No more overdue assignments — reactivate the nurse
+        await ctx.db.patch('nurses', args.nurseId, { status: 'approved' });
+        await handleApproveNurseCount(ctx, 'inc');
+        await handleSuspendedNurseCount(ctx, 'dec');
+
+        await ctx.db.insert('nurseNotifications', {
+          nurseId: args.nurseId,
+          isRead: false,
+          title: 'Account reactivated',
+          description:
+            'All outstanding route sheets have been submitted. Your account is now active again.',
+          type: 'admin',
+          viewCount: 0,
+        });
+      }
+    }
   },
 });
 
@@ -383,6 +428,17 @@ export const approveOrDeclineRouteSheet = mutation({
       await ctx.db.patch(notification._id, {
         status: 'accepted',
       });
+
+      // Trigger commission billing (non-blocking — runs asynchronously)
+      await ctx.scheduler.runAfter(
+        0,
+        internal.nurseCommission.chargeNurseCommission,
+        {
+          nurseId: routeSheet.nurseId,
+          scheduleIds: routeSheet.scheduleIds,
+          hospiceBusinessName: hospice.businessName,
+        },
+      );
     }
   },
 });

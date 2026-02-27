@@ -1,134 +1,256 @@
 import { api } from '@/convex/_generated/api';
 import { type Id } from '@/convex/_generated/dataModel';
-import { BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
-// import { CardField, useStripe } from '@stripe/stripe-react-native';
+import { CardField, useStripe } from '@stripe/stripe-react-native';
 import { useAction } from 'convex/react';
-import React, { useRef, useState } from 'react';
-import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import {
+  ActivityIndicator,
+  Modal,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { toast } from 'sonner-native';
 
 type Props = {
-  isOpen: boolean;
+  visible: boolean;
   onClose: () => void;
   nurseId: Id<'nurses'>;
+  clientSecret: string;
+  stripeCustomerId: string;
+  onSuccess: () => void;
 };
 
-export const AddPaymentMethodModal = ({ isOpen, onClose, nurseId }: Props) => {
-  const bottomSheetRef = useRef<BottomSheetModal>(null);
-  // const { createPaymentMethod } = useStripe();
-  const addPaymentMethod = useAction(api.nursePayments.addPaymentMethod);
+export const AddPaymentMethodModal = ({
+  visible,
+  onClose,
+  nurseId,
+  clientSecret,
+  stripeCustomerId,
+  onSuccess,
+}: Props) => {
+  const { theme } = useUnistyles();
+  const { confirmSetupIntent } = useStripe();
+  const [isLoading, setIsLoading] = useState(false);
+  const [cardComplete, setCardComplete] = useState(false);
 
-  const [loading, setLoading] = useState(false);
-  const [cardDetails, setCardDetails] = useState<any>(null);
+  const addPaymentMethod = useAction(api.nursePaymentsActions.addPaymentMethod);
 
-  React.useEffect(() => {
-    if (isOpen) {
-      bottomSheetRef.current?.present();
-    } else {
-      bottomSheetRef.current?.dismiss();
-    }
-  }, [isOpen]);
-
-  const handleAddCard = async () => {
-    if (!cardDetails?.complete) {
-      toast.error('Invalid card details', {
-        description: 'Please enter complete card information',
+  const handleAdd = useCallback(async () => {
+    if (!cardComplete) {
+      toast.error('Incomplete card', {
+        description: 'Please fill in all card details.',
       });
       return;
     }
 
-    setLoading(true);
+    setIsLoading(true);
     try {
-      // Create payment method with Stripe
-      // const { paymentMethod, error } = await createPaymentMethod({
-      //   paymentMethodType: 'Card',
-      // });
+      // Confirm the SetupIntent with the card entered by the user
+      const { setupIntent, error } = await confirmSetupIntent(clientSecret, {
+        paymentMethodType: 'Card',
+      });
 
-      // if (error) {
-      //   throw new Error(error.message);
-      // }
+      if (error) {
+        throw new Error(error.message);
+      }
 
-      // if (!paymentMethod) {
-      //   throw new Error('Failed to create payment method');
-      // }
+      if (!setupIntent?.paymentMethodId) {
+        throw new Error('No payment method returned from Stripe');
+      }
 
-      // // Add payment method to backend
-      // await addPaymentMethod({
-      //   nurseId,
-      //   paymentMethodId: paymentMethod.id,
-      // });
+      // Save to our backend
+      await addPaymentMethod({
+        nurseId,
+        paymentMethodId: setupIntent.paymentMethodId,
+        stripeCustomerId,
+      });
 
-      toast.success('Card added successfully');
+      toast.success('Card saved successfully!');
+      onSuccess();
       onClose();
-    } catch (error: any) {
-      console.error('Error adding payment method:', error);
-      toast.error('Failed to add card', {
-        description: error.message || 'Please try again',
+    } catch (err: any) {
+      toast.error('Failed to save card', {
+        description: err?.message ?? 'Please try again.',
       });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  };
+  }, [
+    cardComplete,
+    clientSecret,
+    confirmSetupIntent,
+    addPaymentMethod,
+    nurseId,
+    stripeCustomerId,
+    onSuccess,
+    onClose,
+  ]);
 
   return (
-    <BottomSheetModal
-      ref={bottomSheetRef}
-      snapPoints={['50%']}
-      onDismiss={onClose}
-      enablePanDownToClose
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={onClose}
     >
-      <BottomSheetView className="flex-1 px-4 py-6">
-        <Text className="mb-4 text-xl font-bold">Add Payment Method</Text>
+      <View style={styles.overlay}>
+        <View
+          style={[styles.sheet, { backgroundColor: theme.colors.background }]}
+        >
+          {/* Handle */}
+          <View
+            style={[styles.handle, { backgroundColor: theme.colors.grey }]}
+          />
 
-        <View className="mb-6">
-          {/* <CardField
-            postalCodeEnabled={false}
-            placeholders={{
-              number: '4242 4242 4242 4242',
-            }}
-            cardStyle={{
-              backgroundColor: '#FFFFFF',
-              textColor: '#000000',
-            }}
-            style={{
-              width: '100%',
-              height: 50,
-              marginVertical: 10,
-            }}
-            onCardChange={(details) => {
-              setCardDetails(details);
-            }}
-          /> */}
-        </View>
+          <Text style={[styles.title, { color: theme.colors.typography }]}>
+            Add Payment Card
+          </Text>
+          <Text style={[styles.subtitle, { color: theme.colors.textGrey }]}>
+            Your card will be used for commission billing when route sheets are
+            approved.
+          </Text>
 
-        <View className="gap-3">
-          <Pressable
-            onPress={handleAddCard}
-            disabled={loading || !cardDetails?.complete}
-            className={`rounded-lg py-4 ${
-              loading || !cardDetails?.complete ? 'bg-gray-300' : 'bg-blue-500'
-            }`}
+          {/* Stripe native card input */}
+          <View
+            style={[
+              styles.cardFieldWrap,
+              {
+                borderColor: theme.colors.grey,
+                backgroundColor: theme.colors.greyLight,
+              },
+            ]}
           >
-            {loading ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              <Text className="text-center font-semibold text-white">
-                Add Card
+            <CardField
+              postalCodeEnabled={false}
+              placeholders={{ number: '4242 4242 4242 4242' }}
+              cardStyle={{
+                backgroundColor: 'transparent',
+                textColor: theme.colors.typography,
+                placeholderColor: theme.colors.textGrey,
+                borderColor: 'transparent',
+              }}
+              style={styles.cardField}
+              onCardChange={(details) => {
+                setCardComplete(details.complete);
+              }}
+            />
+          </View>
+
+          <View style={styles.actions}>
+            <TouchableOpacity
+              onPress={handleAdd}
+              disabled={isLoading || !cardComplete}
+              style={[
+                styles.primaryBtn,
+                {
+                  backgroundColor:
+                    !cardComplete || isLoading
+                      ? theme.colors.grey
+                      : theme.colors.blue,
+                },
+              ]}
+            >
+              {isLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.primaryBtnText}>Save Card</Text>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={onClose}
+              disabled={isLoading}
+              style={[styles.cancelBtn, { borderColor: theme.colors.grey }]}
+            >
+              <Text
+                style={[styles.cancelBtnText, { color: theme.colors.textGrey }]}
+              >
+                Cancel
               </Text>
-            )}
-          </Pressable>
+            </TouchableOpacity>
+          </View>
 
-          <Pressable
-            onPress={onClose}
-            disabled={loading}
-            className="rounded-lg border border-gray-300 py-4"
-          >
-            <Text className="text-center font-semibold text-gray-700">
-              Cancel
-            </Text>
-          </Pressable>
+          <Text style={[styles.secureNote, { color: theme.colors.textGrey }]}>
+            🔒 Secured by Stripe — we never store your full card number.
+          </Text>
         </View>
-      </BottomSheetView>
-    </BottomSheetModal>
+      </View>
+    </Modal>
   );
 };
+
+const styles = StyleSheet.create(() => ({
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end' as const,
+  },
+  sheet: {
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 24,
+    paddingBottom: 40,
+    gap: 14,
+  },
+  handle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    alignSelf: 'center' as const,
+    marginBottom: 8,
+  },
+  title: {
+    fontSize: 18,
+    fontFamily: 'PublicSansBold',
+  },
+  subtitle: {
+    fontSize: 13,
+    fontFamily: 'PublicSansRegular',
+    lineHeight: 18,
+    marginTop: -4,
+  },
+  cardFieldWrap: {
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    marginTop: 4,
+  },
+  cardField: {
+    width: '100%' as any,
+    height: 50,
+  },
+  actions: {
+    gap: 10,
+    marginTop: 8,
+  },
+  primaryBtn: {
+    borderRadius: 13,
+    paddingVertical: 15,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+  },
+  primaryBtnText: {
+    color: '#fff',
+    fontSize: 15,
+    fontFamily: 'PublicSansBold',
+  },
+  cancelBtn: {
+    borderRadius: 13,
+    paddingVertical: 14,
+    alignItems: 'center' as const,
+    borderWidth: 1,
+  },
+  cancelBtnText: {
+    fontSize: 15,
+    fontFamily: 'PublicSansRegular',
+  },
+  secureNote: {
+    fontSize: 11,
+    fontFamily: 'PublicSansRegular',
+    textAlign: 'center' as const,
+    marginTop: 4,
+  },
+}));

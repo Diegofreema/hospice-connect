@@ -355,6 +355,7 @@ export default defineSchema({
     .index('isApproved', ['isApproved']),
   nurseAssignments: defineTable(NurseAssignments)
     .index('nurse_id', ['nurseId', 'isCompleted', 'assignmentId'])
+    .index('nurse_id_is_submitted', ['nurseId', 'isCompleted', 'isSubmitted'])
     .index('assignmentId', ['assignmentId', 'nurseId'])
     .index('by_completed_submitted', ['isCompleted', 'isSubmitted']),
   activityLogs: defineTable({

@@ -38,7 +38,7 @@ export const suspendNurseFromShifts = mutation({
         message: 'Nurse must be approved before suspension',
       });
     }
-    await ctx.db.patch(args.nurseId, {
+    await ctx.db.patch('nurses', args.nurseId, {
       status: 'suspended',
     });
     await handleSuspendedNurseCount(ctx, 'inc');
