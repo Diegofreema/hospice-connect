@@ -31,9 +31,11 @@ export const cleanupResend = internalMutation({
 //   internal.assignments.updateNursesAssignment
 // );
 
-crons.interval(
+// Fires at midnight UTC each day — catches all assignments where exactly 5 days
+// have elapsed since completion (window: >= 5 days and < 6 days).
+crons.daily(
   'send notification on 5th day',
-  { hours: 24 },
+  { hourUTC: 0, minuteUTC: 0 },
   internal.nurses.sendNotificationsToNursesOnFifthDay,
   {
     numItems: 500,
@@ -41,9 +43,11 @@ crons.interval(
   },
 );
 
-crons.interval(
+// Fires at midnight UTC each day — catches assignments exactly on day 6
+// (window: >= 6 days and < 7 days).
+crons.daily(
   'send notification on 6th day',
-  { hours: 24 },
+  { hourUTC: 0, minuteUTC: 0 },
   internal.nurses.sendNotificationsToNursesOnSixthDay,
   {
     numItems: 500,
@@ -51,9 +55,11 @@ crons.interval(
   },
 );
 
-crons.interval(
+// Fires at midnight UTC each day — catches assignments exactly on day 7
+// (window: >= 7 days and < 8 days) and suspends the nurse's account.
+crons.daily(
   'send notification on 7th day and suspend account',
-  { hours: 24 },
+  { hourUTC: 0, minuteUTC: 0 },
   internal.nurses.sendNotificationsToNursesAndSuspendAccount,
   {
     numItems: 500,

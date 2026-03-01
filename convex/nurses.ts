@@ -583,8 +583,8 @@ export const sendNotificationsToNursesAndSuspendAccount = internalMutation({
     const data = await filter(
       ctx.db.query('nurseAssignments'),
       (nurseAssignment) => {
-        // Exactly on day 7+ (>= 7 days, no upper bound — also suspends account)
-        return checkDurationOfNotSubmittedAssignment(7, nurseAssignment);
+        // Exactly on day 7 (>= 7 days AND < 8 days) — suspends account once
+        return checkDurationOfNotSubmittedAssignment(7, nurseAssignment, 8);
       },
     ).paginate(args);
 
