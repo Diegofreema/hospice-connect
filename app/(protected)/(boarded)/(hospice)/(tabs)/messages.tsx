@@ -20,7 +20,7 @@ const MessageScreen = () => {
       members: { $in: [id] },
       type: 'messaging',
     }),
-    [id]
+    [id],
   );
   const sort = { last_updated: -1 } as any;
   const options = {
@@ -31,7 +31,6 @@ const MessageScreen = () => {
     setChannel(channel);
     router.push(`/channel/${channel.cid}`);
   };
-
   return (
     <Wrapper>
       <ChannelList

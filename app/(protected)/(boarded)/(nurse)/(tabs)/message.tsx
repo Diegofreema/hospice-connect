@@ -18,7 +18,7 @@ const MessageScreen = () => {
       members: { $in: [id] },
       type: 'messaging',
     }),
-    [id]
+    [id],
   );
   const sort = { last_updated: -1 } as any;
   const options = {

@@ -10,8 +10,8 @@ const BoardedLayout = () => {
   const isNurse = user?.role === 'nurse';
   useConfigureRC();
   return (
-    <ChatWrapper>
-      <ChatContext>
+    <ChatContext>
+      <ChatWrapper>
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Protected guard={isNurse}>
             <Stack.Screen name="(nurse)" />
@@ -20,8 +20,8 @@ const BoardedLayout = () => {
             <Stack.Screen name="(hospice)" />
           </Stack.Protected>
         </Stack>
-      </ChatContext>
-    </ChatWrapper>
+      </ChatWrapper>
+    </ChatContext>
   );
 };
 

@@ -27,8 +27,9 @@ export const authComponent = createClient<DataModel, typeof authSchema>(
 
 export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
   return {
-    baseURL: urlToUse,
+    baseURL: siteUrl,
     trustedOrigins: [
+      'https://appleid.apple.com',
       urlToUse,
       nativeAppUrl,
       ...(isDevelopment
@@ -62,6 +63,10 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
       google: {
         clientId: process.env.AUTH_GOOGLE_ID as string,
         clientSecret: process.env.AUTH_GOOGLE_SECRET as string,
+      },
+      apple: {
+        clientId: 'com.hospiceconnect.hospiceconnect.si',
+        clientSecret: process.env.AUTH_APPLE_SECRET as string,
       },
     },
     account: {

@@ -1,7 +1,11 @@
 import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { mutation, query } from './_generated/server';
-import { checkIfNurseHasActiveShift, formatDate } from './helper';
+import {
+  checkIfNurseHasActiveShift,
+  disableAllOtherNotificationsForThisSchedule,
+  formatDate,
+} from './helper';
 import { discipline } from './schema';
 import { getUserHelper } from './users';
 
@@ -47,7 +51,7 @@ export const getOurAvailablePosts = query({
         q
           .eq('hospiceId', args.hospiceId)
           .eq('status', 'available')
-          .eq('discipline', args.discipline)
+          .eq('discipline', args.discipline),
       )
       .order('desc')
       .take(50);
@@ -162,7 +166,7 @@ export const acceptAssignment = mutation({
     const nurseAssignmentExists = await ctx.db
       .query('nurseAssignments')
       .withIndex('assignmentId', (q) =>
-        q.eq('assignmentId', assignment._id).eq('nurseId', args.nurseId)
+        q.eq('assignmentId', assignment._id).eq('nurseId', args.nurseId),
       )
       .first();
     if (!nurseAssignmentExists) {
@@ -187,7 +191,7 @@ export const acceptAssignment = mutation({
       description: `${nurse.name} (${
         nurse.discipline
       }) has accepted your case request for ${formatDate(
-        schedule.startDate
+        schedule.startDate,
       )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
         schedule.endTime
       }.`,
@@ -202,6 +206,15 @@ export const acceptAssignment = mutation({
           status: 'accepted',
         });
       }
+
+      await disableAllOtherNotificationsForThisSchedule({
+        ctx,
+        scheduleId: args.scheduleId,
+        type: 'assignment',
+        nurseNotificationId: args.nurseNotificationId,
+        cursor: null,
+        numItems: 50,
+      });
     }
   },
 });
@@ -252,7 +265,7 @@ export const declineAssignment = mutation({
       description: `${nurse.name} (${
         nurse.discipline
       }) has declined your case request for ${formatDate(
-        schedule.startDate
+        schedule.startDate,
       )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
         schedule.endTime
       }.`,
@@ -309,18 +322,18 @@ export const updateAssignmentToNotCompleted = mutation({
         q
           .eq('nurseId', args.nurseId)
           .eq('isCompleted', false)
-          .eq('assignmentId', args.assignmentId)
+          .eq('assignmentId', args.assignmentId),
       )
       .first();
     if (nurseAssignments) {
       const schedules = await ctx.db
         .query('schedules')
         .withIndex('nurse_id', (q) =>
-          q.eq('nurseId', args.nurseId).eq('assignmentId', args.assignmentId)
+          q.eq('nurseId', args.nurseId).eq('assignmentId', args.assignmentId),
         )
         .collect();
       const allScheduleIsComplete = schedules.every(
-        (s) => s.status === 'completed'
+        (s) => s.status === 'completed',
       );
       if (!allScheduleIsComplete) {
         await ctx.db.patch(nurseAssignments._id, {

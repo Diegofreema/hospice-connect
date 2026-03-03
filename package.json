@@ -166,6 +166,7 @@
     "@types/react": "~19.1.10",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
+    "patch-package": "^8.0.1",
     "react-email": "4.2.8",
     "typescript": "~5.9.2"
   },
@@ -176,5 +177,8 @@
   "private": true,
   "op-sqlite": {
     "iosSqlite": true
+  },
+  "patchedDependencies": {
+    "stream-chat-expo@8.5.0": "patches/stream-chat-expo@8.5.0.patch"
   }
 }

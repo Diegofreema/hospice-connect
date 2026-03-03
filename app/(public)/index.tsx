@@ -2,7 +2,7 @@ import { PrivacyNoticeLink } from '@/components/privacy-notice/privacy-notice-li
 import { Subtitle } from '@/components/subtitle/Subtitle';
 import { DividerWithText } from '@/features/authentication/components/divider-with-text';
 import { LoginForm } from '@/features/authentication/components/form/login-form';
-import { GoogleButton } from '@/features/authentication/components/google-button';
+import { LoginButton } from '@/features/authentication/components/google-button';
 import { PrivacyTermsLink } from '@/features/authentication/components/privacy-term';
 import { MyTitle } from '@/features/shared/components/my-title';
 import { Spacer } from '@/features/shared/components/spacer';
@@ -37,7 +37,8 @@ const LoginScreen = () => {
         <LoginForm />
         {Platform.OS === 'android' && <DividerWithText />}
 
-        {Platform.OS === 'android' && <GoogleButton />}
+        {Platform.OS === 'android' && <LoginButton provider="google" />}
+        {/* {Platform.OS === 'ios' && <LoginButton provider="apple" />} */}
 
         <PrivacyTermsLink />
       </KeyboardAwareScrollView>

@@ -16,7 +16,7 @@ export const useMessage = ({ userToChat }: Props) => {
   try {
     const context = useChatContext();
     client = context?.client;
-  } catch (error) {
+  } catch {
     // Chat context not available, that's okay
     client = null;
   }

@@ -515,7 +515,7 @@ export const sendNotificationsToNursesOnFifthDay = internalMutation({
       await ctx.db.insert('nurseNotifications', {
         nurseId: assignment.nurseId,
         isRead: false,
-        description: `Complete and submit all outstanding route sheets to avoid account deactivation.`,
+        description: `Complete and submit all outstanding route sheet(s) to avoid account deactivation.`,
         title: 'Outstanding route sheet',
         type: 'admin',
         viewCount: 0,
@@ -554,7 +554,7 @@ export const sendNotificationsToNursesOnSixthDay = internalMutation({
       await ctx.db.insert('nurseNotifications', {
         nurseId: assignment.nurseId,
         isRead: false,
-        description: `Complete and submit all outstanding route sheets to avoid account deactivation.`,
+        description: `Complete and submit all outstanding route sheet(s) to avoid account deactivation.`,
         title: 'Outstanding route sheet',
         type: 'admin',
         viewCount: 0,

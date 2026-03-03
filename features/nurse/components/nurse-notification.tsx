@@ -50,7 +50,8 @@ export const NurseNotification = ({ notification }: Props) => {
 
   const isDeclined = notification?.status === 'declined';
   const isAccepted = notification?.status === 'accepted';
-  const showButtons = !isDeclined && !isAccepted;
+  const showButtons =
+    !isDeclined && !isAccepted && notification.status !== 'disabled';
   const isReassignment = notification.type === 'reassignment';
   const isAssignmentOrReassignment =
     notification.type === 'assignment' || notification.type === 'reassignment';

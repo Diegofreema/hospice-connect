@@ -633,3 +633,46 @@ export const getUserFromBetterAuthId = async (
     .withIndex('userId', (q) => q.eq('userId', userId))
     .first();
 };
+
+type DisableAllOtherNotificationsForThisScheduleType = {
+  ctx: MutationCtx;
+  scheduleId: Id<'schedules'>;
+  type: 'assignment' | 'reassignment';
+  nurseNotificationId: Id<'nurseNotifications'>;
+  cursor: null | string;
+  numItems: number;
+};
+
+export const disableAllOtherNotificationsForThisSchedule = async ({
+  ctx,
+  scheduleId,
+  type,
+  nurseNotificationId,
+  cursor,
+  numItems,
+}: DisableAllOtherNotificationsForThisScheduleType) => {
+  const notifications = await ctx.db
+    .query('nurseNotifications')
+    .withIndex('scheduleId', (q) =>
+      q.eq('scheduleId', scheduleId).eq('type', type),
+    )
+    .filter((q) => q.neq(q.field('_id'), nurseNotificationId))
+    .paginate({ cursor, numItems });
+
+  const { isDone, page, continueCursor } = notifications;
+  for (const notification of page) {
+    await ctx.db.patch(notification._id, {
+      status: 'disabled',
+    });
+  }
+  if (!isDone) {
+    await disableAllOtherNotificationsForThisSchedule({
+      ctx,
+      scheduleId,
+      type,
+      nurseNotificationId,
+      cursor: continueCursor,
+      numItems,
+    });
+  }
+};

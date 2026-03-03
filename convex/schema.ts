@@ -253,7 +253,13 @@ export const NurseNotification = {
   description: v.optional(v.string()),
   hospiceId: v.optional(v.id('hospices')),
   scheduleId: v.optional(v.id('schedules')),
-  status: v.optional(v.union(v.literal('accepted'), v.literal('declined'))),
+  status: v.optional(
+    v.union(
+      v.literal('accepted'),
+      v.literal('declined'),
+      v.literal('disabled'),
+    ),
+  ),
   viewCount: v.number(),
   adminNotificationId: v.optional(v.id('adminNotifications')),
 };
@@ -273,7 +279,13 @@ export const HospiceNotification = {
   routeSheetId: v.optional(v.id('routeSheets')),
   scheduleId: v.optional(v.id('schedules')),
   nurseId: v.optional(v.id('nurses')),
-  status: v.optional(v.union(v.literal('accepted'), v.literal('declined'))),
+  status: v.optional(
+    v.union(
+      v.literal('accepted'),
+      v.literal('declined'),
+      v.literal('disabled'),
+    ),
+  ),
   viewCount: v.number(),
   adminNotificationId: v.optional(v.id('adminNotifications')),
 };

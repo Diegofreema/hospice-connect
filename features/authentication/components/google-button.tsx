@@ -5,12 +5,20 @@ import { authClient } from '@/lib/auth-client';
 import { Image } from 'expo-image';
 import React from 'react';
 
-export const GoogleButton = () => {
+type Props = {
+  provider: 'google' | 'apple';
+};
+export const LoginButton = ({ provider }: Props) => {
   const { showToast } = useToast();
+  const imageSource =
+    provider === 'google'
+      ? require('@/assets/images/google.png')
+      : require('@/assets/images/apple.png');
+  const title = provider === 'google' ? 'Google' : 'Apple';
   const handleSignIn = async () => {
     try {
       const { data, error } = await authClient.signIn.social({
-        provider: 'google',
+        provider,
       });
       if (error) {
         showToast({
@@ -19,17 +27,23 @@ export const GoogleButton = () => {
           autodismiss: true,
         });
       }
+
+      console.log({ data });
+
       if (data) {
         showToast({
           title: 'Success',
-          subtitle: 'Signed in with Google successfully',
+          subtitle: `Signed in with ${title} successfully`,
           autodismiss: true,
         });
       }
     } catch (error) {
       showToast({
         title: 'Error',
-        subtitle: generateErrorMessage(error, 'Failed to sign in with Google'),
+        subtitle: generateErrorMessage(
+          error,
+          `Failed to sign in with ${title}`,
+        ),
         autodismiss: true,
       });
     }
@@ -38,10 +52,10 @@ export const GoogleButton = () => {
     <Button
       bg={'transparent'}
       style={{ borderColor: 'grey', borderWidth: 1, width: '100%' }}
-      title="Google"
+      title={title}
       rightIcon={
         <Image
-          source={require('@/assets/images/google.png')}
+          source={imageSource}
           style={{ width: 25, height: 25 }}
           contentFit="contain"
         />
