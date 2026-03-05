@@ -66,9 +66,11 @@ export const ChatWrapper = ({ children }: PropsWithChildren) => {
     },
   };
 
+  if (!client) return null;
+
   return (
     <OverlayProvider value={{ style: chatTheme }}>
-      {client ? <Chat client={client}>{children}</Chat> : children}
+      <Chat client={client}>{children}</Chat>
     </OverlayProvider>
   );
 };
