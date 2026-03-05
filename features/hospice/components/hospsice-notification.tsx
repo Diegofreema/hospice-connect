@@ -158,7 +158,9 @@ export const HospiceNotification = ({ notification }: Props) => {
     }
   };
   const showButtons =
-    notification.status !== 'accepted' && notification.status !== 'declined';
+    notification.status !== 'accepted' &&
+    notification.status !== 'declined' &&
+    notification.status !== 'disabled';
   const isDeclined = notification?.status === 'declined';
   const isAccepted = notification?.status === 'accepted';
   const isRouteSheet = notification.type === 'route_sheet';

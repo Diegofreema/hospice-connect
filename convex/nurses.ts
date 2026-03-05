@@ -594,7 +594,7 @@ export const sendNotificationsToNursesAndSuspendAccount = internalMutation({
       await ctx.db.insert('nurseNotifications', {
         nurseId: assignment.nurseId,
         isRead: false,
-        description: `Complete and submit all outstanding route sheets to reactivate your account.`,
+        description: `Complete and submit all outstanding route sheet(s) to reactivate your account.`,
         title: 'Account suspended',
         type: 'admin',
         viewCount: 0,

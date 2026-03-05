@@ -293,46 +293,6 @@ export const submitRouteSheet = mutation({
       routeSheetId,
       viewCount: 0,
     });
-
-    // ── Auto-reactivation check ───────────────────────────────────────────
-    // If the nurse is suspended, check whether this submission clears all
-    // overdue assignments. If no 7-day-overdue unsubmitted assignments remain,
-    // restore their account to 'approved'.
-    if (nurse.status === 'suspended') {
-      const allAssignments = await ctx.db
-        .query('nurseAssignments')
-        .withIndex('nurse_id_is_submitted', (q) =>
-          q
-            .eq('nurseId', args.nurseId)
-            .eq('isCompleted', true)
-            .eq('isSubmitted', false),
-        )
-        .collect();
-
-      const stillOverdue = allAssignments.some(
-        (a) =>
-          // Exclude the assignment just submitted
-          a._id !== nurseAssignment._id &&
-          checkDurationOfNotSubmittedAssignment(7, a),
-      );
-
-      if (!stillOverdue) {
-        // No more overdue assignments — reactivate the nurse
-        await ctx.db.patch('nurses', args.nurseId, { status: 'approved' });
-        await handleApproveNurseCount(ctx, 'inc');
-        await handleSuspendedNurseCount(ctx, 'dec');
-
-        await ctx.db.insert('nurseNotifications', {
-          nurseId: args.nurseId,
-          isRead: false,
-          title: 'Account reactivated',
-          description:
-            'All outstanding route sheets have been submitted. Your account is now active again.',
-          type: 'admin',
-          viewCount: 0,
-        });
-      }
-    }
   },
 });
 
@@ -354,6 +314,7 @@ export const approveOrDeclineRouteSheet = mutation({
       ctx.db.get('routeSheets', args.routeSheetId),
       ctx.db.get('hospiceNotifications', args.notificationId),
     ]);
+
     if (!hospice) {
       throw new ConvexError({ message: 'Hospice not found' });
     }
@@ -371,6 +332,11 @@ export const approveOrDeclineRouteSheet = mutation({
 
     if (routeSheet.hospiceId !== hospice._id) {
       throw new ConvexError({ message: 'Unauthorized' });
+    }
+
+    const nurse = await ctx.db.get('nurses', routeSheet.nurseId);
+    if (!nurse) {
+      throw new ConvexError({ message: 'Nurse not found' });
     }
     const nurseAssignment = await ctx.db
       .query('nurseAssignments')
@@ -428,7 +394,47 @@ export const approveOrDeclineRouteSheet = mutation({
       await ctx.db.patch(notification._id, {
         status: 'accepted',
       });
+      // ── Auto-reactivation check ───────────────────────────────────────────
+      // If the nurse is suspended, check whether this submission clears all
+      // overdue assignments. If no 7-day-overdue unsubmitted assignments remain,
+      // restore their account to 'approved'.
+      if (nurse.status === 'suspended') {
+        const allAssignments = await ctx.db
+          .query('nurseAssignments')
+          .withIndex('nurse_id_is_submitted', (q) =>
+            q
+              .eq('nurseId', routeSheet.nurseId)
+              .eq('isCompleted', true)
+              .eq('isSubmitted', false),
+          )
+          .collect();
 
+        const stillOverdue = allAssignments.some(
+          (a) =>
+            // Exclude the assignment just submitted
+            a._id !== nurseAssignment._id &&
+            checkDurationOfNotSubmittedAssignment(7, a),
+        );
+
+        if (!stillOverdue) {
+          // No more overdue assignments — reactivate the nurse
+          await ctx.db.patch('nurses', routeSheet.nurseId, {
+            status: 'approved',
+          });
+          await handleApproveNurseCount(ctx, 'inc');
+          await handleSuspendedNurseCount(ctx, 'dec');
+
+          await ctx.db.insert('nurseNotifications', {
+            nurseId: routeSheet.nurseId,
+            isRead: false,
+            title: `${hospice.businessName} has accepted your route sheet for ${assignment.patientFirstName} ${assignment.patientLastName}`,
+            description:
+              'All outstanding route sheets have been submitted. Your account is now active.',
+            type: 'admin',
+            viewCount: 0,
+          });
+        }
+      }
       // Trigger commission billing (non-blocking — runs asynchronously)
       await ctx.scheduler.runAfter(
         0,

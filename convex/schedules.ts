@@ -9,6 +9,7 @@ import {
 import {
   checkIfNurseHasActiveShift,
   deleteAllOtherNotifications,
+  disableAllOtherHospiceNotificationsForThisSchedule,
   formatDate,
   getRatings,
 } from './helper';
@@ -418,6 +419,16 @@ export const acceptCaseRequest = mutation({
         isSubmitted: false,
       });
     }
+
+    // disable all other case request for this shift
+    await disableAllOtherHospiceNotificationsForThisSchedule({
+      ctx,
+      scheduleId: args.scheduleId,
+      type: 'assignment',
+      hospiceNotificationId: args.notificationId,
+      cursor: null,
+      numItems: 10,
+    });
     // sends notification to nurse, that the case request has been accepted
     await ctx.db.insert('nurseNotifications', {
       nurseId: args.nurseId,

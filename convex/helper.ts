@@ -638,7 +638,17 @@ type DisableAllOtherNotificationsForThisScheduleType = {
   ctx: MutationCtx;
   scheduleId: Id<'schedules'>;
   type: 'assignment' | 'reassignment';
-  nurseNotificationId: Id<'nurseNotifications'>;
+  nurseNotificationId?: Id<'nurseNotifications'>;
+  hospiceNotificationId?: Id<'hospiceNotifications'>;
+  cursor: null | string;
+  numItems: number;
+};
+type DisableAllOtherHospiceNotificationsForThisScheduleType = {
+  ctx: MutationCtx;
+  scheduleId: Id<'schedules'>;
+  type: 'assignment' | 'reassignment';
+  nurseNotificationId?: Id<'nurseNotifications'>;
+  hospiceNotificationId?: Id<'hospiceNotifications'>;
   cursor: null | string;
   numItems: number;
 };
@@ -671,6 +681,39 @@ export const disableAllOtherNotificationsForThisSchedule = async ({
       scheduleId,
       type,
       nurseNotificationId,
+      cursor: continueCursor,
+      numItems,
+    });
+  }
+};
+export const disableAllOtherHospiceNotificationsForThisSchedule = async ({
+  ctx,
+  scheduleId,
+  type,
+  hospiceNotificationId,
+  cursor,
+  numItems,
+}: DisableAllOtherHospiceNotificationsForThisScheduleType) => {
+  const notifications = await ctx.db
+    .query('hospiceNotifications')
+    .withIndex('scheduleId', (q) =>
+      q.eq('scheduleId', scheduleId).eq('type', type),
+    )
+    .filter((q) => q.neq(q.field('_id'), hospiceNotificationId))
+    .paginate({ cursor, numItems });
+
+  const { isDone, page, continueCursor } = notifications;
+  for (const notification of page) {
+    await ctx.db.patch(notification._id, {
+      status: 'disabled',
+    });
+  }
+  if (!isDone) {
+    await disableAllOtherHospiceNotificationsForThisSchedule({
+      ctx,
+      scheduleId,
+      type,
+      hospiceNotificationId,
       cursor: continueCursor,
       numItems,
     });

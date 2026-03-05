@@ -45,7 +45,7 @@ export const insertNoCardNotification = internalMutation({
       title: 'Payment method required',
       description:
         'Your route sheet was approved! Please add a payment card in the Billing section so your commission can be processed.',
-      type: 'normal',
+      type: 'admin',
       viewCount: 0,
     });
   },

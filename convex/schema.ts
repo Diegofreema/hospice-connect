@@ -354,6 +354,7 @@ export default defineSchema({
   hospiceNotifications: defineTable(HospiceNotification)
     .index('by_hospice_id', ['hospiceId', 'isRead'])
     .index('hospiceId_scheduleId', ['hospiceId', 'scheduleId', 'type'])
+    .index('scheduleId', ['scheduleId', 'type'])
     .index('by_admin_notification_id', ['adminNotificationId']),
   hospiceSubscriptions: defineTable(hospiceSubscription).index(
     'by_hospice_id',
