@@ -78,11 +78,13 @@
         "expo-build-properties",
         {
           "android": {
-            "enableMinifyInReleaseBuilds": true,
-            "enableProguardInReleaseBuilds": true
+            "enableMinifyInReleaseBuilds": false,
+            "enableProguardInReleaseBuilds": false,
+            "kotlinVersion": "2.1.20"
           }
         }
       ],
+      "./plugins/withAndroidBuildConfig",
       "expo-background-task",
       "expo-font"
     ],
