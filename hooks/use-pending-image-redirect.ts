@@ -1,7 +1,7 @@
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Platform } from 'react-native';
 
 const PENDING_ROUTE_KEY = 'pending_picker_route';
@@ -23,54 +23,67 @@ export async function savePendingRoute(pathname: string) {
 /**
  * Clears the saved pending route.
  */
-async function clearPendingRoute() {
+export async function clearPendingRoute() {
   try {
     await SecureStore.deleteItemAsync(PENDING_ROUTE_KEY);
-  } catch (error) {
+  } catch {
     // ignore
   }
 }
 
 /**
- * Hook to check for pending image picker results on app startup.
- * If Android killed the Activity while the picker was open,
- * this navigates back to the saved route so the user can see
- * their picked image.
+ * Hook to restore navigation after Android kills the Activity while
+ * the image picker / gallery / file system is open.
  *
- * Place this in your root layout or a top-level component.
+ * @param isReady - Pass `true` once auth has resolved and navigation is mounted.
  */
-export function usePendingImageRedirect() {
+export function usePendingImageRedirect(isReady: boolean) {
+  const hasChecked = useRef(false);
+
   useEffect(() => {
     if (Platform.OS !== 'android') return;
+    if (!isReady) return;
+    if (hasChecked.current) return; // Only attempt once per app lifecycle
+    hasChecked.current = true;
 
-    const check = async () => {
+    const restoreRoute = async () => {
       try {
         const pendingRoute = await SecureStore.getItemAsync(PENDING_ROUTE_KEY);
         if (!pendingRoute) return;
 
-        // Check if there's a pending image picker result
-        const result = await ImagePicker.getPendingResultAsync();
-        const hasPendingImage =
-          result &&
-          'canceled' in result &&
-          !result.canceled &&
-          result.assets?.[0]?.uri;
-
-        // Clear the saved route
+        // Clear immediately so we don't redirect again on next restart
         await clearPendingRoute();
 
-        if (hasPendingImage) {
-          // Small delay to let the navigation stack settle
-          setTimeout(() => {
-            router.replace(pendingRoute as any);
-          }, 500);
+        // Try to recover the picked image (if any)
+        try {
+          const result = await ImagePicker.getPendingResultAsync();
+          if (
+            result &&
+            'canceled' in result &&
+            !result.canceled &&
+            result.assets?.[0]?.uri
+          ) {
+            console.log('Recovered pending image:', result.assets[0].uri);
+          }
+        } catch {
+          // getPendingResultAsync can throw if there's nothing pending
         }
+
+        // Navigate back to where the user was.
+        // Use setTimeout to ensure the navigation stack is fully mounted.
+        setTimeout(() => {
+          try {
+            router.replace(pendingRoute as any);
+          } catch (e) {
+            console.error('Failed to restore route:', e);
+          }
+        }, 500);
       } catch (error) {
-        console.error('Error checking pending image redirect:', error);
+        console.error('Error restoring route after Activity restart:', error);
         await clearPendingRoute();
       }
     };
 
-    check();
-  }, []);
+    restoreRoute();
+  }, [isReady]);
 }

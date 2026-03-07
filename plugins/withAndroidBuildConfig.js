@@ -1,7 +1,33 @@
 const {
   withAppBuildGradle,
   withGradleProperties,
+  withAndroidManifest,
 } = require('@expo/config-plugins');
+
+/**
+ * The full set of configChanges that prevents Android from destroying
+ * MainActivity when opening external activities (gallery, file picker, camera).
+ * Without these, Android recreates the activity and the app resets to the home screen.
+ */
+const FULL_CONFIG_CHANGES =
+  'keyboard|keyboardHidden|orientation|screenSize|screenLayout|uiMode|mnc|locale|layoutDirection|fontScale|smallestScreenSize|density';
+
+/**
+ * Sets android:configChanges on MainActivity to the full list.
+ * This is the native fix for the "app resets when gallery opens" bug on Android.
+ */
+const withMainActivityConfigChanges = (config) => {
+  return withAndroidManifest(config, (mod) => {
+    const manifest = mod.modResults;
+    const mainActivity = manifest.manifest.application?.[0]?.activity?.find(
+      (a) => a.$['android:name'] === '.MainActivity',
+    );
+    if (mainActivity) {
+      mainActivity.$['android:configChanges'] = FULL_CONFIG_CHANGES;
+    }
+    return mod;
+  });
+};
 
 /**
  * Custom Expo config plugin that:
@@ -120,6 +146,7 @@ const withGradleJvmArgs = (config) => {
 
 const withAndroidBuildConfig = (config) => {
   config = withGradleJvmArgs(config);
+  config = withMainActivityConfigChanges(config);
   return config;
 };
 

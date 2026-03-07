@@ -19,7 +19,7 @@ import {
 import { usePendingImageRedirect } from '@/hooks/use-pending-image-redirect';
 import { useUpdate } from '@/hooks/use-update';
 import React from 'react';
-import { Platform, View } from 'react-native';
+import { ActivityIndicator, Platform, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import {
@@ -77,15 +77,34 @@ export default function RootLayout() {
 const InitialRoute = () => {
   const { theme } = useUnistyles();
 
-  const { user } = useAuth();
+  const { user, isPending } = useAuth();
   const segment = useSegments();
   const pathname = usePathname();
   const isWeb = Platform.OS === 'web';
   console.log({ pathname, segment });
   const isAuthenticated = !!user;
 
-  // Check for pending image picker results after Activity restart
-  usePendingImageRedirect();
+  // Check for pending image picker results after Activity restart.
+  // Only redirect once auth is resolved (!isPending) so nav guards are stable.
+  usePendingImageRedirect(!isPending);
+
+  // Wait for auth to resolve before rendering navigation guards.
+  // This prevents flashing the login screen during Android cold-start
+  // (e.g. after the OS destroys the activity while the gallery is open).
+  if (isPending && Platform.OS === 'android') {
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: theme.colors.white,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <ActivityIndicator size="large" color={theme.colors.blue} />
+      </View>
+    );
+  }
 
   return (
     <ToastProvider>

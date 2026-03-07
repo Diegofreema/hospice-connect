@@ -646,7 +646,7 @@ type DisableAllOtherNotificationsForThisScheduleType = {
 type DisableAllOtherHospiceNotificationsForThisScheduleType = {
   ctx: MutationCtx;
   scheduleId: Id<'schedules'>;
-  type: 'assignment' | 'reassignment';
+
   nurseNotificationId?: Id<'nurseNotifications'>;
   hospiceNotificationId?: Id<'hospiceNotifications'>;
   cursor: null | string;
@@ -671,9 +671,7 @@ export const disableAllOtherNotificationsForThisSchedule = async ({
 
   const { isDone, page, continueCursor } = notifications;
   for (const notification of page) {
-    await ctx.db.patch(notification._id, {
-      status: 'disabled',
-    });
+    await ctx.db.delete('nurseNotifications', notification._id);
   }
   if (!isDone) {
     await disableAllOtherNotificationsForThisSchedule({
@@ -689,7 +687,6 @@ export const disableAllOtherNotificationsForThisSchedule = async ({
 export const disableAllOtherHospiceNotificationsForThisSchedule = async ({
   ctx,
   scheduleId,
-  type,
   hospiceNotificationId,
   cursor,
   numItems,
@@ -697,22 +694,19 @@ export const disableAllOtherHospiceNotificationsForThisSchedule = async ({
   const notifications = await ctx.db
     .query('hospiceNotifications')
     .withIndex('scheduleId', (q) =>
-      q.eq('scheduleId', scheduleId).eq('type', type),
+      q.eq('scheduleId', scheduleId).eq('type', 'case_request'),
     )
     .filter((q) => q.neq(q.field('_id'), hospiceNotificationId))
     .paginate({ cursor, numItems });
 
   const { isDone, page, continueCursor } = notifications;
   for (const notification of page) {
-    await ctx.db.patch(notification._id, {
-      status: 'disabled',
-    });
+    await ctx.db.delete('hospiceNotifications', notification._id);
   }
   if (!isDone) {
     await disableAllOtherHospiceNotificationsForThisSchedule({
       ctx,
       scheduleId,
-      type,
       hospiceNotificationId,
       cursor: continueCursor,
       numItems,

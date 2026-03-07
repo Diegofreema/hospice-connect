@@ -424,7 +424,6 @@ export const acceptCaseRequest = mutation({
     await disableAllOtherHospiceNotificationsForThisSchedule({
       ctx,
       scheduleId: args.scheduleId,
-      type: 'assignment',
       hospiceNotificationId: args.notificationId,
       cursor: null,
       numItems: 10,

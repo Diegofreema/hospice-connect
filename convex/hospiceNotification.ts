@@ -142,13 +142,11 @@ export const cancelShiftNotification = mutation({
       hospiceId: assignment.hospiceId,
       nurseId: nurse._id,
       type: 'cancel_request',
-      description: args.reason,
-      scheduleId: shift._id,
-      title: `${nurse.name} (${
-        nurse.discipline
-      }) submitted cancel request for ${formatDate(
+      description: `submitted cancel request for ${formatDate(
         shift.startDate,
-      )} to ${formatDate(shift.endDate)}: ${shift.startTime}-${shift.endTime}`,
+      )} to ${formatDate(shift.endDate)}: ${shift.startTime}-${shift.endTime} ${args.reason}`,
+      scheduleId: shift._id,
+      title: `${nurse.name} (${nurse.discipline})`,
       viewCount: 0,
     });
   },

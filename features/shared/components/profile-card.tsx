@@ -2,7 +2,10 @@ import { Avatar } from '@/components/avatar/Avatar';
 import { SpinnerArc } from '@/components/loaders';
 import { api } from '@/convex/_generated/api';
 import { type Id } from '@/convex/_generated/dataModel';
-import { savePendingRoute } from '@/hooks/use-pending-image-redirect';
+import {
+  clearPendingRoute,
+  savePendingRoute,
+} from '@/hooks/use-pending-image-redirect';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { IconCamera, IconUpload } from '@tabler/icons-react-native';
 import { useMutation } from 'convex/react';
@@ -118,6 +121,9 @@ export const ProfileCard = ({
         quality: 0.5,
         allowsMultipleSelection: false,
       });
+
+      // Picker returned normally (Activity was NOT destroyed) — clear the saved route
+      await clearPendingRoute();
 
       if (!result.canceled) {
         const uri = result.assets[0].uri;
