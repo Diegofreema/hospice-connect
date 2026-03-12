@@ -108,6 +108,15 @@ export const rejectHospice = mutation({
       status: 'rejected',
       rejectedReason: args.rejectedReason,
     });
+
+    await ctx.db.insert('hospiceNotifications', {
+      viewCount: 0,
+      isRead: false,
+      title: 'Account rejected',
+      type: 'admin',
+      hospiceId: hospice._id,
+      description: args.rejectedReason,
+    });
     await handlePendingHospiceApprovalCount(ctx, 'dec');
     await handleRejectedHospiceCount(ctx, 'inc');
   },

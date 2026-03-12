@@ -5,6 +5,46 @@ const {
 } = require('@expo/config-plugins');
 
 /**
+ * Adds android:largeHeap="true" to the <application> element.
+ * This gives the app a larger memory heap, making Android less likely
+ * to kill the process when it goes to background for native API calls
+ * (file picker, camera, clipboard).
+ */
+const withLargeHeap = (config) => {
+  return withAndroidManifest(config, (mod) => {
+    const app = mod.modResults.manifest.application?.[0];
+    if (app) {
+      app.$['android:largeHeap'] = 'true';
+    }
+    return mod;
+  });
+};
+
+/**
+ * Disables lint abort-on-error and release lint checks.
+ * The LintDriver crashes with Kotlin 2.1.20 — this prevents it from
+ * breaking the release build until the upstream bug is resolved.
+ */
+const withLintConfig = (config) => {
+  return withAppBuildGradle(config, (mod) => {
+    const contents = mod.modResults.contents;
+    if (contents.includes('abortOnError false')) return mod; // idempotent
+    mod.modResults.contents = contents.replace(/lint\s*\{[^}]*\}/s, '');
+    // Append lint block before the closing brace of the android block
+    mod.modResults.contents = mod.modResults.contents.replace(
+      /(androidResources\s*\{[^}]*\})(\s*\})/s,
+      (_, androidResources, closingBrace) =>
+        `${androidResources}
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }${closingBrace}`,
+    );
+    return mod;
+  });
+};
+
+/**
  * The full set of configChanges that prevents Android from destroying
  * MainActivity when opening external activities (gallery, file picker, camera).
  * Without these, Android recreates the activity and the app resets to the home screen.
@@ -147,6 +187,8 @@ const withGradleJvmArgs = (config) => {
 const withAndroidBuildConfig = (config) => {
   config = withGradleJvmArgs(config);
   config = withMainActivityConfigChanges(config);
+  config = withLargeHeap(config);
+  config = withLintConfig(config);
   return config;
 };
 

@@ -1,13 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
-import { Platform } from 'react-native';
 import Purchases from 'react-native-purchases';
 
 export const useGetOfferings = () => {
   const getOfferings = async () => {
     try {
-      if (Platform.OS === 'ios') {
-        return null;
-      }
       const offerings = await Purchases.getOfferings();
       if (
         offerings.current !== null &&

@@ -3,6 +3,7 @@ import { useToast } from '@/components/demos/toast';
 import { api } from '@/convex/_generated/api';
 import { type Id } from '@/convex/_generated/dataModel';
 import { CreateAssignmentForm } from '@/features/hospice/components/create-assignment-form';
+import { ProProvider } from '@/features/hospice/components/pro-provider';
 import { type CreateAssignmentValidator } from '@/features/hospice/validator';
 import { Wrapper } from '@/features/shared/components/wrapper';
 import {
@@ -70,18 +71,20 @@ const CreateScreen = () => {
     }
   };
   return (
-    <Wrapper>
-      <KeyboardAwareScrollView
-        showsVerticalScrollIndicator={false}
-        bottomOffset={50}
-        bounces={false}
-        contentContainerStyle={{
-          paddingBottom: Platform.OS === 'ios' ? 100 : 50,
-        }}
-      >
-        <CreateAssignmentForm onSubmit={onSubmit} />
-      </KeyboardAwareScrollView>
-    </Wrapper>
+    <ProProvider>
+      <Wrapper>
+        <KeyboardAwareScrollView
+          showsVerticalScrollIndicator={false}
+          bottomOffset={50}
+          bounces={false}
+          contentContainerStyle={{
+            paddingBottom: Platform.OS === 'ios' ? 100 : 50,
+          }}
+        >
+          <CreateAssignmentForm onSubmit={onSubmit} />
+        </KeyboardAwareScrollView>
+      </Wrapper>
+    </ProProvider>
   );
 };
 

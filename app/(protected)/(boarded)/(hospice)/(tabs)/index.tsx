@@ -1,6 +1,7 @@
 import { useHospice } from '@/components/context/hospice-context';
 import { api } from '@/convex/_generated/api';
 import { FetchNurses } from '@/features/hospice/components/fetch-nurses';
+import { ProProvider } from '@/features/hospice/components/pro-provider';
 import { RateRange } from '@/features/hospice/components/rate-range';
 import { nurseFilter } from '@/features/hospice/constants';
 import { type NurseType } from '@/features/hospice/types';
@@ -21,6 +22,7 @@ import { StyleSheet } from 'react-native-unistyles';
 
 export default function HomeScreen() {
   const { hospice } = useHospice();
+
   const [selected, setSelected] = useState<'All' | NurseType>('All');
   const [range, setRange] = useState({
     rate1: '5',
@@ -41,7 +43,7 @@ export default function HomeScreen() {
   if (hospice === null) return null;
 
   return (
-    <>
+    <ProProvider>
       <Wrapper>
         <AccountBrief
           data={{
@@ -84,7 +86,7 @@ export default function HomeScreen() {
       >
         <RateRange setRange={setRange} range={range} />
       </CustomSheet>
-    </>
+    </ProProvider>
   );
 }
 

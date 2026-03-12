@@ -131,6 +131,14 @@ export const rejectNurse = mutation({
       status: 'rejected',
       rejectedReason: args.rejectedReason,
     });
+    await ctx.db.insert('nurseNotifications', {
+      viewCount: 0,
+      isRead: false,
+      title: 'Account Rejected',
+      type: 'admin',
+      description: args.rejectedReason,
+      nurseId: nurse._id,
+    });
     await handlePendingNurseApprovalCount(ctx, 'dec');
     await handleRejectedNurseCount(ctx, 'inc');
   },

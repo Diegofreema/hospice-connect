@@ -9,7 +9,7 @@ export const useConfigureRC = () => {
     Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
 
     if (Platform.OS === 'ios') {
-      //    Purchases.configure({apiKey: <revenuecat_project_apple_api_key>});
+      Purchases.configure({ apiKey: 'appl_iNVtzSygqQqsuOTTEhwumMBAgow' });
     } else if (Platform.OS === 'android') {
       Purchases.configure({ apiKey: 'goog_nOEvpbJXIvSITLBWyRHueuAnPBD' });
     }

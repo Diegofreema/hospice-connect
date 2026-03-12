@@ -112,7 +112,7 @@ export function Nurses() {
       toast.success(currentStatus ? 'Reactivated' : 'Suspended', {
         description: `The healthcare professional account has been ${currentStatus ? 'reactivated' : 'suspended'} successfully.`,
       });
-    } catch (error) {
+    } catch {
       toast.error('Error', {
         description:
           'Failed to update healthcare professional status. Please try again.',
