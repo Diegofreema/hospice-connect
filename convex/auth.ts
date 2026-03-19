@@ -2,7 +2,7 @@ import { expo } from '@better-auth/expo';
 import { createClient, type GenericCtx } from '@convex-dev/better-auth';
 import { convex, crossDomain } from '@convex-dev/better-auth/plugins';
 import { betterAuth, type BetterAuthOptions } from 'better-auth';
-
+import { emailOTP } from 'better-auth/plugins';
 import type { DataModel } from './_generated/dataModel';
 
 import { requireActionCtx } from '@convex-dev/better-auth/utils';
@@ -10,7 +10,7 @@ import { components } from './_generated/api';
 import { query } from './_generated/server';
 import authConfig from './auth.config';
 import authSchema from './betterAuth/schema';
-import { sendResetPassword } from './sendEmail';
+import { sendEmailVerification, sendResetPassword } from './sendEmail';
 
 const siteUrl = process.env.SITE_URL!;
 const nativeAppUrl = process.env.NATIVE_APP_URL || 'hospice-connect://';
@@ -49,7 +49,7 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
     database: authComponent.adapter(ctx),
     emailAndPassword: {
       enabled: true,
-      requireEmailVerification: false,
+      requireEmailVerification: true,
       sendResetPassword: async ({ user, url }) => {
         await sendResetPassword(requireActionCtx(ctx), {
           to: user.email,
@@ -74,7 +74,27 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
         enabled: true,
       },
     },
-    plugins: [expo(), convex({ authConfig }), crossDomain({ siteUrl })],
+    plugins: [
+      expo(),
+      convex({ authConfig }),
+      crossDomain({ siteUrl }),
+      emailOTP({
+        async sendVerificationOTP({ email, otp, type }) {
+          if (type === 'sign-in') {
+            // Send the OTP for sign in
+          } else if (type === 'email-verification') {
+            // Send the OTP for email verification
+            await sendEmailVerification(requireActionCtx(ctx), {
+              to: email,
+              code: otp,
+              expires: Date.now() + 15 * 60 * 1000,
+            });
+          } else {
+            // Send the OTP for password reset
+          }
+        },
+      }),
+    ],
     user: {
       additionalFields: {
         role: {

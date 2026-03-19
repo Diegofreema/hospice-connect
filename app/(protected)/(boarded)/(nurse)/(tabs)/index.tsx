@@ -20,7 +20,7 @@ import { StyleSheet } from 'react-native-unistyles';
 
 type Variants = 'available' | 'in-progress' | 'completed';
 export default function HomeScreen() {
-  const { nurse, isSuspended } = useNurse();
+  const { nurse, isSuspended, isPending, isRejected } = useNurse();
   const unreadCount = useQuery(
     api.nurseNotifications.unreadMessagesCount,
     nurse ? { nurseId: nurse._id } : 'skip',
@@ -104,6 +104,8 @@ export default function HomeScreen() {
           onOpenSheet={onOpenSheet}
           discipline={nurse.discipline}
           isSuspended={isSuspended}
+          isPending={isPending}
+          isRejected={isRejected}
         />
       )}
       {selectedValue === 'in-progress' && (

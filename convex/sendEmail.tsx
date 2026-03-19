@@ -22,7 +22,7 @@ const sendEmail = async (
     to: string;
     subject: string;
     html: string;
-  }
+  },
 ) => {
   await resend.sendEmail(ctx, {
     from: 'HospiceConnect <innovate@learnfactory.com.ng>',
@@ -41,10 +41,10 @@ export const sendEmailVerification = async (
     to: string;
     code: string;
     expires: number;
-  }
+  },
 ) => {
   const html = await pretty(
-    await render(<VerifyEmail code={code} expires={new Date(expires)} />)
+    await render(<VerifyEmail code={code} expires={new Date(expires)} />),
   );
   await sendEmail(ctx, {
     to,
@@ -65,7 +65,7 @@ export const sendResetPassword = async (
     url: string;
     expires: number;
     name: string;
-  }
+  },
 ) => {
   await sendEmail(ctx, {
     to,
@@ -75,7 +75,7 @@ export const sendResetPassword = async (
         url={url}
         expires={new Date(expires)}
         userName={name}
-      />
+      />,
     ),
   });
 };

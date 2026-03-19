@@ -27,6 +27,7 @@ import { type FunctionReturnType } from 'convex/server';
 import { useState } from 'react';
 import { Alert } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+import { toast } from 'sonner-native';
 import { useSelectAssignment } from '../hooks/use-select-assignment';
 import { useUpdatePostStatus } from '../hooks/use-update-post-status';
 
@@ -35,6 +36,7 @@ type Props = {
   onView: () => void;
   hospiceId: Id<'hospices'>;
   onOpenReOpenAssignment: () => void;
+  isPro: boolean;
 };
 
 export const Post = ({
@@ -42,6 +44,7 @@ export const Post = ({
   onView,
   hospiceId,
   onOpenReOpenAssignment,
+  isPro,
 }: Props) => {
   const name = post.patientFirstName + ' ' + post.patientLastName;
   const isCanceled = post.status === 'ended';
@@ -117,6 +120,11 @@ export const Post = ({
   const setId = useSelectAssignment((state) => state.setId);
   const { theme } = useUnistyles();
   const onClick = (value: string) => {
+    if (!isPro) {
+      router.push('/pro');
+      toast.info('Please upgrade to pro to use this feature');
+      return;
+    }
     if (value === 'edit') {
       router.push(`/edit/${post._id}`);
     }
@@ -146,18 +154,43 @@ export const Post = ({
     }
   };
   const onReOpen = async () => {
+    if (!isPro) {
+      router.push('/pro');
+      toast.info('Please upgrade to pro to use this feature');
+      return;
+    }
     onOpenReOpenAssignment();
   };
   const onAssign = () => {
+    if (!isPro) {
+      router.push('/pro');
+      toast.info('Please upgrade to pro to use this feature');
+      return;
+    }
     router.push(`/assign-nurse?id=${post._id}&discipline=${post.discipline}`);
   };
   const onHandleAction = () => {
+    if (!isPro) {
+      router.push('/pro');
+      toast.info('Please upgrade to pro to use this feature');
+      return;
+    }
     if (post.status === 'completed' || post.status === 'ended') {
       void onReOpen();
       setId(post._id);
     } else {
       onAssign();
     }
+  };
+
+  const onHandleView = () => {
+    if (!isPro) {
+      router.push('/pro');
+      toast.info('Please upgrade to pro to use this feature');
+      return;
+    }
+    setId(post._id);
+    onView();
   };
   const disabled = post.status === 'booked';
   const buttonText =
@@ -215,10 +248,7 @@ export const Post = ({
         <LongInfo title="Location" description={post.patientAddress} />
         <View flexDirection="row" gap="lg" style={styles.footer}>
           <CustomPressable
-            onPress={() => {
-              setId(post._id);
-              onView();
-            }}
+            onPress={onHandleView}
             style={[styles.button, styles.viewSchedule]}
           >
             <Text size={'normal'} color={'blue'}>

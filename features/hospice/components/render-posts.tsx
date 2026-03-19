@@ -27,9 +27,10 @@ type Props = {
   posts: FunctionReturnType<typeof api.posts.getOurPosts>['page'];
   loadMore: () => void;
   loadingMore: boolean;
+  isPro: boolean;
 };
 
-export const RenderPosts = ({ posts, loadMore, loadingMore }: Props) => {
+export const RenderPosts = ({ posts, loadMore, loadingMore, isPro }: Props) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const bottomSheetRefCancelSchedule = useRef<BottomSheet>(null);
   const bottomSheetRefEditSchedule = useRef<BottomSheet>(null);
@@ -104,6 +105,7 @@ export const RenderPosts = ({ posts, loadMore, loadingMore }: Props) => {
               onView={onViewSchedule}
               hospiceId={hospice?._id!}
               onOpenReOpenAssignment={onReOpenAssignment}
+              isPro={isPro}
             />
           )}
           keyExtractor={(item) => item._id}

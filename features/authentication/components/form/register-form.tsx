@@ -18,6 +18,7 @@ import {
 
 import { useToast } from '@/components/demos/toast';
 import { authClient } from '@/lib/auth-client';
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { TouchableOpacity } from 'react-native';
@@ -53,6 +54,7 @@ export const RegisterForm = () => {
         email: values.email.trim(),
         password: values.password.trim(),
         name: `${values.firstName.trim()} ${values.lastName.trim()}`.trim(),
+        // @ts-ignore
         isBoarded: false,
         role: 'nurse',
       });
@@ -64,7 +66,23 @@ export const RegisterForm = () => {
         });
         return;
       }
-
+      const { error: err } = await authClient.emailOtp.sendVerificationOtp({
+        email: values.email.trim(), // required
+        type: 'email-verification', // required
+      });
+      if (err) {
+        showToast({
+          title: 'Error',
+          subtitle: err.message,
+        });
+        return;
+      } else {
+        router.push('/verify');
+        showToast({
+          title: 'Success',
+          subtitle: 'Otp has been sent to your email',
+        });
+      }
       reset();
     } catch (error) {
       console.log(error);

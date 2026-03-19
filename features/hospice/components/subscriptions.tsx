@@ -1,7 +1,7 @@
+import { useCustomerRCContext } from '@/components/context/customer-rc-context';
 import { ErrorComponent } from '@/features/shared/components/error';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { useCancelSubscription } from '@/hooks/rc/use-cancel-subscription';
-import { useGetCustomerRC } from '@/hooks/rc/use-get-customer-rc';
 import { useGetOfferings } from '@/hooks/rc/use-get-offerings';
 import {
   IconCalendar,
@@ -79,11 +79,11 @@ export const Subscriptions = () => {
   const [isRestoring, setIsRestoring] = useState(false);
 
   const {
-    data: customerInfo,
+    customerInfo,
     isPending: customerPending,
     isError: customerError,
     refetch: refetchCustomer,
-  } = useGetCustomerRC();
+  } = useCustomerRCContext();
 
   const {
     data: offerings,

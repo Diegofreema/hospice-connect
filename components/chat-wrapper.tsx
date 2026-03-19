@@ -1,4 +1,5 @@
 import { chatApiKey } from '@/chat-config';
+import { SmallLoader } from '@/features/shared/components/small-loader';
 import { useUnread } from '@/features/shared/hooks/use-unread';
 import axios from 'axios';
 import { type PropsWithChildren, useCallback, useEffect } from 'react';
@@ -68,7 +69,7 @@ export const ChatWrapper = ({ children }: PropsWithChildren) => {
   };
 
   if (!client) {
-    return null;
+    return <SmallLoader size={50} />;
   }
 
   return (

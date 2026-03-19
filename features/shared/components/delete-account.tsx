@@ -1,8 +1,7 @@
-/* eslint-disable prettier/prettier */
 import { useAuth } from '@/components/context/auth';
+import { useCustomerRCContext } from '@/components/context/customer-rc-context';
 import { api } from '@/convex/_generated/api';
 import { useCancelSubscription } from '@/hooks/rc/use-cancel-subscription';
-import { useGetCustomerRC } from '@/hooks/rc/use-get-customer-rc';
 import { authClient } from '@/lib/auth-client';
 import {
   IconAlertTriangle,
@@ -37,8 +36,8 @@ export const DeleteAccount = () => {
   const hasPendingRequest = deletionStatus?.status === 'pending';
 
   // RevenueCat — only used for hospice users
-  const { data: customerInfo, isPending: isLoadingSubscription } =
-    useGetCustomerRC();
+  const { customerInfo, isPending: isLoadingSubscription } =
+    useCustomerRCContext();
   const { openManagementURL, isLoading: isCancelLoading } =
     useCancelSubscription();
 
@@ -157,8 +156,8 @@ export const DeleteAccount = () => {
               style={[styles.pendingSubtext, { color: theme.colors.black }]}
             >
               Your account is scheduled for permanent deletion within 30 days of
-              your request. You've been signed out and can no longer use the
-              app. If you change your mind, tap the button below.
+              your request. You&apos;ve been signed out and can no longer use
+              the app. If you change your mind, tap the button below.
             </Text>
           </View>
         </View>

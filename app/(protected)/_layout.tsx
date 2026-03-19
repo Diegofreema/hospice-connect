@@ -51,6 +51,7 @@ const ProtectedLayout = () => {
           <Stack.Screen name="(not-boarded)" />
         </Stack.Protected>
       </Stack>
+
       <StatusBar style="dark" />
     </SafeAreaView>
   );

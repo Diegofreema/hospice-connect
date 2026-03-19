@@ -108,6 +108,7 @@ const NurseCreate = () => {
         email: user.email,
       });
       await authClient.updateUser({
+        // @ts-ignore
         isBoarded: true,
       });
       showToast({

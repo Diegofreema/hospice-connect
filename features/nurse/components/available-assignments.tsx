@@ -13,12 +13,16 @@ type Props = {
   discipline: 'RN' | 'LVN' | 'HHA';
   onOpenSheet: () => void;
   isSuspended: boolean;
+  isPending: boolean;
+  isRejected: boolean;
 };
 export const AvailableAssignments = ({
   nurseId,
   onOpenSheet,
   discipline,
   isSuspended,
+  isPending,
+  isRejected,
 }: Props) => {
   const { loadMore, results, status } = usePaginatedQuery(
     api.assignments.availableAssignments,
@@ -31,6 +35,22 @@ export const AvailableAssignments = ({
       <UnderReview
         title="Account suspended"
         description="Please submit your outstanding Route Sheet(s) to reactivate your account"
+      />
+    );
+  }
+  if (isPending) {
+    return (
+      <UnderReview
+        title="Account pending"
+        description="Please wait for your account to be approved"
+      />
+    );
+  }
+  if (isRejected) {
+    return (
+      <UnderReview
+        title="Account rejected"
+        description="Please check your notifications for more information or contact the admin to resolve this issue"
       />
     );
   }

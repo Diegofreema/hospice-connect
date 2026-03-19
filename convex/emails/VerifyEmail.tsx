@@ -49,7 +49,7 @@ export const VerifyEmail = ({ expires, code }: VerifyEmailProps) => (
 
           {/* CTA Button */}
           <Text className="text-sm">
-            Please enter the following code on the sign in page.
+            Please enter the following code on the otp page.
           </Text>
           <Section className="text-center">
             <Text className="font-semibold">Verification code</Text>
@@ -61,7 +61,7 @@ export const VerifyEmail = ({ expires, code }: VerifyEmailProps) => (
           </Section>
 
           <Text style={text}>
-            This verification link will expire in 24 hours for security reasons.
+            This verification code will expire in 24 hours for security reasons.
           </Text>
 
           {/* Program Info */}
@@ -93,8 +93,6 @@ export const VerifyEmail = ({ expires, code }: VerifyEmailProps) => (
     </Body>
   </Html>
 );
-
-export default VerifyEmail;
 
 // Styles
 const main = {
