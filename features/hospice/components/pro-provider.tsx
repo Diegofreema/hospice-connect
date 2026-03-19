@@ -23,6 +23,14 @@ export const ProProvider = ({ children }: PropsWithChildren) => {
   if (isError) {
     return <ErrorComponent refetch={refetch} text="Something went wrong" />;
   }
+  if (hospice?.status === 'suspended') {
+    return (
+      <UnderReview
+        title="Hospice suspended"
+        description="Please contact the admin to resolve this issue"
+      />
+    );
+  }
   if (!isPro) {
     return (
       <View style={{ flex: 1, backgroundColor: 'white', gap: 15 }}>

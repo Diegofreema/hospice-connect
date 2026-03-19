@@ -2,6 +2,7 @@ import { Center } from '@/components/center/center';
 import { Image } from 'expo-image';
 
 import { authClient } from '@/lib/auth-client';
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { toast } from 'sonner-native';
 import { Button } from './button';
@@ -12,10 +13,12 @@ import { Wrapper } from './wrapper';
 type Props = {
   title?: string;
   description?: string;
+  type?: 'card';
 };
 export const UnderReview = ({
   title = 'Account Under Review',
   description = 'We are currently verifying your information. Please check back shortly',
+  type,
 }: Props) => {
   const [loading, setLoading] = useState(false);
   const onLogout = async () => {
@@ -35,6 +38,24 @@ export const UnderReview = ({
       },
     });
   };
+  const image =
+    type === 'card'
+      ? require('@/assets/images/card.png')
+      : require('@/assets/images/review.png');
+  const buttonTitle = () => {
+    if (type === 'card') {
+      return 'Add Card';
+    }
+    return 'Logout';
+  };
+
+  const onPress = () => {
+    if (type === 'card') {
+      router.push('/billing');
+      return;
+    }
+    onLogout();
+  };
   return (
     <Wrapper>
       <Center
@@ -46,7 +67,7 @@ export const UnderReview = ({
         }}
       >
         <Image
-          source={require('@/assets/images/review.png')}
+          source={image}
           style={{ width: 200, height: 200 }}
           contentFit="contain"
         />
@@ -55,8 +76,8 @@ export const UnderReview = ({
           {description}
         </Text>
         <Button
-          title="Logout"
-          onPress={onLogout}
+          title={buttonTitle()}
+          onPress={onPress}
           disabled={loading}
           style={{ width: '100%' }}
         />

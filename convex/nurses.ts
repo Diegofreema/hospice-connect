@@ -618,3 +618,21 @@ export const sendNotificationsToNursesAndSuspendAccount = internalMutation({
     }
   },
 });
+
+export const hasAddedCard = query({
+  args: {
+    nurseId: v.id('nurses'),
+  },
+  handler: async (ctx, args) => {
+    const nurse = await ctx.db.get('nurses', args.nurseId);
+    if (!nurse) return false;
+    const paymentMethods = await ctx.db
+      .query('nursePaymentMethods')
+      .withIndex('by_nurse', (q) => q.eq('nurseId', nurse._id))
+      .first();
+    if (!paymentMethods) {
+      return false;
+    }
+    return true;
+  },
+});
