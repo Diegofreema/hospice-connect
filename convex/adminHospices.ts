@@ -145,9 +145,25 @@ export const suspendHospice = mutation({
     if (status === 'suspended') {
       await handleApproveHospiceCount(ctx, 'dec');
       await handleSuspendedHospiceCount(ctx, 'inc');
+      await ctx.db.insert('hospiceNotifications', {
+        viewCount: 0,
+        isRead: false,
+        title: 'Account suspended',
+        type: 'admin',
+        hospiceId: hospice._id,
+        description: 'Your hospice account has been suspended',
+      });
     } else {
       await handleApproveHospiceCount(ctx, 'inc');
       await handleSuspendedHospiceCount(ctx, 'dec');
+      await ctx.db.insert('hospiceNotifications', {
+        viewCount: 0,
+        isRead: false,
+        title: 'Account reactivated',
+        type: 'admin',
+        hospiceId: hospice._id,
+        description: 'Your hospice account has been reactivated',
+      });
     }
   },
 });

@@ -428,8 +428,7 @@ export const approveOrDeclineRouteSheet = mutation({
             nurseId: routeSheet.nurseId,
             isRead: false,
             title: `${hospice.businessName} has accepted your route sheet for ${assignment.patientFirstName} ${assignment.patientLastName}`,
-            description:
-              'All outstanding route sheets have been submitted. Your account is now active.',
+            description: 'Your account is now active.',
             type: 'admin',
             viewCount: 0,
           });

@@ -14,6 +14,7 @@ import { useAction, useQuery } from 'convex/react';
 import { useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Alert, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { toast } from 'sonner-native';
 import { AddPaymentMethodModal } from './add-payment-method';
@@ -25,7 +26,7 @@ export const Billings = () => {
   const { theme } = useUnistyles();
   const { nurse } = useNurse();
   const router = useRouter();
-
+  const { bottom } = useSafeAreaInsets();
   const [showAddModal, setShowAddModal] = useState(false);
   const [setupData, setSetupData] = useState<{
     clientSecret: string;
@@ -232,6 +233,7 @@ export const Billings = () => {
             {
               backgroundColor: theme.colors.background,
               borderTopColor: theme.colors.grey,
+              paddingBottom: bottom + 16,
             },
           ]}
         >

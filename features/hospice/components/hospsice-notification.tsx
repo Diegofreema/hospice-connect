@@ -204,8 +204,12 @@ export const HospiceNotification = ({ notification }: Props) => {
                 </Text>
                 {notification.description && (
                   <Text size="normal" style={{ flex: 1, maxWidth: '80%' }}>
-                    {notification.type === 'cancel_request' && 'Reason: '}{' '}
                     {notification.description}
+                  </Text>
+                )}
+                {notification.reason && (
+                  <Text size="normal" style={{ flex: 1, maxWidth: '80%' }}>
+                    {notification.reason}
                   </Text>
                 )}
               </View>

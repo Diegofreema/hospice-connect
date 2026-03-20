@@ -274,6 +274,7 @@ export const HospiceNotification = {
     v.literal('assignment'),
     v.literal('reassignment'),
   ),
+  reason: v.optional(v.string()),
   title: v.string(),
   description: v.optional(v.string()),
   routeSheetId: v.optional(v.id('routeSheets')),

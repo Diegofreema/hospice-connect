@@ -133,7 +133,7 @@ export function Assignments() {
         <CardHeader>
           <CardTitle>Assignments List</CardTitle>
           <CardDescription>
-            View and manage all healthcare professional's assignments
+            View and manage all healthcare professional&apos;s assignments
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -172,6 +172,7 @@ export function Assignments() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="font-bold">S/N</TableHead>
                   <TableHead className="font-bold">Hospice</TableHead>
                   <TableHead className="font-bold">Patient</TableHead>
                   <TableHead className="font-bold">Discipline</TableHead>
@@ -191,8 +192,9 @@ export function Assignments() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  results.map((assignment) => (
+                  results.map((assignment, index) => (
                     <TableRow key={assignment._id}>
+                      <TableCell>{index + 1}</TableCell>
                       <TableCell>{assignment.hospiceName}</TableCell>
                       <TableCell className="font-medium">
                         {assignment.patientFirstName}{' '}

@@ -58,7 +58,7 @@ type Status = 'pending' | 'approved' | 'rejected' | 'suspended';
 export function Hospices() {
   const [searchQuery, setSearchQuery] = useState('');
   const [stateFilter, setStateFilter] = useState<string>('all');
-  const [status, setStatus] = useState<Status>('approved');
+  const [status, setStatus] = useState<Status | 'all'>('all');
   const [selectedHospiceId, setSelectedHospiceId] =
     useState<Id<'hospices'> | null>(null);
 

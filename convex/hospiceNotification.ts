@@ -144,10 +144,11 @@ export const cancelShiftNotification = mutation({
       type: 'cancel_request',
       description: `submitted cancel request for ${formatDate(
         shift.startDate,
-      )} to ${formatDate(shift.endDate)}: ${shift.startTime}-${shift.endTime} ${args.reason}`,
+      )} to ${formatDate(shift.endDate)}: ${shift.startTime}-${shift.endTime}`,
       scheduleId: shift._id,
       title: `${nurse.name} (${nurse.discipline})`,
       viewCount: 0,
+      reason: args.reason,
     });
   },
 });
