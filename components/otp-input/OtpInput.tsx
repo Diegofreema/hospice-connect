@@ -116,7 +116,6 @@ export const OtpInput = ({
     setOtpValue,
     focus,
 
-    containerStyle,
     otpInputStyle,
     textStyle,
     focusedColor,
@@ -160,7 +159,7 @@ export const OtpInput = ({
 
   return (
     <OtpContext.Provider value={inputProps as OtpContextProps}>
-      <Animated.View style={[styles.container]}>
+      <Animated.View style={[styles.container, containerStyle]}>
         <Animated.View style={[styles.row, animatedContainerStyle]}>
           {data.map((_, i) => {
             return <OtpItem key={i} index={i} />;

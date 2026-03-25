@@ -3,6 +3,8 @@ import { api } from '@/convex/_generated/api';
 import { type Id } from '@/convex/_generated/dataModel';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { Wrapper } from '@/features/shared/components/wrapper';
+import { generateErrorMessage } from '@/features/shared/utils';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import {
   IconArrowLeft,
@@ -12,8 +14,15 @@ import {
 } from '@tabler/icons-react-native';
 import { useAction, useQuery } from 'convex/react';
 import { useRouter } from 'expo-router';
-import { useCallback, useState } from 'react';
-import { Alert, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { useCallback, useRef, useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { toast } from 'sonner-native';
@@ -27,7 +36,12 @@ export const Billings = () => {
   const { nurse } = useNurse();
   const router = useRouter();
   const { bottom } = useSafeAreaInsets();
-  const [showAddModal, setShowAddModal] = useState(false);
+  const [adding, setAdding] = useState(false);
+
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+  }, []);
   const [setupData, setSetupData] = useState<{
     clientSecret: string;
     customerId: string;
@@ -54,17 +68,24 @@ export const Billings = () => {
     api.nursePaymentsActions.setDefaultPaymentMethod,
   );
 
-  const handleOpenAddCard = useCallback(async () => {
+  const handleOpenAddCard = async () => {
+    setAdding(true);
     try {
       const data = await createSetupIntent({ nurseId });
       setSetupData(data);
-      setShowAddModal(true);
-    } catch (err: any) {
-      toast.error('Could not initialise payment setup', {
-        description: err?.message,
+      handlePresentModalPress();
+    } catch (err) {
+      const errorMessage = generateErrorMessage(
+        err,
+        'Could not initialize payment setup',
+      );
+      toast.error('Error', {
+        description: errorMessage,
       });
+    } finally {
+      setAdding(false);
     }
-  }, [createSetupIntent, nurseId]);
+  };
 
   const handleRemove = useCallback(
     (paymentMethodId: Id<'nursePaymentMethods'>) => {
@@ -111,9 +132,8 @@ export const Billings = () => {
     [setDefaultPaymentMethod, nurseId],
   );
 
-  const handleModalClose = useCallback(() => {
-    setShowAddModal(false);
-    setSetupData(null);
+  const handleCloseModal = useCallback(() => {
+    bottomSheetModalRef.current?.dismiss();
   }, []);
 
   if (!nurse) return null;
@@ -239,24 +259,32 @@ export const Billings = () => {
         >
           <TouchableOpacity
             onPress={handleOpenAddCard}
-            style={[styles.addBtn, { backgroundColor: theme.colors.blue }]}
+            disabled={adding}
+            style={[
+              styles.addBtn,
+              {
+                backgroundColor: adding ? theme.colors.grey : theme.colors.blue,
+              },
+            ]}
           >
-            <IconPlus size={18} color="#fff" strokeWidth={2.5} />
+            {adding ? (
+              <ActivityIndicator size={18} color="#fff" />
+            ) : (
+              <IconPlus size={18} color="#fff" strokeWidth={2.5} />
+            )}
             <Text style={styles.addBtnText}>Add Payment Card</Text>
           </TouchableOpacity>
         </View>
 
         {/* Add card modal */}
-        {showAddModal && setupData && (
-          <AddPaymentMethodModal
-            visible={showAddModal}
-            onClose={handleModalClose}
-            nurseId={nurseId}
-            clientSecret={setupData.clientSecret}
-            stripeCustomerId={setupData.customerId}
-            onSuccess={handleModalClose}
-          />
-        )}
+        <AddPaymentMethodModal
+          nurseId={nurseId}
+          clientSecret={setupData?.clientSecret ?? ''}
+          stripeCustomerId={setupData?.customerId ?? ''}
+          onSuccess={handleCloseModal}
+          ref={bottomSheetModalRef}
+          onCloseModal={handleCloseModal}
+        />
       </Wrapper>
     </StripeProvider>
   );

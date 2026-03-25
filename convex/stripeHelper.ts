@@ -1,67 +1,17 @@
 'use node';
 
 import { ConvexError } from 'convex/values';
+import Stripe from 'stripe';
 
-const STRIPE_BASE = 'https://api.stripe.com/v1';
-
-// ── DRY fetch helper ─────────────────────────────────────────────────────────
-
-async function stripeRequest<T = any>(
-  method: 'GET' | 'POST' | 'DELETE',
-  path: string,
-  body?: Record<string, any>,
-): Promise<T> {
+const getStripe = () => {
   const secretKey = process.env.STRIPE_SECRET_KEY;
   if (!secretKey) {
     throw new ConvexError({ message: 'Stripe secret key not configured' });
   }
-
-  const headers: Record<string, string> = {
-    Authorization: `Bearer ${secretKey}`,
-    'Content-Type': 'application/x-www-form-urlencoded',
-  };
-
-  const init: RequestInit = {
-    method,
-    headers,
-  };
-
-  if (body && method !== 'GET') {
-    init.body = encodeFormBody(body);
-  }
-
-  const res = await fetch(`${STRIPE_BASE}${path}`, init);
-  const json = await res.json();
-
-  if (!res.ok) {
-    throw new ConvexError({
-      message: json?.error?.message ?? 'Stripe request failed',
-    });
-  }
-
-  return json as T;
-}
-
-/** Recursively encode a nested object as application/x-www-form-urlencoded */
-function encodeFormBody(obj: Record<string, any>, prefix = ''): string {
-  const parts: string[] = [];
-  for (const [key, value] of Object.entries(obj)) {
-    if (value === undefined || value === null) continue;
-    const fullKey = prefix ? `${prefix}[${key}]` : key;
-    if (typeof value === 'object' && !Array.isArray(value)) {
-      parts.push(encodeFormBody(value, fullKey));
-    } else if (Array.isArray(value)) {
-      value.forEach((v, i) => {
-        parts.push(
-          `${encodeURIComponent(`${fullKey}[${i}]`)}=${encodeURIComponent(v)}`,
-        );
-      });
-    } else {
-      parts.push(`${encodeURIComponent(fullKey)}=${encodeURIComponent(value)}`);
-    }
-  }
-  return parts.join('&');
-}
+  return new Stripe(secretKey, {
+    apiVersion: '2025-02-24.acacia' as any,
+  });
+};
 
 // ── Customer ─────────────────────────────────────────────────────────────────
 
@@ -70,7 +20,8 @@ export async function createStripeCustomer(
   email: string,
   nurseId: string,
 ): Promise<{ id: string }> {
-  return stripeRequest('POST', '/customers', {
+  const stripe = getStripe();
+  return stripe.customers.create({
     name,
     email,
     metadata: { nurseId },
@@ -82,11 +33,13 @@ export async function createStripeCustomer(
 export async function createSetupIntent(
   customerId: string,
 ): Promise<{ id: string; client_secret: string }> {
-  return stripeRequest('POST', '/setup_intents', {
+  const stripe = getStripe();
+  const si = await stripe.setupIntents.create({
     customer: customerId,
     usage: 'off_session',
-    'payment_method_types[]': 'card',
+    payment_method_types: ['card'],
   });
+  return { id: si.id, client_secret: si.client_secret! };
 }
 
 // ── Retrieve PaymentMethod from SetupIntent ──────────────────────────────────
@@ -96,7 +49,16 @@ export async function retrieveSetupIntent(setupIntentId: string): Promise<{
   status: string;
   payment_method: string | null;
 }> {
-  return stripeRequest('GET', `/setup_intents/${setupIntentId}`);
+  const stripe = getStripe();
+  const res = await stripe.setupIntents.retrieve(setupIntentId);
+  return {
+    id: res.id,
+    status: res.status,
+    payment_method:
+      typeof res.payment_method === 'string'
+        ? res.payment_method
+        : res.payment_method?.id || null,
+  };
 }
 
 // ── Get PaymentMethod details ────────────────────────────────────────────────
@@ -110,7 +72,20 @@ export async function getPaymentMethod(pmId: string): Promise<{
     exp_year: number;
   };
 }> {
-  return stripeRequest('GET', `/payment_methods/${pmId}`);
+  const stripe = getStripe();
+  const res = await stripe.paymentMethods.retrieve(pmId);
+  if (!res.card) {
+    throw new ConvexError({ message: 'Payment method is not a card' });
+  }
+  return {
+    id: res.id,
+    card: {
+      brand: res.card.brand,
+      last4: res.card.last4,
+      exp_month: res.card.exp_month,
+      exp_year: res.card.exp_year,
+    },
+  };
 }
 
 // ── Attach PaymentMethod to Customer ────────────────────────────────────────
@@ -119,7 +94,8 @@ export async function attachPaymentMethodToCustomer(
   pmId: string,
   customerId: string,
 ): Promise<{ id: string }> {
-  return stripeRequest('POST', `/payment_methods/${pmId}/attach`, {
+  const stripe = getStripe();
+  return stripe.paymentMethods.attach(pmId, {
     customer: customerId,
   });
 }
@@ -127,7 +103,8 @@ export async function attachPaymentMethodToCustomer(
 // ── Detach PaymentMethod ─────────────────────────────────────────────────────
 
 export async function detachPaymentMethod(pmId: string): Promise<void> {
-  await stripeRequest('POST', `/payment_methods/${pmId}/detach`);
+  const stripe = getStripe();
+  await stripe.paymentMethods.detach(pmId);
 }
 
 // ── Off-session PaymentIntent (commission charge) ────────────────────────────
@@ -139,13 +116,18 @@ export async function chargeOffSession(
   currency: string = 'usd',
   description: string,
 ): Promise<{ id: string; status: string }> {
-  return stripeRequest('POST', '/payment_intents', {
+  const stripe = getStripe();
+  
+  // This is the implementation via Stripe SDK (as requested)
+  const paymentIntent = await stripe.paymentIntents.create({
     amount: amountCents,
     currency,
     customer: customerId,
     payment_method: paymentMethodId,
-    off_session: 'true',
-    confirm: 'true',
+    off_session: true, // Important for charging without the customer present
+    confirm: true,
     description,
   });
+  
+  return { id: paymentIntent.id, status: paymentIntent.status };
 }

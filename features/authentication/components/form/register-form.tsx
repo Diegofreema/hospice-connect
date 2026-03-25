@@ -63,6 +63,7 @@ export const RegisterForm = () => {
         showToast({
           title: 'Error',
           subtitle: error.message,
+          autodismiss: true,
         });
         return;
       }
@@ -70,17 +71,27 @@ export const RegisterForm = () => {
         email: values.email.trim(), // required
         type: 'email-verification', // required
       });
+
+      console.log({ err });
+
       if (err) {
         showToast({
           title: 'Error',
           subtitle: err.message,
+          autodismiss: true,
         });
         return;
       } else {
-        router.push('/verify');
+        router.push({
+          pathname: '/verify',
+          params: {
+            email: values.email.trim(),
+          },
+        });
         showToast({
           title: 'Success',
           subtitle: 'Otp has been sent to your email',
+          autodismiss: true,
         });
       }
       reset();
@@ -90,6 +101,7 @@ export const RegisterForm = () => {
       showToast({
         title: 'Error',
         subtitle: 'An unexpected error occurred. Please try again.',
+        autodismiss: true,
       });
     }
   };

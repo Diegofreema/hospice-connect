@@ -78,8 +78,8 @@
         "expo-build-properties",
         {
           "android": {
-            "enableMinifyInReleaseBuilds": false,
-            "enableProguardInReleaseBuilds": false,
+            "enableMinifyInReleaseBuilds": true,
+            "enableProguardInReleaseBuilds": true,
             "kotlinVersion": "2.1.20"
           }
         }

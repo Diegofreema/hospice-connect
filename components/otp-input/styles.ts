@@ -1,9 +1,7 @@
 import { StyleSheet } from 'react-native';
-import { WIDTH } from './const';
 
 export const otpInputStyles = StyleSheet.create({
   container: {
-    width: WIDTH,
     height: 120,
   },
   row: {

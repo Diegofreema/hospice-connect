@@ -1,6 +1,6 @@
 import { otpInputStyles as styles } from "../styles";
 import React, { type FC, useContext, useEffect } from "react";
-import { Dimensions, Keyboard, Pressable, TextInput, View } from "react-native";
+import { Keyboard, Pressable, TextInput, View } from "react-native";
 import Animated, {
   LinearTransition,
   useSharedValue,
@@ -23,7 +23,6 @@ export const OtpItem: FC<OtpItemProps> = (props: OtpItemProps) => {
     setOtpValue,
     focus,
     autoFocus,
-    containerStyle,
     otpInputStyle,
     textStyle,
     otpCount,
@@ -47,7 +46,7 @@ export const OtpItem: FC<OtpItemProps> = (props: OtpItemProps) => {
     borderOpacity.value = withTiming(focus === props.index ? 1 : 0.3, {
       duration: 200,
     });
-  }, [focus]);
+  }, [focus, props.index, borderWidth, borderOpacity]);
 
   useEffect(() => {
     if (otpValue) {
@@ -59,7 +58,7 @@ export const OtpItem: FC<OtpItemProps> = (props: OtpItemProps) => {
         Keyboard.dismiss();
       }
     }
-  }, [otpValue]);
+  }, [otpValue, props.index, otpCount, setOtpValue, setFocus]);
 
   const getTextStyle = () => {
     if (error) {
@@ -69,7 +68,7 @@ export const OtpItem: FC<OtpItemProps> = (props: OtpItemProps) => {
   };
 
   return (
-    <View key={props.index} style={[containerStyle]}>
+    <View key={props.index}>
       <TextInput
         style={[
           styles.inputSize,

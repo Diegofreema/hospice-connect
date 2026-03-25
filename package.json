@@ -153,6 +153,7 @@
     "resend": "^6.0.1",
     "sonner-native": "^0.21.1",
     "stream-chat-expo": "^8.5.0",
+    "stripe": "^20.4.1",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.18",
     "uniwind": "^1.2.7",

@@ -1,205 +1,239 @@
+import { useAuth } from '@/components/context/auth';
+import { useNurse } from '@/components/context/nurse-context';
 import { api } from '@/convex/_generated/api';
 import { type Id } from '@/convex/_generated/dataModel';
-import { CardField, useStripe } from '@stripe/stripe-react-native';
-import { useAction } from 'convex/react';
-import React, { useCallback, useState } from 'react';
+import BottomSheetKeyboardAwareScrollView from '@/features/shared/components/bottom-sheet-aware-scroll-view';
 import {
-  ActivityIndicator,
-  Modal,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+  BottomSheetBackdrop,
+  BottomSheetModal,
+  BottomSheetModalProvider,
+  BottomSheetView,
+} from '@gorhom/bottom-sheet';
+import { CardField, useStripe } from '@stripe/stripe-react-native';
+import { Details } from '@stripe/stripe-react-native/lib/typescript/src/types/components/CardFieldInput';
+import { useAction } from 'convex/react';
+import React, { forwardRef, useCallback, useState } from 'react';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { toast } from 'sonner-native';
 
 type Props = {
-  visible: boolean;
-  onClose: () => void;
   nurseId: Id<'nurses'>;
   clientSecret: string;
   stripeCustomerId: string;
   onSuccess: () => void;
+
+  onCloseModal: () => void;
 };
 
-export const AddPaymentMethodModal = ({
-  visible,
-  onClose,
-  nurseId,
-  clientSecret,
-  stripeCustomerId,
-  onSuccess,
-}: Props) => {
-  const { theme } = useUnistyles();
-  const { confirmSetupIntent } = useStripe();
-  const [isLoading, setIsLoading] = useState(false);
-  const [cardComplete, setCardComplete] = useState(false);
+export const AddPaymentMethodModal = forwardRef<BottomSheetModal, Props>(
+  (
+    {
+      nurseId,
+      clientSecret,
+      stripeCustomerId,
+      onSuccess,
 
-  const addPaymentMethod = useAction(api.nursePaymentsActions.addPaymentMethod);
+      onCloseModal,
+    },
+    ref,
+  ) => {
+    const { theme } = useUnistyles();
+    const { bottom } = useSafeAreaInsets();
+    const { confirmSetupIntent } = useStripe();
+    const [isLoading, setIsLoading] = useState(false);
 
-  const handleAdd = useCallback(async () => {
-    if (!cardComplete) {
-      toast.error('Incomplete card', {
-        description: 'Please fill in all card details.',
-      });
-      return;
-    }
+    const handleSheetChanges = useCallback(
+      (index: number) => {
+        if (index === -1) {
+          onCloseModal();
+        }
+      },
+      [onCloseModal],
+    );
 
-    setIsLoading(true);
-    try {
-      // Confirm the SetupIntent with the card entered by the user
-      const { setupIntent, error } = await confirmSetupIntent(clientSecret, {
-        paymentMethodType: 'Card',
-      });
+    const renderBackdrop = useCallback(
+      (props: any) => (
+        <BottomSheetBackdrop
+          {...props}
+          disappearsOnIndex={-1}
+          appearsOnIndex={0}
+          opacity={0.5}
+        />
+      ),
+      [],
+    );
+    const [details, setDetails] = useState<Details>();
+    const { user } = useAuth();
+    const { nurse } = useNurse();
+    const addPaymentMethod = useAction(
+      api.nursePaymentsActions.addPaymentMethod,
+    );
 
-      if (error) {
-        throw new Error(error.message);
+    const handleAdd = async () => {
+      if (!user || !nurse) {
+        toast.error('User or nurse not found');
+        return;
+      }
+      if (!cardComplete) {
+        toast.error('Incomplete card', {
+          description: 'Please fill in all card details.',
+        });
+        return;
       }
 
-      if (!setupIntent?.paymentMethodId) {
-        throw new Error('No payment method returned from Stripe');
+      setIsLoading(true);
+      try {
+        // Confirm the SetupIntent with the card entered by the user
+        const { setupIntent, error } = await confirmSetupIntent(clientSecret, {
+          paymentMethodType: 'Card',
+          paymentMethodData: {
+            billingDetails: {
+              email: user?.email,
+              name: nurse?.name,
+              phone: nurse?.phoneNumber,
+            },
+          },
+        });
+
+        if (error) {
+          console.log(error);
+
+          throw new Error(error.message);
+        }
+
+        if (!setupIntent?.id) {
+          throw new Error('No payment method returned from Stripe');
+        }
+
+        // Save to our backend
+        await addPaymentMethod({
+          nurseId,
+          paymentMethodId: setupIntent.id,
+          stripeCustomerId,
+        });
+
+        toast.success('Card saved successfully!');
+        onSuccess();
+        onCloseModal();
+      } catch (err: any) {
+        toast.error('Failed to save card', {
+          description: err?.message ?? 'Please try again.',
+        });
+      } finally {
+        setIsLoading(false);
       }
-
-      // Save to our backend
-      await addPaymentMethod({
-        nurseId,
-        paymentMethodId: setupIntent.paymentMethodId,
-        stripeCustomerId,
-      });
-
-      toast.success('Card saved successfully!');
-      onSuccess();
-      onClose();
-    } catch (err: any) {
-      toast.error('Failed to save card', {
-        description: err?.message ?? 'Please try again.',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [
-    cardComplete,
-    clientSecret,
-    confirmSetupIntent,
-    addPaymentMethod,
-    nurseId,
-    stripeCustomerId,
-    onSuccess,
-    onClose,
-  ]);
-
-  return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-    >
-      <View style={styles.overlay}>
-        <View
-          style={[styles.sheet, { backgroundColor: theme.colors.background }]}
+    };
+    const cardComplete = details?.complete;
+    const isDisabled = isLoading || !cardComplete;
+    return (
+      <BottomSheetModalProvider>
+        <BottomSheetModal
+          ref={ref}
+          onChange={handleSheetChanges}
+          backdropComponent={renderBackdrop}
+          enableDynamicSizing={true}
+          backgroundStyle={{ backgroundColor: theme.colors.background }}
+          handleIndicatorStyle={{ backgroundColor: theme.colors.grey }}
+          keyboardBehavior="extend"
         >
-          {/* Handle */}
-          <View
-            style={[styles.handle, { backgroundColor: theme.colors.grey }]}
-          />
-
-          <Text style={[styles.title, { color: theme.colors.typography }]}>
-            Add Payment Card
-          </Text>
-          <Text style={[styles.subtitle, { color: theme.colors.textGrey }]}>
-            Your card will be used for commission billing when route sheets are
-            approved.
-          </Text>
-
-          {/* Stripe native card input */}
-          <View
-            style={[
-              styles.cardFieldWrap,
-              {
-                borderColor: theme.colors.grey,
-                backgroundColor: theme.colors.greyLight,
-              },
-            ]}
-          >
-            <CardField
-              postalCodeEnabled={false}
-              placeholders={{ number: '4242 4242 4242 4242' }}
-              cardStyle={{
-                backgroundColor: 'transparent',
-                textColor: theme.colors.typography,
-                placeholderColor: theme.colors.textGrey,
-                borderColor: 'transparent',
-              }}
-              style={styles.cardField}
-              onCardChange={(details) => {
-                setCardComplete(details.complete);
-              }}
-            />
-          </View>
-
-          <View style={styles.actions}>
-            <TouchableOpacity
-              onPress={handleAdd}
-              disabled={isLoading || !cardComplete}
-              style={[
-                styles.primaryBtn,
-                {
-                  backgroundColor:
-                    !cardComplete || isLoading
-                      ? theme.colors.grey
-                      : theme.colors.blue,
-                },
-              ]}
+          <BottomSheetView style={styles.sheet}>
+            <BottomSheetKeyboardAwareScrollView
+              style={{ paddingBottom: bottom + 20 }}
             >
-              {isLoading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.primaryBtnText}>Save Card</Text>
-              )}
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={onClose}
-              disabled={isLoading}
-              style={[styles.cancelBtn, { borderColor: theme.colors.grey }]}
-            >
-              <Text
-                style={[styles.cancelBtnText, { color: theme.colors.textGrey }]}
-              >
-                Cancel
+              <Text style={[styles.title, { color: theme.colors.typography }]}>
+                Add Payment Card
               </Text>
-            </TouchableOpacity>
-          </View>
+              <Text style={[styles.subtitle, { color: theme.colors.textGrey }]}>
+                Your card will be used for commission billing when route sheets
+                are approved.
+              </Text>
 
-          <Text style={[styles.secureNote, { color: theme.colors.textGrey }]}>
-            🔒 Secured by Stripe — we never store your full card number.
-          </Text>
-        </View>
-      </View>
-    </Modal>
-  );
-};
+              {/* Stripe native card input */}
+              <View
+                style={[
+                  styles.cardFieldWrap,
+                  {
+                    borderColor: theme.colors.grey,
+                    backgroundColor: theme.colors.greyLight,
+                  },
+                ]}
+              >
+                <CardField
+                  postalCodeEnabled={false}
+                  placeholders={{ number: '4242 4242 4242 4242' }}
+                  cardStyle={{
+                    backgroundColor: '#00000000', // '#00000000' is transparent in Android ARGB/RGBA format
+                    textColor: '#000000', // Android requires 6 or 8 char hex codes
+                    placeholderColor: theme.colors.textGrey,
+                    borderColor: '#00000000',
+                    cursorColor: '#000000',
+                  }}
+                  style={styles.cardField}
+                  onCardChange={(details) => {
+                    setDetails(details);
+                  }}
+                />
+              </View>
 
+              <View style={styles.actions}>
+                <TouchableOpacity
+                  onPress={handleAdd}
+                  disabled={isDisabled}
+                  style={[
+                    styles.primaryBtn,
+                    {
+                      backgroundColor: isDisabled
+                        ? theme.colors.grey
+                        : theme.colors.blue,
+                    },
+                  ]}
+                >
+                  {isLoading ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text style={styles.primaryBtnText}>Save Card</Text>
+                  )}
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={onCloseModal}
+                  disabled={isLoading}
+                  style={[styles.cancelBtn, { borderColor: theme.colors.grey }]}
+                >
+                  <Text
+                    style={[
+                      styles.cancelBtnText,
+                      { color: theme.colors.textGrey },
+                    ]}
+                  >
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <Text
+                style={[
+                  styles.secureNote,
+                  { color: theme.colors.textGrey, marginBottom: bottom + 20 },
+                ]}
+              >
+                🔒 Secured by Stripe — we never store your full card number.
+              </Text>
+            </BottomSheetKeyboardAwareScrollView>
+          </BottomSheetView>
+        </BottomSheetModal>
+      </BottomSheetModalProvider>
+    );
+  },
+);
+
+AddPaymentMethodModal.displayName = 'AddPaymentMethodModal';
 const styles = StyleSheet.create(() => ({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end' as const,
-  },
   sheet: {
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
     padding: 24,
-    paddingBottom: 40,
     gap: 14,
-  },
-  handle: {
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-    alignSelf: 'center' as const,
-    marginBottom: 8,
   },
   title: {
     fontSize: 18,

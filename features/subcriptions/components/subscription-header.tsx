@@ -24,7 +24,7 @@ export const SubscriptionHeader = () => {
           style={styles.heroLogo}
           contentFit="contain"
         />
-        <Text style={styles.heroTitle}>Hospice Connect Pro</Text>
+        <Text style={styles.heroTitle}>HospiceConnect Pro</Text>
         <Text style={styles.heroSubtitle}>
           Unlock full access to the platform and start managing your care team
           today.

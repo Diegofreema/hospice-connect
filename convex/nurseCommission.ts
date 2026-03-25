@@ -62,6 +62,15 @@ export const chargeNurseCommission = internalAction({
         'usd',
         description,
       );
+
+      await ctx.runMutation(
+        internal.nurseCommissionHelpers.insertChargeSuccessNotification,
+        {
+          nurseId: args.nurseId,
+          amountCents: commissionAmountCents,
+          hospiceBusinessName: args.hospiceBusinessName,
+        },
+      );
     } catch (err: any) {
       console.error('[chargeNurseCommission] charge failed:', err?.message);
       await ctx.runMutation(

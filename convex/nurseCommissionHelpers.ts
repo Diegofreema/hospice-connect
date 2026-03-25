@@ -64,3 +64,22 @@ export const insertChargeFailedNotification = internalMutation({
     });
   },
 });
+
+export const insertChargeSuccessNotification = internalMutation({
+  args: {
+    nurseId: v.id('nurses'),
+    amountCents: v.number(),
+    hospiceBusinessName: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const amountStr = (args.amountCents / 100).toFixed(2);
+    await ctx.db.insert('nurseNotifications', {
+      nurseId: args.nurseId,
+      isRead: false,
+      title: 'Commission Processed',
+      description: `You have been successfully charged $${amountStr} for the ${args.hospiceBusinessName} route sheet commission.`,
+      type: 'admin',
+      viewCount: 0,
+    });
+  },
+});
