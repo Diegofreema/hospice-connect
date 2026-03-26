@@ -1,21 +1,26 @@
-import { useNurse } from '@/components/context/nurse-context';
-import { api } from '@/convex/_generated/api';
+import { ErrorComponent } from '@/features/shared/components/error';
 import { UnderReview } from '@/features/shared/components/under-review';
-import { useQuery } from 'convex/react';
+import { useGetPaymentMethods } from '@/hooks/use-get-payment-methods';
 import React, { PropsWithChildren } from 'react';
 
 export const AddedCardProvider = ({ children }: PropsWithChildren) => {
-  const { nurse } = useNurse();
-  const hasAddedCard = useQuery(
-    api.nurses.hasAddedCard,
-    nurse
-      ? {
-          nurseId: nurse?._id,
-        }
-      : 'skip',
-  );
+  const {
+    data: paymentMethods = [],
+    isLoading: loading,
+    refetch: loadPaymentMethods,
+    isError,
+  } = useGetPaymentMethods();
 
-  if (!hasAddedCard) {
+  if (isError && !loading) {
+    return (
+      <ErrorComponent
+        text="Failed to load payment methods"
+        refetch={loadPaymentMethods}
+      />
+    );
+  }
+
+  if (!paymentMethods?.length) {
     return (
       <UnderReview
         title="You haven't added your card yet"

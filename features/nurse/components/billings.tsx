@@ -3,6 +3,7 @@ import { api } from '@/convex/_generated/api';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { Wrapper } from '@/features/shared/components/wrapper';
 import { generateErrorMessage } from '@/features/shared/utils';
+import { useGetPaymentMethods } from '@/hooks/use-get-payment-methods';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import {
@@ -13,7 +14,7 @@ import {
 } from '@tabler/icons-react-native';
 import { useAction } from 'convex/react';
 import { useRouter } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -26,7 +27,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { toast } from 'sonner-native';
 import { AddPaymentMethodModal } from './add-payment-method';
-import { PaymentMethodCard, type StripeCard } from './payment-method-card';
+import { PaymentMethodCard } from './payment-method-card';
 
 const STRIPE_PK = process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? '';
 
@@ -36,8 +37,6 @@ export const Billings = () => {
   const router = useRouter();
   const { bottom } = useSafeAreaInsets();
   const [adding, setAdding] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [paymentMethods, setPaymentMethods] = useState<StripeCard[]>([]);
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const handlePresentModalPress = useCallback(() => {
@@ -50,30 +49,21 @@ export const Billings = () => {
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [settingDefaultId, setSettingDefaultId] = useState<string | null>(null);
 
-  const nurseId = nurse!._id;
+  const {
+    data: paymentMethods = [],
+    isLoading: loading,
+    refetch: loadPaymentMethods,
+  } = useGetPaymentMethods();
 
-  const getPaymentMethods = useAction(api.nursePaymentsActions.getPaymentMethods);
-  const createSetupIntent = useAction(api.nursePaymentsActions.createSetupIntentForNurse);
-  const removePaymentMethodAction = useAction(api.nursePaymentsActions.removePaymentMethod);
-  const setDefaultPaymentMethodAction = useAction(api.nursePaymentsActions.setDefaultPaymentMethod);
-
-  const loadPaymentMethods = useCallback(async () => {
-    setLoading(true);
-    try {
-      const methods = await getPaymentMethods({ nurseId });
-      setPaymentMethods(methods);
-    } catch (err) {
-      toast.error('Could not load payment methods', {
-        description: generateErrorMessage(err, 'Please try again.'),
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [nurseId, getPaymentMethods]);
-
-  useEffect(() => {
-    loadPaymentMethods();
-  }, [loadPaymentMethods]);
+  const createSetupIntent = useAction(
+    api.nursePaymentsActions.createSetupIntentForNurse,
+  );
+  const removePaymentMethodAction = useAction(
+    api.nursePaymentsActions.removePaymentMethod,
+  );
+  const setDefaultPaymentMethodAction = useAction(
+    api.nursePaymentsActions.setDefaultPaymentMethod,
+  );
 
   const handleOpenAddCard = async () => {
     setAdding(true);
@@ -83,7 +73,10 @@ export const Billings = () => {
       handlePresentModalPress();
     } catch (err) {
       toast.error('Error', {
-        description: generateErrorMessage(err, 'Could not initialize payment setup'),
+        description: generateErrorMessage(
+          err,
+          'Could not initialize payment setup',
+        ),
       });
     } finally {
       setAdding(false);
@@ -107,7 +100,9 @@ export const Billings = () => {
                 toast.success('Card removed');
                 await loadPaymentMethods();
               } catch (err: any) {
-                toast.error('Failed to remove card', { description: err?.message });
+                toast.error('Failed to remove card', {
+                  description: err?.message,
+                });
               } finally {
                 setRemovingId(null);
               }
@@ -136,7 +131,11 @@ export const Billings = () => {
         setSettingDefaultId(null);
       }
     },
-    [setDefaultPaymentMethodAction, nurse?.stripeCustomerId, loadPaymentMethods],
+    [
+      setDefaultPaymentMethodAction,
+      nurse?.stripeCustomerId,
+      loadPaymentMethods,
+    ],
   );
 
   const handleCloseModal = useCallback(() => {
@@ -149,6 +148,7 @@ export const Billings = () => {
   }, [handleCloseModal, loadPaymentMethods]);
 
   if (!nurse) return null;
+  const nurseId = nurse._id;
 
   return (
     <StripeProvider publishableKey={STRIPE_PK}>
@@ -157,12 +157,21 @@ export const Billings = () => {
         <View style={styles.header}>
           <TouchableOpacity
             onPress={() => router.back()}
-            style={[styles.backBtn, { backgroundColor: theme.colors.greyLight }]}
+            style={[
+              styles.backBtn,
+              { backgroundColor: theme.colors.greyLight },
+            ]}
             hitSlop={8}
           >
-            <IconArrowLeft size={18} color={theme.colors.typography} strokeWidth={2.2} />
+            <IconArrowLeft
+              size={18}
+              color={theme.colors.typography}
+              strokeWidth={2.2}
+            />
           </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: theme.colors.typography }]}>
+          <Text
+            style={[styles.headerTitle, { color: theme.colors.typography }]}
+          >
             Billing & Payments
           </Text>
           <View style={{ width: 36 }} />
@@ -173,10 +182,18 @@ export const Billings = () => {
           <View
             style={[
               styles.infoBanner,
-              { backgroundColor: 'rgba(76,85,255,0.06)', borderColor: theme.colors.blue },
+              {
+                backgroundColor: 'rgba(76,85,255,0.06)',
+                borderColor: theme.colors.blue,
+              },
             ]}
           >
-            <View style={[styles.infoIconWrap, { backgroundColor: 'rgba(76,85,255,0.12)' }]}>
+            <View
+              style={[
+                styles.infoIconWrap,
+                { backgroundColor: 'rgba(76,85,255,0.12)' },
+              ]}
+            >
               <IconShieldCheck size={18} color={theme.colors.blue} />
             </View>
             <View style={{ flex: 1 }}>
@@ -199,14 +216,25 @@ export const Billings = () => {
           {loading ? (
             <SmallLoader size={32} />
           ) : paymentMethods.length === 0 ? (
-            <View style={[styles.emptyState, { borderColor: theme.colors.grey }]}>
-              <View style={[styles.emptyIconWrap, { backgroundColor: theme.colors.greyLight }]}>
+            <View
+              style={[styles.emptyState, { borderColor: theme.colors.grey }]}
+            >
+              <View
+                style={[
+                  styles.emptyIconWrap,
+                  { backgroundColor: theme.colors.greyLight },
+                ]}
+              >
                 <IconCreditCard size={28} color={theme.colors.textGrey} />
               </View>
-              <Text style={[styles.emptyTitle, { color: theme.colors.typography }]}>
+              <Text
+                style={[styles.emptyTitle, { color: theme.colors.typography }]}
+              >
                 No cards saved
               </Text>
-              <Text style={[styles.emptyText, { color: theme.colors.textGrey }]}>
+              <Text
+                style={[styles.emptyText, { color: theme.colors.textGrey }]}
+              >
                 Add a payment card to enable automatic commission billing.
               </Text>
             </View>
@@ -246,7 +274,9 @@ export const Billings = () => {
             disabled={adding}
             style={[
               styles.addBtn,
-              { backgroundColor: adding ? theme.colors.grey : theme.colors.blue },
+              {
+                backgroundColor: adding ? theme.colors.grey : theme.colors.blue,
+              },
             ]}
           >
             {adding ? (
