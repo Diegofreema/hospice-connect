@@ -4,7 +4,7 @@ import { type Id } from '@/convex/_generated/dataModel';
 import { FlexButtons } from '@/features/shared/components/flex-buttons';
 import { generateErrorMessage } from '@/features/shared/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from 'convex/react';
+import { useAction } from 'convex/react';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Modal, Text, TextInput, View } from 'react-native';
@@ -33,8 +33,8 @@ export const DeclineRouteSheetModal: React.FC<DeclineRouteSheetModalProps> = ({
   routeSheetId,
   notificationId,
 }) => {
-  const approveOrDecline = useMutation(
-    api.routeSheets.approveOrDeclineRouteSheet,
+  const approveOrDecline = useAction(
+    api.routeSheetsActions.approveOrDeclineRouteSheet,
   );
   const { showToast } = useToast();
   const {

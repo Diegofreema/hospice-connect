@@ -3,7 +3,7 @@ import { api } from '@/convex/_generated/api';
 import { type Id } from '@/convex/_generated/dataModel';
 import { FlexButtons } from '@/features/shared/components/flex-buttons';
 import { generateErrorMessage } from '@/features/shared/utils';
-import { useMutation } from 'convex/react';
+import { useAction } from 'convex/react';
 import React, { useState } from 'react';
 import { Modal, Text, View } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
@@ -25,7 +25,7 @@ export const ApproveRouteSheetModal: React.FC<ApproveRouteSheetModalProps> = ({
   routeSheetId,
 }) => {
   const [processing, setProcessing] = useState(false);
-  const approve = useMutation(api.routeSheets.approveOrDeclineRouteSheet);
+  const approve = useAction(api.routeSheetsActions.approveOrDeclineRouteSheet);
   const { showToast } = useToast();
 
   const handleClose = () => {

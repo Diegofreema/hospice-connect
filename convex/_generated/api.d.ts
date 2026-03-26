@@ -42,6 +42,8 @@ import type * as posts from "../posts.js";
 import type * as privateData from "../privateData.js";
 import type * as profileUpdates from "../profileUpdates.js";
 import type * as routeSheets from "../routeSheets.js";
+import type * as routeSheetsActions from "../routeSheetsActions.js";
+import type * as routeSheetsHelpers from "../routeSheetsHelpers.js";
 import type * as schedules from "../schedules.js";
 import type * as sendEmail from "../sendEmail.js";
 import type * as shifts from "../shifts.js";
@@ -91,6 +93,8 @@ declare const fullApi: ApiFromModules<{
   privateData: typeof privateData;
   profileUpdates: typeof profileUpdates;
   routeSheets: typeof routeSheets;
+  routeSheetsActions: typeof routeSheetsActions;
+  routeSheetsHelpers: typeof routeSheetsHelpers;
   schedules: typeof schedules;
   sendEmail: typeof sendEmail;
   shifts: typeof shifts;

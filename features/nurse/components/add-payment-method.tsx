@@ -22,8 +22,7 @@ type Props = {
   nurseId: Id<'nurses'>;
   clientSecret: string;
   stripeCustomerId: string;
-  onSuccess: () => void;
-
+  onSuccess: () => Promise<void> | void;
   onCloseModal: () => void;
 };
 
@@ -103,19 +102,28 @@ export const AddPaymentMethodModal = forwardRef<BottomSheetModal, Props>(
           throw new Error(error.message);
         }
 
-        if (!setupIntent?.id) {
+        if (!setupIntent?.paymentMethod) {
           throw new Error('No payment method returned from Stripe');
         }
 
-        // Save to our backend
+        // Attach to customer — no DB write
+        const pmId =
+          typeof setupIntent.paymentMethod === 'string'
+            ? setupIntent.paymentMethod
+            : (setupIntent.paymentMethod as any)?.id;
+
+        if (!pmId) {
+          throw new Error('No payment method returned from Stripe');
+        }
+
         await addPaymentMethod({
           nurseId,
-          paymentMethodId: setupIntent.id,
+          paymentMethodId: pmId,
           stripeCustomerId,
         });
 
         toast.success('Card saved successfully!');
-        onSuccess();
+        await onSuccess();
         onCloseModal();
       } catch (err: any) {
         toast.error('Failed to save card', {

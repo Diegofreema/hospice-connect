@@ -27,7 +27,9 @@ export const MoreLinks = ({ links, isSuspended }: Props) => {
     }
   };
   const { data: account } = useGetAccount();
-  const isCredentialAccount = !!account;
+  const isCredentialAccount = !!(
+    account && account?.find((account) => account.providerId === 'credentials')
+  );
 
   const displayLinks = useMemo(() => {
     const list = [...links];

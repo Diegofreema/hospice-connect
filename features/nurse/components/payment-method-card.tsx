@@ -1,13 +1,21 @@
-import { type Doc, type Id } from '@/convex/_generated/dataModel';
 import { IconCheck, IconTrash } from '@tabler/icons-react-native';
 import React from 'react';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
+export type StripeCard = {
+  id: string;
+  brand: string;
+  last4: string;
+  expMonth: number;
+  expYear: number;
+  isDefault: boolean;
+};
+
 type Props = {
-  paymentMethod: Doc<'nursePaymentMethods'>;
-  onRemove: (id: Id<'nursePaymentMethods'>) => void;
-  onSetDefault: (id: Id<'nursePaymentMethods'>) => void;
+  paymentMethod: StripeCard;
+  onRemove: (stripePaymentMethodId: string) => void;
+  onSetDefault: (stripePaymentMethodId: string) => void;
   isRemoving?: boolean;
   isSettingDefault?: boolean;
 };
@@ -37,7 +45,7 @@ export const PaymentMethodCard = ({
   isSettingDefault,
 }: Props) => {
   const { theme } = useUnistyles();
-  const { brand, last4, expMonth, expYear, isDefault, _id } = paymentMethod;
+  const { brand, last4, expMonth, expYear, isDefault, id } = paymentMethod;
 
   const brandLabel = BRAND_LABELS[brand.toLowerCase()] ?? brand.toUpperCase();
   const brandColor = BRAND_COLORS[brand.toLowerCase()] ?? theme.colors.blue;
@@ -84,7 +92,7 @@ export const PaymentMethodCard = ({
           </View>
         ) : (
           <TouchableOpacity
-            onPress={() => onSetDefault(_id)}
+            onPress={() => onSetDefault(id)}
             disabled={isSettingDefault}
             style={[styles.setDefaultBtn, { borderColor: theme.colors.grey }]}
           >
@@ -101,7 +109,7 @@ export const PaymentMethodCard = ({
         )}
 
         <TouchableOpacity
-          onPress={() => onRemove(_id)}
+          onPress={() => onRemove(id)}
           disabled={isRemoving}
           style={[
             styles.removeBtn,

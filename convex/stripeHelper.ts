@@ -28,6 +28,11 @@ export async function createStripeCustomer(
   });
 }
 
+export async function getStripeCustomer(customerId: string) {
+  const stripe = getStripe();
+  return stripe.customers.retrieve(customerId) as Promise<Stripe.Customer>;
+}
+
 // ── SetupIntent ──────────────────────────────────────────────────────────────
 
 export async function createSetupIntent(
@@ -105,6 +110,48 @@ export async function attachPaymentMethodToCustomer(
 export async function detachPaymentMethod(pmId: string): Promise<void> {
   const stripe = getStripe();
   await stripe.paymentMethods.detach(pmId);
+}
+
+// ── List Customer's Payment Methods ──────────────────────────────────────────
+
+export type StripeCard = {
+  id: string;
+  brand: string;
+  last4: string;
+  expMonth: number;
+  expYear: number;
+  isDefault: boolean;
+};
+
+export async function listCustomerPaymentMethods(
+  customerId: string,
+  defaultPmId?: string | null,
+): Promise<StripeCard[]> {
+  const stripe = getStripe();
+  const result = await stripe.paymentMethods.list({
+    customer: customerId,
+    type: 'card',
+  });
+  return result.data.map((pm) => ({
+    id: pm.id,
+    brand: pm.card?.brand ?? 'unknown',
+    last4: pm.card?.last4 ?? '****',
+    expMonth: pm.card?.exp_month ?? 0,
+    expYear: pm.card?.exp_year ?? 0,
+    isDefault: pm.id === defaultPmId,
+  }));
+}
+
+// ── Set Customer's Default Payment Method ────────────────────────────────────
+
+export async function setDefaultPaymentMethodOnCustomer(
+  customerId: string,
+  pmId: string,
+): Promise<void> {
+  const stripe = getStripe();
+  await stripe.customers.update(customerId, {
+    invoice_settings: { default_payment_method: pmId },
+  });
 }
 
 // ── Off-session PaymentIntent (commission charge) ────────────────────────────

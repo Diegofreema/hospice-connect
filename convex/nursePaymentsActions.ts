@@ -8,7 +8,10 @@ import {
   createSetupIntent,
   createStripeCustomer,
   detachPaymentMethod,
-  getPaymentMethod,
+  getStripeCustomer,
+  listCustomerPaymentMethods,
+  setDefaultPaymentMethodOnCustomer,
+  type StripeCard,
 } from './stripeHelper';
 
 // ── Actions ───────────────────────────────────────────────────────────────────
@@ -31,7 +34,6 @@ export const createSetupIntentForNurse = action({
       throw new ConvexError({ message: 'User not authenticated' });
     }
 
-    // Fetch nurse via query (actions can run queries)
     const nurse = await ctx.runQuery(api.nurses.getNurseById, {
       userId: identity.subject,
     });
@@ -65,8 +67,7 @@ export const createSetupIntentForNurse = action({
 
 /**
  * Step 2 of add-card flow (called after client confirms the SetupIntent):
- * The Stripe SDK gives us the paymentMethodId from the confirmed SetupIntent.
- * We attach it to the customer and save it to our DB.
+ * Attaches the payment method to the Stripe customer — no DB writes.
  */
 export const addPaymentMethod = action({
   args: {
@@ -88,79 +89,76 @@ export const addPaymentMethod = action({
       // Silently ignore; PM may already be attached after SetupIntent confirm
     });
 
-    // Fetch card details
-    const pm = await getPaymentMethod(args.paymentMethodId);
-    if (!pm.card) {
-      throw new ConvexError({
-        message: 'Only card payment methods are supported',
-      });
-    }
-
-    // First card becomes default
-    const existing = await ctx.runQuery(api.nursePayments.getPaymentMethods, {
-      nurseId: args.nurseId,
-    });
-    const isDefault = existing.length === 0;
-
-    await ctx.runMutation(internal.nursePayments.savePaymentMethod, {
-      nurseId: args.nurseId,
-      stripeCustomerId: args.stripeCustomerId,
-      stripePaymentMethodId: pm.id,
-      last4: pm.card.last4,
-      brand: pm.card.brand,
-      expMonth: pm.card.exp_month,
-      expYear: pm.card.exp_year,
-      isDefault,
-    });
-
     return { success: true };
   },
 });
 
-/** Remove a saved payment method — detaches from Stripe and deletes from DB */
-export const removePaymentMethod = action({
+/**
+ * Fetch all saved cards for a nurse directly from Stripe.
+ * Stripe is the single source of truth — nothing stored in Convex.
+ */
+export const getPaymentMethods = action({
   args: {
-    paymentMethodId: v.id('nursePaymentMethods'),
-  },
-  handler: async (ctx, args): Promise<{ success: boolean }> => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new ConvexError({ message: 'User not authenticated' });
-    }
-
-    const pm = await ctx.runQuery(api.nursePayments.getPaymentMethodById, {
-      paymentMethodId: args.paymentMethodId,
-    });
-    if (!pm) {
-      throw new ConvexError({ message: 'Payment method not found' });
-    }
-
-    await detachPaymentMethod(pm.stripePaymentMethodId);
-
-    await ctx.runMutation(internal.nursePayments.deletePaymentMethod, {
-      paymentMethodId: args.paymentMethodId,
-    });
-
-    return { success: true };
-  },
-});
-
-/** Set a different card as the default */
-export const setDefaultPaymentMethod = action({
-  args: {
-    paymentMethodId: v.id('nursePaymentMethods'),
     nurseId: v.id('nurses'),
   },
+  handler: async (ctx, args): Promise<StripeCard[]> => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError({ message: 'User not authenticated' });
+    }
+
+    const nurse = await ctx.runQuery(api.nurses.getNurseById, {
+      userId: identity.subject,
+    });
+    if (!nurse || !nurse.stripeCustomerId) {
+      return [];
+    }
+
+    // Fetch the customer to get the default PM
+    const customer = await getStripeCustomer(nurse.stripeCustomerId);
+    const defaultPmId =
+      typeof customer.invoice_settings?.default_payment_method === 'string'
+        ? customer.invoice_settings.default_payment_method
+        : (customer.invoice_settings?.default_payment_method as any)?.id ??
+          null;
+
+    return listCustomerPaymentMethods(nurse.stripeCustomerId, defaultPmId);
+  },
+});
+
+/** Remove a saved payment method — detaches from Stripe only. No DB write. */
+export const removePaymentMethod = action({
+  args: {
+    stripePaymentMethodId: v.string(),
+  },
   handler: async (ctx, args): Promise<{ success: boolean }> => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new ConvexError({ message: 'User not authenticated' });
     }
 
-    await ctx.runMutation(internal.nursePayments.updatePaymentMethodDefault, {
-      paymentMethodId: args.paymentMethodId,
-      nurseId: args.nurseId,
-    });
+    await detachPaymentMethod(args.stripePaymentMethodId);
+
+    return { success: true };
+  },
+});
+
+/** Set a different card as the default — updates Stripe customer only. */
+export const setDefaultPaymentMethod = action({
+  args: {
+    stripePaymentMethodId: v.string(),
+    stripeCustomerId: v.string(),
+  },
+  handler: async (ctx, args): Promise<{ success: boolean }> => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError({ message: 'User not authenticated' });
+    }
+
+    await setDefaultPaymentMethodOnCustomer(
+      args.stripeCustomerId,
+      args.stripePaymentMethodId,
+    );
 
     return { success: true };
   },

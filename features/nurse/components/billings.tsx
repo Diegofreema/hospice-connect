@@ -1,6 +1,5 @@
 import { useNurse } from '@/components/context/nurse-context';
 import { api } from '@/convex/_generated/api';
-import { type Id } from '@/convex/_generated/dataModel';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { Wrapper } from '@/features/shared/components/wrapper';
 import { generateErrorMessage } from '@/features/shared/utils';
@@ -12,9 +11,9 @@ import {
   IconPlus,
   IconShieldCheck,
 } from '@tabler/icons-react-native';
-import { useAction, useQuery } from 'convex/react';
+import { useAction } from 'convex/react';
 import { useRouter } from 'expo-router';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -27,7 +26,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { toast } from 'sonner-native';
 import { AddPaymentMethodModal } from './add-payment-method';
-import { PaymentMethodCard } from './payment-method-card';
+import { PaymentMethodCard, type StripeCard } from './payment-method-card';
 
 const STRIPE_PK = process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? '';
 
@@ -37,6 +36,8 @@ export const Billings = () => {
   const router = useRouter();
   const { bottom } = useSafeAreaInsets();
   const [adding, setAdding] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [paymentMethods, setPaymentMethods] = useState<StripeCard[]>([]);
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const handlePresentModalPress = useCallback(() => {
@@ -46,27 +47,33 @@ export const Billings = () => {
     clientSecret: string;
     customerId: string;
   } | null>(null);
-  const [removingId, setRemovingId] =
-    useState<Id<'nursePaymentMethods'> | null>(null);
-  const [settingDefaultId, setSettingDefaultId] =
-    useState<Id<'nursePaymentMethods'> | null>(null);
+  const [removingId, setRemovingId] = useState<string | null>(null);
+  const [settingDefaultId, setSettingDefaultId] = useState<string | null>(null);
 
-  // nurse is guaranteed non-null by NurseProvider + BillingScreen guard
   const nurseId = nurse!._id;
 
-  const paymentMethods = useQuery(api.nursePayments.getPaymentMethods, {
-    nurseId,
-  });
+  const getPaymentMethods = useAction(api.nursePaymentsActions.getPaymentMethods);
+  const createSetupIntent = useAction(api.nursePaymentsActions.createSetupIntentForNurse);
+  const removePaymentMethodAction = useAction(api.nursePaymentsActions.removePaymentMethod);
+  const setDefaultPaymentMethodAction = useAction(api.nursePaymentsActions.setDefaultPaymentMethod);
 
-  const createSetupIntent = useAction(
-    api.nursePaymentsActions.createSetupIntentForNurse,
-  );
-  const removePaymentMethod = useAction(
-    api.nursePaymentsActions.removePaymentMethod,
-  );
-  const setDefaultPaymentMethod = useAction(
-    api.nursePaymentsActions.setDefaultPaymentMethod,
-  );
+  const loadPaymentMethods = useCallback(async () => {
+    setLoading(true);
+    try {
+      const methods = await getPaymentMethods({ nurseId });
+      setPaymentMethods(methods);
+    } catch (err) {
+      toast.error('Could not load payment methods', {
+        description: generateErrorMessage(err, 'Please try again.'),
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [nurseId, getPaymentMethods]);
+
+  useEffect(() => {
+    loadPaymentMethods();
+  }, [loadPaymentMethods]);
 
   const handleOpenAddCard = async () => {
     setAdding(true);
@@ -75,12 +82,8 @@ export const Billings = () => {
       setSetupData(data);
       handlePresentModalPress();
     } catch (err) {
-      const errorMessage = generateErrorMessage(
-        err,
-        'Could not initialize payment setup',
-      );
       toast.error('Error', {
-        description: errorMessage,
+        description: generateErrorMessage(err, 'Could not initialize payment setup'),
       });
     } finally {
       setAdding(false);
@@ -88,7 +91,7 @@ export const Billings = () => {
   };
 
   const handleRemove = useCallback(
-    (paymentMethodId: Id<'nursePaymentMethods'>) => {
+    (stripePaymentMethodId: string) => {
       Alert.alert(
         'Remove Card',
         'Are you sure you want to remove this payment method?',
@@ -98,14 +101,13 @@ export const Billings = () => {
             text: 'Remove',
             style: 'destructive',
             onPress: async () => {
-              setRemovingId(paymentMethodId);
+              setRemovingId(stripePaymentMethodId);
               try {
-                await removePaymentMethod({ paymentMethodId });
+                await removePaymentMethodAction({ stripePaymentMethodId });
                 toast.success('Card removed');
+                await loadPaymentMethods();
               } catch (err: any) {
-                toast.error('Failed to remove card', {
-                  description: err?.message,
-                });
+                toast.error('Failed to remove card', { description: err?.message });
               } finally {
                 setRemovingId(null);
               }
@@ -114,27 +116,37 @@ export const Billings = () => {
         ],
       );
     },
-    [removePaymentMethod],
+    [removePaymentMethodAction, loadPaymentMethods],
   );
 
   const handleSetDefault = useCallback(
-    async (paymentMethodId: Id<'nursePaymentMethods'>) => {
-      setSettingDefaultId(paymentMethodId);
+    async (stripePaymentMethodId: string) => {
+      if (!nurse?.stripeCustomerId) return;
+      setSettingDefaultId(stripePaymentMethodId);
       try {
-        await setDefaultPaymentMethod({ paymentMethodId, nurseId });
+        await setDefaultPaymentMethodAction({
+          stripePaymentMethodId,
+          stripeCustomerId: nurse.stripeCustomerId,
+        });
         toast.success('Default card updated');
+        await loadPaymentMethods();
       } catch (err: any) {
         toast.error('Failed to update default', { description: err?.message });
       } finally {
         setSettingDefaultId(null);
       }
     },
-    [setDefaultPaymentMethod, nurseId],
+    [setDefaultPaymentMethodAction, nurse?.stripeCustomerId, loadPaymentMethods],
   );
 
   const handleCloseModal = useCallback(() => {
     bottomSheetModalRef.current?.dismiss();
   }, []);
+
+  const handleCardAdded = useCallback(async () => {
+    handleCloseModal();
+    await loadPaymentMethods();
+  }, [handleCloseModal, loadPaymentMethods]);
 
   if (!nurse) return null;
 
@@ -145,21 +157,12 @@ export const Billings = () => {
         <View style={styles.header}>
           <TouchableOpacity
             onPress={() => router.back()}
-            style={[
-              styles.backBtn,
-              { backgroundColor: theme.colors.greyLight },
-            ]}
+            style={[styles.backBtn, { backgroundColor: theme.colors.greyLight }]}
             hitSlop={8}
           >
-            <IconArrowLeft
-              size={18}
-              color={theme.colors.typography}
-              strokeWidth={2.2}
-            />
+            <IconArrowLeft size={18} color={theme.colors.typography} strokeWidth={2.2} />
           </TouchableOpacity>
-          <Text
-            style={[styles.headerTitle, { color: theme.colors.typography }]}
-          >
+          <Text style={[styles.headerTitle, { color: theme.colors.typography }]}>
             Billing & Payments
           </Text>
           <View style={{ width: 36 }} />
@@ -170,18 +173,10 @@ export const Billings = () => {
           <View
             style={[
               styles.infoBanner,
-              {
-                backgroundColor: 'rgba(76,85,255,0.06)',
-                borderColor: theme.colors.blue,
-              },
+              { backgroundColor: 'rgba(76,85,255,0.06)', borderColor: theme.colors.blue },
             ]}
           >
-            <View
-              style={[
-                styles.infoIconWrap,
-                { backgroundColor: 'rgba(76,85,255,0.12)' },
-              ]}
-            >
+            <View style={[styles.infoIconWrap, { backgroundColor: 'rgba(76,85,255,0.12)' }]}>
               <IconShieldCheck size={18} color={theme.colors.blue} />
             </View>
             <View style={{ flex: 1 }}>
@@ -201,42 +196,31 @@ export const Billings = () => {
           </Text>
 
           {/* Card list */}
-          {paymentMethods === undefined ? (
+          {loading ? (
             <SmallLoader size={32} />
           ) : paymentMethods.length === 0 ? (
-            <View
-              style={[styles.emptyState, { borderColor: theme.colors.grey }]}
-            >
-              <View
-                style={[
-                  styles.emptyIconWrap,
-                  { backgroundColor: theme.colors.greyLight },
-                ]}
-              >
+            <View style={[styles.emptyState, { borderColor: theme.colors.grey }]}>
+              <View style={[styles.emptyIconWrap, { backgroundColor: theme.colors.greyLight }]}>
                 <IconCreditCard size={28} color={theme.colors.textGrey} />
               </View>
-              <Text
-                style={[styles.emptyTitle, { color: theme.colors.typography }]}
-              >
+              <Text style={[styles.emptyTitle, { color: theme.colors.typography }]}>
                 No cards saved
               </Text>
-              <Text
-                style={[styles.emptyText, { color: theme.colors.textGrey }]}
-              >
+              <Text style={[styles.emptyText, { color: theme.colors.textGrey }]}>
                 Add a payment card to enable automatic commission billing.
               </Text>
             </View>
           ) : (
             <FlatList
               data={paymentMethods}
-              keyExtractor={(item) => item._id}
+              keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
                 <PaymentMethodCard
                   paymentMethod={item}
                   onRemove={handleRemove}
                   onSetDefault={handleSetDefault}
-                  isRemoving={removingId === item._id}
-                  isSettingDefault={settingDefaultId === item._id}
+                  isRemoving={removingId === item.id}
+                  isSettingDefault={settingDefaultId === item.id}
                 />
               )}
               contentContainerStyle={styles.list}
@@ -262,9 +246,7 @@ export const Billings = () => {
             disabled={adding}
             style={[
               styles.addBtn,
-              {
-                backgroundColor: adding ? theme.colors.grey : theme.colors.blue,
-              },
+              { backgroundColor: adding ? theme.colors.grey : theme.colors.blue },
             ]}
           >
             {adding ? (
@@ -281,7 +263,7 @@ export const Billings = () => {
           nurseId={nurseId}
           clientSecret={setupData?.clientSecret ?? ''}
           stripeCustomerId={setupData?.customerId ?? ''}
-          onSuccess={handleCloseModal}
+          onSuccess={handleCardAdded}
           ref={bottomSheetModalRef}
           onCloseModal={handleCloseModal}
         />
@@ -309,13 +291,11 @@ const styles = StyleSheet.create(() => ({
     fontSize: 16,
     fontFamily: 'PublicSansBold',
   },
-
   content: {
     flex: 1,
     gap: 16,
     paddingTop: 8,
   },
-
   infoBanner: {
     flexDirection: 'row' as const,
     gap: 12,
@@ -343,7 +323,6 @@ const styles = StyleSheet.create(() => ({
     fontFamily: 'PublicSansRegular',
     lineHeight: 17,
   },
-
   sectionLabel: {
     fontSize: 11,
     fontFamily: 'PublicSansBold',
@@ -351,11 +330,9 @@ const styles = StyleSheet.create(() => ({
     textTransform: 'uppercase' as const,
     marginBottom: -4,
   },
-
   list: {
     gap: 10,
   },
-
   emptyState: {
     padding: 32,
     borderRadius: 16,
@@ -382,7 +359,6 @@ const styles = StyleSheet.create(() => ({
     textAlign: 'center' as const,
     lineHeight: 18,
   },
-
   ctaContainer: {
     paddingBottom: 12,
     paddingTop: 12,

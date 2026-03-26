@@ -14,7 +14,7 @@ export const useGetAccount = () => {
       if (error) {
         throw new Error(error.message || 'Failed to fetch account info');
       }
-      return data.find((account) => account.providerId === 'credentials');
+      return data;
     },
     enabled: !!session?.user?.id,
   });
