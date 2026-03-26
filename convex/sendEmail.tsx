@@ -128,6 +128,109 @@ export const sendEmailVerification = async (
     <div class="footer">
       <p>© ${new Date().getFullYear()} HospiceConnect. All rights reserved.</p>
     </div>
+    </div>
+  </div>
+</body>
+</html>
+    `,
+  });
+};
+
+export const sendResetPasswordOTP = async (
+  ctx: ActionCtx,
+  {
+    to,
+    code,
+    expires,
+  }: {
+    to: string;
+    code: string;
+    expires: number;
+  },
+) => {
+  await sendEmail(ctx, {
+    to,
+    subject: `Password Reset Request - HospiceConnect`,
+    html: `
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reset Your Password</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: #f4f7fa;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+    }
+    .header {
+      background-color: #4C55FF;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .header h1 {
+      color: #ffffff;
+      margin: 0;
+      font-size: 28px;
+    }
+    .content {
+      padding: 40px 30px;
+      text-align: center;
+    }
+    .otp-box {
+      display: inline-block;
+      background-color: #f4f7fa;
+      padding: 20px 40px;
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+    .otp-code {
+      font-size: 36px;
+      font-weight: 700;
+      color: #005A5A;
+      letter-spacing: 8px;
+    }
+    .info-text {
+      color: #666666;
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .footer {
+      background-color: #f4f7fa;
+      padding: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: #999999;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>HospiceConnect</h1>
+    </div>
+    <div class="content">
+      <p class="info-text">We received a request to reset your password. Please use the code below to securely reset it.</p>
+      
+      <div class="otp-box">
+        <span class="otp-code">${code}</span>
+      </div>
+      
+      <p class="info-text">This code will expire in 15 minutes.</p>
+      
+      <p class="info-text">If you didn't request a password reset, please ignore this email or contact support if you have concerns.</p>
+    </div>
+    <div class="footer">
+      <p>© ${new Date().getFullYear()} HospiceConnect. All rights reserved.</p>
+    </div>
   </div>
 </body>
 </html>

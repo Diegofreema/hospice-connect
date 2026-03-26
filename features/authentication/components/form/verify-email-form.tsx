@@ -15,11 +15,14 @@ import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
 type Props = {
   email: string;
+  isForgotPassword: 'true' | 'false';
 };
 
-export const VerifyEmailForm = ({ email }: Props) => {
+export const VerifyEmailForm = ({ email, isForgotPassword }: Props) => {
   const { theme } = useUnistyles();
   const [code, setCode] = useState('');
+  console.log({ isForgotPassword });
+
   const [loading, setLoading] = useState(false);
   const { startTimer, timeLeft } = useTimer();
   const { width } = useWindowDimensions();
@@ -31,41 +34,57 @@ export const VerifyEmailForm = ({ email }: Props) => {
   };
 
   const handleResendCode = async () => {
-    try {
-      setLoading(true);
-      startTimer();
-      const { error } = await authClient.emailOtp.sendVerificationOtp({
-        email: email, // required
-        type: 'email-verification', // required
-      });
-      if (error) {
-        showToast({
-          title: 'Error',
-          subtitle: error.message,
-          autodismiss: true,
-        });
-      } else {
-        showToast({
-          title: 'Success',
-          subtitle: 'Otp has been sent to your email',
-          autodismiss: true,
-        });
-      }
-    } catch (error) {
-      console.log(error);
-
-      showToast({
-        title: 'Error',
-        subtitle: 'An unexpected error occurred. Please try again.',
-        autodismiss: true,
-      });
-    } finally {
-      setLoading(false);
+    startTimer();
+    if (isForgotPassword === 'true') {
+      handleResendForgotPasswordOtp();
+    } else {
+      handleResendVerifyEmailOtp();
+    }
+  };
+  const onPress = async () => {
+    if (isForgotPassword === 'true') {
+      await handleVerifyForgotPassword();
+    } else {
+      await handleVerifyEmail();
     }
   };
 
+  const handleVerifyForgotPassword = async () => {
+    setLoading(true);
+    await authClient.emailOtp.checkVerificationOtp({
+      email,
+      type: 'forget-password',
+      otp: code,
+      fetchOptions: {
+        onSuccess: () => {
+          setLoading(false);
+          showToast({
+            title: 'Success',
+            subtitle: 'Otp has been verified successfully',
+            autodismiss: true,
+          });
+          router.push({
+            // @ts-ignore
+            pathname: '/reset-password',
+            params: {
+              email: email,
+              otp: code,
+            },
+          });
+        },
+        onError: ({ error }) => {
+          setLoading(false);
+          showToast({
+            title: 'Error',
+            subtitle: error.message,
+            autodismiss: true,
+          });
+        },
+      },
+    });
+  };
+
   const handleVerifyEmail = async () => {
-    startTimer();
     setLoading(true);
     const { data, error } = await authClient.emailOtp.verifyEmail({
       email: email, // required
@@ -88,9 +107,59 @@ export const VerifyEmailForm = ({ email }: Props) => {
     setLoading(false);
   };
 
+  const handleResendForgotPasswordOtp = async () => {
+    setLoading(true);
+    await authClient.emailOtp.requestPasswordReset({
+      email: email,
+      fetchOptions: {
+        onSuccess: () => {
+          setLoading(false);
+          showToast({
+            title: 'Success',
+            subtitle: 'Otp has been sent successfully',
+            autodismiss: true,
+          });
+        },
+        onError: ({ error }) => {
+          setLoading(false);
+          showToast({
+            title: 'Error',
+            subtitle: error.message,
+            autodismiss: true,
+          });
+        },
+      },
+    });
+  };
+
+  const handleResendVerifyEmailOtp = async () => {
+    await authClient.emailOtp.sendVerificationOtp({
+      email: email, // required
+      type: 'email-verification', // required
+      fetchOptions: {
+        onSuccess: () => {
+          setLoading(false);
+          showToast({
+            title: 'Success',
+            subtitle: 'Otp has been sent to your email',
+            autodismiss: true,
+          });
+        },
+        onError: ({ error }) => {
+          setLoading(false);
+          showToast({
+            title: 'Error',
+            subtitle: error.message,
+            autodismiss: true,
+          });
+        },
+      },
+    });
+  };
+
   const disabledColor =
     timeLeft > 0 || loading ? theme.colors.grey : theme.colors.greenLight;
-
+  const disabled = loading || code.length !== 6;
   return (
     <View>
       <OtpInput
@@ -110,17 +179,13 @@ export const VerifyEmailForm = ({ email }: Props) => {
       <PrivacyNoticeLink
         onPress={handleResendCode}
         disabled={timeLeft > 0 || loading}
-        style={{ backgroundColor: disabledColor }}
+        style={{ backgroundColor: disabledColor, width: 'auto' }}
       >
         {timeLeft > 0 ? `Resend Code in ${timeLeft}s` : 'Resend Code'}
       </PrivacyNoticeLink>
 
       <Spacer />
-      <Button
-        title="Verify Email"
-        onPress={handleVerifyEmail}
-        disabled={loading}
-      />
+      <Button title="Verify Email" onPress={onPress} disabled={disabled} />
     </View>
   );
 };

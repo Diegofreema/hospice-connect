@@ -16,7 +16,7 @@ import {
 export const HospiceMore = () => {
   const { hospice } = useHospice();
   if (hospice === null) return null;
-
+  const isVerified = hospice.status === 'approved';
   return (
     <Stack>
       <Spacer height={30} />
@@ -27,6 +27,7 @@ export const HospiceMore = () => {
         }}
         title="Business Profile"
         href={'/business-profile'}
+        verified={isVerified}
       />
       <Spacer height={30} />
       <MoreLinks links={links} />

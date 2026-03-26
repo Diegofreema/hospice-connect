@@ -18,10 +18,14 @@ export const More = () => {
   const { nurse, isSuspended } = useNurse();
   if (nurse === null) return null;
   const name = nurse.name;
+  const isVerified = nurse.status === 'approved';
   return (
     <View>
       <Spacer height={30} />
-      <AccountBrief data={{ name, image: nurse.image as string }} />
+      <AccountBrief
+        data={{ name, image: nurse.image as string }}
+        verified={isVerified}
+      />
       <Spacer height={30} />
       <MoreLinks links={links} isSuspended={isSuspended} />
     </View>

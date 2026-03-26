@@ -7,13 +7,13 @@ import { Wrapper } from '@/features/shared/components/wrapper';
 import { useLocalSearchParams } from 'expo-router';
 
 const ResetPassword = () => {
-  const { email } = useLocalSearchParams<{ email: string }>();
+  const { email, otp } = useLocalSearchParams<{ email: string; otp: string }>();
   return (
     <Wrapper gap="md">
       <BackButton />
       <MyTitle title="Create new password" />
       <SubTitle isBlack>Please create a new password</SubTitle>
-      <ResetForm email={email} />
+      <ResetForm email={email} otp={otp} />
     </Wrapper>
   );
 };

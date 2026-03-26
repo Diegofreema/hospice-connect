@@ -17,6 +17,7 @@ type Props = {
   title?: string;
   href?: Href;
   count?: number;
+  verified: boolean;
 };
 
 export const AccountBrief = ({
@@ -25,6 +26,7 @@ export const AccountBrief = ({
   title = 'My account',
   href = '/nurse-profile',
   count,
+  verified,
 }: Props) => {
   const onPress = () => {
     if (!href) return;
@@ -32,6 +34,7 @@ export const AccountBrief = ({
   };
   const fontSize = isHome ? 14 : 11;
   const fontColor = isHome ? 'black' : 'textGrey';
+
   return (
     <TouchableOpacity onPress={onPress}>
       <View
@@ -59,15 +62,15 @@ export const AccountBrief = ({
         </View>
         {!isHome && (
           <Badge
-            label="Verified"
+            label={verified ? 'Verified' : 'Not verified'}
             radius="full"
             size="sm"
-            variant="success"
+            variant={verified ? 'success' : 'error'}
             icon={
               <SymbolView
                 name="circle.fill"
                 size={12}
-                tintColor={'lightgreen'}
+                tintColor={verified ? 'lightgreen' : 'red'}
               />
             }
           />

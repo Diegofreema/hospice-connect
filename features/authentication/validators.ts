@@ -17,7 +17,7 @@ export const registerSchema = z
       .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
       .regex(
         /[^A-Za-z0-9]/,
-        'Password must contain at least one special character'
+        'Password must contain at least one special character',
       ),
     confirmPassword: z.string().min(1, 'Confirm password is required'),
   })
@@ -33,18 +33,23 @@ export const forgotPasswordSchema = z.object({
   email: z.email('Email is required').min(1, 'Email is required'),
 });
 
-export const resetPasswordSchema = z.object({
-  code: z.string().min(1, 'Code is required'),
-  password: z
-    .string()
-    .min(6, 'Password must be at least 6 characters long')
-    .regex(/[0-9]/, 'Password must contain at least one number')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(
-      /[^A-Za-z0-9]/,
-      'Password must contain at least one special character'
-    ),
-});
+export const resetPasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(6, 'Password must be at least 6 characters long')
+      .regex(/[0-9]/, 'Password must contain at least one number')
+      .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+      .regex(
+        /[^A-Za-z0-9]/,
+        'Password must contain at least one special character',
+      ),
+    confirmPassword: z.string().min(1, 'Confirm password is required'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ['confirmPassword'],
+    message: 'Passwords do not match',
+  });
 
 export type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>;
 

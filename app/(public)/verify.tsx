@@ -9,8 +9,9 @@ import { useLocalSearchParams } from 'expo-router';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 
 const Verify = () => {
-  const { email } = useLocalSearchParams<{
+  const { email, isForgotPassword } = useLocalSearchParams<{
     email: string;
+    isForgotPassword: 'true' | 'false';
   }>();
   return (
     <Wrapper>
@@ -21,7 +22,7 @@ const Verify = () => {
           We have sent code to {email || 'example@example.com'}
         </Subtitle>
         <Spacer height={50} />
-        <VerifyEmailForm email={email} />
+        <VerifyEmailForm email={email} isForgotPassword={isForgotPassword} />
       </KeyboardAwareScrollView>
     </Wrapper>
   );

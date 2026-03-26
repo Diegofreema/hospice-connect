@@ -9,14 +9,21 @@ import { type Href, router } from 'expo-router';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useUnistyles } from 'react-native-unistyles';
-import { forgotPasswordSchema, type ForgotPasswordSchema } from '../../validators';
+import {
+  forgotPasswordSchema,
+  type ForgotPasswordSchema,
+} from '../../validators';
 import { ControlInput } from './control-input';
 
 type Props = {
   link?: Href;
+  isForgotPassword?: boolean;
 };
 // @ts-ignore
-export const ForgotForm = ({ link = '/reset-password' }: Props) => {
+export const ForgotForm = ({
+  link = '/verify',
+  isForgotPassword = true,
+}: Props) => {
   const { theme } = useUnistyles();
   const {
     handleSubmit,
@@ -31,27 +38,35 @@ export const ForgotForm = ({ link = '/reset-password' }: Props) => {
   });
   const { showToast } = useToast();
   const onSubmit = async (values: ForgotPasswordSchema) => {
-    const { data, error } = await authClient.requestPasswordReset({
+    await authClient.emailOtp.requestPasswordReset({
       email: values.email,
+
+      fetchOptions: {
+        onSuccess: () => {
+          showToast({
+            title: 'Success',
+            subtitle: 'Otp sent successfully',
+            autodismiss: true,
+          });
+          router.push({
+            // @ts-ignore
+            pathname: link,
+            params: {
+              email: values.email,
+              isForgotPassword: isForgotPassword ? 'true' : 'false',
+            },
+          });
+          reset();
+        },
+        onError: ({ error }) => {
+          showToast({
+            title: 'Error',
+            subtitle: error.message,
+            autodismiss: true,
+          });
+        },
+      },
     });
-
-    if (error) {
-      showToast({
-        title: 'Error',
-        subtitle: error.message,
-        autodismiss: true,
-      });
-    }
-
-    if (data) {
-      showToast({
-        title: 'Success',
-        subtitle: data.message,
-        autodismiss: true,
-      });
-      router.push(link);
-      reset();
-    }
   };
   return (
     <View gap="xl">

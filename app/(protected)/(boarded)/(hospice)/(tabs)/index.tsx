@@ -41,6 +41,7 @@ export default function HomeScreen() {
     bottomSheetRef.current?.close();
   };
   if (hospice === null) return null;
+  const isVerified = hospice.status === 'approved';
 
   return (
     <ProProvider>
@@ -54,6 +55,7 @@ export default function HomeScreen() {
           href={'/business-profile'}
           isHome
           count={unreadCount || 0}
+          verified={isVerified}
         />
         <Stack gap={'lg'} mode="flexCentered">
           <SearchComponent

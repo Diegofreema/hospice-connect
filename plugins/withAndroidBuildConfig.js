@@ -102,6 +102,12 @@ const PROGUARD_RULES = `
 
 # ─── Stripe React Native ──────────────────────────────────────────────────────
 -keep class com.reactnativestripesdk.** { *; }
+# Suppress missing optional push provisioning classes (not used in this app)
+-dontwarn com.stripe.android.pushProvisioning.PushProvisioningActivity$g
+-dontwarn com.stripe.android.pushProvisioning.PushProvisioningActivityStarter$Args
+-dontwarn com.stripe.android.pushProvisioning.PushProvisioningActivityStarter$Error
+-dontwarn com.stripe.android.pushProvisioning.PushProvisioningActivityStarter
+-dontwarn com.stripe.android.pushProvisioning.PushProvisioningEphemeralKeyProvider
 
 # ─── Stream Chat ──────────────────────────────────────────────────────────────
 -keep class io.getstream.** { *; }
@@ -144,7 +150,7 @@ const withProguardRules = (config) => {
     const contents = mod.modResults.contents;
 
     // Only add once
-    if (contents.includes('─── React Native Core ───')) {
+    if (contents.includes('extra-proguard-rules.pro')) {
       return mod;
     }
 
@@ -189,6 +195,7 @@ const withAndroidBuildConfig = (config) => {
   config = withMainActivityConfigChanges(config);
   config = withLargeHeap(config);
   config = withLintConfig(config);
+  config = withProguardRules(config);
   return config;
 };
 

@@ -10,7 +10,11 @@ import { components } from './_generated/api';
 import { query } from './_generated/server';
 import authConfig from './auth.config';
 import authSchema from './betterAuth/schema';
-import { sendEmailVerification, sendResetPassword } from './sendEmail';
+import {
+  sendEmailVerification,
+  sendResetPassword,
+  sendResetPasswordOTP,
+} from './sendEmail';
 
 const siteUrl = process.env.SITE_URL!;
 const nativeAppUrl = process.env.NATIVE_APP_URL || 'hospice-connect://';
@@ -91,6 +95,11 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
             });
           } else {
             // Send the OTP for password reset
+            await sendResetPasswordOTP(requireActionCtx(ctx), {
+              to: email,
+              code: otp,
+              expires: Date.now() + 15 * 60 * 1000,
+            });
           }
         },
       }),

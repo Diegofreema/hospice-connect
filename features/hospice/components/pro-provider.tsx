@@ -64,6 +64,7 @@ const Wrapper = ({ children }: PropsWithChildren) => {
     api.hospiceNotification.unreadMessagesCount,
     hospice && hospice._id ? { hospiceId: hospice._id } : 'skip',
   );
+  const isVerified = hospice?.status === 'approved';
   return (
     <View style={{ flex: 1, backgroundColor: 'white', gap: 15 }}>
       <View style={{ paddingHorizontal: 16 }}>
@@ -76,6 +77,7 @@ const Wrapper = ({ children }: PropsWithChildren) => {
           href={'/business-profile'}
           isHome
           count={unreadCount || 0}
+          verified={isVerified}
         />
       </View>
       {children}

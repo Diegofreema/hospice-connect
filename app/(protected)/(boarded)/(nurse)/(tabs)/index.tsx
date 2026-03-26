@@ -55,6 +55,7 @@ export default function HomeScreen() {
   };
   if (nurse === null) return null;
   const name = nurse.name;
+  const isVerified = nurse.status === 'approved';
 
   return (
     <AddedCardProvider>
@@ -64,6 +65,7 @@ export default function HomeScreen() {
             data={{ name, image: nurse.image as string }}
             isHome
             count={unreadCount || 0}
+            verified={isVerified}
           />
         </View>
         <View px="xl">
