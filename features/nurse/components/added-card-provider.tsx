@@ -20,7 +20,7 @@ export const AddedCardProvider = ({ children }: PropsWithChildren) => {
     );
   }
 
-  if (!paymentMethods?.length) {
+  if (!paymentMethods?.length && !loading) {
     return (
       <UnderReview
         title="You haven't added your card yet"

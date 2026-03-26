@@ -201,8 +201,9 @@ export const Billings = () => {
                 How billing works
               </Text>
               <Text style={[styles.infoText, { color: theme.colors.textGrey }]}>
-                When a hospice approves your route sheet, a commission fee is
-                automatically charged from your default card.
+                Upon approval of your route sheet by a hospice, a commission fee
+                will be charged automatically to your designated default payment
+                card.
               </Text>
             </View>
           </View>
