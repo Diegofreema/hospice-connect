@@ -54,3 +54,24 @@ export const resetPasswordSchema = z
 export type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>;
 
 export type ForgotPasswordSchema = z.infer<typeof forgotPasswordSchema>;
+
+export const changePasswordSchema = z
+  .object({
+    oldPassword: z.string().min(1, 'Old password is required'),
+    newPassword: z
+      .string()
+      .min(6, 'Password must be at least 6 characters long')
+      .regex(/[0-9]/, 'Password must contain at least one number')
+      .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+      .regex(
+        /[^A-Za-z0-9]/,
+        'Password must contain at least one special character',
+      ),
+    confirmPassword: z.string().min(1, 'Confirm password is required'),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    path: ['confirmPassword'],
+    message: 'Passwords do not match',
+  });
+
+export type ChangePasswordSchema = z.infer<typeof changePasswordSchema>;

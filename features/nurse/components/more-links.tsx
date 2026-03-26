@@ -1,14 +1,17 @@
 import { LogOut } from '@/features/shared/components/log-out';
 import { TabBarIcon } from '@/features/shared/components/tab-bar-icon';
 import { Text } from '@/features/shared/components/text';
+import React, { useMemo } from 'react';
 import { View } from '../../shared/components/view';
 
-import { IconChevronRight } from '@tabler/icons-react-native';
+import { useGetAccount } from '@/hooks/use-get-account';
+import { IconChevronRight, IconPasswordUser } from '@tabler/icons-react-native';
 import { type Href, router } from 'expo-router';
 import { openBrowserAsync } from 'expo-web-browser';
 import { FlatList, TouchableOpacity } from 'react-native';
 import { useUnistyles } from 'react-native-unistyles';
 import { type LinkType } from '../types';
+
 type Props = {
   links: LinkType[];
   isSuspended?: boolean;
@@ -23,10 +26,30 @@ export const MoreLinks = ({ links, isSuspended }: Props) => {
       router.push(link);
     }
   };
+  const { data: account } = useGetAccount();
+  const isCredentialAccount = !!account;
+
+  const displayLinks = useMemo(() => {
+    const list = [...links];
+    if (isCredentialAccount) {
+      const hasChangePassword = list.some(
+        (link) => link.label === 'Change Password',
+      );
+      if (!hasChangePassword) {
+        const lastIndex = Math.max(0, list.length - 1);
+        list.splice(lastIndex, 0, {
+          label: 'Change Password',
+          icon: IconPasswordUser,
+          link: '/change-password' as any,
+        });
+      }
+    }
+    return list;
+  }, [links, isCredentialAccount]);
 
   return (
     <FlatList
-      data={links}
+      data={displayLinks}
       renderItem={({ item }) => {
         const isExternal = [
           'Support',

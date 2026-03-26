@@ -16,6 +16,7 @@ import { MoreLinks } from './more-links';
 
 export const More = () => {
   const { nurse, isSuspended } = useNurse();
+
   if (nurse === null) return null;
   const name = nurse.name;
   const isVerified = nurse.status === 'approved';
