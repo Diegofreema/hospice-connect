@@ -442,7 +442,7 @@ export function RouteSheets() {
                             <Button
                               size="sm"
                               onClick={() => handleReactivateNurse(nurse._id)}
-                              className="gap-2 bg-green-500 hover:bg-green-600"
+                              className="gap-2 bg-green-500 text-white hover:bg-green-600"
                               disabled={loading}
                             >
                               <CheckCircle className="h-4 w-4" />
