@@ -53,11 +53,9 @@ export const MoreLinks = ({ links, isSuspended }: Props) => {
     <FlatList
       data={displayLinks}
       renderItem={({ item }) => {
-        const isExternal = [
-          'Support',
-          'Privacy Policy',
-          'Terms of Service',
-        ].includes(item.label);
+        const isExternal = ['Privacy Policy', 'Terms of Service'].includes(
+          item.label,
+        );
         const type = isExternal ? 'external' : 'internal';
         const disabled = isSuspended && item.label === 'Availability';
         const isDeleteAccount = item.label === 'Delete Account';

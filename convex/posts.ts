@@ -3,7 +3,7 @@ import { ConvexError, v } from 'convex/values';
 import { mutation, query } from './_generated/server';
 import {
   checkIfNurseHasActiveShift,
-  disableAllOtherNotificationsForThisSchedule,
+  deleteAllOtherNotificationsForThisSchedule,
   formatDate,
 } from './helper';
 import { discipline } from './schema';
@@ -207,7 +207,7 @@ export const acceptAssignment = mutation({
         });
       }
 
-      await disableAllOtherNotificationsForThisSchedule({
+      await deleteAllOtherNotificationsForThisSchedule({
         ctx,
         scheduleId: args.scheduleId,
         type: 'assignment',

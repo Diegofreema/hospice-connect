@@ -8,8 +8,8 @@ import {
 } from './_generated/server';
 import {
   checkIfNurseHasActiveShift,
+  deleteAllOtherHospiceNotificationsForThisSchedule,
   deleteAllOtherNotifications,
-  disableAllOtherHospiceNotificationsForThisSchedule,
   formatDate,
   getRatings,
 } from './helper';
@@ -421,7 +421,7 @@ export const acceptCaseRequest = mutation({
     }
 
     // disable all other case request for this shift
-    await disableAllOtherHospiceNotificationsForThisSchedule({
+    await deleteAllOtherHospiceNotificationsForThisSchedule({
       ctx,
       scheduleId: args.scheduleId,
       hospiceNotificationId: args.notificationId,

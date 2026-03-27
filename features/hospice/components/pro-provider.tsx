@@ -24,7 +24,7 @@ export const ProProvider = ({ children }: PropsWithChildren) => {
     return (
       <Wrapper>
         <UnderReview
-          title="Hospice suspended"
+          title="Account suspended"
           description="Please contact the admin to resolve this issue"
         />
       </Wrapper>

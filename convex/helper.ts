@@ -653,7 +653,7 @@ type DisableAllOtherHospiceNotificationsForThisScheduleType = {
   numItems: number;
 };
 
-export const disableAllOtherNotificationsForThisSchedule = async ({
+export const deleteAllOtherNotificationsForThisSchedule = async ({
   ctx,
   scheduleId,
   type,
@@ -674,7 +674,7 @@ export const disableAllOtherNotificationsForThisSchedule = async ({
     await ctx.db.delete('nurseNotifications', notification._id);
   }
   if (!isDone) {
-    await disableAllOtherNotificationsForThisSchedule({
+    await deleteAllOtherNotificationsForThisSchedule({
       ctx,
       scheduleId,
       type,
@@ -684,7 +684,7 @@ export const disableAllOtherNotificationsForThisSchedule = async ({
     });
   }
 };
-export const disableAllOtherHospiceNotificationsForThisSchedule = async ({
+export const deleteAllOtherHospiceNotificationsForThisSchedule = async ({
   ctx,
   scheduleId,
   hospiceNotificationId,
@@ -704,7 +704,7 @@ export const disableAllOtherHospiceNotificationsForThisSchedule = async ({
     await ctx.db.delete('hospiceNotifications', notification._id);
   }
   if (!isDone) {
-    await disableAllOtherHospiceNotificationsForThisSchedule({
+    await deleteAllOtherHospiceNotificationsForThisSchedule({
       ctx,
       scheduleId,
       hospiceNotificationId,

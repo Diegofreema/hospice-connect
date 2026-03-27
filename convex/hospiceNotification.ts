@@ -148,7 +148,7 @@ export const cancelShiftNotification = mutation({
       scheduleId: shift._id,
       title: `${nurse.name} (${nurse.discipline})`,
       viewCount: 0,
-      reason: args.reason,
+      reason: `Reason: ${args.reason}`,
     });
   },
 });

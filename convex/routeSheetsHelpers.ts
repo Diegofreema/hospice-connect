@@ -114,8 +114,8 @@ export const approveRouteSheetMutation = internalMutation({
         await ctx.db.insert('nurseNotifications', {
           nurseId: args.nurseId,
           isRead: false,
-          title: `${args.hospiceBusinessName} has accepted your route sheet for ${args.patientFirstName} ${args.patientLastName}`,
-          description: 'Your account is now active.',
+          title: `${args.hospiceBusinessName} `,
+          description: `has accepted your route sheet for ${args.patientFirstName} ${args.patientLastName}.Your account is now active.`,
           type: 'admin',
           viewCount: 0,
         });

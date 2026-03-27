@@ -49,6 +49,7 @@ import type * as sendEmail from "../sendEmail.js";
 import type * as shifts from "../shifts.js";
 import type * as streamToken from "../streamToken.js";
 import type * as stripeHelper from "../stripeHelper.js";
+import type * as support from "../support.js";
 import type * as types from "../types.js";
 import type * as users from "../users.js";
 
@@ -100,6 +101,7 @@ declare const fullApi: ApiFromModules<{
   shifts: typeof shifts;
   streamToken: typeof streamToken;
   stripeHelper: typeof stripeHelper;
+  support: typeof support;
   types: typeof types;
   users: typeof users;
 }>;

@@ -46,7 +46,7 @@ const links: LinkType[] = [
   {
     label: 'Support',
     icon: IconHeadset,
-    link: 'https://hospice-connect-web.vercel.app/contact',
+    link: '/support',
   },
   {
     label: 'Privacy Policy',
