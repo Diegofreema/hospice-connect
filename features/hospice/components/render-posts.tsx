@@ -105,7 +105,7 @@ export const RenderPosts = ({ posts, loadMore, loadingMore, isPro }: Props) => {
               onView={onViewSchedule}
               hospiceId={hospice?._id!}
               onOpenReOpenAssignment={onReOpenAssignment}
-              isPro={isPro}
+              isPro={true}
             />
           )}
           keyExtractor={(item) => item._id}

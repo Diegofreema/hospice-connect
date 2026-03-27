@@ -160,11 +160,27 @@ export const suspendNurse = mutation({
         message: 'Nurse not found',
       });
     }
+    
+    const oldStatus = nurse.status;
+    const newStatus = args.isSuspended ? 'suspended' : 'approved';
+    
+    if (oldStatus === newStatus) return;
+
     await ctx.db.patch(args.nurseId, {
-      status: args.isSuspended ? 'suspended' : 'approved',
+      status: newStatus,
     });
-    await handleSuspendedNurseCount(ctx, args.isSuspended ? 'inc' : 'dec');
-    await handleApproveNurseCount(ctx, args.isSuspended ? 'dec' : 'inc');
+    
+    if (oldStatus === 'rejected' && newStatus === 'approved') {
+      await handleRejectedNurseCount(ctx, 'dec');
+      await handleApproveNurseCount(ctx, 'inc');
+    } else if (oldStatus === 'suspended' && newStatus === 'approved') {
+      await handleSuspendedNurseCount(ctx, 'dec');
+      await handleApproveNurseCount(ctx, 'inc');
+    } else if (oldStatus === 'approved' && newStatus === 'suspended') {
+      await handleApproveNurseCount(ctx, 'dec');
+      await handleSuspendedNurseCount(ctx, 'inc');
+    }
+
     await ctx.db.insert('nurseNotifications', {
       nurseId: args.nurseId,
       title: args.isSuspended ? 'Account Suspended' : 'Account Restored',

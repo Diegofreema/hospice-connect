@@ -68,6 +68,7 @@ const AssignNurse = () => {
           rate2={range.rate2}
           isAssigned
           onAction={onOpenScheduleSheet}
+          assignmentId={id}
         />
       </Wrapper>
       <CustomSheet

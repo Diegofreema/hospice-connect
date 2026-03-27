@@ -20,6 +20,7 @@ type Props = {
   onAction?: () => void;
   nurseId?: Id<'nurses'> | null;
   disabled?: boolean;
+  assignmentId?: Id<'assignments'>;
 };
 
 export const FetchNurses = ({
@@ -30,6 +31,7 @@ export const FetchNurses = ({
   onAction,
   nurseId,
   disabled,
+  assignmentId,
 }: Props) => {
   const todayToText = format(new Date(), 'EEEE');
 
@@ -41,6 +43,7 @@ export const FetchNurses = ({
       range2: +rate2,
       todayToText,
       nurseId,
+      assignmentId,
     },
     { initialNumItems: 30 },
   );

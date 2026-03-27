@@ -337,10 +337,20 @@ export const getNurses = query({
       v.literal('All'),
     ),
     todayToText: v.string(),
+    assignmentId: v.optional(v.id('assignments')),
     paginationOpts: paginationOptsValidator,
     nurseId: v.optional(v.union(v.id('nurses'), v.null())),
   },
   handler: async (ctx, args) => {
+    let state = '';
+    if (args.assignmentId) {
+      const assignment = await ctx.db.get('assignments', args.assignmentId);
+      if (!assignment) {
+        throw new ConvexError({ message: 'Assignment not found' });
+      }
+      state = assignment.state;
+    }
+
     const minRange = Math.min(args.range1, args.range2);
     const maxRange = Math.max(args.range1, args.range2);
 
@@ -354,6 +364,17 @@ export const getNurses = query({
         (nurse.rate || 0) >= minRange && (nurse.rate || 0) <= maxRange;
       // Apply nurseId filter
       const matchesNurseId = !args.nurseId || nurse._id !== args.nurseId;
+      const matchesState = nurse.stateOfRegistration === state;
+
+      if (state.trim() !== '') {
+        return (
+          matchesDiscipline &&
+          matchesRange &&
+          matchesNurseId &&
+          nurse.status === 'approved' &&
+          matchesState
+        );
+      }
       return (
         matchesDiscipline &&
         matchesRange &&

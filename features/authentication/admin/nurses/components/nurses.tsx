@@ -2,8 +2,7 @@
 
 import { NurseDetailsDialog } from '@/components/web/admin/nurse-details-dialog';
 import { PendingApprovalsCard } from '@/components/web/admin/pending-approvals-card';
-import { Badge } from '@/components/web/ui/badge';
-import { Button } from '@/components/web/ui/button';
+
 import {
   Card,
   CardContent,
@@ -19,32 +18,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/web/ui/select';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/web/ui/table';
+
 import { api } from '@/convex/_generated/api';
 import { useMutation, usePaginatedQuery, useQuery } from 'convex/react';
-import { Eye, Filter, Search, UserCheck, UserX } from 'lucide-react-native';
+import { Filter, Search } from 'lucide-react-native';
 import { useState } from 'react';
 
-import { ActionDialog } from '@/components/web/admin/action-dialog';
 import type { Id } from '@/convex/_generated/dataModel';
 import { type DisciplineType } from '@/convex/schema';
 import { usStates } from '@/lib/constants';
-import {
-  cn,
-  formatString,
-  generateStatusColorAndBackgroundColor,
-  generateStatusText,
-} from '@/lib/utils';
+import { formatString } from '@/lib/utils';
 import { toast } from 'sonner-native';
 import { Status } from '../types';
+import { NurseTable } from './nurse-table';
 
 export function Nurses() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -74,7 +60,7 @@ export function Nurses() {
   const stats = useQuery(api.adminNurses.getNurseStats);
   const suspendNurse = useMutation(api.adminNurses.suspendNurse);
 
-  if (paginationStatus === 'LoadingFirstPage' || stats === undefined) {
+  if (stats === undefined) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
@@ -105,12 +91,12 @@ export function Nurses() {
 
   const handleSuspendToggle = async (
     nurseId: Id<'nurses'>,
-    currentStatus: boolean,
+    currentStatus: boolean, // if true, it will make them approved (isSuspended: false)
   ) => {
     try {
       await suspendNurse({ nurseId, isSuspended: !currentStatus });
-      toast.success(currentStatus ? 'Reactivated' : 'Suspended', {
-        description: `The healthcare professional account has been ${currentStatus ? 'reactivated' : 'suspended'} successfully.`,
+      toast.success(currentStatus ? 'Approved' : 'Suspended', {
+        description: `The healthcare professional account has been ${currentStatus ? 'approved/reactivated' : 'suspended'} successfully.`,
       });
     } catch {
       toast.error('Error', {
@@ -264,131 +250,13 @@ export function Nurses() {
           </div>
 
           {/* Table */}
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="font-bold">S/N</TableHead>
-                  <TableHead className="font-bold">Name</TableHead>
-                  <TableHead className="font-bold">Email</TableHead>
-                  <TableHead className="font-bold">Discipline</TableHead>
-                  <TableHead className="font-bold">State</TableHead>
-                  <TableHead className="font-bold">Status</TableHead>
-                  <TableHead className="text-right font-bold">
-                    Actions
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {nurses.length === 0 ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={7}
-                      className="text-center text-muted-foreground py-8"
-                    >
-                      No healthcare professional found matching your filters.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  nurses.map((nurse, index) => (
-                    <TableRow key={nurse._id}>
-                      <TableCell className="font-medium">{index + 1}</TableCell>
-                      <TableCell className="font-medium">
-                        {nurse.name}
-                      </TableCell>
-                      <TableCell>{nurse.email}</TableCell>
-                      <TableCell>{nurse.discipline}</TableCell>
-                      <TableCell>
-                        {formatString(nurse.stateOfRegistration)}
-                      </TableCell>
-
-                      <TableCell>
-                        <Badge
-                          variant="secondary"
-                          className={generateStatusColorAndBackgroundColor(
-                            nurse.status,
-                          )}
-                        >
-                          {generateStatusText(nurse.status)}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setSelectedNurseId(nurse._id)}
-                            title="View Details"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          {nurse.status !== 'pending' ? (
-                            <ActionDialog
-                              title={
-                                nurse.status === 'suspended'
-                                  ? 'Reactivate'
-                                  : 'Suspend'
-                              }
-                              description={
-                                nurse.status === 'suspended'
-                                  ? 'Are you sure you want to reactivate this nurse?'
-                                  : 'Are you sure you want to suspend this nurse?'
-                              }
-                              onAction={() =>
-                                handleSuspendToggle(
-                                  nurse._id,
-                                  nurse.status === 'suspended',
-                                )
-                              }
-                            >
-                              <Button
-                                className={cn(
-                                  nurse.status === 'suspended'
-                                    ? 'bg-green-500'
-                                    : 'bg-red-500',
-                                )}
-                                size="icon"
-                                title={
-                                  nurse.status === 'suspended'
-                                    ? 'Reactivate'
-                                    : 'Suspend'
-                                }
-                              >
-                                {nurse.status === 'suspended' ? (
-                                  <UserCheck className="h-4 w-4 text-white" />
-                                ) : (
-                                  <UserX className="h-4 w-4 text-white" />
-                                )}
-                              </Button>
-                            </ActionDialog>
-                          ) : (
-                            <Button
-                              className=" cursor-not-allowed"
-                              disabled
-                              size="icon"
-                            >
-                              <UserX className="h-4 w-4" />
-                            </Button>
-                          )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-              <TableFooter>
-                <Button
-                  onClick={handleLoadMore}
-                  disabled={paginationStatus !== 'CanLoadMore'}
-                  className="mt-4"
-                >
-                  {paginationStatus === 'CanLoadMore'
-                    ? 'Load More'
-                    : 'No More healthcare professional'}
-                </Button>
-              </TableFooter>
-            </Table>
-          </div>
+          <NurseTable
+            nurses={nurses}
+            paginationStatus={paginationStatus}
+            handleLoadMore={handleLoadMore}
+            handleSuspendToggle={handleSuspendToggle}
+            setSelectedNurseId={setSelectedNurseId}
+          />
         </CardContent>
       </Card>
 
