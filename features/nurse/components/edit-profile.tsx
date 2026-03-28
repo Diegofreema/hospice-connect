@@ -63,7 +63,8 @@ export const EditProfile = () => {
         data.discipline !== nurse?.discipline ||
         data.email !== nurse.email ||
         data.licenseState !== nurse.stateOfRegistration ||
-        format(data.dateOfBirth || new Date(), 'PPP') !== nurse.dateOfBirth;
+        format(data.dateOfBirth || new Date(), 'PPP') !== nurse.dateOfBirth ||
+        data.licenseNumber !== nurse.licenseNumber;
       await updateNurse({
         nurseId: nurse?._id,
         address: data.address?.trim(),
@@ -166,6 +167,13 @@ export const EditProfile = () => {
           errors={errors}
           label="Zip Code"
           placeholder="Enter zip code"
+        />
+        <ControlInput
+          control={control}
+          name={'licenseNumber'}
+          errors={errors}
+          label="License Number"
+          placeholder="Enter license number"
         />
 
         <ControlSelect

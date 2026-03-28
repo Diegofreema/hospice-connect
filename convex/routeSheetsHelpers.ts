@@ -168,16 +168,28 @@ export const declineRouteSheetMutation = internalMutation({
   },
 });
 
-/** Sends an admin notification telling the nurse to update their payment method. */
+/** Sends an admin notification telling the nurse and hospice about the payment failure. */
 export const insertCardDeclinedNotification = internalMutation({
-  args: { nurseId: v.id('nurses') },
+  args: { 
+    nurseId: v.id('nurses'),
+    hospiceId: v.id('hospices'),
+    errorMessage: v.string()
+  },
   handler: async (ctx, args) => {
     await ctx.db.insert('nurseNotifications', {
       nurseId: args.nurseId,
       isRead: false,
       title: 'Card Declined — Action Required',
-      description:
-        'Your card was declined when processing your commission. Please update your payment method in Billing & Payments to continue accepting shifts.',
+      description: `Your card was declined when processing your commission: ${args.errorMessage}. Please update your payment method in Billing & Payments to continue accepting shifts.`,
+      type: 'admin',
+      viewCount: 0,
+    });
+
+    await ctx.db.insert('hospiceNotifications', {
+      hospiceId: args.hospiceId,
+      isRead: false,
+      title: 'Commission Payment Failed',
+      description: `The nurse's payment method was declined: ${args.errorMessage}. The nurse has been notified to update their payment method.`,
       type: 'admin',
       viewCount: 0,
     });

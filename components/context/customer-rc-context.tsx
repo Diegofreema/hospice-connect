@@ -1,6 +1,6 @@
 import { useGetCustomerRC } from '@/hooks/rc/use-get-customer-rc';
 import React, { createContext, PropsWithChildren, useContext } from 'react';
-import { CustomerInfo } from 'react-native-purchases';
+import { CustomerInfo, PurchasesEntitlementInfo } from 'react-native-purchases';
 
 type CustomerRCContextType = {
   customerInfo: CustomerInfo | undefined;
@@ -8,6 +8,7 @@ type CustomerRCContextType = {
   isError: boolean;
   refetch: () => void;
   isPro: boolean;
+  activeEntitlement: PurchasesEntitlementInfo;
 };
 
 const CustomerRCContext = createContext<CustomerRCContextType | null>(null);
@@ -24,9 +25,19 @@ export const CustomerRCProvider = ({ children }: PropsWithChildren) => {
     customerInfo && Object.entries(customerInfo.entitlements.active).length > 0
   );
 
+  const activeEntitlement = Object.entries(
+    customerInfo?.entitlements.active ?? {},
+  )[0]?.[1];
   return (
     <CustomerRCContext.Provider
-      value={{ customerInfo, isPending, isError, refetch, isPro }}
+      value={{
+        customerInfo,
+        isPending,
+        isError,
+        refetch,
+        isPro,
+        activeEntitlement,
+      }}
     >
       {children}
     </CustomerRCContext.Provider>

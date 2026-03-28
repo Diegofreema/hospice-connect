@@ -2,7 +2,7 @@ import * as WebBrowser from 'expo-web-browser';
 
 import { authClient } from '@/lib/auth-client';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
-import Purchases, { PurchasesPackage } from 'react-native-purchases';
+import { PurchasesPackage } from 'react-native-purchases';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
 type Props = {
@@ -26,11 +26,11 @@ export const SubscriptionFooter = ({
   return (
     <View style={{ gap: 15 }}>
       <View style={styles.footerLinks}>
-        <TouchableOpacity onPress={() => Purchases.restorePurchases()}>
+        {/* <TouchableOpacity onPress={() => Purchases.restorePurchases()}>
           <Text style={[styles.footerLink, { color: theme.colors.textGrey }]}>
             Restore Purchases
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <Text style={[styles.footerDot, { color: theme.colors.textGrey }]}>
           ·
         </Text>

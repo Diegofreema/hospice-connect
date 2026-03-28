@@ -62,8 +62,6 @@ const SORT_ORDER: Record<string, number> = {
   $rc_annual: 2,
 };
 
-const ENTITLEMENT_KEY = 'pro';
-
 function formatDate(ms: number) {
   return new Date(ms).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -83,6 +81,8 @@ export const Subscriptions = () => {
     isPending: customerPending,
     isError: customerError,
     refetch: refetchCustomer,
+    isPro,
+    activeEntitlement,
   } = useCustomerRCContext();
 
   const {
@@ -111,9 +111,7 @@ export const Subscriptions = () => {
     );
 
   // ── Subscription state ──────────────────────────────────────────
-  const activeEntitlement =
-    customerInfo?.entitlements?.active?.[ENTITLEMENT_KEY];
-  const isSubscribed = !!activeEntitlement;
+
   const expiresAt = activeEntitlement?.expirationDate
     ? new Date(activeEntitlement.expirationDate).getTime()
     : null;
@@ -135,7 +133,7 @@ export const Subscriptions = () => {
   const activeId = selectedId ?? defaultSelection;
   const activePackage = sorted.find((p) => p.identifier === activeId) ?? null;
 
-  const isChangingPlan = isSubscribed && activeId !== productId;
+  const isChangingPlan = isPro && activeId !== productId;
 
   // ── Actions ─────────────────────────────────────────────────────
   const handlePurchase = async () => {
@@ -143,7 +141,7 @@ export const Subscriptions = () => {
       Alert.alert('No plan selected', 'Please select a subscription plan.');
       return;
     }
-    if (isSubscribed && !isChangingPlan) {
+    if (isPro && !isChangingPlan) {
       toast('You are already on this plan.');
       return;
     }
@@ -177,7 +175,7 @@ export const Subscriptions = () => {
     setIsRestoring(true);
     try {
       await Purchases.restorePurchases();
-      await refetchCustomer();
+      refetchCustomer();
       toast.success('Purchases restored successfully.');
     } catch {
       toast.error('Restore failed', { description: 'Please try again.' });
@@ -193,10 +191,10 @@ export const Subscriptions = () => {
   const handleCancelOrManage = () => {
     Alert.alert(
       'Manage Subscription',
-      isSubscribed
+      isPro
         ? 'You can cancel or modify your subscription from your store account. Would you like to open the management page?'
         : "You don't have an active subscription.",
-      isSubscribed
+      isPro
         ? [
             { text: 'Not Now', style: 'cancel' },
             {
@@ -220,12 +218,10 @@ export const Subscriptions = () => {
           style={[
             styles.statusBanner,
             {
-              backgroundColor: isSubscribed
+              backgroundColor: isPro
                 ? 'rgba(76,85,255,0.08)'
                 : 'rgba(255,159,45,0.08)',
-              borderColor: isSubscribed
-                ? theme.colors.blue
-                : theme.colors.orange,
+              borderColor: isPro ? theme.colors.blue : theme.colors.orange,
             },
           ]}
         >
@@ -234,7 +230,7 @@ export const Subscriptions = () => {
               style={[
                 styles.statusIconWrap,
                 {
-                  backgroundColor: isSubscribed
+                  backgroundColor: isPro
                     ? 'rgba(76,85,255,0.14)'
                     : 'rgba(255,159,45,0.14)',
                 },
@@ -242,7 +238,7 @@ export const Subscriptions = () => {
             >
               <IconDiamond
                 size={22}
-                color={isSubscribed ? theme.colors.blue : theme.colors.orange}
+                color={isPro ? theme.colors.blue : theme.colors.orange}
               />
             </View>
             <View style={{ flex: 1 }}>
@@ -250,13 +246,13 @@ export const Subscriptions = () => {
                 style={[
                   styles.statusTitle,
                   {
-                    color: isSubscribed
-                      ? theme.colors.blue
-                      : theme.colors.orange,
+                    color: isPro ? theme.colors.blue : theme.colors.orange,
                   },
                 ]}
               >
-                {isSubscribed ? 'Pro Subscriber' : 'Free Plan'}
+                {isPro 
+                  ? `${currentPlanMeta?.label ?? 'Pro'} Subscriber` 
+                  : 'Free Plan'}
               </Text>
               <Text
                 style={[
@@ -264,12 +260,12 @@ export const Subscriptions = () => {
                   { color: theme.colors.textGrey },
                 ]}
               >
-                {isSubscribed
+                {isPro
                   ? (currentPlanMeta?.label ?? 'Active') + ' Plan'
                   : 'Upgrade to unlock all features'}
               </Text>
             </View>
-            {isSubscribed && (
+            {isPro && (
               <View
                 style={[
                   styles.activeBadge,
@@ -281,7 +277,7 @@ export const Subscriptions = () => {
             )}
           </View>
 
-          {isSubscribed && (
+          {isPro && (
             <View
               style={[
                 styles.billingInfo,
@@ -359,141 +355,149 @@ export const Subscriptions = () => {
         </View>
 
         {/* ── Plan chooser ── */}
-        <Text style={[styles.sectionLabel, { color: theme.colors.textGrey }]}>
-          {isSubscribed ? 'Switch Plan' : 'Choose a Plan'}
-        </Text>
-
-        {sorted.length === 0 ? (
-          <View style={[styles.noPlanBox, { borderColor: theme.colors.grey }]}>
+        {!isPro && (
+          <>
             <Text
-              style={{
-                color: theme.colors.textGrey,
-                textAlign: 'center',
-                fontFamily: 'PublicSansRegular',
-                fontSize: 14,
-              }}
+              style={[styles.sectionLabel, { color: theme.colors.textGrey }]}
             >
-              No subscription plans available at the moment.
+              Choose a Plan
             </Text>
-          </View>
-        ) : (
-          <View style={styles.plansRow}>
-            {sorted.map((pkg) => {
-              const isActive = pkg.identifier === activeId;
-              const isCurrent = pkg.identifier === productId;
-              const meta = PLAN_META[pkg.identifier] ?? {
-                label: pkg.identifier,
-                billingNote: '',
-                icon: IconCalendar,
-              };
-              const PlanIcon = meta.icon;
-              const price = pkg.product.priceString;
 
-              return (
-                <TouchableOpacity
-                  key={pkg.identifier}
-                  activeOpacity={0.82}
-                  onPress={() => setSelectedId(pkg.identifier)}
-                  style={[
-                    styles.planCard,
-                    {
-                      borderColor: isActive
-                        ? theme.colors.blue
-                        : theme.colors.grey,
-                      backgroundColor: isActive
-                        ? 'rgba(76,85,255,0.06)'
-                        : theme.colors.background,
-                    },
-                  ]}
+            {sorted.length === 0 ? (
+              <View
+                style={[styles.noPlanBox, { borderColor: theme.colors.grey }]}
+              >
+                <Text
+                  style={{
+                    color: theme.colors.textGrey,
+                    textAlign: 'center',
+                    fontFamily: 'PublicSansRegular',
+                    fontSize: 14,
+                  }}
                 >
-                  {meta.badge && (
-                    <View
+                  No subscription plans available at the moment.
+                </Text>
+              </View>
+            ) : (
+              <View style={styles.plansRow}>
+                {sorted.map((pkg) => {
+                  const isActive = pkg.identifier === activeId;
+                  const isCurrent = pkg.identifier === productId;
+                  const meta = PLAN_META[pkg.identifier] ?? {
+                    label: pkg.identifier,
+                    billingNote: '',
+                    icon: IconCalendar,
+                  };
+                  const PlanIcon = meta.icon;
+                  const price = pkg.product.priceString;
+
+                  return (
+                    <TouchableOpacity
+                      key={pkg.identifier}
+                      activeOpacity={0.82}
+                      onPress={() => setSelectedId(pkg.identifier)}
                       style={[
-                        styles.badge,
-                        { backgroundColor: theme.colors.blue },
-                      ]}
-                    >
-                      <Text style={styles.badgeText}>{meta.badge}</Text>
-                    </View>
-                  )}
-                  {isCurrent && isSubscribed && (
-                    <View
-                      style={[
-                        styles.badge,
+                        styles.planCard,
                         {
-                          backgroundColor: meta.badge
-                            ? theme.colors.greenDark
-                            : theme.colors.greenDark,
-                          top: meta.badge ? undefined : 0,
+                          borderColor: isActive
+                            ? theme.colors.blue
+                            : theme.colors.grey,
+                          backgroundColor: isActive
+                            ? 'rgba(76,85,255,0.06)'
+                            : theme.colors.background,
                         },
                       ]}
                     >
-                      <Text style={styles.badgeText}>Current</Text>
-                    </View>
-                  )}
+                      {meta.badge && (
+                        <View
+                          style={[
+                            styles.badge,
+                            { backgroundColor: theme.colors.blue },
+                          ]}
+                        >
+                          <Text style={styles.badgeText}>{meta.badge}</Text>
+                        </View>
+                      )}
+                      {isCurrent && isPro && (
+                        <View
+                          style={[
+                            styles.badge,
+                            {
+                              backgroundColor: meta.badge
+                                ? theme.colors.greenDark
+                                : theme.colors.greenDark,
+                              top: meta.badge ? undefined : 0,
+                            },
+                          ]}
+                        >
+                          <Text style={styles.badgeText}>Current</Text>
+                        </View>
+                      )}
 
-                  <View
-                    style={[
-                      styles.planIconWrap,
-                      {
-                        backgroundColor: isActive
-                          ? 'rgba(76,85,255,0.14)'
-                          : theme.colors.greyLight,
-                      },
-                    ]}
-                  >
-                    <PlanIcon
-                      size={18}
-                      color={
-                        isActive ? theme.colors.blue : theme.colors.textGrey
-                      }
-                    />
-                  </View>
+                      <View
+                        style={[
+                          styles.planIconWrap,
+                          {
+                            backgroundColor: isActive
+                              ? 'rgba(76,85,255,0.14)'
+                              : theme.colors.greyLight,
+                          },
+                        ]}
+                      >
+                        <PlanIcon
+                          size={18}
+                          color={
+                            isActive ? theme.colors.blue : theme.colors.textGrey
+                          }
+                        />
+                      </View>
 
-                  <Text
-                    style={[
-                      styles.planLabel,
-                      {
-                        color: isActive
-                          ? theme.colors.blue
-                          : theme.colors.typography,
-                        marginTop: 8,
-                      },
-                    ]}
-                  >
-                    {meta.label}
-                  </Text>
+                      <Text
+                        style={[
+                          styles.planLabel,
+                          {
+                            color: isActive
+                              ? theme.colors.blue
+                              : theme.colors.typography,
+                            marginTop: 8,
+                          },
+                        ]}
+                      >
+                        {meta.label}
+                      </Text>
 
-                  <Text
-                    style={[
-                      styles.planPrice,
-                      {
-                        color: isActive
-                          ? theme.colors.blue
-                          : theme.colors.typography,
-                      },
-                    ]}
-                  >
-                    {price}
-                  </Text>
+                      <Text
+                        style={[
+                          styles.planPrice,
+                          {
+                            color: isActive
+                              ? theme.colors.blue
+                              : theme.colors.typography,
+                          },
+                        ]}
+                      >
+                        {price}
+                      </Text>
 
-                  <Text
-                    numberOfLines={2}
-                    style={[
-                      styles.planBillingNote,
-                      { color: theme.colors.textGrey },
-                    ]}
-                  >
-                    {meta.billingNote}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
+                      <Text
+                        numberOfLines={2}
+                        style={[
+                          styles.planBillingNote,
+                          { color: theme.colors.textGrey },
+                        ]}
+                      >
+                        {meta.billingNote}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            )}
+          </>
         )}
 
         {/* ── Quick Actions ── */}
-        {isSubscribed && (
+        {isPro && (
           <View
             style={[
               styles.section,
@@ -558,17 +562,17 @@ export const Subscriptions = () => {
           </TouchableOpacity>
         </View>
 
-        {!isSubscribed && (
+        {/* {!isPro && (
           <TouchableOpacity onPress={handleRestore} style={styles.restoreBtn}>
             <Text style={[styles.footerLink, { color: theme.colors.textGrey }]}>
               Restore Purchases
             </Text>
           </TouchableOpacity>
-        )}
+        )} */}
       </ScrollView>
 
       {/* ── Sticky CTA ── */}
-      {sorted.length > 0 && (
+      {!isPro && sorted.length > 0 && (
         <View
           style={[
             styles.ctaContainer,
@@ -581,21 +585,19 @@ export const Subscriptions = () => {
           <TouchableOpacity
             onPress={handlePurchase}
             disabled={
-              isPurchasing ||
-              sorted.length === 0 ||
-              (isSubscribed && !isChangingPlan)
+              isPurchasing || sorted.length === 0 || (isPro && !isChangingPlan)
             }
             style={[
               styles.ctaButton,
               {
                 backgroundColor:
-                  isSubscribed && !isChangingPlan
+                  isPro && !isChangingPlan
                     ? theme.colors.greyLight
                     : theme.colors.blue,
                 opacity:
                   isPurchasing ||
                   sorted.length === 0 ||
-                  (isSubscribed && !isChangingPlan)
+                  (isPro && !isChangingPlan)
                     ? 0.65
                     : 1,
               },
@@ -609,13 +611,11 @@ export const Subscriptions = () => {
                   styles.ctaText,
                   {
                     color:
-                      isSubscribed && !isChangingPlan
-                        ? theme.colors.textGrey
-                        : '#fff',
+                      isPro && !isChangingPlan ? theme.colors.textGrey : '#fff',
                   },
                 ]}
               >
-                {isSubscribed && !isChangingPlan
+                {isPro && !isChangingPlan
                   ? 'Current Plan'
                   : isChangingPlan
                     ? `Switch to ${PLAN_META[activeId ?? '']?.label ?? 'this'} Plan`

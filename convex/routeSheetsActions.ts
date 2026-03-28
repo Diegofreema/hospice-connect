@@ -12,6 +12,7 @@ import { action } from './_generated/server';
 import {
   chargeOffSession,
   getStripeCustomer,
+  getStripeErrorMessage,
   listCustomerPaymentMethods,
 } from './stripeHelper';
 
@@ -31,7 +32,9 @@ export const approveOrDeclineRouteSheet = action({
 
     // ── Fetch all needed records ───────────────────────────────────────────
     const [hospice, routeSheet, notification] = await Promise.all([
-      ctx.runQuery(internal.routeSheetsHelpers.getHospiceInternal, { hospiceId: args.hospiceId }),
+      ctx.runQuery(internal.routeSheetsHelpers.getHospiceInternal, {
+        hospiceId: args.hospiceId,
+      }),
       ctx.runQuery(internal.routeSheetsHelpers.getRouteSheetInternal, {
         routeSheetId: args.routeSheetId,
       }),
@@ -41,19 +44,27 @@ export const approveOrDeclineRouteSheet = action({
     ]);
 
     if (!hospice) throw new ConvexError({ message: 'Hospice not found' });
-    if (!routeSheet) throw new ConvexError({ message: 'Route sheet not found' });
-    if (!notification) throw new ConvexError({ message: 'Notification not found' });
+    if (!routeSheet)
+      throw new ConvexError({ message: 'Route sheet not found' });
+    if (!notification)
+      throw new ConvexError({ message: 'Notification not found' });
     if (routeSheet.hospiceId !== args.hospiceId)
       throw new ConvexError({ message: 'Unauthorized' });
 
-    const nurse = await ctx.runQuery(internal.routeSheetsHelpers.getNurseInternal, {
-      nurseId: routeSheet.nurseId,
-    });
+    const nurse = await ctx.runQuery(
+      internal.routeSheetsHelpers.getNurseInternal,
+      {
+        nurseId: routeSheet.nurseId,
+      },
+    );
     if (!nurse) throw new ConvexError({ message: 'Nurse not found' });
 
-    const assignment = await ctx.runQuery(internal.routeSheetsHelpers.getAssignmentInternal, {
-      assignmentId: routeSheet.assignmentId,
-    });
+    const assignment = await ctx.runQuery(
+      internal.routeSheetsHelpers.getAssignmentInternal,
+      {
+        assignmentId: routeSheet.assignmentId,
+      },
+    );
     if (!assignment) throw new ConvexError({ message: 'Assignment not found' });
 
     const nurseAssignment = await ctx.runQuery(
@@ -65,19 +76,22 @@ export const approveOrDeclineRouteSheet = action({
 
     // ── Decline path ───────────────────────────────────────────────────────
     if (!args.isApproved) {
-      await ctx.runMutation(internal.routeSheetsHelpers.declineRouteSheetMutation, {
-        routeSheetId: args.routeSheetId,
-        nurseId: nurse._id,
-        hospiceId: args.hospiceId,
-        assignmentId: assignment._id,
-        notificationId: args.notificationId,
-        nurseAssignmentId: nurseAssignment._id,
-        scheduleIds: routeSheet.scheduleIds,
-        hospiceBusinessName: hospice.businessName,
-        patientFirstName: assignment.patientFirstName,
-        patientLastName: assignment.patientLastName,
-        reason: args.reason,
-      });
+      await ctx.runMutation(
+        internal.routeSheetsHelpers.declineRouteSheetMutation,
+        {
+          routeSheetId: args.routeSheetId,
+          nurseId: nurse._id,
+          hospiceId: args.hospiceId,
+          assignmentId: assignment._id,
+          notificationId: args.notificationId,
+          nurseAssignmentId: nurseAssignment._id,
+          scheduleIds: routeSheet.scheduleIds,
+          hospiceBusinessName: hospice.businessName,
+          patientFirstName: assignment.patientFirstName,
+          patientLastName: assignment.patientLastName,
+          reason: args.reason,
+        },
+      );
       return;
     }
 
@@ -94,8 +108,8 @@ export const approveOrDeclineRouteSheet = action({
     const defaultPmId =
       typeof customer.invoice_settings?.default_payment_method === 'string'
         ? customer.invoice_settings.default_payment_method
-        : (customer.invoice_settings?.default_payment_method as any)?.id ??
-          null;
+        : ((customer.invoice_settings?.default_payment_method as any)?.id ??
+          null);
 
     const cards = await listCustomerPaymentMethods(
       nurse.stripeCustomerId,
@@ -117,18 +131,18 @@ export const approveOrDeclineRouteSheet = action({
     );
 
     if (commission && commission > 0) {
-      const scheduleRates = await ctx.runQuery(
+      const scheduleEarnings = await ctx.runQuery(
         internal.nurseCommissionHelpers.getScheduleRates,
         { scheduleIds: routeSheet.scheduleIds },
       );
-      const totalRate = (scheduleRates as number[]).reduce(
+      const totalEarnings = scheduleEarnings.reduce(
         (sum: number, r: number) => sum + r,
         0,
       );
 
-      if (totalRate > 0) {
+      if (totalEarnings > 0) {
         const commissionAmountCents = Math.round(
-          totalRate * (commission / 100) * 100,
+          totalEarnings * (commission / 100) * 100,
         );
         const description = `Commission (${commission}%) — approved by ${hospice.businessName}`;
 
@@ -141,33 +155,40 @@ export const approveOrDeclineRouteSheet = action({
             description,
           );
         } catch (err: any) {
+          const cleanMessage = getStripeErrorMessage(err);
+
           // Card was declined or charge failed — notify nurse and block approval
           await ctx.runMutation(
             internal.routeSheetsHelpers.insertCardDeclinedNotification,
-            { nurseId: nurse._id },
+            {
+              nurseId: nurse._id,
+              hospiceId: args.hospiceId,
+              errorMessage: cleanMessage,
+            },
           );
 
-          const stripeMessage =
-            err?.raw?.message ?? err?.message ?? 'Card declined';
           throw new ConvexError({
-            message: `Payment failed: ${stripeMessage}. The nurse has been notified to update their payment method.`,
+            message: `Payment failed: ${cleanMessage}. The nurse has been notified to update their payment method.`,
           });
         }
       }
     }
 
     // 3. Everything succeeded — mark route sheet as approved
-    await ctx.runMutation(internal.routeSheetsHelpers.approveRouteSheetMutation, {
-      routeSheetId: args.routeSheetId,
-      nurseId: nurse._id,
-      hospiceId: args.hospiceId,
-      assignmentId: assignment._id,
-      notificationId: args.notificationId,
-      nurseAssignmentId: nurseAssignment._id,
-      hospiceBusinessName: hospice.businessName,
-      patientFirstName: assignment.patientFirstName,
-      patientLastName: assignment.patientLastName,
-      nurseStatus: nurse.status,
-    });
+    await ctx.runMutation(
+      internal.routeSheetsHelpers.approveRouteSheetMutation,
+      {
+        routeSheetId: args.routeSheetId,
+        nurseId: nurse._id,
+        hospiceId: args.hospiceId,
+        assignmentId: assignment._id,
+        notificationId: args.notificationId,
+        nurseAssignmentId: nurseAssignment._id,
+        hospiceBusinessName: hospice.businessName,
+        patientFirstName: assignment.patientFirstName,
+        patientLastName: assignment.patientLastName,
+        nurseStatus: nurse.status,
+      },
+    );
   },
 });

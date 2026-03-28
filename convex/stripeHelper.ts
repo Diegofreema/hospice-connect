@@ -164,7 +164,7 @@ export async function chargeOffSession(
   description: string,
 ): Promise<{ id: string; status: string }> {
   const stripe = getStripe();
-  
+
   // This is the implementation via Stripe SDK (as requested)
   const paymentIntent = await stripe.paymentIntents.create({
     amount: amountCents,
@@ -175,6 +175,52 @@ export async function chargeOffSession(
     confirm: true,
     description,
   });
-  
+
   return { id: paymentIntent.id, status: paymentIntent.status };
 }
+interface StripeError {
+  type: StripeErrorType;
+  code?: string;
+  message: string;
+  decline_code?: string;
+  param?: string;
+  doc_url?: string;
+}
+
+type StripeErrorType =
+  | 'api_error'
+  | 'card_error'
+  | 'idempotency_error'
+  | 'invalid_request_error'
+  | 'rate_limit_error'
+  | 'validation_error'
+  | 'authentication_error';
+
+export const getStripeErrorMessage = (error: StripeError) => {
+  if (!error) return 'An unknown error occurred';
+
+  // Common card error decline codes
+  switch (error.code) {
+    case 'card_declined':
+      switch (error.decline_code) {
+        case 'insufficient_funds':
+          return 'The card has insufficient funds to complete the purchase.';
+        case 'lost_card':
+          return 'This card has been reported lost. Please use a different payment method.';
+        case 'stolen_card':
+          return 'This card has been reported stolen. Please use a different payment method.';
+        case 'expired_card':
+          return 'This card has expired. Please update your card details.';
+        default:
+          return 'The card was declined. Please try a different card.';
+      }
+    case 'incorrect_cvc':
+      return "The card's security code is incorrect.";
+    case 'processing_error':
+      return 'An error occurred while processing the card. Please try again.';
+    case 'authentication_required':
+      return 'This payment requires authentication. Please try a different payment method.';
+    default:
+      return error.message || 'An error occurred processing your payment.';
+  }
+};
