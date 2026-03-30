@@ -4,6 +4,7 @@ import { Image } from 'expo-image';
 import React from 'react';
 import { StyleSheet } from 'react-native-unistyles';
 import {
+  calculateTotalEarnings,
   calculateTotalHours,
   convertNumberToStringThenToNumber,
   reverseDateStringToMDY,
@@ -86,13 +87,7 @@ export const RoustSheetComponent = ({
       ).toFixed(2)}`,
     ]),
   ];
-  const totalPay = shifts.reduce(
-    (acc, shift) =>
-      acc +
-      convertNumberToStringThenToNumber(calculateTotalHours([shift])) *
-        shift.rate,
-    0,
-  );
+  const totalPay = calculateTotalEarnings(shifts);
 
   return (
     <View gap={'xxl'}>

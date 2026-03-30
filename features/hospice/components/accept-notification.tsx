@@ -15,6 +15,7 @@ interface ApproveRouteSheetModalProps {
   routeSheetId: Id<'routeSheets'>;
   hospiceId: Id<'hospices'>;
   notificationId: Id<'hospiceNotifications'>;
+  totalEarnings: number;
 }
 
 export const ApproveRouteSheetModal: React.FC<ApproveRouteSheetModalProps> = ({
@@ -23,6 +24,7 @@ export const ApproveRouteSheetModal: React.FC<ApproveRouteSheetModalProps> = ({
   notificationId,
   hospiceId,
   routeSheetId,
+  totalEarnings,
 }) => {
   const [processing, setProcessing] = useState(false);
   const approve = useAction(api.routeSheetsActions.approveOrDeclineRouteSheet);
@@ -40,6 +42,7 @@ export const ApproveRouteSheetModal: React.FC<ApproveRouteSheetModalProps> = ({
         isApproved: true,
         hospiceId,
         notificationId,
+        totalEarnings,
       });
 
       showToast({

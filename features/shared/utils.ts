@@ -524,3 +524,13 @@ export const getPasswordStrength = (password: string) => {
     color: colors[strength - 1] || '',
   };
 };
+
+export const calculateTotalEarnings = (shifts: Doc<'schedules'>[]) => {
+  return shifts.reduce(
+    (acc, shift) =>
+      acc +
+      convertNumberToStringThenToNumber(calculateTotalHours([shift])) *
+        shift.rate,
+    0,
+  );
+};

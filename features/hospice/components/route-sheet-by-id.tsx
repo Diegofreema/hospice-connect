@@ -5,6 +5,7 @@ import { useMarkAsRead } from '@/features/hospice/hooks/use-mark-as-read';
 import { RoustSheetComponent } from '@/features/shared/components/route-sheet-component';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { Text } from '@/features/shared/components/text';
+import { calculateTotalEarnings } from '@/features/shared/utils';
 import { useQuery } from 'convex/react';
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
@@ -87,6 +88,7 @@ export const RouteSheetById = () => {
         onClose={onClose}
         visible={declineModalVisible}
         notificationId={notificationId}
+        totalEarnings={calculateTotalEarnings(schedules)}
       />
       <ApproveRouteSheetModal
         hospiceId={hospice?._id!}
@@ -94,6 +96,7 @@ export const RouteSheetById = () => {
         visible={approveModalVisible}
         onClose={() => setApproveModalVisible(false)}
         notificationId={notificationId}
+        totalEarnings={calculateTotalEarnings(schedules)}
       />
     </ScrollView>
   );

@@ -90,7 +90,7 @@ export const ReopenCase = ({ onClose }: Props) => {
   return (
     <BottomSheetKeyboardAwareScrollView
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ gap: 20 }}
+      contentContainerStyle={{ gap: 20, paddingBottom: 50 }}
     >
       <ControlledDatePicker
         control={control}

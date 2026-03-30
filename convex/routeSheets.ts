@@ -76,11 +76,8 @@ export const getDetailsForRouteSheet = query({
 
     const schedules = await ctx.db
       .query('schedules')
-      .withIndex(
-        'nurse_id',
-        (q) => q.eq('nurseId', nurse._id).eq('assignmentId', assignment._id),
-        // .eq('status', 'completed')
-        // .eq('isSubmitted', false)
+      .withIndex('nurse_id', (q) =>
+        q.eq('nurseId', nurse._id).eq('assignmentId', assignment._id),
       )
       .filter((q) =>
         q.and(
@@ -93,6 +90,7 @@ export const getDetailsForRouteSheet = query({
         ),
       )
       .collect();
+    console.log({ schedules });
 
     return {
       nurse,
@@ -220,6 +218,12 @@ export const submitRouteSheet = mutation({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
+    }
+
+    if (!args.scheduleIds.length) {
+      throw new ConvexError({
+        message: 'No shift was added to the route sheet',
+      });
     }
 
     const nurse = await ctx.db.get(args.nurseId);

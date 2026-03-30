@@ -18,6 +18,7 @@ interface DeclineRouteSheetModalProps {
   routeSheetId: Id<'routeSheets'>;
   hospiceId: Id<'hospices'>;
   notificationId: Id<'hospiceNotifications'>;
+  totalEarnings: number;
 }
 
 const formValidator = z.object({
@@ -32,8 +33,9 @@ export const DeclineRouteSheetModal: React.FC<DeclineRouteSheetModalProps> = ({
   hospiceId,
   routeSheetId,
   notificationId,
+  totalEarnings,
 }) => {
-  const approveOrDecline = useAction(
+  const declineRouteSheet = useAction(
     api.routeSheetsActions.approveOrDeclineRouteSheet,
   );
   const { showToast } = useToast();
@@ -56,12 +58,13 @@ export const DeclineRouteSheetModal: React.FC<DeclineRouteSheetModalProps> = ({
 
   const onSubmit = async (data: FormData) => {
     try {
-      await approveOrDecline({
+      await declineRouteSheet({
         routeSheetId,
         isApproved: false,
         hospiceId,
         reason: data.reason,
         notificationId,
+        totalEarnings,
       });
 
       showToast({

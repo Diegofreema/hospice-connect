@@ -23,6 +23,7 @@ export const approveOrDeclineRouteSheet = action({
     hospiceId: v.id('hospices'),
     reason: v.optional(v.string()),
     notificationId: v.id('hospiceNotifications'),
+    totalEarnings: v.number(),
   },
   handler: async (ctx, args): Promise<void> => {
     const identity = await ctx.auth.getUserIdentity();
@@ -131,19 +132,14 @@ export const approveOrDeclineRouteSheet = action({
     );
 
     if (commission && commission > 0) {
-      const scheduleEarnings = await ctx.runQuery(
-        internal.nurseCommissionHelpers.getScheduleRates,
-        { scheduleIds: routeSheet.scheduleIds },
-      );
-      const totalEarnings = scheduleEarnings.reduce(
-        (sum: number, r: number) => sum + r,
-        0,
-      );
+      const totalEarnings = args.totalEarnings;
+      console.log('totalEarnings', totalEarnings);
 
       if (totalEarnings > 0) {
         const commissionAmountCents = Math.round(
           totalEarnings * (commission / 100) * 100,
         );
+        console.log('commissionAmountCents', commissionAmountCents);
         const description = `Commission (${commission}%) — approved by ${hospice.businessName}`;
 
         try {
