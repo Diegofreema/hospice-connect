@@ -84,7 +84,7 @@ export const ViewRouteSheet = () => {
     }
 
     .text-normal {
-      font-size: 18px;
+      font-size: 15px;
     }
 
     .flex-text {
@@ -296,7 +296,7 @@ export const ViewRouteSheet = () => {
 </body>
 </html>
   `;
-  const { exportViewToPdf, loading, printToFile, progress, uri } =
+  const { exportViewToPdf, loading, printToFile, progress } =
     useDownloadOrPrint({
       htmlContent,
     });

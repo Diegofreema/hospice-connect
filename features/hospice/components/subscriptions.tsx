@@ -1,6 +1,8 @@
 import { useCustomerRCContext } from '@/components/context/customer-rc-context';
+import { useHospice } from '@/components/context/hospice-context';
 import { ErrorComponent } from '@/features/shared/components/error';
 import { SmallLoader } from '@/features/shared/components/small-loader';
+import { setRCAttributes } from '@/features/shared/utils';
 import { useCancelSubscription } from '@/hooks/rc/use-cancel-subscription';
 import { useGetOfferings } from '@/hooks/rc/use-get-offerings';
 import {
@@ -72,6 +74,7 @@ function formatDate(ms: number) {
 
 export const Subscriptions = () => {
   const { theme } = useUnistyles();
+  const { hospice } = useHospice();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
@@ -137,6 +140,9 @@ export const Subscriptions = () => {
 
   // ── Actions ─────────────────────────────────────────────────────
   const handlePurchase = async () => {
+    if (!hospice?.businessName) {
+      return;
+    }
     if (!activePackage) {
       Alert.alert('No plan selected', 'Please select a subscription plan.');
       return;
@@ -159,6 +165,7 @@ export const Subscriptions = () => {
           },
         );
         refetchCustomer();
+        await setRCAttributes(hospice.businessName);
       }
     } catch (err: any) {
       if (!err.userCancelled) {
@@ -250,8 +257,8 @@ export const Subscriptions = () => {
                   },
                 ]}
               >
-                {isPro 
-                  ? `${currentPlanMeta?.label ?? 'Pro'} Subscriber` 
+                {isPro
+                  ? `${currentPlanMeta?.label ?? 'Pro'} Subscriber`
                   : 'Free Plan'}
               </Text>
               <Text

@@ -652,6 +652,13 @@ type DisableAllOtherHospiceNotificationsForThisScheduleType = {
   cursor: null | string;
   numItems: number;
 };
+type DisableOtherHospiceNotificationsForThisScheduleType = {
+  ctx: MutationCtx;
+  scheduleId: Id<'schedules'>;
+
+  cursor: null | string;
+  numItems: number;
+};
 
 export const deleteAllOtherNotificationsForThisSchedule = async ({
   ctx,
@@ -708,6 +715,32 @@ export const deleteAllOtherHospiceNotificationsForThisSchedule = async ({
       ctx,
       scheduleId,
       hospiceNotificationId,
+      cursor: continueCursor,
+      numItems,
+    });
+  }
+};
+export const deleteAllNurseNotificationsForThisSchedule = async ({
+  ctx,
+  scheduleId,
+  cursor,
+  numItems,
+}: DisableOtherHospiceNotificationsForThisScheduleType) => {
+  const notifications = await ctx.db
+    .query('hospiceNotifications')
+    .withIndex('scheduleId', (q) =>
+      q.eq('scheduleId', scheduleId).eq('type', 'case_request'),
+    )
+    .paginate({ cursor, numItems });
+
+  const { isDone, page, continueCursor } = notifications;
+  for (const notification of page) {
+    await ctx.db.delete('hospiceNotifications', notification._id);
+  }
+  if (!isDone) {
+    await deleteAllNurseNotificationsForThisSchedule({
+      ctx,
+      scheduleId,
       cursor: continueCursor,
       numItems,
     });

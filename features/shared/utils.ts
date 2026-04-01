@@ -16,6 +16,7 @@ import {
   set,
 } from 'date-fns';
 import { Dimensions } from 'react-native';
+import Purchases from 'react-native-purchases';
 
 const { width } = Dimensions.get('window');
 
@@ -533,4 +534,10 @@ export const calculateTotalEarnings = (shifts: Doc<'schedules'>[]) => {
         shift.rate,
     0,
   );
+};
+
+export const setRCAttributes = async (hospiceName: string) => {
+  await Purchases.setAttributes({
+    $displayName: hospiceName,
+  });
 };

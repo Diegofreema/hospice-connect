@@ -7,6 +7,7 @@ import Purchases, { LOG_LEVEL } from 'react-native-purchases';
 
 export const useConfigureRC = () => {
   const { user } = useAuth();
+
   useEffect(() => {
     if (!user?.id) return;
     Purchases.setLogLevel(LOG_LEVEL.VERBOSE);

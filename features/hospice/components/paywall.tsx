@@ -1,5 +1,7 @@
+import { useHospice } from '@/components/context/hospice-context';
 import { ErrorComponent } from '@/features/shared/components/error';
 import { SmallLoader } from '@/features/shared/components/small-loader';
+import { setRCAttributes } from '@/features/shared/utils';
 import { SubscriptionCard } from '@/features/subcriptions/components/subcription-card';
 import { SubscriptionFooter } from '@/features/subcriptions/components/subcription-footer';
 import { SubscriptionHeader } from '@/features/subcriptions/components/subscription-header';
@@ -40,6 +42,7 @@ const SORT_ORDER: Record<string, number> = {
 
 export const Paywall = () => {
   const { theme } = useUnistyles();
+  const { hospice } = useHospice();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isPurchasing, setIsPurchasing] = useState(false);
   const { bottom } = useSafeAreaInsets();
@@ -67,6 +70,9 @@ export const Paywall = () => {
   const activePackage = sorted.find((p) => p.identifier === activeId) ?? null;
 
   const handlePurchase = async () => {
+    if (!hospice?.businessName) {
+      return;
+    }
     if (!activePackage) {
       Alert.alert('No plan selected', 'Please select a subscription plan.');
       return;
@@ -79,6 +85,7 @@ export const Paywall = () => {
           description: 'Welcome to Hospice Connect Pro.',
         });
       }
+      await setRCAttributes(hospice.businessName);
     } catch (err: any) {
       if (!err.userCancelled) {
         toast.error('Purchase failed', {

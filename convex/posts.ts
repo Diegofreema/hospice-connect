@@ -1,8 +1,10 @@
 import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
-import { mutation, query } from './_generated/server';
+import { internal } from './_generated/api';
+import { internalMutation, mutation, query } from './_generated/server';
 import {
   checkIfNurseHasActiveShift,
+  deleteAllNurseNotificationsForThisSchedule,
   deleteAllOtherNotificationsForThisSchedule,
   formatDate,
 } from './helper';
@@ -198,6 +200,7 @@ export const acceptAssignment = mutation({
       nurseId: args.nurseId,
       viewCount: 0,
     });
+
     if (args.nurseNotificationId) {
       const notification = await ctx.db.get(args.nurseNotificationId);
 
@@ -216,8 +219,32 @@ export const acceptAssignment = mutation({
         numItems: 50,
       });
     }
+
+    await ctx.scheduler.runAfter(
+      0,
+      internal.posts.deleteCaseRequestNotificationsAfterNurseAcceptedAssignment,
+      {
+        scheduleId: args.scheduleId,
+      },
+    );
   },
 });
+
+export const deleteCaseRequestNotificationsAfterNurseAcceptedAssignment =
+  internalMutation({
+    args: {
+      scheduleId: v.id('schedules'),
+    },
+    handler: async (ctx, args) => {
+      // hospice notification for this schedule
+      await deleteAllNurseNotificationsForThisSchedule({
+        ctx,
+        scheduleId: args.scheduleId,
+        cursor: null,
+        numItems: 10,
+      });
+    },
+  });
 
 export const declineAssignment = mutation({
   args: {

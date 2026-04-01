@@ -1,17 +1,12 @@
 import { useToast } from '@/components/demos/toast';
 import { api } from '@/convex/_generated/api';
-import {
-  type Doc,
-  type Id,
-} from '@/convex/_generated/dataModel';
+import { type Doc, type Id } from '@/convex/_generated/dataModel';
 import { ControlInput } from '@/features/authentication/components/form/control-input';
 import { Button } from '@/features/shared/components/button';
-import { CustomPressable } from '@/features/shared/components/custom-pressable';
 import { FlexText } from '@/features/shared/components/flex-text';
 import { KeyboardAwareScrollViewComponent } from '@/features/shared/components/key-board-aware-scroll-view';
 import { RoustSheetComponent } from '@/features/shared/components/route-sheet-component';
 import { SmallLoader } from '@/features/shared/components/small-loader';
-import { Text } from '@/features/shared/components/text';
 import { View } from '@/features/shared/components/view';
 import { ViewSignature } from '@/features/shared/components/view-signature';
 import { generateErrorMessage, trimText } from '@/features/shared/utils';
@@ -220,12 +215,7 @@ const Bottom = ({
   return (
     <View gap="xl">
       <View gap="xl">
-        <CustomPressable
-          onPress={() => setVisible(true)}
-          style={styles.signature}
-        >
-          <Text>Please click to take signature</Text>
-        </CustomPressable>
+        <Button title="Tap here to sign" onPress={() => setVisible(true)} />
         {signature && <ViewSignature signature={signature} />}
       </View>
       <ControlInput
