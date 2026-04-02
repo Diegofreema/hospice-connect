@@ -1,12 +1,16 @@
 import { expo } from '@better-auth/expo';
-import { createClient, type GenericCtx } from '@convex-dev/better-auth';
+import {
+  createClient,
+  type AuthFunctions,
+  type GenericCtx,
+} from '@convex-dev/better-auth';
 import { convex, crossDomain } from '@convex-dev/better-auth/plugins';
 import { betterAuth, type BetterAuthOptions } from 'better-auth';
 import { emailOTP } from 'better-auth/plugins';
+import { components, internal } from './_generated/api';
 import type { DataModel } from './_generated/dataModel';
 
 import { requireActionCtx } from '@convex-dev/better-auth/utils';
-import { components } from './_generated/api';
 import { query } from './_generated/server';
 import authConfig from './auth.config';
 import authSchema from './betterAuth/schema';
@@ -20,11 +24,26 @@ const siteUrl = process.env.SITE_URL!;
 const nativeAppUrl = process.env.NATIVE_APP_URL || 'hospice-connect://';
 const isDevelopment = process.env.NODE_ENV === 'development';
 const urlToUse = isDevelopment ? 'http://localhost:8081' : siteUrl;
+const authFunctions: AuthFunctions = internal.auth;
 export const authComponent = createClient<DataModel, typeof authSchema>(
   components.betterAuth,
   {
+    authFunctions,
     local: {
       schema: authSchema,
+    },
+    triggers: {
+      user: {
+        onCreate: async (ctx, doc) => {
+          await ctx.db.insert('users', {
+            role: doc.role as 'nurse' | 'hospice' | 'admin',
+            userId: doc._id,
+            isBoarded: false,
+            name: doc.name,
+            email: doc.email,
+          });
+        },
+      },
     },
   },
 );
@@ -137,3 +156,4 @@ export const getCurrentUser = query({
 });
 
 export const { getAuthUser } = authComponent.clientApi();
+export const { onCreate, onUpdate, onDelete } = authComponent.triggersApi();

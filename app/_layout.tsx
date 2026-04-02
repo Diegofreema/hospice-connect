@@ -91,7 +91,7 @@ const InitialRoute = () => {
   // Wait for auth to resolve before rendering navigation guards.
   // This prevents flashing the login screen during Android cold-start
   // (e.g. after the OS destroys the activity while the gallery is open).
-  if (isPending && Platform.OS === 'android') {
+  if (isPending) {
     return (
       <View
         style={{

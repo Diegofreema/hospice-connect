@@ -1,6 +1,5 @@
 'use client';
 
-import { Badge } from '@/components/web/ui/badge';
 import { Button } from '@/components/web/ui/button';
 import {
   Card,
@@ -19,24 +18,19 @@ import {
 } from '@/components/web/ui/select';
 import {
   Table,
-  TableBody,
-  TableCell,
   TableFooter,
   TableHead,
   TableHeader,
   TableRow,
 } from '@/components/web/ui/table';
 import { api } from '@/convex/_generated/api';
-import {
-  getAssignmentStatusText,
-  getColorsForDiscipline,
-} from '@/features/shared/utils';
-import { getScheduleStatusAndColor } from '@/lib/utils';
+
 import { usePaginatedQuery, useQuery } from 'convex/react';
-import { format, parse } from 'date-fns';
+
 import { Search } from 'lucide-react-native';
 import { useState } from 'react';
 import { Loader } from '../../shared/loader';
+import { AssignmentBody } from './assignment-body';
 type AssignmentStatus =
   | 'all'
   | 'completed'
@@ -55,7 +49,7 @@ export function Assignments() {
   );
   const stats = useQuery(api.adminAssignment.getAssignmentStats);
 
-  if (status === 'LoadingFirstPage' || !stats) {
+  if (!stats) {
     return <Loader message="Loading assignments" />;
   }
 
@@ -64,13 +58,6 @@ export function Assignments() {
       loadMore(25);
     }
   };
-
-  console.log(
-    results.map((r) => ({
-      start: r.startDate,
-      end: r.endDate,
-    })),
-  );
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -84,7 +71,7 @@ export function Assignments() {
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-5">
+      <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -181,65 +168,7 @@ export function Assignments() {
                   <TableHead className="font-bold">Status</TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody>
-                {results.length === 0 ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={7}
-                      className="text-center text-muted-foreground py-8"
-                    >
-                      No assignments found matching your filters.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  results.map((assignment, index) => (
-                    <TableRow key={assignment._id}>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell>{assignment.hospiceName}</TableCell>
-                      <TableCell className="font-medium">
-                        {assignment.patientFirstName}{' '}
-                        {assignment.patientLastName}
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          className={getColorsForDiscipline(
-                            assignment.discipline,
-                          )}
-                        >
-                          {assignment.discipline}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {format(
-                          parse(assignment.startDate, 'dd-MM-yyyy', new Date()),
-                          'MM-dd-yyyy',
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {assignment.endDate
-                          ? format(
-                              parse(
-                                assignment.endDate,
-                                'dd-MM-yyyy',
-                                new Date(),
-                              ),
-                              'MM-dd-yyyy',
-                            )
-                          : 'Ongoing'}
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          className={getScheduleStatusAndColor(
-                            assignment.status,
-                          )}
-                        >
-                          {getAssignmentStatusText(assignment.status)}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
+              <AssignmentBody results={results} status={status} />
               <TableFooter>
                 <Button
                   onClick={onLoadMore}

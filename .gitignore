@@ -39,3 +39,6 @@ yarn-error.*
 app-example
 /ios
 /android
+
+hopice-connect-firebase-adminsdk-fbsvc-c6b284ffea.json
+google-services.json

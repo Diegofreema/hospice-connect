@@ -1,4 +1,5 @@
 import { ConvexError, v } from 'convex/values';
+import { internal } from './_generated/api';
 import { type Id } from './_generated/dataModel';
 import {
   mutation,
@@ -504,6 +505,14 @@ export const acceptCaseRequest = mutation({
         status: 'booked',
         nurseId: args.nurseId,
       });
+      await ctx.scheduler.runAfter(
+        0,
+        internal.posts.deleteCaseRequestNotificationsOrAssignmentNotifications,
+        {
+          scheduleId: args.scheduleId,
+          type: 'assignment',
+        },
+      );
     }
   },
 });

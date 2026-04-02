@@ -28,7 +28,7 @@ export const ErrorComponent = ({ refetch, text }: Props) => {
       >
         {text || 'Something went wrong, please try again'}
       </Text>
-      <Button title="Retry" onPress={handleRefetch} style={{ flex: 1 }} />
+      <Button title="Retry" onPress={handleRefetch} style={{ minWidth: 100 }} />
     </View>
   );
 };

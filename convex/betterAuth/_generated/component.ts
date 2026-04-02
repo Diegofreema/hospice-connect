@@ -1020,5 +1020,25 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
         },
         Name
       >;
+      getUsers: FunctionReference<
+        "query",
+        "internal",
+        any,
+        Array<{
+          _creationTime: number;
+          _id: string;
+          createdAt: number;
+          email: string;
+          emailVerified: boolean;
+          image?: null | string;
+          isBoarded: boolean;
+          name: string;
+          role: string;
+          streamToken?: null | string;
+          updatedAt: number;
+          userId?: null | string;
+        }>,
+        Name
+      >;
     };
   };

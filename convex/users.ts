@@ -76,3 +76,21 @@ export const createUser = internalMutation({
 export const getUserHelper = async (ctx: QueryCtx, id: string) => {
   return await authComponent.getAnyUserById(ctx, id);
 };
+
+// export const getAndUpdateUsers = mutation({
+//   handler: async (ctx) => {
+//     const users = await ctx.runQuery(components.betterAuth.users.getUsers);
+//     let count = 0;
+//     for (const user of users) {
+//       count++;
+//       await ctx.db.insert('users', {
+//         role: user.role as 'nurse' | 'hospice' | 'admin',
+//         userId: user._id,
+//         isBoarded: false,
+//         name: user.name,
+//         email: user.email,
+//       });
+//     }
+//     return count;
+//   },
+// });

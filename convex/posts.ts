@@ -4,6 +4,7 @@ import { internal } from './_generated/api';
 import { internalMutation, mutation, query } from './_generated/server';
 import {
   checkIfNurseHasActiveShift,
+  deleteAllHospiceNotificationsForThisSchedule,
   deleteAllNurseNotificationsForThisSchedule,
   deleteAllOtherNotificationsForThisSchedule,
   formatDate,
@@ -222,27 +223,38 @@ export const acceptAssignment = mutation({
 
     await ctx.scheduler.runAfter(
       0,
-      internal.posts.deleteCaseRequestNotificationsAfterNurseAcceptedAssignment,
+      internal.posts.deleteCaseRequestNotificationsOrAssignmentNotifications,
       {
         scheduleId: args.scheduleId,
+        type: 'case_request',
       },
     );
   },
 });
 
-export const deleteCaseRequestNotificationsAfterNurseAcceptedAssignment =
+export const deleteCaseRequestNotificationsOrAssignmentNotifications =
   internalMutation({
     args: {
       scheduleId: v.id('schedules'),
+      type: v.union(v.literal('case_request'), v.literal('assignment')),
     },
     handler: async (ctx, args) => {
       // hospice notification for this schedule
-      await deleteAllNurseNotificationsForThisSchedule({
-        ctx,
-        scheduleId: args.scheduleId,
-        cursor: null,
-        numItems: 10,
-      });
+      if (args.type === 'case_request') {
+        await deleteAllNurseNotificationsForThisSchedule({
+          ctx,
+          scheduleId: args.scheduleId,
+          cursor: null,
+          numItems: 10,
+        });
+      } else {
+        await deleteAllHospiceNotificationsForThisSchedule({
+          ctx,
+          scheduleId: args.scheduleId,
+          cursor: null,
+          numItems: 10,
+        });
+      }
     },
   });
 

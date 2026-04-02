@@ -1,4 +1,5 @@
 import { ErrorComponent } from '@/features/shared/components/error';
+import { UnderReview } from '@/features/shared/components/under-review';
 import { useGetPaymentMethods } from '@/hooks/use-get-payment-methods';
 import React, { PropsWithChildren } from 'react';
 
@@ -19,15 +20,15 @@ export const AddedCardProvider = ({ children }: PropsWithChildren) => {
     );
   }
 
-  // if (!paymentMethods?.length && !loading) {
-  //   return (
-  //     <UnderReview
-  //       title="You haven't added your card yet"
-  //       description="Please add your card to continue"
-  //       type="card"
-  //     />
-  //   );
-  // }
+  if (!paymentMethods?.length && !loading) {
+    return (
+      <UnderReview
+        title="You haven't added your card yet"
+        description="Please add your card to continue"
+        type="card"
+      />
+    );
+  }
 
   return <>{children}</>;
 };

@@ -746,3 +746,29 @@ export const deleteAllNurseNotificationsForThisSchedule = async ({
     });
   }
 };
+export const deleteAllHospiceNotificationsForThisSchedule = async ({
+  ctx,
+  scheduleId,
+  cursor,
+  numItems,
+}: DisableOtherHospiceNotificationsForThisScheduleType) => {
+  const notifications = await ctx.db
+    .query('nurseNotifications')
+    .withIndex('scheduleId', (q) =>
+      q.eq('scheduleId', scheduleId).eq('type', 'assignment'),
+    )
+    .paginate({ cursor, numItems });
+
+  const { isDone, page, continueCursor } = notifications;
+  for (const notification of page) {
+    await ctx.db.delete('nurseNotifications', notification._id);
+  }
+  if (!isDone) {
+    await deleteAllHospiceNotificationsForThisSchedule({
+      ctx,
+      scheduleId,
+      cursor: continueCursor,
+      numItems,
+    });
+  }
+};

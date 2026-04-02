@@ -1,14 +1,15 @@
 import crons from '@convex-dev/crons/convex.config.js';
+import pushNotifications from '@convex-dev/expo-push-notifications/convex.config.js';
 import resend from '@convex-dev/resend/convex.config';
 import shardedCounter from '@convex-dev/sharded-counter/convex.config.js';
 import stripe from '@convex-dev/stripe/convex.config.js';
 import { defineApp } from 'convex/server';
 import betterAuth from './betterAuth/convex.config';
-
 const app = defineApp();
 app.use(stripe);
 app.use(shardedCounter);
 app.use(crons);
 app.use(betterAuth);
 app.use(resend);
+app.use(pushNotifications);
 export default app;
