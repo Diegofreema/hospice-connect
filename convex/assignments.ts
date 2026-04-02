@@ -19,6 +19,8 @@ import {
   checkIfNurseHasActiveShift,
   formatDate,
   sendAvailableAssignmentNotificationToNurse,
+  sendNotificationToAllNursesWithSameDiscipline,
+  sendPushNotificationHelper,
 } from './helper';
 import { getSchedulesByAssignmentIdHelper } from './schedules';
 import { careLevel, discipline, type DisciplineType, shifts } from './schema';
@@ -447,25 +449,15 @@ export const updateAssignment = mutation({
     }
 
     if (args.discipline !== assignment.discipline) {
-      const nurses = await ctx.db
-        .query('nurses')
-        .withIndex('by_discipline', (q) =>
-          q
-            .eq('discipline', args.discipline)
-            .eq('stateOfRegistration', args.state),
-        )
-        .collect();
-      for (const nurse of nurses) {
-        await ctx.db.insert('nurseNotifications', {
-          nurseId: nurse._id,
-          isRead: false,
-          description: `A new assignment matching your discipline has been posted by ${hospice.businessName}.`,
-          title: 'New Assignment Available',
-          type: 'normal',
-          hospiceId: args.hospiceId,
-          viewCount: 0,
-        });
-      }
+      await sendNotificationToAllNursesWithSameDiscipline({
+        ctx,
+        discipline: args.discipline,
+        state: args.state,
+        hospiceId: args.hospiceId,
+        hospiceName: hospice.businessName,
+        cursor: null,
+        numItems: 50,
+      });
     }
     const oldSchedules = await ctx.db
       .query('schedules')
@@ -739,6 +731,16 @@ export const cancelAssignment = mutation({
           type: 'normal',
           viewCount: 0,
         });
+
+        await sendPushNotificationHelper({
+          ctx,
+          userId: schedule.nurseId as Id<'nurses'>,
+          title: 'Assignment Ended',
+          body: text,
+          data: {
+            type: 'normal',
+          },
+        });
       }
     }
 
@@ -823,21 +825,33 @@ export const reassignShift = mutation({
       isReassigned: true,
       status: 'cancelled',
     });
+
+    const body = `${
+      hospice.businessName
+    } has cancelled your schedule for  ${formatDate(
+      schedule.startDate,
+    )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
+      schedule.endTime
+    }.`;
     await ctx.db.insert('nurseNotifications', {
       hospiceId: assignment.hospiceId,
       nurseId: schedule.nurseId!,
       title: 'Schedule cancelled',
-      description: `${
-        hospice.businessName
-      } has cancelled your schedule for  ${formatDate(
-        schedule.startDate,
-      )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
-        schedule.endTime
-      }.`,
+      description: body,
       type: 'normal',
       viewCount: 0,
       isRead: false,
     });
+    await sendPushNotificationHelper({
+      ctx,
+      userId: nurse.userId,
+      title: 'Schedule cancelled',
+      body,
+      data: {
+        type: 'normal',
+      },
+    });
+
     await ctx.db.patch(schedule._id, {
       nurseId: args.newNurseId,
       reassignedAt: args.assignedAt,
@@ -1018,34 +1032,43 @@ export const sendReassignmentNotificationToNurses = async (
   ctx: MutationCtx,
 ) => {
   // find nurses that are within that state and match the discipline
-  const data = await filter(
-    ctx.db
-      .query('nurses')
-      .withIndex('by_discipline', (q) =>
-        q.eq('discipline', discipline).eq('stateOfRegistration', state),
-      ),
-    (nurse) => nurse._id !== nurseId,
-  ).paginate({ cursor, numItems });
+  const data = await ctx.db
+    .query('nurses')
+    .withIndex('by_discipline', (q) =>
+      q.eq('discipline', discipline).eq('stateOfRegistration', state),
+    )
+    .filter((q) => q.neq(q.field('_id'), nurseId))
+    .paginate({ cursor, numItems });
 
   const { isDone, page, continueCursor } = data;
   if (page.length === 0) {
     return;
   }
 
+  const body = `${
+    businessName
+  } has opened a shift for reassignment scheduled for ${formatDate(
+    startDate,
+  )} to ${formatDate(endDate)}; ${startTime} - ${endTime}.`;
   for (const nurse of page) {
     ctx.db.insert('nurseNotifications', {
       nurseId: nurse._id,
       isRead: false,
       hospiceId,
       scheduleId,
-      description: `${
-        businessName
-      } has opened a shift for reassignment scheduled for ${formatDate(
-        startDate,
-      )} to ${formatDate(endDate)}; ${startTime} - ${endTime}.`,
+      description: body,
       title: 'ASAP schedule reassignment',
       type: 'reassignment',
       viewCount: 0,
+    });
+    await sendPushNotificationHelper({
+      ctx,
+      userId: nurse.userId,
+      title: 'ASAP schedule reassignment',
+      body,
+      data: {
+        type: 'nurse_notification',
+      },
     });
   }
 

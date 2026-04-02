@@ -13,7 +13,7 @@ import {
   handleRejectedNurseCount,
   handleSuspendedNurseCount,
 } from './counter';
-import { getUserHelperFn } from './helper';
+import { getUserHelperFn, sendPushNotificationHelper } from './helper';
 
 // Get all nurses
 export const getNurses = query({
@@ -141,6 +141,15 @@ export const rejectNurse = mutation({
     });
     await handlePendingNurseApprovalCount(ctx, 'dec');
     await handleRejectedNurseCount(ctx, 'inc');
+    await sendPushNotificationHelper({
+      ctx,
+      userId: nurse.userId,
+      title: 'Account Rejected',
+      body: args.rejectedReason,
+      data: {
+        type: 'nurse_notification',
+      },
+    });
   },
 });
 
@@ -160,16 +169,16 @@ export const suspendNurse = mutation({
         message: 'Nurse not found',
       });
     }
-    
+
     const oldStatus = nurse.status;
     const newStatus = args.isSuspended ? 'suspended' : 'approved';
-    
+
     if (oldStatus === newStatus) return;
 
     await ctx.db.patch(args.nurseId, {
       status: newStatus,
     });
-    
+
     if (oldStatus === 'rejected' && newStatus === 'approved') {
       await handleRejectedNurseCount(ctx, 'dec');
       await handleApproveNurseCount(ctx, 'inc');
@@ -190,6 +199,17 @@ export const suspendNurse = mutation({
       type: 'admin',
       isRead: false,
       viewCount: 0,
+    });
+    await sendPushNotificationHelper({
+      ctx,
+      userId: nurse.userId,
+      title: args.isSuspended ? 'Account Suspended' : 'Account Restored',
+      body: args.isSuspended
+        ? 'Your account has been suspended'
+        : 'Your account has been restored',
+      data: {
+        type: 'nurse_notification',
+      },
     });
   },
 });

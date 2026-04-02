@@ -13,6 +13,7 @@ import {
   deleteAllOtherNotifications,
   formatDate,
   getRatings,
+  sendPushNotificationHelper,
 } from './helper';
 import { scheduleStatus } from './schema';
 
@@ -108,6 +109,13 @@ export const cancelSchedule = mutation({
         nurseId: undefined, // explicitly unassign
       });
     }
+    const body = `${
+      hospice.businessName
+    } has ${notificationText} for ${formatDate(
+      schedule.startDate,
+    )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
+      schedule.endTime
+    }.`;
 
     // === 8. Send notification to nurse ===
     await ctx.db.insert('nurseNotifications', {
@@ -116,15 +124,19 @@ export const cancelSchedule = mutation({
       hospiceId: args.hospiceId,
       scheduleId: args.scheduleId,
       title: notificationTitle,
-      description: `${
-        hospice.businessName
-      } has ${notificationText} for ${formatDate(
-        schedule.startDate,
-      )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
-        schedule.endTime
-      }.`,
+      description: body,
       type: 'normal',
       viewCount: 0,
+    });
+
+    await sendPushNotificationHelper({
+      ctx,
+      userId: nurse.userId,
+      title: notificationTitle,
+      body,
+      data: {
+        type: 'normal',
+      },
     });
 
     // === 9. If this was a response to a cancel request, mark it as accepted ===
@@ -211,9 +223,16 @@ export const sendScheduleNotification = mutation({
       if (!schedule) {
         throw new ConvexError({ message: 'Schedule not found' });
       }
-      const assignment = await ctx.db.get(schedule.assignmentId);
+
+      const [assignment, nurse] = await Promise.all([
+        ctx.db.get('assignments', schedule.assignmentId),
+        ctx.db.get('nurses', args.nurseId),
+      ]);
       if (!assignment) {
         throw new ConvexError({ message: 'Assignment not found' });
+      }
+      if (!nurse) {
+        throw new ConvexError({ message: 'Nurse not found' });
       }
       if (assignment.hospiceId !== args.hospiceId) {
         throw new ConvexError({
@@ -227,22 +246,32 @@ export const sendScheduleNotification = mutation({
         shift: schedule,
         isHospice: args.isHospice,
       });
+      const body = `${
+        args.hospiceName
+      } has assigned you a schedule for ${formatDate(
+        schedule.startDate,
+      )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
+        schedule.endTime
+      }.`;
 
       await ctx.db.insert('nurseNotifications', {
         nurseId: args.nurseId,
         isRead: false,
         hospiceId: args.hospiceId,
         scheduleId: scheduleId,
-        description: `${
-          args.hospiceName
-        } has assigned you a schedule for ${formatDate(
-          schedule.startDate,
-        )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
-          schedule.endTime
-        }.`,
+        description: body,
         title: 'Schedule assigned',
         type: 'assignment',
         viewCount: 0,
+      });
+      await sendPushNotificationHelper({
+        ctx,
+        userId: nurse.userId,
+        title: 'Schedule assigned',
+        body,
+        data: {
+          type: 'normal',
+        },
       });
     }
   },
@@ -281,21 +310,31 @@ export const declineSchedule = mutation({
     if (!nurse) {
       throw new ConvexError({ message: 'Nurse not found' });
     }
+    const body = `${
+      args.hospiceName
+    } has declined your shift cancel request for ${formatDate(
+      schedule.startDate,
+    )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
+      schedule.endTime
+    }.`;
     await ctx.db.insert('nurseNotifications', {
       nurseId: args.nurseId,
       isRead: false,
       hospiceId: args.hospiceId,
       scheduleId: args.scheduleId,
-      description: `${
-        args.hospiceName
-      } has declined your shift cancel request for ${formatDate(
-        schedule.startDate,
-      )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
-        schedule.endTime
-      }.`,
+      description: body,
       title: 'Cancel request declined',
       type: 'normal',
       viewCount: 0,
+    });
+    await sendPushNotificationHelper({
+      ctx,
+      userId: nurse.userId,
+      title: 'Cancel request declined',
+      body,
+      data: {
+        type: 'normal',
+      },
     });
     await ctx.db.patch(args.notificationId, {
       status: 'declined',
@@ -335,24 +374,34 @@ export const declineCaseRequest = mutation({
     if (!nurse) {
       throw new ConvexError({ message: 'Nurse not found' });
     }
+    const body = `${
+      args.hospiceName
+    } has declined your case request for ${formatDate(
+      schedule.startDate,
+    )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
+      schedule.endTime
+    }.`;
     await ctx.db.insert('nurseNotifications', {
       nurseId: args.nurseId,
       isRead: false,
       hospiceId: args.hospiceId,
       scheduleId: args.scheduleId,
-      description: `${
-        args.hospiceName
-      } has declined your case request for ${formatDate(
-        schedule.startDate,
-      )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
-        schedule.endTime
-      }.`,
+      description: body,
       title: 'Case request declined',
       type: 'normal',
       viewCount: 0,
     });
     await ctx.db.patch(args.notificationId, {
       status: 'declined',
+    });
+    await sendPushNotificationHelper({
+      ctx,
+      userId: nurse.userId,
+      title: 'Case request declined',
+      body,
+      data: {
+        type: 'normal',
+      },
     });
   },
 });
@@ -429,22 +478,32 @@ export const acceptCaseRequest = mutation({
       cursor: null,
       numItems: 10,
     });
+    const body = `${
+      args.hospiceName
+    } has approved your case request for ${formatDate(
+      schedule.startDate,
+    )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
+      schedule.endTime
+    }.`;
     // sends notification to nurse, that the case request has been accepted
     await ctx.db.insert('nurseNotifications', {
       nurseId: args.nurseId,
       isRead: false,
       hospiceId: args.hospiceId,
       scheduleId: args.scheduleId,
-      description: `${
-        args.hospiceName
-      } has approved your case request for ${formatDate(
-        schedule.startDate,
-      )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
-        schedule.endTime
-      }.`,
+      description: body,
       title: 'Case request accepted',
       type: 'normal',
       viewCount: 0,
+    });
+    await sendPushNotificationHelper({
+      ctx,
+      userId: nurse.userId,
+      title: 'Case request accepted',
+      body,
+      data: {
+        type: 'normal',
+      },
     });
     // updates the notification status to accepted
     await ctx.db.patch(args.notificationId, {
@@ -460,21 +519,36 @@ export const acceptCaseRequest = mutation({
         isReassigned: true,
         status: 'cancelled',
       });
+      const body = `${
+        hospice.businessName
+      } has cancelled your schedule for  ${formatDate(
+        schedule.startDate,
+      )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
+        schedule.endTime
+      }.`;
       await ctx.db.insert('nurseNotifications', {
         hospiceId: assignment.hospiceId,
         nurseId: schedule.nurseId!,
         title: 'Schedule cancelled',
-        description: `${
-          hospice.businessName
-        } has cancelled your schedule for  ${formatDate(
-          schedule.startDate,
-        )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
-          schedule.endTime
-        }.`,
+        description: body,
         type: 'normal',
         viewCount: 0,
         isRead: false,
       });
+      if (schedule.nurseId) {
+        const nurse = await ctx.db.get('nurses', schedule.nurseId!);
+        if (nurse) {
+          await sendPushNotificationHelper({
+            ctx,
+            userId: nurse.userId,
+            title: 'Schedule cancelled',
+            body,
+            data: {
+              type: 'normal',
+            },
+          });
+        }
+      }
       await ctx.db.patch(schedule._id, {
         nurseId: args.nurseId,
         reassignedAt: args.reassignedAt,

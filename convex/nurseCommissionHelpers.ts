@@ -5,9 +5,10 @@
  */
 
 import { v } from 'convex/values';
-import { internalMutation, internalQuery } from './_generated/server';
 import { parse } from 'date-fns';
 import { type Doc } from './_generated/dataModel';
+import { internalMutation, internalQuery } from './_generated/server';
+import { sendPushNotificationHelper } from './helper';
 
 // ── Date parsing utilities matching frontend calculateTotalHours ──────────────
 
@@ -119,29 +120,55 @@ export const getDefaultPaymentMethodInternal = internalQuery({
 export const insertNoCardNotification = internalMutation({
   args: { nurseId: v.id('nurses') },
   handler: async (ctx, args) => {
+    const body =
+      'Your route sheet was approved! Please add a payment card in the Billing section so your commission can be processed.';
     await ctx.db.insert('nurseNotifications', {
       nurseId: args.nurseId,
       isRead: false,
       title: 'Payment method required',
-      description:
-        'Your route sheet was approved! Please add a payment card in the Billing section so your commission can be processed.',
+      description: body,
       type: 'admin',
       viewCount: 0,
     });
+    const nurse = await ctx.db.get('nurses', args.nurseId);
+    if (nurse) {
+      await sendPushNotificationHelper({
+        ctx,
+        userId: nurse.userId,
+        title: 'Payment method required',
+        body,
+        data: {
+          type: 'normal',
+        },
+      });
+    }
   },
 });
 
 export const insertChargeFailedNotification = internalMutation({
   args: { nurseId: v.id('nurses'), errorMessage: v.string() },
   handler: async (ctx, args) => {
+    const body = `We could not charge your commission. Please ensure your card is valid. (${args.errorMessage})`;
     await ctx.db.insert('nurseNotifications', {
       nurseId: args.nurseId,
       isRead: false,
       title: 'Commission charge failed',
-      description: `We could not charge your commission. Please ensure your card is valid. (${args.errorMessage})`,
+      description: body,
       type: 'normal',
       viewCount: 0,
     });
+    const nurse = await ctx.db.get('nurses', args.nurseId);
+    if (nurse) {
+      await sendPushNotificationHelper({
+        ctx,
+        userId: nurse.userId,
+        title: 'Commission charge failed',
+        body,
+        data: {
+          type: 'normal',
+        },
+      });
+    }
   },
 });
 
@@ -153,13 +180,26 @@ export const insertChargeSuccessNotification = internalMutation({
   },
   handler: async (ctx, args) => {
     const amountStr = (args.amountCents / 100).toFixed(2);
+    const body = `You have been successfully charged $${amountStr} for the ${args.hospiceBusinessName} route sheet commission.`;
     await ctx.db.insert('nurseNotifications', {
       nurseId: args.nurseId,
       isRead: false,
       title: 'Commission Processed',
-      description: `You have been successfully charged $${amountStr} for the ${args.hospiceBusinessName} route sheet commission.`,
+      description: body,
       type: 'admin',
       viewCount: 0,
     });
+    const nurse = await ctx.db.get('nurses', args.nurseId);
+    if (nurse) {
+      await sendPushNotificationHelper({
+        ctx,
+        userId: nurse.userId,
+        title: 'Commission Processed',
+        body,
+        data: {
+          type: 'normal',
+        },
+      });
+    }
   },
 });

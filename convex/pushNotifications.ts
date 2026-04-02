@@ -28,7 +28,7 @@ export const sendPushNotification = internalMutation({
     title: v.string(),
     to: v.id('users'),
     body: v.string(),
-    data: v.record(v.string(), v.string()),
+    data: v.optional(v.record(v.string(), v.string())),
   },
   handler: async (ctx, args) => {
     await pushNotifications.sendPushNotification(ctx, {

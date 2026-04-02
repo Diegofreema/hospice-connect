@@ -9,7 +9,7 @@ import {
   handleApproveNurseCount,
   handleSuspendedNurseCount,
 } from './counter';
-import { getUserHelperFn } from './helper';
+import { getUserHelperFn, sendPushNotificationHelper } from './helper';
 
 // Get unsubmitted route sheets (for a nurse or all)
 
@@ -52,6 +52,15 @@ export const suspendNurseFromShifts = mutation({
       viewCount: 0,
       isRead: false,
     });
+    await sendPushNotificationHelper({
+      ctx,
+      userId: nurse.userId,
+      title: 'Account Suspended',
+      body: 'Please submit your outstanding Route Sheet(s) to reactivate your account',
+      data: {
+        type: 'nurse_notification',
+      },
+    });
   },
 });
 
@@ -90,6 +99,15 @@ export const reactivateNurse = mutation({
       type: 'admin',
       viewCount: 0,
       isRead: false,
+    });
+    await sendPushNotificationHelper({
+      ctx,
+      userId: nurse.userId,
+      title: 'Account Reactivated',
+      body: 'Your account has been reactivated',
+      data: {
+        type: 'nurse_notification',
+      },
     });
   },
 });

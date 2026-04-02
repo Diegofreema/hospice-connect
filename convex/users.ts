@@ -8,7 +8,7 @@ import {
 import { authComponent } from './auth';
 
 export const getUser = query({
-  handler: async (ctx, args) => {
+  handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       return null;

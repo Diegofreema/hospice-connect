@@ -3,7 +3,7 @@ import { type Doc, type Id } from './_generated/dataModel';
 import { mutation, type MutationCtx, type QueryCtx } from './_generated/server';
 
 import { filter } from 'convex-helpers/server/filter';
-import { components } from './_generated/api';
+import { components, internal } from './_generated/api';
 import { parseDateTimeWallClock } from './actionHelper';
 import { authComponent } from './auth';
 import { type Id as BetterAuthId } from './betterAuth/_generated/dataModel';
@@ -514,16 +514,26 @@ export const sendAvailableAssignmentNotificationToNurse = async (
         .eq('status', 'approved'),
     )
     .paginate({ cursor, numItems });
+  const body = `A new assignment matching your discipline has been posted by ${hospice.businessName}.`;
   const { isDone, page, continueCursor } = data;
   for (const n of page) {
     await ctx.db.insert('nurseNotifications', {
       nurseId: n._id,
       isRead: false,
-      description: `A new assignment matching your discipline has been posted by ${hospice.businessName}.`,
+      description: body,
       title: 'New Assignment Available',
       type: 'normal',
       hospiceId: hospice._id,
       viewCount: 0,
+    });
+    await sendPushNotificationHelper({
+      ctx,
+      userId: n.userId,
+      title: 'New Assignment Available',
+      body,
+      data: {
+        type: 'normal',
+      },
     });
   }
 
@@ -767,6 +777,113 @@ export const deleteAllHospiceNotificationsForThisSchedule = async ({
     await deleteAllHospiceNotificationsForThisSchedule({
       ctx,
       scheduleId,
+      cursor: continueCursor,
+      numItems,
+    });
+  }
+};
+
+export const getUserToSendNotification = async (
+  ctx: MutationCtx,
+  userId: string,
+) => {
+  return await ctx.db
+    .query('users')
+    .withIndex('userId', (q) => q.eq('userId', userId))
+    .first();
+};
+
+type SendPushNotificationHelperType = {
+  ctx: MutationCtx;
+  userId: string;
+  title: string;
+  body: string;
+  data?: Record<string, string>;
+};
+
+export const sendPushNotificationHelper = async ({
+  ctx,
+  userId,
+  title,
+  body,
+  data,
+}: SendPushNotificationHelperType) => {
+  const user = await getUserToSendNotification(ctx, userId);
+  if (!user) {
+    return;
+  }
+
+  await ctx.scheduler.runAfter(
+    0,
+    internal.pushNotifications.sendPushNotification,
+    {
+      title,
+      body,
+      to: user._id,
+      data,
+    },
+  );
+};
+
+type SendNotificationToAllNursesWithSameDisciplineType = {
+  ctx: MutationCtx;
+  discipline: DisciplineType;
+  state: string;
+  hospiceId: Id<'hospices'>;
+  hospiceName: string;
+
+  cursor: string | null;
+  numItems: number;
+};
+
+export const sendNotificationToAllNursesWithSameDiscipline = async ({
+  ctx,
+  discipline,
+  state,
+  hospiceId,
+
+  hospiceName,
+  cursor,
+  numItems,
+}: SendNotificationToAllNursesWithSameDisciplineType) => {
+  const nurses = await ctx.db
+    .query('nurses')
+    .withIndex('by_discipline', (q) =>
+      q.eq('discipline', discipline).eq('stateOfRegistration', state),
+    )
+    .paginate({ cursor, numItems });
+  const { isDone, page, continueCursor } = nurses;
+  const body = `A new assignment matching your discipline has been posted by ${hospiceName}.`;
+  for (const nurse of page) {
+    await ctx.db.insert('nurseNotifications', {
+      nurseId: nurse._id,
+      isRead: false,
+      description: body,
+      title: 'New Assignment Available',
+      type: 'normal',
+      hospiceId: hospiceId,
+      viewCount: 0,
+    });
+
+    await sendPushNotificationHelper({
+      ctx,
+      userId: nurse.userId,
+      title: 'New Assignment Available',
+      body,
+      data: {
+        type: 'normal',
+        hospiceId: hospiceId,
+      },
+    });
+  }
+  if (!isDone) {
+    await sendNotificationToAllNursesWithSameDiscipline({
+      ctx,
+      discipline,
+      state,
+      hospiceId,
+
+      hospiceName,
       cursor: continueCursor,
       numItems,
     });

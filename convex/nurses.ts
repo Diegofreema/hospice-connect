@@ -23,6 +23,7 @@ import {
   getAvailability,
   getImage,
   getRatings,
+  sendPushNotificationHelper,
 } from './helper';
 import { discipline } from './schema';
 import { getUserHelper } from './users';
@@ -533,14 +534,28 @@ export const sendNotificationsToNursesOnFifthDay = internalMutation({
     const { page, isDone, continueCursor } = data;
 
     for (const assignment of page) {
+      const body =
+        'Complete and submit all outstanding route sheet(s) to avoid account deactivation.';
       await ctx.db.insert('nurseNotifications', {
         nurseId: assignment.nurseId,
         isRead: false,
-        description: `Complete and submit all outstanding route sheet(s) to avoid account deactivation.`,
+        description: body,
         title: 'Outstanding route sheet',
         type: 'admin',
         viewCount: 0,
       });
+      const nurse = await ctx.db.get('nurses', assignment.nurseId);
+      if (nurse) {
+        await sendPushNotificationHelper({
+          ctx,
+          userId: nurse.userId,
+          title: 'Outstanding route sheet',
+          body,
+          data: {
+            type: 'normal',
+          },
+        });
+      }
     }
 
     if (!isDone) {
@@ -572,14 +587,28 @@ export const sendNotificationsToNursesOnSixthDay = internalMutation({
     const { page, isDone, continueCursor } = data;
 
     for (const assignment of page) {
+      const body =
+        'Complete and submit all outstanding route sheet(s) to avoid account deactivation.';
       await ctx.db.insert('nurseNotifications', {
         nurseId: assignment.nurseId,
         isRead: false,
-        description: `Complete and submit all outstanding route sheet(s) to avoid account deactivation.`,
+        description: body,
         title: 'Outstanding route sheet',
         type: 'admin',
         viewCount: 0,
       });
+      const nurse = await ctx.db.get('nurses', assignment.nurseId);
+      if (nurse) {
+        await sendPushNotificationHelper({
+          ctx,
+          userId: nurse.userId,
+          title: 'Outstanding route sheet',
+          body,
+          data: {
+            type: 'normal',
+          },
+        });
+      }
     }
 
     if (!isDone) {
@@ -612,14 +641,28 @@ export const sendNotificationsToNursesAndSuspendAccount = internalMutation({
     const { page, isDone, continueCursor } = data;
 
     for (const assignment of page) {
+      const body =
+        'Complete and submit all outstanding route sheet(s) to reactivate your account.';
       await ctx.db.insert('nurseNotifications', {
         nurseId: assignment.nurseId,
         isRead: false,
-        description: `Complete and submit all outstanding route sheet(s) to reactivate your account.`,
+        description: body,
         title: 'Account suspended',
         type: 'admin',
         viewCount: 0,
       });
+      const nurse = await ctx.db.get('nurses', assignment.nurseId);
+      if (nurse) {
+        await sendPushNotificationHelper({
+          ctx,
+          userId: nurse.userId,
+          title: 'Account suspended',
+          body,
+          data: {
+            type: 'normal',
+          },
+        });
+      }
       await ctx.db.patch('nurses', assignment.nurseId, {
         status: 'suspended',
       });

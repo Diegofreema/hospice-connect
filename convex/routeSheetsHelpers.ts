@@ -3,7 +3,7 @@
  * Extracted here so the 'use node' action in routeSheets.ts can call them.
  */
 
-import { v } from 'convex/values';
+import { ConvexError, v } from 'convex/values';
 import { internalMutation, internalQuery } from './_generated/server';
 import {
   handleApproveNurseCount,
@@ -11,7 +11,10 @@ import {
   handleUnApprovedSubmittedRouteSheets,
   handleUnSubmittedRouteSheetsCount,
 } from './counter';
-import { checkDurationOfNotSubmittedAssignment } from './helper';
+import {
+  checkDurationOfNotSubmittedAssignment,
+  sendPushNotificationHelper,
+} from './helper';
 
 // ── Internal Queries (for use from the node action) ─────────────────────────
 
@@ -68,22 +71,36 @@ export const approveRouteSheetMutation = internalMutation({
     nurseStatus: v.string(),
   },
   handler: async (ctx, args) => {
+    const nurse = await ctx.db.get('nurses', args.nurseId);
+    if (!nurse) throw new ConvexError({ message: 'Nurse not found' });
     // Mark route sheet as approved
     await ctx.db.patch(args.routeSheetId, {
       isSeen: true,
       status: 'approved',
     });
 
-    await ctx.db.patch(args.notificationId, { status: 'accepted' });
-
+    await ctx.db.patch('hospiceNotifications', args.notificationId, {
+      status: 'accepted',
+    });
+    const body = `${args.hospiceBusinessName} accepted your route sheet for ${args.patientFirstName} ${args.patientLastName}.`;
     await ctx.db.insert('nurseNotifications', {
       isRead: false,
       nurseId: args.nurseId,
       title: 'Route sheet approved',
-      description: `${args.hospiceBusinessName} accepted your route sheet for ${args.patientFirstName} ${args.patientLastName}.`,
+      description: body,
       type: 'normal',
       hospiceId: args.hospiceId,
       viewCount: 0,
+    });
+
+    await sendPushNotificationHelper({
+      ctx,
+      userId: nurse.userId,
+      title: 'Route sheet approved',
+      body,
+      data: {
+        type: 'normal',
+      },
     });
 
     await handleUnApprovedSubmittedRouteSheets(ctx, 'dec');
@@ -107,6 +124,7 @@ export const approveRouteSheetMutation = internalMutation({
       );
 
       if (!stillOverdue) {
+        const body = `${args.hospiceBusinessName} accepted your route sheet for ${args.patientFirstName} ${args.patientLastName}.Your account is now active.`;
         await ctx.db.patch(args.nurseId, { status: 'approved' });
         await handleApproveNurseCount(ctx, 'inc');
         await handleSuspendedNurseCount(ctx, 'dec');
@@ -114,10 +132,20 @@ export const approveRouteSheetMutation = internalMutation({
         await ctx.db.insert('nurseNotifications', {
           nurseId: args.nurseId,
           isRead: false,
-          title: `${args.hospiceBusinessName} `,
-          description: `has accepted your route sheet for ${args.patientFirstName} ${args.patientLastName}.Your account is now active.`,
+          title: args.hospiceBusinessName,
+          description: body,
           type: 'admin',
           viewCount: 0,
+        });
+
+        await sendPushNotificationHelper({
+          ctx,
+          userId: nurse.userId,
+          title: args.hospiceBusinessName,
+          body,
+          data: {
+            type: 'normal',
+          },
         });
       }
     }
@@ -170,19 +198,34 @@ export const declineRouteSheetMutation = internalMutation({
 
 /** Sends an admin notification telling the nurse and hospice about the payment failure. */
 export const insertCardDeclinedNotification = internalMutation({
-  args: { 
+  args: {
     nurseId: v.id('nurses'),
     hospiceId: v.id('hospices'),
-    errorMessage: v.string()
+    errorMessage: v.string(),
   },
   handler: async (ctx, args) => {
+    const nurse = await ctx.db.get(args.nurseId);
+    if (!nurse) {
+      return;
+    }
+    const body = `Your card was declined when processing your commission: ${args.errorMessage}. Please update your payment method in Billing & Payments to continue accepting shifts.`;
     await ctx.db.insert('nurseNotifications', {
       nurseId: args.nurseId,
       isRead: false,
       title: 'Card Declined — Action Required',
-      description: `Your card was declined when processing your commission: ${args.errorMessage}. Please update your payment method in Billing & Payments to continue accepting shifts.`,
+      description: body,
       type: 'admin',
       viewCount: 0,
+    });
+
+    await sendPushNotificationHelper({
+      ctx,
+      userId: nurse.userId,
+      title: 'Card Declined — Action Required',
+      body: body,
+      data: {
+        type: 'normal',
+      },
     });
 
     await ctx.db.insert('hospiceNotifications', {

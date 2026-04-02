@@ -4,7 +4,11 @@ import { ConvexError, v } from 'convex/values';
 import { type Id } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import { type Id as BetterAuthId } from './betterAuth/_generated/dataModel';
-import { getUserById, getUserHelperFn } from './helper';
+import {
+  getUserById,
+  getUserHelperFn,
+  sendPushNotificationHelper,
+} from './helper';
 // Send notification to nurse
 export const sendNurseNotification = mutation({
   args: {
@@ -243,8 +247,9 @@ export const sendNotifications = mutation({
     });
 
     if (targetType === 'nurse') {
-      await Promise.all(
-        recipientIds.map(async (id) => {
+      for (const id of recipientIds) {
+        const nurse = await ctx.db.get('nurses', id as Id<'nurses'>);
+        if (nurse) {
           await ctx.db.insert('nurseNotifications', {
             nurseId: id as Id<'nurses'>,
             title,
@@ -254,11 +259,21 @@ export const sendNotifications = mutation({
             viewCount: 0,
             adminNotificationId,
           });
-        }),
-      );
+          await sendPushNotificationHelper({
+            ctx,
+            userId: nurse.userId,
+            title,
+            body: description,
+            data: {
+              type: 'normal',
+            },
+          });
+        }
+      }
     } else if (targetType === 'hospice') {
-      await Promise.all(
-        recipientIds.map(async (id) => {
+      for (const id of recipientIds) {
+        const hospice = await ctx.db.get('hospices', id as Id<'hospices'>);
+        if (hospice) {
           await ctx.db.insert('hospiceNotifications', {
             hospiceId: id as Id<'hospices'>,
             title,
@@ -268,8 +283,8 @@ export const sendNotifications = mutation({
             viewCount: 0,
             adminNotificationId,
           });
-        }),
-      );
+        }
+      }
     }
 
     return adminNotificationId;
