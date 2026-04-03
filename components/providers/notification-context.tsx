@@ -78,18 +78,20 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     const responseListener =
       Notifications.addNotificationResponseReceivedListener((response) => {
         const data = response.notification.request.content.data;
-        // if (data.type === 'single') {
-        //   onMessage(data.loggedInUserId as string, 'single');
-        // }
-        // if (data.type === 'group') {
-        //   onMessage(data.conversationId as string, 'group');
-        // }
-        // ! to fix route later
-        if (data.type === 'starred') {
+
+        if (data.type === 'normal') {
+          router.push('/');
         }
-        if (data.type === 'notification') {
+        if (data.type === 'nurse_notification') {
+          router.push('/nurse-notification');
         }
-        if (data.type === 'review') {
+        if (data.type === 'hospice_notification') {
+          router.push('/hospice-notification');
+        }
+        if (data.type === 'hospice_route_sheet_notification') {
+          router.push(
+            `/view-route-sheet?id=${data?.routeSheetId}&notificationId=${data?.notificationId}&isRead=${data?.isRead}`,
+          );
         }
       });
 

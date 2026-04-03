@@ -1,7 +1,11 @@
 import { paginationOptsValidator } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { mutation, query } from './_generated/server';
-import { checkIfNurseHasActiveShift, formatDate } from './helper';
+import {
+  checkIfNurseHasActiveShift,
+  formatDate,
+  sendPushNotificationHelper,
+} from './helper';
 import { getNurseDetails } from './nurses';
 
 export const unreadMessagesCount = query({
@@ -136,19 +140,29 @@ export const cancelShiftNotification = mutation({
     if (!hospice) {
       throw new ConvexError({ message: 'Hospice not found' });
     }
+    const body = `submitted cancel request for ${formatDate(
+      shift.startDate,
+    )} to ${formatDate(shift.endDate)}: ${shift.startTime}-${shift.endTime}`;
 
     await ctx.db.insert('hospiceNotifications', {
       isRead: false,
       hospiceId: assignment.hospiceId,
       nurseId: nurse._id,
       type: 'cancel_request',
-      description: `submitted cancel request for ${formatDate(
-        shift.startDate,
-      )} to ${formatDate(shift.endDate)}: ${shift.startTime}-${shift.endTime}`,
+      description: body,
       scheduleId: shift._id,
       title: `${nurse.name} (${nurse.discipline})`,
       viewCount: 0,
       reason: `Reason: ${args.reason}`,
+    });
+    await sendPushNotificationHelper({
+      ctx,
+      userId: hospice.userId,
+      title: `${nurse.name} (${nurse.discipline})`,
+      body,
+      data: {
+        type: 'hospice_notification',
+      },
     });
   },
 });
@@ -214,20 +228,28 @@ export const sendCaseRequestNotification = mutation({
       if (notificationExists) {
         await ctx.db.delete(notificationExists._id);
       }
+      const body = `has submitted a case request for ${formatDate(
+        shift.startDate,
+      )} to ${formatDate(shift.endDate)}: ${shift.startTime}-${shift.endTime}`;
 
       await ctx.db.insert('hospiceNotifications', {
         isRead: false,
         hospiceId: assignment.hospiceId,
         nurseId: nurse._id,
         type: 'case_request',
-        description: `has submitted a case request for ${formatDate(
-          shift.startDate,
-        )} to ${formatDate(shift.endDate)}: ${shift.startTime}-${
-          shift.endTime
-        }`,
+        description: body,
         scheduleId: scheduleId,
         title: `${nurse.name} (${nurse.discipline}) `,
         viewCount: 0,
+      });
+      await sendPushNotificationHelper({
+        ctx,
+        userId: hospice.userId,
+        title: `${nurse.name} (${nurse.discipline}) `,
+        body,
+        data: {
+          type: 'hospice_notification',
+        },
       });
     }
   },

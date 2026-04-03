@@ -204,8 +204,11 @@ export const insertCardDeclinedNotification = internalMutation({
     errorMessage: v.string(),
   },
   handler: async (ctx, args) => {
-    const nurse = await ctx.db.get(args.nurseId);
-    if (!nurse) {
+    const [nurse, hospice] = await Promise.all([
+      ctx.db.get('nurses', args.nurseId),
+      ctx.db.get('hospices', args.hospiceId),
+    ]);
+    if (!nurse || !hospice) {
       return;
     }
     const body = `Your card was declined when processing your commission: ${args.errorMessage}. Please update your payment method in Billing & Payments to continue accepting shifts.`;
@@ -227,14 +230,24 @@ export const insertCardDeclinedNotification = internalMutation({
         type: 'normal',
       },
     });
+    const _body = `The nurse's payment method was declined: ${args.errorMessage}. The nurse has been notified to update their payment method.`;
 
     await ctx.db.insert('hospiceNotifications', {
       hospiceId: args.hospiceId,
       isRead: false,
       title: 'Commission Payment Failed',
-      description: `The nurse's payment method was declined: ${args.errorMessage}. The nurse has been notified to update their payment method.`,
+      description: _body,
       type: 'admin',
       viewCount: 0,
+    });
+    await sendPushNotificationHelper({
+      ctx,
+      userId: hospice.userId,
+      title: 'Commission Payment Failed',
+      body: _body,
+      data: {
+        type: 'normal',
+      },
     });
   },
 });

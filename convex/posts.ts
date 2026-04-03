@@ -8,6 +8,7 @@ import {
   deleteAllNurseNotificationsForThisSchedule,
   deleteAllOtherNotificationsForThisSchedule,
   formatDate,
+  sendPushNotificationHelper,
 } from './helper';
 import { discipline } from './schema';
 import { getUserHelper } from './users';
@@ -136,9 +137,14 @@ export const acceptAssignment = mutation({
     if (!schedule) {
       throw new ConvexError({ message: 'Schedule not found' });
     }
-    const assignment = await ctx.db.get(schedule.assignmentId);
+    const assignment = await ctx.db.get('assignments', schedule.assignmentId);
+
     if (!assignment) {
       throw new ConvexError({ message: 'Assignment not found' });
+    }
+    const hospice = await ctx.db.get('hospices', assignment.hospiceId);
+    if (!hospice) {
+      throw new ConvexError({ message: 'Hospice not found' });
     }
 
     if (schedule.status === 'not_covered') {
@@ -184,22 +190,31 @@ export const acceptAssignment = mutation({
       nurseId: args.nurseId,
       status: 'booked',
     });
-
+    const body = `${nurse.name} (${
+      nurse.discipline
+    }) has accepted your case request for ${formatDate(
+      schedule.startDate,
+    )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
+      schedule.endTime
+    }.`;
     await ctx.db.insert('hospiceNotifications', {
       isRead: false,
       hospiceId: assignment.hospiceId,
       type: 'assignment',
       title: 'Schedule accepted',
       scheduleId: args.scheduleId,
-      description: `${nurse.name} (${
-        nurse.discipline
-      }) has accepted your case request for ${formatDate(
-        schedule.startDate,
-      )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
-        schedule.endTime
-      }.`,
+      description: body,
       nurseId: args.nurseId,
       viewCount: 0,
+    });
+    await sendPushNotificationHelper({
+      ctx,
+      userId: hospice.userId,
+      title: 'Schedule accepted',
+      body,
+      data: {
+        type: 'hospice_notification',
+      },
     });
 
     if (args.nurseNotificationId) {
@@ -280,6 +295,10 @@ export const declineAssignment = mutation({
     if (!assignment) {
       throw new ConvexError({ message: 'Assignment not found' });
     }
+    const hospice = await ctx.db.get('hospices', assignment.hospiceId);
+    if (!hospice) {
+      throw new ConvexError({ message: 'Hospice not found' });
+    }
 
     const notification = await ctx.db.get(args.nurseNotificationId);
     if (!notification) {
@@ -295,21 +314,33 @@ export const declineAssignment = mutation({
       status: 'declined',
     });
 
+    const body = `${nurse.name} (${
+      nurse.discipline
+    }) has declined your case request for ${formatDate(
+      schedule.startDate,
+    )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
+      schedule.endTime
+    }.`;
+
     await ctx.db.insert('hospiceNotifications', {
       isRead: false,
       hospiceId: assignment.hospiceId,
       type: 'assignment',
       title: 'Assignment Declined',
       scheduleId: args.scheduleId,
-      description: `${nurse.name} (${
-        nurse.discipline
-      }) has declined your case request for ${formatDate(
-        schedule.startDate,
-      )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
-        schedule.endTime
-      }.`,
+      description: body,
       nurseId: notification.nurseId,
       viewCount: 0,
+    });
+
+    await sendPushNotificationHelper({
+      ctx,
+      userId: hospice.userId,
+      title: 'Assignment Declined',
+      body,
+      data: {
+        type: 'hospice_notification',
+      },
     });
   },
 });

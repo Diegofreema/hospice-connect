@@ -283,6 +283,15 @@ export const sendNotifications = mutation({
             viewCount: 0,
             adminNotificationId,
           });
+          await sendPushNotificationHelper({
+            ctx,
+            userId: hospice.userId,
+            title,
+            body: description,
+            data: {
+              type: 'hospice_notification',
+            },
+          });
         }
       }
     }

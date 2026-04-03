@@ -661,7 +661,10 @@ export const updateAssignmentStatusToCompleted = mutation({
         isCompleted: true,
         completedAt: Date.now(),
       });
-      await handleUnSubmittedRouteSheetsCount(ctx, 'inc');
+      // Only count nurses who haven't already submitted their route sheet
+      if (!nurseAssignment.isSubmitted) {
+        await handleUnSubmittedRouteSheetsCount(ctx, 'inc');
+      }
     }
 
     await handleActiveAssignmentsCount(ctx, 'dec');
@@ -764,7 +767,10 @@ export const cancelAssignment = mutation({
         isCompleted: true,
         completedAt: args.cancelledAt,
       });
-      await handleUnSubmittedRouteSheetsCount(ctx, 'inc');
+      // Only count nurses who haven't already submitted their route sheet
+      if (!nurseAssignment.isSubmitted) {
+        await handleUnSubmittedRouteSheetsCount(ctx, 'inc');
+      }
     }
     // === Step 3: Update assignment ===
     await ctx.db.patch(assignment._id, {
@@ -856,21 +862,31 @@ export const reassignShift = mutation({
       nurseId: args.newNurseId,
       reassignedAt: args.assignedAt,
     });
+    const _body = `${nurse.name} (${
+      nurse.discipline
+    }) has accepted your case request for ${formatDate(
+      schedule.startDate,
+    )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
+      schedule.endTime
+    }.`;
     await ctx.db.insert('hospiceNotifications', {
       isRead: false,
       hospiceId: assignment.hospiceId,
       type: 'assignment',
       title: 'Schedule accepted',
       scheduleId: args.shift,
-      description: `${nurse.name} (${
-        nurse.discipline
-      }) has accepted your case request for ${formatDate(
-        schedule.startDate,
-      )} to ${formatDate(schedule.endDate)}; ${schedule.startTime} - ${
-        schedule.endTime
-      }.`,
+      description: _body,
       nurseId: args.newNurseId,
       viewCount: 0,
+    });
+    await sendPushNotificationHelper({
+      ctx,
+      userId: hospice.userId,
+      title: 'Schedule accepted',
+      body: _body,
+      data: {
+        type: 'normal',
+      },
     });
     await ctx.db.patch(args.notificationId, {
       status: 'accepted',
@@ -998,20 +1014,29 @@ export const sendReassignmentNotificationToHospice = mutation({
     await ctx.db.patch(notification._id, {
       status: 'accepted',
     });
-
+    const body = `${nurse.name} (${
+      nurse.discipline
+    }) has submitted a case request for ${formatDate(
+      shift.startDate,
+    )} to ${formatDate(shift.endDate)}: ${shift.startTime}-${shift.endTime}`;
     await ctx.db.insert('hospiceNotifications', {
       isRead: false,
       hospiceId: assignment.hospiceId,
       nurseId: nurse._id,
       type: 'reassignment',
-      description: `${nurse.name} (${
-        nurse.discipline
-      }) has submitted a case request for ${formatDate(
-        shift.startDate,
-      )} to ${formatDate(shift.endDate)}: ${shift.startTime}-${shift.endTime}`,
+      description: body,
       scheduleId: args.scheduleId,
       title: 'Request for case reassignment',
       viewCount: 0,
+    });
+    await sendPushNotificationHelper({
+      ctx,
+      userId: hospice.userId,
+      title: 'Request for case reassignment',
+      body,
+      data: {
+        type: 'normal',
+      },
     });
   },
 });

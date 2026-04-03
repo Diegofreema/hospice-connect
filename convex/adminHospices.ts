@@ -13,7 +13,7 @@ import {
   handleRejectedHospiceCount,
   handleSuspendedHospiceCount,
 } from './counter';
-import { getUserHelperFn } from './helper';
+import { getUserHelperFn, sendPushNotificationHelper } from './helper';
 
 // Get all hospices
 export const getHospices = query({
@@ -117,6 +117,15 @@ export const rejectHospice = mutation({
       hospiceId: hospice._id,
       description: args.rejectedReason,
     });
+    await sendPushNotificationHelper({
+      ctx,
+      body: args.rejectedReason,
+      title: 'Account rejected',
+      userId: hospice.userId,
+      data: {
+        type: 'normal',
+      },
+    });
     await handlePendingHospiceApprovalCount(ctx, 'dec');
     await handleRejectedHospiceCount(ctx, 'inc');
   },
@@ -145,24 +154,44 @@ export const suspendHospice = mutation({
     if (status === 'suspended') {
       await handleApproveHospiceCount(ctx, 'dec');
       await handleSuspendedHospiceCount(ctx, 'inc');
+      const body = 'Your hospice account has been suspended';
       await ctx.db.insert('hospiceNotifications', {
         viewCount: 0,
         isRead: false,
         title: 'Account suspended',
         type: 'admin',
         hospiceId: hospice._id,
-        description: 'Your hospice account has been suspended',
+        description: body,
+      });
+      await sendPushNotificationHelper({
+        ctx,
+        body,
+        title: 'Account suspended',
+        userId: hospice.userId,
+        data: {
+          type: 'normal',
+        },
       });
     } else {
       await handleApproveHospiceCount(ctx, 'inc');
       await handleSuspendedHospiceCount(ctx, 'dec');
+      const body = 'Your hospice account has been reactivated';
       await ctx.db.insert('hospiceNotifications', {
         viewCount: 0,
         isRead: false,
         title: 'Account reactivated',
         type: 'admin',
         hospiceId: hospice._id,
-        description: 'Your hospice account has been reactivated',
+        description: body,
+      });
+      await sendPushNotificationHelper({
+        ctx,
+        body,
+        title: 'Account reactivated',
+        userId: hospice.userId,
+        data: {
+          type: 'normal',
+        },
       });
     }
   },

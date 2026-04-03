@@ -5,6 +5,7 @@ import {
   handleUnSubmittedRouteSheetsCount,
   updateCount,
 } from './counter';
+import { sendPushNotificationHelper } from './helper';
 
 export const nurseSubmittedRouteSheet = query({
   args: {
@@ -90,7 +91,6 @@ export const getDetailsForRouteSheet = query({
         ),
       )
       .collect();
-  
 
     return {
       nurse,
@@ -283,7 +283,7 @@ export const submitRouteSheet = mutation({
       ...args,
       status: 'pending',
     });
-    await ctx.db.insert('hospiceNotifications', {
+    const notificationId = await ctx.db.insert('hospiceNotifications', {
       hospiceId: args.hospiceId,
       isRead: false,
       nurseId: args.nurseId,
@@ -292,6 +292,17 @@ export const submitRouteSheet = mutation({
       type: 'route_sheet',
       routeSheetId,
       viewCount: 0,
+    });
+    await sendPushNotificationHelper({
+      ctx,
+      title: `${nurse.name} (${nurse.discipline})`,
+      body: 'Submitted a route sheet, Click to view',
+      userId: hospice.userId,
+      data: {
+        type: 'hospice_route_sheet_notification',
+        routeSheetId,
+        notificationId,
+      },
     });
   },
 });

@@ -130,15 +130,25 @@ export const notifyHospice = mutation({
         message: 'Hospice not found',
       });
     }
+    const body =
+      'You have unapproved route sheet(s). Please kindly approve them ASAP';
 
     await ctx.db.insert('hospiceNotifications', {
       hospiceId: args.hospice,
       title: 'Unapproved Route Sheets',
-      description:
-        'You have unapproved route sheet(s). Please kindly approve them ASAP',
+      description: body,
       type: 'admin',
       viewCount: 0,
       isRead: false,
+    });
+    await sendPushNotificationHelper({
+      ctx,
+      userId: hospice.userId,
+      title: 'Unapproved Route Sheets',
+      body,
+      data: {
+        type: 'hospice_notification',
+      },
     });
   },
 });
