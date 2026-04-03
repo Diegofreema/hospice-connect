@@ -9,7 +9,9 @@ export const setupBackgroundUpdates = async () => {
     const update = await Updates.checkForUpdateAsync();
     if (update.isAvailable) {
       await Updates.fetchUpdateAsync();
-      await Updates.reloadAsync();
+      // Do not call Updates.reloadAsync() from a background task.
+      // The fetched update will auto-apply on next cold start.
+      // Reloading while backgrounded (e.g. file picker open) causes the app to restart.
     }
     return Promise.resolve();
   });
