@@ -13,6 +13,14 @@ import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 export const authClient = createAuthClient({
   baseURL: process.env.EXPO_PUBLIC_CONVEX_SITE_URL,
+  // Disable session refetch on focus for native platforms.
+  // On Android, returning from a native picker (image gallery, file system)
+  // triggers an AppState "active" event, which causes better-auth to refetch
+  // the session. This momentarily resets auth state, causing navigation guards
+  // to re-evaluate and send the user back to the first screen.
+  sessionOptions: {
+    refetchOnWindowFocus: Platform.OS === 'web',
+  },
   plugins: [
     emailOTPClient(),
     inferAdditionalFields({
