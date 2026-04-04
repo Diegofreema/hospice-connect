@@ -646,7 +646,17 @@ export const updateAssignmentStatusToCompleted = mutation({
     if (!assignment) {
       return;
     }
+    // Guard against already-cancelled/ended assignments
     if (['cancelled', 'ended'].includes(assignment.status)) {
+      return;
+    }
+
+    // Idempotency guard: if this assignment is already completed,
+    // do nothing. This prevents duplicate counter increments when
+    // useUpdatePostStatus fires from multiple mounted components
+    // (e.g. in-progress-card + assignment-post) before Convex
+    // has propagated the status update back to all of them.
+    if (assignment.status === 'completed') {
       return;
     }
 

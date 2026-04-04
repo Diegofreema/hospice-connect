@@ -79,32 +79,6 @@ export const approveRouteSheetMutation = internalMutation({
       status: 'approved',
     });
 
-    await ctx.db.patch('hospiceNotifications', args.notificationId, {
-      status: 'accepted',
-    });
-    const body = `${args.hospiceBusinessName} accepted your route sheet for ${args.patientFirstName} ${args.patientLastName}.`;
-    await ctx.db.insert('nurseNotifications', {
-      isRead: false,
-      nurseId: args.nurseId,
-      title: 'Route sheet approved',
-      description: body,
-      type: 'normal',
-      hospiceId: args.hospiceId,
-      viewCount: 0,
-    });
-
-    await sendPushNotificationHelper({
-      ctx,
-      userId: nurse.userId,
-      title: 'Route sheet approved',
-      body,
-      data: {
-        type: 'normal',
-      },
-    });
-
-    await handleUnApprovedSubmittedRouteSheets(ctx, 'dec');
-
     // ── Auto-reactivation check ────────────────────────────────────────────
     if (args.nurseStatus === 'suspended') {
       const allAssignments = await ctx.db
@@ -132,7 +106,7 @@ export const approveRouteSheetMutation = internalMutation({
         await ctx.db.insert('nurseNotifications', {
           nurseId: args.nurseId,
           isRead: false,
-          title: args.hospiceBusinessName,
+          title: 'Route sheet approved',
           description: body,
           type: 'admin',
           viewCount: 0,
@@ -141,14 +115,39 @@ export const approveRouteSheetMutation = internalMutation({
         await sendPushNotificationHelper({
           ctx,
           userId: nurse.userId,
-          title: args.hospiceBusinessName,
+          title: 'Route sheet approved',
           body,
           data: {
             type: 'normal',
           },
         });
       }
+    } else {
+      await ctx.db.patch('hospiceNotifications', args.notificationId, {
+        status: 'accepted',
+      });
+      const body = `${args.hospiceBusinessName} accepted your route sheet for ${args.patientFirstName} ${args.patientLastName}.`;
+      await ctx.db.insert('nurseNotifications', {
+        isRead: false,
+        nurseId: args.nurseId,
+        title: 'Route sheet approved',
+        description: body,
+        type: 'normal',
+        hospiceId: args.hospiceId,
+        viewCount: 0,
+      });
+
+      await sendPushNotificationHelper({
+        ctx,
+        userId: nurse.userId,
+        title: 'Route sheet approved',
+        body,
+        data: {
+          type: 'normal',
+        },
+      });
     }
+    await handleUnApprovedSubmittedRouteSheets(ctx, 'dec');
   },
 });
 

@@ -1,7 +1,7 @@
 import { v } from 'convex/values';
 import { action } from './_generated/server';
-import { resend } from './sendEmail';
 import { authComponent } from './auth';
+import { resend } from './sendEmail';
 
 export const submitSupportTicket = action({
   args: {
@@ -19,7 +19,7 @@ export const submitSupportTicket = action({
 
     await resend.sendEmail(ctx, {
       from: 'HospiceConnect Support <innovate@learnfactory.com.ng>',
-      to: 'support@hospice.com',
+      to: 'info@hospice-connect.net.',
       subject: `[Support Ticket] ${args.subject}`,
       html: `
         <div style="font-family: sans-serif; line-height: 1.5; color: #333;">

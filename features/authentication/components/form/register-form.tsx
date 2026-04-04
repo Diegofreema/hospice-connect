@@ -48,62 +48,56 @@ export const RegisterForm = () => {
     resolver: zodResolver(registerSchema),
   });
   const { password } = watch();
+  const onSendOtp = async (email: string) => {
+    await authClient.emailOtp.sendVerificationOtp({
+      email: email.trim(), // required
+      type: 'email-verification', // required
+      fetchOptions: {
+        onSuccess: () => {
+          router.push({
+            pathname: '/verify',
+            params: {
+              email: email.trim(),
+            },
+          });
+          showToast({
+            title: 'Success',
+            subtitle: 'Otp has been sent to your email',
+            autodismiss: true,
+          });
+        },
+        onError: ({ error }) => {
+          showToast({
+            title: 'Error',
+            subtitle: error.message,
+            autodismiss: true,
+          });
+        },
+      },
+    });
+  };
   const onSubmit = async (values: RegisterSchema) => {
-    try {
-      const { error } = await authClient.signUp.email({
-        email: values.email.trim(),
-        password: values.password.trim(),
-        name: `${values.firstName.trim()} ${values.lastName.trim()}`.trim(),
-        // @ts-ignore
-        isBoarded: false,
-        role: 'nurse',
-      });
-
-      if (error) {
-        showToast({
-          title: 'Error',
-          subtitle: error.message,
-          autodismiss: true,
-        });
-        return;
-      }
-      const { error: err } = await authClient.emailOtp.sendVerificationOtp({
-        email: values.email.trim(), // required
-        type: 'email-verification', // required
-      });
-
-      console.log({ err });
-
-      if (err) {
-        showToast({
-          title: 'Error',
-          subtitle: err.message,
-          autodismiss: true,
-        });
-        return;
-      } else {
-        router.push({
-          pathname: '/verify',
-          params: {
-            email: values.email.trim(),
-          },
-        });
-        showToast({
-          title: 'Success',
-          subtitle: 'Otp has been sent to your email',
-          autodismiss: true,
-        });
-      }
-      reset();
-    } catch (error) {
-      console.log(error);
-
-      showToast({
-        title: 'Error',
-        subtitle: 'An unexpected error occurred. Please try again.',
-        autodismiss: true,
-      });
-    }
+    await authClient.signUp.email({
+      email: values.email.trim(),
+      password: values.password.trim(),
+      name: `${values.firstName.trim()} ${values.lastName.trim()}`.trim(),
+      // @ts-ignore
+      isBoarded: false,
+      role: 'nurse',
+      fetchOptions: {
+        onSuccess: () => {
+          onSendOtp(values.email);
+          reset();
+        },
+        onError: ({ error }) => {
+          showToast({
+            title: 'Error',
+            subtitle: error.message,
+            autodismiss: true,
+          });
+        },
+      },
+    });
   };
   const toggleSecure = () => {
     setSecured(!secured);

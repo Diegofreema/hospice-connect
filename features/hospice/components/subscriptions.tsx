@@ -80,7 +80,6 @@ export const Subscriptions = () => {
   const [isRestoring, setIsRestoring] = useState(false);
 
   const {
-    customerInfo,
     isPending: customerPending,
     isError: customerError,
     refetch: refetchCustomer,
@@ -545,10 +544,21 @@ export const Subscriptions = () => {
         )}
 
         {/* ── Footer ── */}
+        {/* Auto-renewal disclosure required by Apple guideline 3.1.2 */}
+        {!isPro && activePackage && (
+          <Text
+            style={[styles.disclosureText, { color: theme.colors.textGrey }]}
+          >
+            {`${activePackage.product.title} · ${activePackage.product.priceString} — subscription auto-renews unless cancelled at least 24 hours before the end of the current period. Manage or cancel anytime in your App Store account settings.`}
+          </Text>
+        )}
         <View style={styles.footerLinks}>
+          {/* Apple's standard EULA — required when using Apple's standard Terms of Use */}
           <TouchableOpacity
             onPress={() =>
-              handleOpenLink('https://hospice-connect-web.vercel.app/terms')
+              handleOpenLink(
+                'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/',
+              )
             }
           >
             <Text style={[styles.footerLink, { color: theme.colors.textGrey }]}>
@@ -936,6 +946,14 @@ const styles = StyleSheet.create(() => ({
   },
 
   // Footer
+  disclosureText: {
+    fontSize: 11,
+    fontFamily: 'PublicSansRegular',
+    textAlign: 'center' as const,
+    lineHeight: 16,
+    paddingHorizontal: 4,
+    marginBottom: 4,
+  },
   footerLinks: {
     flexDirection: 'row' as const,
     justifyContent: 'center' as const,
@@ -946,6 +964,7 @@ const styles = StyleSheet.create(() => ({
   footerLink: {
     fontSize: 13,
     fontFamily: 'PublicSansRegular',
+    textDecorationLine: 'underline' as const,
   },
   footerDot: {
     fontSize: 13,

@@ -1,14 +1,14 @@
 import { ChatWrapper } from '@/components/chat-wrapper';
 import { useAuth } from '@/components/context/auth';
 import { ChatContext } from '@/components/context/chat-context';
-import { useConfigureRC } from '@/hooks/rc/use-configure-rc';
+import { useRecordNotification } from '@/hooks/use-record-notification';
 import { Stack } from 'expo-router';
 
 const BoardedLayout = () => {
   const { user } = useAuth();
 
   const isNurse = user?.role === 'nurse';
-  useConfigureRC();
+  useRecordNotification();
   return (
     <ChatContext>
       <ChatWrapper>

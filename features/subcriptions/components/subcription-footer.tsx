@@ -5,6 +5,11 @@ import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import { PurchasesPackage } from 'react-native-purchases';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
+// Apple's standard EULA — required when using Apple's standard Terms of Use
+const APPLE_EULA_URL =
+  'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
+const PRIVACY_URL = 'https://hospice-connect-web.vercel.app/privacy';
+
 type Props = {
   handlePurchase: () => void;
   isPurchasing: boolean;
@@ -25,37 +30,31 @@ export const SubscriptionFooter = ({
   };
   return (
     <View style={{ gap: 15 }}>
+      {/* ── Subscription disclosure (required by Apple) ── */}
+      <Text style={[styles.disclosure, { color: theme.colors.textGrey }]}>
+        {activePackage
+          ? `${activePackage.product.title} · ${activePackage.product.priceString} — subscription auto-renews unless cancelled at least 24 hours before the end of the current period. Manage or cancel anytime in your App Store account settings.`
+          : 'Subscription auto-renews unless cancelled at least 24 hours before the period ends.'}
+      </Text>
+
+      {/* ── Legal links ── */}
       <View style={styles.footerLinks}>
-        {/* <TouchableOpacity onPress={() => Purchases.restorePurchases()}>
+        <TouchableOpacity onPress={() => handleOpenLink(APPLE_EULA_URL)}>
           <Text style={[styles.footerLink, { color: theme.colors.textGrey }]}>
-            Restore Purchases
-          </Text>
-        </TouchableOpacity> */}
-        <Text style={[styles.footerDot, { color: theme.colors.textGrey }]}>
-          ·
-        </Text>
-        <TouchableOpacity
-          onPress={() =>
-            handleOpenLink('https://hospice-connect-web.vercel.app/terms')
-          }
-        >
-          <Text style={[styles.footerLink, { color: theme.colors.textGrey }]}>
-            Terms
+            Terms of Use
           </Text>
         </TouchableOpacity>
         <Text style={[styles.footerDot, { color: theme.colors.textGrey }]}>
           ·
         </Text>
-        <TouchableOpacity
-          onPress={() =>
-            handleOpenLink('https://hospice-connect-web.vercel.app/privacy')
-          }
-        >
+        <TouchableOpacity onPress={() => handleOpenLink(PRIVACY_URL)}>
           <Text style={[styles.footerLink, { color: theme.colors.textGrey }]}>
-            Privacy
+            Privacy Policy
           </Text>
         </TouchableOpacity>
       </View>
+
+      {/* ── CTA ── */}
       <View
         style={[
           styles.ctaContainer,
@@ -100,6 +99,15 @@ export const SubscriptionFooter = ({
 };
 
 const styles = StyleSheet.create((theme) => ({
+  // Disclosure text
+  disclosure: {
+    fontSize: 11,
+    fontFamily: 'PublicSansRegular',
+    textAlign: 'center',
+    lineHeight: 16,
+    paddingHorizontal: 8,
+  },
+
   // Footer
   footerLinks: {
     flexDirection: 'row',
@@ -111,6 +119,7 @@ const styles = StyleSheet.create((theme) => ({
   footerLink: {
     fontSize: 13,
     fontFamily: 'PublicSansRegular',
+    textDecorationLine: 'underline',
   },
   footerDot: {
     fontSize: 13,

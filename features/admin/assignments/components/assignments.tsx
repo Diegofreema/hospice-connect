@@ -18,6 +18,7 @@ import {
 } from '@/components/web/ui/select';
 import {
   Table,
+  TableCell,
   TableFooter,
   TableHead,
   TableHeader,
@@ -170,15 +171,20 @@ export function Assignments() {
               </TableHeader>
               <AssignmentBody results={results} status={status} />
               <TableFooter>
-                <Button
-                  onClick={onLoadMore}
-                  disabled={status !== 'CanLoadMore'}
-                  className="mt-4"
-                >
-                  {status === 'CanLoadMore'
-                    ? 'Load More'
-                    : 'No More Assignments'}
-                </Button>
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center p-4">
+                    <Button
+                      onClick={onLoadMore}
+                      disabled={status !== 'CanLoadMore'}
+                      variant="outline"
+                      className="w-full max-w-xs"
+                    >
+                      {status === 'CanLoadMore'
+                        ? 'Load More'
+                        : 'No More Assignments'}
+                    </Button>
+                  </TableCell>
+                </TableRow>
               </TableFooter>
             </Table>
           </div>

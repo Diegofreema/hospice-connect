@@ -21,9 +21,16 @@ type Props = {
 export const AssignmentBody = ({ results, status }: Props) => {
   if (status === 'LoadingFirstPage') {
     return (
-      <div className="flex items-center justify-center">
-        <Loader message="Loading assignments" />;
-      </div>
+      <TableBody>
+        <TableRow>
+          <TableCell
+            colSpan={7}
+            className="text-center text-muted-foreground py-10"
+          >
+            <Loader message="Loading assignments" />
+          </TableCell>
+        </TableRow>
+      </TableBody>
     );
   }
   return (

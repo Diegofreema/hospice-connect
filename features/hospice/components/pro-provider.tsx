@@ -30,13 +30,6 @@ export const ProProvider = ({ children }: PropsWithChildren) => {
       </Wrapper>
     );
   }
-  if (!isPro) {
-    return (
-      <Wrapper>
-        <Paywall />
-      </Wrapper>
-    );
-  }
   if (hospice?.status === 'pending') {
     return (
       <Wrapper>
@@ -51,6 +44,13 @@ export const ProProvider = ({ children }: PropsWithChildren) => {
           title="Hospice rejected"
           description="Please contact the admin to resolve this issue"
         />
+      </Wrapper>
+    );
+  }
+  if (!isPro) {
+    return (
+      <Wrapper>
+        <Paywall />
       </Wrapper>
     );
   }

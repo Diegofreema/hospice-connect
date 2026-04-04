@@ -1,6 +1,4 @@
-import { api } from '@/convex/_generated/api';
 import { registerForPushNotificationsAsync } from '@/lib/register-push-notification';
-import { useMutation } from 'convex/react';
 import * as Notifications from 'expo-notifications';
 import { useRouter } from 'expo-router';
 import React, {
@@ -47,9 +45,6 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   children,
 }) => {
   const [expoPushToken, setExpoPushToken] = useState<string | undefined>('');
-  const recordPushNotificationToken = useMutation(
-    api.pushNotifications.recordPushNotificationToken,
-  );
 
   const [notification, setNotification] =
     useState<Notifications.Notification | null>(null);
@@ -60,12 +55,6 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     registerForPushNotificationsAsync().then(
       (token) => {
         setExpoPushToken(token);
-        const registerPush = async () => {
-          await recordPushNotificationToken({
-            token: token as string,
-          });
-        };
-        registerPush();
       },
       (error) => setError(error),
     );
@@ -99,7 +88,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       notificationListener.remove();
       responseListener.remove();
     };
-  }, [router, recordPushNotificationToken]);
+  }, [router]);
 
   return (
     <NotificationContext.Provider

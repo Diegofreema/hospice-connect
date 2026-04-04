@@ -1,9 +1,11 @@
 import { CustomerRCProvider } from '@/components/context/customer-rc-context';
 import { HospiceProvider } from '@/components/context/hospice-context';
+import { useConfigureRC } from '@/hooks/rc/use-configure-rc';
 import { Stack } from 'expo-router';
 import { Platform } from 'react-native';
 
 const HospiceLayout = () => {
+  useConfigureRC();
   return (
     <HospiceProvider>
       <CustomerRCProvider>

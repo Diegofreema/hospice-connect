@@ -21,10 +21,7 @@ export const useUpdate = () => {
 
         if (update.isAvailable) {
           await Updates.fetchUpdateAsync();
-          // Do not call Updates.reloadAsync() here.
-          // The fetched update will auto-apply on next cold start.
-          // Calling reloadAsync() caused the app to reload when Android
-          // recreated the Activity after returning from native pickers.
+          await Updates.reloadAsync();
         }
       } catch (error) {
         console.log(error);

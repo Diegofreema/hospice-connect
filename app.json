@@ -88,9 +88,7 @@
       "./plugins/withAndroidBuildConfig",
       "expo-background-task",
       "expo-font",
-      "expo-notifications",
-      "expo-clipboard",
-      "expo-document-picker"
+      "expo-notifications"
     ],
     "experiments": {
       "typedRoutes": true
