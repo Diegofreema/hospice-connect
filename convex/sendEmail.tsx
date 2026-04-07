@@ -24,7 +24,7 @@ const sendEmail = async (
   },
 ) => {
   await resend.sendEmail(ctx, {
-    from: 'HospiceConnect <innovate@learnfactory.com.ng>',
+    from: 'HospiceConnect <support@hospice-connect.net>',
     to,
     subject,
     html,

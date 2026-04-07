@@ -6,7 +6,7 @@ import { View } from '../../shared/components/view';
 
 import { useGetAccount } from '@/hooks/use-get-account';
 import { IconChevronRight, IconPasswordUser } from '@tabler/icons-react-native';
-import { type Href, router } from 'expo-router';
+import { router, type Href } from 'expo-router';
 import { openBrowserAsync } from 'expo-web-browser';
 import { FlatList, TouchableOpacity } from 'react-native';
 import { useUnistyles } from 'react-native-unistyles';
@@ -20,6 +20,7 @@ type Props = {
 export const MoreLinks = ({ links, isSuspended }: Props) => {
   const { theme } = useUnistyles();
   const onPress = async (link: Href, type: 'external' | 'internal') => {
+    console.log(link);
     if (type === 'external') {
       await openBrowserAsync(link as string);
     } else {

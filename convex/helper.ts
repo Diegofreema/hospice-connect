@@ -594,7 +594,7 @@ export const getUserHelperFn = async (ctx: QueryCtx | MutationCtx) => {
 };
 export const getUserById = async (
   ctx: QueryCtx | MutationCtx,
-  userId: BetterAuthId<'user'>,
+  userId: string,
 ) => {
   return ctx.runQuery(components.betterAuth.users.getUser, {
     userId,

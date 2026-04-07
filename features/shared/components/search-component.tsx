@@ -34,7 +34,7 @@ export const SearchComponent = ({
           gap={'sm'}
           isFlexCentered
           borderRadius={'md'}
-          padding={'xxl'}
+          padding={'xl'}
           backgroundColor={theme.colors.buttonGrey}
         >
           <IconSearch size={20} />
@@ -51,7 +51,7 @@ export const SearchComponent = ({
       gap={'sm'}
       isFlexCentered
       borderRadius={'md'}
-      padding={'xxl'}
+      padding={'xl'}
       backgroundColor={theme.colors.buttonGrey}
     >
       <IconSearch size={20} />

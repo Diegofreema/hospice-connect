@@ -61,6 +61,6 @@ const links: LinkType[] = [
   {
     label: 'Delete Account',
     icon: IconTrash,
-    link: '/delete-account',
+    link: '/delete-hospice-account',
   },
 ];

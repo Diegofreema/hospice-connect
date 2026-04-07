@@ -14,7 +14,6 @@ import { format } from 'date-fns';
 import { router, useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { View } from 'react-native';
-import { useGetNurseId } from '../hooks/use-get-nurse-id';
 import { NurseCard } from './nurse-card';
 type Props = {
   query: string;
@@ -35,7 +34,7 @@ export const SearchNurses = ({ query }: Props) => {
   const sendReassignmentNotification = useMutation(
     api.assignments.sendReassignmentNotification,
   );
-  const nurseId = useGetNurseId((state) => state.id);
+
   const onReassign = async () => {
     if (!hospice || !hospice?._id || !id) return;
     try {

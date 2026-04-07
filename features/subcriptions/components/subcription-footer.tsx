@@ -1,14 +1,20 @@
 import * as WebBrowser from 'expo-web-browser';
 
 import { authClient } from '@/lib/auth-client';
-import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Platform,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { PurchasesPackage } from 'react-native-purchases';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
 // Apple's standard EULA — required when using Apple's standard Terms of Use
 const APPLE_EULA_URL =
   'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
-const PRIVACY_URL = 'https://hospice-connect-web.vercel.app/privacy';
+const PRIVACY_URL = 'https://hospice-connect-web.vercel.app/privacy-policy';
 
 type Props = {
   handlePurchase: () => void;
@@ -38,21 +44,23 @@ export const SubscriptionFooter = ({
       </Text>
 
       {/* ── Legal links ── */}
-      <View style={styles.footerLinks}>
-        <TouchableOpacity onPress={() => handleOpenLink(APPLE_EULA_URL)}>
-          <Text style={[styles.footerLink, { color: theme.colors.textGrey }]}>
-            Terms of Use
+      {Platform.OS === 'ios' && (
+        <View style={styles.footerLinks}>
+          <TouchableOpacity onPress={() => handleOpenLink(APPLE_EULA_URL)}>
+            <Text style={[styles.footerLink, { color: theme.colors.textGrey }]}>
+              Terms of Use
+            </Text>
+          </TouchableOpacity>
+          <Text style={[styles.footerDot, { color: theme.colors.textGrey }]}>
+            ·
           </Text>
-        </TouchableOpacity>
-        <Text style={[styles.footerDot, { color: theme.colors.textGrey }]}>
-          ·
-        </Text>
-        <TouchableOpacity onPress={() => handleOpenLink(PRIVACY_URL)}>
-          <Text style={[styles.footerLink, { color: theme.colors.textGrey }]}>
-            Privacy Policy
-          </Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity onPress={() => handleOpenLink(PRIVACY_URL)}>
+            <Text style={[styles.footerLink, { color: theme.colors.textGrey }]}>
+              Privacy Policy
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* ── CTA ── */}
       <View

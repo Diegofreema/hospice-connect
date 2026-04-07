@@ -19,7 +19,7 @@
 //   async sendVerificationRequest({ identifier: email, provider, token }) {
 //     const resend = new ResendAPI(provider.apiKey);
 //     const { error } = await resend.emails.send({
-//       from: 'HospiceConnect <innovate@learnfactory.com.ng>',
+//       from: 'HospiceConnect <support@hospice-connect.net>',
 //       to: [email],
 //       subject: `Verify your email`,
 //       text: `Your verification code is ${token}`,

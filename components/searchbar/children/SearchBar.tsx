@@ -1,35 +1,32 @@
-import React, { useState, useRef, useEffect } from "react";
+import { BlurView } from 'expo-blur';
+import { SymbolView } from 'expo-symbols';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  View,
-  TextInput,
-  TouchableOpacity,
+  Dimensions,
   StyleSheet,
   Text,
-  Dimensions,
-  Pressable,
-} from "react-native";
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Animated, {
-  useSharedValue,
+  interpolate,
+  runOnJS,
   useAnimatedStyle,
+  useSharedValue,
   withSpring,
   withTiming,
-  interpolate,
-  Easing,
-  runOnJS,
-  useAnimatedReaction,
-} from "react-native-reanimated";
-import { SymbolView } from "expo-symbols";
-import { BlurView } from "expo-blur";
-import { type SearchBarProps } from "./SearchBar.types";
+} from 'react-native-reanimated';
+import { type SearchBarProps } from './SearchBar.types';
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 const AnimatedView = Animated.createAnimatedComponent(View);
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
-const { width: screenWidth } = Dimensions.get("window");
+const { width: screenWidth } = Dimensions.get('window');
 
 export const SearchBar = ({
-  placeholder = "Search",
+  placeholder = 'Search',
   onSearch,
   onClear,
   style,
@@ -44,7 +41,7 @@ export const SearchBar = ({
   centerWhenUnfocused = true,
   ...props
 }: SearchBarProps) => {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const [containerDimensions, setContainerDimensions] = useState({ width: 0 });
   const inputRef = useRef<TextInput>(null);
@@ -94,8 +91,8 @@ export const SearchBar = ({
   const animatedSearchContentStyle = useAnimatedStyle(() => {
     const justifyContent =
       focusProgress.value === 0 && centerWhenUnfocused
-        ? "center"
-        : "flex-start";
+        ? 'center'
+        : 'flex-start';
     const paddingLeft = interpolate(focusProgress.value, [0, 1], [0, 12]);
     return { justifyContent, paddingLeft };
   });
@@ -114,7 +111,7 @@ export const SearchBar = ({
       focusProgress.value,
       [0, 1],
       [centerOffset, 0],
-      { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+      { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
     );
 
     return {
@@ -132,7 +129,7 @@ export const SearchBar = ({
       focusProgress.value,
       [0, 1],
       [centerOffset, 0],
-      { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+      { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
     );
 
     return {
@@ -192,7 +189,7 @@ export const SearchBar = ({
   const handleCancel = () => {
     inputRef.current?.blur();
     setIsFocused(false);
-    setQuery("");
+    setQuery('');
     onSearchDone();
     onClear?.();
     focusProgress.value = withTiming(0);
@@ -222,7 +219,7 @@ export const SearchBar = ({
 
   const handleClear = () => {
     textOpacity.value = withTiming(0, { duration: 150 }, () => {
-      runOnJS(setQuery)("");
+      runOnJS(setQuery)('');
       textOpacity.value = withTiming(1, { duration: 150 });
     });
 
@@ -278,7 +275,7 @@ export const SearchBar = ({
                       animatedInputStyle,
                       props?.inputStyle,
                     ]}
-                    cursorColor={props?.tint ?? "#007AFF"}
+                    cursorColor={props?.tint ?? '#007AFF'}
                     placeholder={placeholder}
                     placeholderTextColor="#8E8E93"
                     value={query}
@@ -288,7 +285,7 @@ export const SearchBar = ({
                     returnKeyType="search"
                     autoCorrect={false}
                     autoCapitalize="none"
-                    selectionColor={props?.tint ?? "#007AFF"}
+                    selectionColor={props?.tint ?? '#007AFF'}
                     {...props}
                   />
                 </AnimatedView>
@@ -328,7 +325,7 @@ export const SearchBar = ({
               style={[
                 styles.cancelText,
                 {
-                  color: props?.tint ?? "#007AFF",
+                  color: props?.tint ?? '#007AFF',
                 },
               ]}
             >
@@ -343,50 +340,50 @@ export const SearchBar = ({
 
 const styles = StyleSheet.create({
   container: {
-    width: "100%",
+    width: '100%',
     paddingHorizontal: 0,
     paddingVertical: 8,
   },
   searchRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   searchBarContainer: {},
   blurContainer: {
     borderRadius: 12,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
   searchContainer: {
-    backgroundColor: "rgba(118, 118, 128, 0.12)",
+    backgroundColor: 'rgba(118, 118, 128, 0.12)',
     borderRadius: 12,
     minHeight: 35,
-    justifyContent: "center",
+    justifyContent: 'center',
   },
   searchContent: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
   searchIconContainer: {
     width: 20,
     height: 20,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: 8,
   },
   input: {
-    width: "100%",
-    color: "#FFFFFF",
+    width: '100%',
+    color: '#FFFFFF',
     fontSize: 17,
-    fontFamily: "System",
-    fontWeight: "400",
+    fontFamily: 'System',
+    fontWeight: '400',
 
     includeFontPadding: false,
-    textAlignVertical: "center",
+    textAlignVertical: 'center',
     minHeight: 24,
 
-    textAlign: "left",
+    textAlign: 'left',
   },
   clearButton: {
     padding: 4,
@@ -395,8 +392,8 @@ const styles = StyleSheet.create({
   cancelButtonContainer: {
     paddingLeft: 12,
     minWidth: 60,
-    justifyContent: "center",
-    alignItems: "flex-start",
+    justifyContent: 'center',
+    alignItems: 'flex-start',
   },
   cancelButton: {
     paddingVertical: 8,
@@ -404,7 +401,7 @@ const styles = StyleSheet.create({
   },
   cancelText: {
     fontSize: 17,
-    fontFamily: "System",
-    fontWeight: "400",
+    fontFamily: 'System',
+    fontWeight: '400',
   },
 });

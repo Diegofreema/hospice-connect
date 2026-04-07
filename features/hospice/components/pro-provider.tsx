@@ -3,7 +3,6 @@ import { useHospice } from '@/components/context/hospice-context';
 import { api } from '@/convex/_generated/api';
 import { AccountBrief } from '@/features/shared/components/account-brief';
 import { ErrorComponent } from '@/features/shared/components/error';
-import { SmallLoader } from '@/features/shared/components/small-loader';
 import { UnderReview } from '@/features/shared/components/under-review';
 import { useQuery } from 'convex/react';
 import { PropsWithChildren } from 'react';
@@ -14,9 +13,6 @@ export const ProProvider = ({ children }: PropsWithChildren) => {
   const { isPro, isPending, isError, refetch } = useCustomerRCContext();
   const { hospice } = useHospice();
 
-  if (isPending) {
-    return <SmallLoader size={50} />;
-  }
   if (isError) {
     return <ErrorComponent refetch={refetch} text="Something went wrong" />;
   }
@@ -47,7 +43,7 @@ export const ProProvider = ({ children }: PropsWithChildren) => {
       </Wrapper>
     );
   }
-  if (!isPro) {
+  if (!isPro && !isPending) {
     return (
       <Wrapper>
         <Paywall />

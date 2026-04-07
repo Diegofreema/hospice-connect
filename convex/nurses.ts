@@ -23,6 +23,7 @@ import {
   getAvailability,
   getImage,
   getRatings,
+  getUserById,
   sendPushNotificationHelper,
 } from './helper';
 import { discipline } from './schema';
@@ -408,9 +409,19 @@ export const getNurses = query({
         };
       }),
     );
+    const nursesThatAreNotAdmin = await Promise.all(
+      nursesImage.map(async (nurse) => {
+        const user = await getUserById(ctx, nurse.userId);
+        return {
+          ...nurse,
+          isNurseAdmin: user?.role === 'admin',
+        };
+      }),
+    );
+
     return {
       ...nurses,
-      page: nursesImage,
+      page: nursesThatAreNotAdmin.filter((nurse) => !nurse.isNurseAdmin),
     };
   },
 });
@@ -487,8 +498,17 @@ export const searchNursesByFirstNameAndLastName = query({
         };
       }),
     );
+    const nursesThatAreNotAdmin = await Promise.all(
+      nursesImage.map(async (nurse) => {
+        const user = await getUserById(ctx, nurse.userId);
+        return {
+          ...nurse,
+          isNurseAdmin: user?.role === 'admin',
+        };
+      }),
+    );
 
-    return nursesImage;
+    return nursesThatAreNotAdmin.filter((nurse) => !nurse.isNurseAdmin);
   },
 });
 

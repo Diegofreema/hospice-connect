@@ -302,23 +302,29 @@ export function Hospices() {
                             title={
                               hospice.status === 'suspended'
                                 ? 'Reactivate'
-                                : 'Suspend'
+                                : hospice.status === 'rejected'
+                                  ? 'Approve'
+                                  : 'Suspend'
                             }
                             description={
                               hospice.status === 'suspended'
                                 ? 'Are you sure you want to reactivate this hospice?'
-                                : 'Are you sure you want to suspend this hospice?'
+                                : hospice.status === 'rejected'
+                                  ? 'Are you sure you want to approve this hospice?'
+                                  : 'Are you sure you want to suspend this hospice?'
                             }
                             onAction={() =>
                               handleSuspendToggle(
                                 hospice._id,
-                                hospice.status === 'suspended',
+                                hospice.status === 'suspended' ||
+                                  hospice.status === 'rejected',
                               )
                             }
                           >
                             <Button
                               className={cn(
-                                hospice.status === 'suspended'
+                                hospice.status === 'suspended' ||
+                                  hospice.status === 'rejected'
                                   ? 'bg-green-500 hover:bg-green-600'
                                   : 'bg-red-500 hover:bg-red-600',
                               )}
@@ -326,10 +332,13 @@ export function Hospices() {
                               title={
                                 hospice.status === 'suspended'
                                   ? 'Reactivate'
-                                  : 'Suspend'
+                                  : hospice.status === 'rejected'
+                                    ? 'Approve'
+                                    : 'Suspend'
                               }
                             >
-                              {hospice.status === 'suspended' ? (
+                              {hospice.status === 'suspended' ||
+                              hospice.status === 'rejected' ? (
                                 <Building2Check className="h-4 w-4 text-white" />
                               ) : (
                                 <Building2 className="h-4 w-4 text-white" />

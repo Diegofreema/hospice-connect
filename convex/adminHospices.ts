@@ -147,53 +147,48 @@ export const suspendHospice = mutation({
         message: 'Hospice not found',
       });
     }
+    const oldStatus = hospice.status;
     const status = args.isSuspended ? 'suspended' : 'approved';
+    if (oldStatus === status) {
+      return;
+    }
     await ctx.db.patch(args.hospiceId, {
       status,
     });
-    if (status === 'suspended') {
+    if (oldStatus === 'rejected' && status === 'approved') {
+      await handleRejectedHospiceCount(ctx, 'dec');
+      await handleApproveHospiceCount(ctx, 'inc');
+    }
+    if (oldStatus === 'suspended' && status === 'approved') {
+      await handleSuspendedHospiceCount(ctx, 'dec');
+      await handleApproveHospiceCount(ctx, 'inc');
+    } else if (oldStatus === 'approved' && status === 'suspended') {
       await handleApproveHospiceCount(ctx, 'dec');
       await handleSuspendedHospiceCount(ctx, 'inc');
-      const body = 'Your hospice account has been suspended';
-      await ctx.db.insert('hospiceNotifications', {
-        viewCount: 0,
-        isRead: false,
-        title: 'Account suspended',
-        type: 'admin',
-        hospiceId: hospice._id,
-        description: body,
-      });
-      await sendPushNotificationHelper({
-        ctx,
-        body,
-        title: 'Account suspended',
-        userId: hospice.userId,
-        data: {
-          type: 'normal',
-        },
-      });
-    } else {
-      await handleApproveHospiceCount(ctx, 'inc');
-      await handleSuspendedHospiceCount(ctx, 'dec');
-      const body = 'Your hospice account has been reactivated';
-      await ctx.db.insert('hospiceNotifications', {
-        viewCount: 0,
-        isRead: false,
-        title: 'Account reactivated',
-        type: 'admin',
-        hospiceId: hospice._id,
-        description: body,
-      });
-      await sendPushNotificationHelper({
-        ctx,
-        body,
-        title: 'Account reactivated',
-        userId: hospice.userId,
-        data: {
-          type: 'normal',
-        },
-      });
     }
+    const body = args.isSuspended
+      ? 'Your hospice account has been suspended'
+      : 'Your hospice account has been reactivated';
+    const title = args.isSuspended
+      ? 'Account suspended'
+      : 'Account reactivated';
+    await ctx.db.insert('hospiceNotifications', {
+      viewCount: 0,
+      isRead: false,
+      title,
+      type: 'admin',
+      hospiceId: hospice._id,
+      description: body,
+    });
+    await sendPushNotificationHelper({
+      ctx,
+      body,
+      title: 'Account suspended',
+      userId: hospice.userId,
+      data: {
+        type: 'normal',
+      },
+    });
   },
 });
 
