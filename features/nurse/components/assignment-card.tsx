@@ -77,7 +77,7 @@ export const AssignmentAvailableCard = ({ item: post, onOpenSheet }: Props) => {
         <FlexButtons
           onPress={handleAccept}
           onCancel={onMessage}
-          buttonText2="Accept"
+          buttonText2="Request Shifts"
           buttonText="Message"
         />
       </CardContent>

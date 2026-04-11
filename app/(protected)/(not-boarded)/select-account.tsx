@@ -1,3 +1,4 @@
+import { Subtitle } from '@/components/subtitle/Subtitle';
 import { AccountSelector } from '@/features/authentication/components/account-selector';
 import { PrivacyTermsLink } from '@/features/authentication/components/privacy-term';
 import { BackButton } from '@/features/shared/components/back-button';
@@ -25,9 +26,12 @@ const AccountType = () => {
     }
   };
   return (
-    <Wrapper>
+    <Wrapper gap="lg">
       <BackButton marginTop={0} onPress={onPress} />
-      <MyTitle title="Select account type" style={{ marginTop: 20 }} />
+      <MyTitle title="Complete your profile" style={{ marginTop: 20 }} />
+      <Subtitle style={{ marginTop: 20, textAlign: 'center' }}>
+        Select account type
+      </Subtitle>
       <AccountSelector selected={selected} setSelected={setSelected} />
       <Button
         title="Next"

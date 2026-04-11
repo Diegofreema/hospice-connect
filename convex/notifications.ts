@@ -124,15 +124,11 @@ export const getAdminNotifications = query({
           ctx,
           notification.sentBy as BetterAuthId<'user'>,
         );
-        if (!sender) {
-          throw new ConvexError({
-            message: 'Sender not found',
-          });
-        }
+
         return {
           ...notification,
-          email: sender?.email,
-          name: sender?.name,
+          email: sender?.email || 'N/A',
+          name: sender?.name || 'N/A',
         };
       }),
     );
