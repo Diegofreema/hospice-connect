@@ -1,4 +1,3 @@
-import { useAppChatContext } from '@/components/context/chat-context';
 import { ChatHeader } from '@/features/shared/components/chat-header';
 import { CustomPressable } from '@/features/shared/components/custom-pressable';
 import { SmallLoader } from '@/features/shared/components/small-loader';
@@ -7,25 +6,62 @@ import { View } from '@/features/shared/components/view';
 import { Wrapper } from '@/features/shared/components/wrapper';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { IconSend } from '@tabler/icons-react-native';
-import React from 'react';
+import { useLocalSearchParams } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+import type { Channel as StreamChatChannel } from 'stream-chat';
 import {
   Channel,
   MessageInput,
   MessageList,
   type SendButtonProps,
+  useChatContext,
   useMessageInputContext,
 } from 'stream-chat-expo';
-
 const ChannelScreen = () => {
-  const { channel } = useAppChatContext();
+  // const { channel } = useAppChatContext();
+  const { client } = useChatContext();
   const headerHeight = useHeaderHeight() + (StatusBar.currentHeight ?? 0);
   const { bottom } = useSafeAreaInsets();
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const [loading, setLoading] = useState(false);
+  const [channel, setChannel] = useState<StreamChatChannel | null>(null);
 
-  if (!channel) {
+  useEffect(() => {
+    if (!id || !client) return;
+    let active = true;
+
+    const fetchChannel = async () => {
+      setLoading(true);
+      try {
+        const channels = await client.queryChannels(
+          { type: 'messaging', cid: id },
+          {},
+          { watch: true, state: true },
+        );
+        if (active && channels.length > 0) {
+          setChannel(channels[0]);
+        }
+      } catch (error) {
+        console.log({ error });
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    fetchChannel();
+
+    return () => {
+      active = false;
+      // Stop watching to unsubscribe from real-time events and avoid memory leaks
+      channel?.stopWatching();
+    };
+  }, [id, client, channel]);
+
+  if (loading || !channel) {
     return <SmallLoader size={50} />;
   }
 

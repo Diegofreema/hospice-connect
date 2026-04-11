@@ -16,6 +16,7 @@ import {
   useSegments,
 } from 'expo-router';
 
+import { useSubscribeNotification } from '@/hooks/rc/use-subscribe-notification';
 import { usePendingImageRedirect } from '@/hooks/use-pending-image-redirect';
 import { useUpdate } from '@/hooks/use-update';
 import React from 'react';
@@ -83,6 +84,7 @@ const InitialRoute = () => {
   const isWeb = Platform.OS === 'web';
   console.log({ pathname, segment });
   const isAuthenticated = !!user;
+  useSubscribeNotification();
 
   // Check for pending image picker results after Activity restart.
   // Only redirect once auth is resolved (!isPending) so nav guards are stable.

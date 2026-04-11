@@ -1,5 +1,5 @@
+import { CustomDatePicker } from '@/features/shared/components/custom-date-picker';
 import { Text } from '@/features/shared/components/text';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
 import { useState } from 'react';
 import {
@@ -61,17 +61,14 @@ export const ControlledDatePicker = <TFieldValues extends FieldValues>({
             </TouchableOpacity>
             {open && (
               <View style={{ alignSelf: 'center' }}>
-                <DateTimePicker
-                  testID="dateTimePicker"
+                <CustomDatePicker
                   value={value}
                   mode={mode}
                   is24Hour={true}
                   display="spinner"
-                  onChange={(event, selectedDate) => {
+                  onChange={(_, selectedDate) => {
                     setOpen(false);
-                    if (event.type !== 'dismissed') {
-                      onChange(selectedDate);
-                    }
+                    onChange(selectedDate);
                   }}
                 />
               </View>

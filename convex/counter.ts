@@ -35,8 +35,8 @@ export const updateCount = async (ctx: MutationCtx) => {
   // await completedAssignmentsCount.subtract(ctx, 1);
   // await rejectedNurseCount.inc(ctx);
   // await unSubmittedRouteSheetsCount.dec(ctx);
-  await handleApproveHospiceCount(ctx, 'inc');
-  await handleRejectedHospiceCount(ctx, 'dec');
+  await activeAssignmentsCount.add(ctx, -3);
+  await endedAssignmentsCount.add(ctx, 3);
 };
 
 export const handlePendingHospiceAccountsUpdate = async (

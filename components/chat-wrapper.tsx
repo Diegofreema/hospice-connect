@@ -1,6 +1,7 @@
 import { chatApiKey } from '@/chat-config';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { useUnread } from '@/features/shared/hooks/use-unread';
+import { useRegisterDevice } from '@/hooks/use-register';
 import axios from 'axios';
 import { type PropsWithChildren, useCallback, useEffect } from 'react';
 import { Chat, OverlayProvider, useCreateChatClient } from 'stream-chat-expo';
@@ -32,6 +33,8 @@ export const ChatWrapper = ({ children }: PropsWithChildren) => {
     },
     tokenOrProvider: tokenProvider,
   });
+
+  useRegisterDevice(client, user?.id as string);
 
   useEffect(() => {
     if (client && user?.id) {
@@ -74,7 +77,9 @@ export const ChatWrapper = ({ children }: PropsWithChildren) => {
 
   return (
     <OverlayProvider value={{ style: chatTheme }}>
-      <Chat client={client}>{children}</Chat>
+      <Chat client={client} enableOfflineSupport>
+        {children}
+      </Chat>
     </OverlayProvider>
   );
 };

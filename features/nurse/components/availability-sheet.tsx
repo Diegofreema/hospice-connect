@@ -6,12 +6,12 @@ import { Text } from '@/features/shared/components/text';
 import { generateErrorMessage } from '@/features/shared/utils';
 
 import { useToast } from '@/components/demos/toast';
+import { CustomDatePicker } from '@/features/shared/components/custom-date-picker';
 import { FlexButtons } from '@/features/shared/components/flex-buttons';
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { IconX } from '@tabler/icons-react-native';
 import { useMutation } from 'convex/react';
 import { format } from 'date-fns';
@@ -161,10 +161,9 @@ export const AvailabilitySheet = forwardRef<BottomSheet, Props>(
           </View>
           {show && (
             <>
-              <DateTimePicker
+              <CustomDatePicker
                 style={{ marginBottom: 20 }}
                 display="spinner"
-                testID="dateTimePicker"
                 value={startTime}
                 mode="time"
                 is24Hour
@@ -175,9 +174,8 @@ export const AvailabilitySheet = forwardRef<BottomSheet, Props>(
             </>
           )}
           {show2 && (
-            <DateTimePicker
+            <CustomDatePicker
               display="spinner"
-              testID="dateTimePicker"
               value={endTime}
               mode="time"
               is24Hour

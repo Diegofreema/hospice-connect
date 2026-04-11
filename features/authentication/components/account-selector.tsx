@@ -8,7 +8,7 @@ import { StyleSheet } from 'react-native-unistyles';
 
 const accountTypes = [
   { type: 'nurse', text: 'Healthcare Professional' },
-  { type: 'hospice', text: 'Hospice' },
+  { type: 'hospice', text: 'Hospice business' },
 ] as const;
 type Props = {
   selected: 'nurse' | 'hospice';
@@ -29,7 +29,7 @@ export const AccountSelector = ({ selected, setSelected }: Props) => {
           />
 
           <Text size={'large'} isBold>
-            {accountType.text}
+            Enroll as {accountType.text}
           </Text>
         </TouchableOpacity>
       ))}

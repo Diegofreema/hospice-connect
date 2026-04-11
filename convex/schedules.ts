@@ -8,6 +8,10 @@ import {
   type QueryCtx,
 } from './_generated/server';
 import {
+  handleActiveAssignmentsCount,
+  handleCompletedAssignmentCount,
+} from './counter';
+import {
   checkIfNurseHasActiveShift,
   deleteAllOtherHospiceNotificationsForThisSchedule,
   deleteAllOtherNotifications,
@@ -633,9 +637,16 @@ export const updateScheduleStatus = mutation({
     const lastSchedule = schedules[schedules.length - 1];
     if (lastSchedule._id === schedule._id) {
       if (args.status === 'not_covered') {
-        await ctx.db.patch(assignment._id, {
-          status: 'completed',
-        });
+        // Guard: only update counters if the assignment isn't already completed
+        if (assignment.status !== 'completed') {
+          await ctx.db.patch(assignment._id, {
+            status: 'completed',
+          });
+          // Keep sharded counters in sync — this is the path where the last
+          // schedule goes 'not_covered', which closes the assignment.
+          await handleActiveAssignmentsCount(ctx, 'dec');
+          await handleCompletedAssignmentCount(ctx, 'inc');
+        }
       }
     }
     await ctx.db.patch(args.scheduleId, {

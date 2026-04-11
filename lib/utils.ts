@@ -1,7 +1,8 @@
 import { Status } from '@/features/authentication/admin/nurses/types';
+import messaging from '@react-native-firebase/messaging';
 import { clsx, type ClassValue } from 'clsx';
+import { PermissionsAndroid, Platform } from 'react-native';
 import { twMerge } from 'tailwind-merge';
-
 export const formatString = (str: string) => {
   return str
     .replace(/_/g, ' ')
@@ -51,5 +52,22 @@ export const generateStatusText = (status: Status) => {
       return 'Rejected';
     default:
       return 'Suspended';
+  }
+};
+
+export const requestPermission = async () => {
+  // Request permission for Android 13 and above
+  if (Platform.OS === 'android' && Platform.Version >= 33) {
+    await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+    );
+    return;
+  }
+  const authStatus = await messaging().requestPermission();
+  const enabled =
+    authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+    authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+  if (enabled) {
+    console.log('Authorization status:', authStatus);
   }
 };

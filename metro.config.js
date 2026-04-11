@@ -7,8 +7,6 @@ const { withUniwindConfig } = require('uniwind/metro');
 
 const config = getDefaultConfig(__dirname);
 
-config.resolver.unstable_enablePackageExports = true;
-
 // Platform-specific module resolution to exclude mobile folders from web builds
 config.resolver.resolveRequest = (context, moduleName, platform) => {
   // Exclude (protected) and (public) route folders from web builds
