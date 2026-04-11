@@ -4,6 +4,7 @@ import { Spacer } from '@/features/shared/components/spacer';
 
 import { View } from '../../../shared/components/view';
 
+import { useAuth } from '@/components/context/auth';
 import { useToast } from '@/components/demos/toast';
 import { authClient } from '@/lib/auth-client';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -23,7 +24,7 @@ import { loginSchema, type LoginSchema } from '../../validators';
 import { ControlInput } from './control-input';
 export const LoginForm = () => {
   const [secured, setSecured] = useState(true);
-
+  const { isPending } = useAuth();
   const { showToast } = useToast();
   const { theme } = useUnistyles();
   const {
@@ -39,7 +40,7 @@ export const LoginForm = () => {
     resolver: zodResolver(loginSchema),
   });
   const onSubmit = async (data: LoginSchema) => {
-    const res = await authClient.signIn.email({
+    await authClient.signIn.email({
       email: data.email,
       password: data.password,
       fetchOptions: {
@@ -50,17 +51,28 @@ export const LoginForm = () => {
           });
           reset();
         },
+        onError: async ({ error }) => {
+          if (error.message === 'Email not verified') {
+            router.push(`/verify?email=${data.email}`);
+            showToast({
+              title: 'Email not verified',
+              subtitle:
+                'Otp has been sent to your email, please verify your email',
+              autodismiss: true,
+            });
+            await authClient.emailOtp.requestPasswordReset({
+              email: data.email,
+            });
+          } else {
+            showToast({
+              title: 'Error',
+              subtitle: error.message,
+              autodismiss: true,
+            });
+          }
+        },
       },
     });
-
-    if (res.error) {
-      showToast({
-        title: 'Error',
-        subtitle: res.error.message,
-        autodismiss: true,
-      });
-      return;
-    }
   };
   const toggleSecure = () => {
     setSecured(!secured);
@@ -105,7 +117,7 @@ export const LoginForm = () => {
       <Spacer />
       <Button
         title="Login"
-        disabled={isSubmitting}
+        disabled={isSubmitting || isPending}
         onPress={handleSubmit(onSubmit)}
       />
     </View>

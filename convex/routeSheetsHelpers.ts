@@ -168,7 +168,7 @@ export const declineRouteSheetMutation = internalMutation({
   handler: async (ctx, args) => {
     const text = `Reason: ${args.reason || 'N/A'}, Please resubmit shortly.`;
 
-    await ctx.db.patch(args.routeSheetId, {
+    await ctx.db.patch('routeSheets', args.routeSheetId, {
       isSeen: true,
       status: 'declined',
     });
@@ -177,8 +177,12 @@ export const declineRouteSheetMutation = internalMutation({
       await ctx.db.patch(scheduleId, { isSubmitted: false });
     }
 
-    await ctx.db.patch(args.notificationId, { status: 'declined' });
-    await ctx.db.patch(args.nurseAssignmentId, { isSubmitted: false });
+    await ctx.db.patch('hospiceNotifications', args.notificationId, {
+      status: 'declined',
+    });
+    await ctx.db.patch('nurseAssignments', args.nurseAssignmentId, {
+      isSubmitted: false,
+    });
 
     await ctx.db.insert('nurseNotifications', {
       isRead: false,

@@ -101,6 +101,7 @@ export const Day = ({ day, onPress }: Props) => {
           onValueChange={updateAvailability}
           width={40}
           height={20}
+          offColor={theme.colors.errorText}
         />
         <PrivacyNoticeLink onPress={onPress}>
           {timeIsSet ? 'Edit' : 'Set time'}

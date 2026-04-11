@@ -1,52 +1,47 @@
+import { useAuth } from '@/components/context/auth';
 import { useToast } from '@/components/demos/toast';
 import { Button } from '@/features/shared/components/button';
-import { generateErrorMessage } from '@/features/shared/utils';
 import { authClient } from '@/lib/auth-client';
 import { Image } from 'expo-image';
-import React from 'react';
+import React, { useState } from 'react';
 
 type Props = {
   provider: 'google' | 'apple';
 };
 export const LoginButton = ({ provider }: Props) => {
   const { showToast } = useToast();
+  const { isPending } = useAuth();
+  const [loading, setLoading] = useState(false);
   const imageSource =
     provider === 'google'
       ? require('@/assets/images/google.png')
       : require('@/assets/images/apple.png');
   const title = provider === 'google' ? 'Google' : 'Apple';
   const handleSignIn = async () => {
-    try {
-      const { data, error } = await authClient.signIn.social({
-        provider,
-      });
-      if (error) {
-        showToast({
-          title: 'Error',
-          subtitle: error.message,
-          autodismiss: true,
-        });
-      }
-
-      console.log({ data });
-
-      if (data) {
-        showToast({
-          title: 'Success',
-          subtitle: `Signed in with ${title} successfully`,
-          autodismiss: true,
-        });
-      }
-    } catch (error) {
-      showToast({
-        title: 'Error',
-        subtitle: generateErrorMessage(
-          error,
-          `Failed to sign in with ${title}`,
-        ),
-        autodismiss: true,
-      });
-    }
+    await authClient.signIn.social({
+      provider,
+      fetchOptions: {
+        onRequest: () => {
+          setLoading(true);
+        },
+        onSuccess: () => {
+          showToast({
+            title: 'Success',
+            subtitle: `Signed in with ${title} successfully`,
+            autodismiss: true,
+          });
+          setLoading(false);
+        },
+        onError: ({ error }) => {
+          showToast({
+            title: 'Error',
+            subtitle: error.message,
+            autodismiss: true,
+          });
+          setLoading(false);
+        },
+      },
+    });
   };
   return (
     <Button
@@ -62,6 +57,7 @@ export const LoginButton = ({ provider }: Props) => {
       }
       onPress={handleSignIn}
       color="black"
+      disabled={isPending || loading}
     />
   );
 };

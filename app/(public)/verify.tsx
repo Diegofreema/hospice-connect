@@ -19,7 +19,8 @@ const Verify = () => {
       <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <MyTitle title="Enter Code" />
         <Subtitle isBlack>
-          We have sent code to {email || 'example@example.com'}
+          We have sent code to {email || 'example@example.com'} check your email
+          including spam/junk folder.
         </Subtitle>
         <Spacer height={50} />
         <VerifyEmailForm email={email} isForgotPassword={isForgotPassword} />

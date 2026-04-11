@@ -20,7 +20,6 @@ type Props = {
 export const MoreLinks = ({ links, isSuspended }: Props) => {
   const { theme } = useUnistyles();
   const onPress = async (link: Href, type: 'external' | 'internal') => {
-    console.log(link);
     if (type === 'external') {
       await openBrowserAsync(link as string);
     } else {

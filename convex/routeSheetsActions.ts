@@ -93,6 +93,7 @@ export const approveOrDeclineRouteSheet = action({
           reason: args.reason,
         },
       );
+
       return;
     }
 
@@ -101,7 +102,7 @@ export const approveOrDeclineRouteSheet = action({
     if (!nurse.stripeCustomerId) {
       throw new ConvexError({
         message:
-          'This nurse has no payment method on file. Please ask them to add a card before approving.',
+          'This nurse has no payment method added. Please ask them to add a card before approving.',
       });
     }
 
@@ -121,7 +122,7 @@ export const approveOrDeclineRouteSheet = action({
     if (!defaultCard) {
       throw new ConvexError({
         message:
-          'This nurse has no payment method on file. Please ask them to add a card before approving.',
+          'This nurse has no payment method added. Please ask them to add a card before approving.',
       });
     }
 
@@ -149,6 +150,14 @@ export const approveOrDeclineRouteSheet = action({
             commissionAmountCents,
             'usd',
             description,
+          );
+
+          await ctx.runMutation(
+            internal.routeSheets.updateHospiceNotificationStatus,
+            {
+              notificationId: args.notificationId,
+              status: 'accepted',
+            },
           );
         } catch (err: any) {
           const cleanMessage = getStripeErrorMessage(err);

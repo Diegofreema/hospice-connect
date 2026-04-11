@@ -19,7 +19,7 @@ import {
 import { usePendingImageRedirect } from '@/hooks/use-pending-image-redirect';
 import { useUpdate } from '@/hooks/use-update';
 import React from 'react';
-import { ActivityIndicator, Platform, View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import {
@@ -91,20 +91,6 @@ const InitialRoute = () => {
   // Wait for auth to resolve before rendering navigation guards.
   // This prevents flashing the login screen during Android cold-start
   // (e.g. after the OS destroys the activity while the gallery is open).
-  if (isPending) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: theme.colors.white,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <ActivityIndicator size="large" color={theme.colors.blue} />
-      </View>
-    );
-  }
 
   return (
     <ToastProvider>

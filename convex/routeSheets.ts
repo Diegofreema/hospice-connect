@@ -312,3 +312,21 @@ export const updateRouteSheetStatus = internalMutation({
     await updateCount(ctx);
   },
 });
+
+export const updateHospiceNotificationStatus = internalMutation({
+  args: {
+    notificationId: v.id('hospiceNotifications'),
+    status: v.union(v.literal('accepted'), v.literal('declined')),
+  },
+  handler: async (ctx, args) => {
+    const notification = await ctx.db.get(
+      'hospiceNotifications',
+      args.notificationId,
+    );
+    if (!notification) return;
+
+    await ctx.db.patch(args.notificationId, {
+      status: args.status,
+    });
+  },
+});

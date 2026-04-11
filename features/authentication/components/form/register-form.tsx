@@ -109,7 +109,7 @@ export const RegisterForm = () => {
     if (!password) return { strength: 0, label: '', color: '' };
 
     let strength = 0;
-    if (password.length >= 6) strength++;
+    if (password.length >= 8) strength++;
     if (/[A-Z]/.test(password)) strength++;
     if (/[a-z]/.test(password)) strength++;
     if (/[0-9]/.test(password)) strength++;
@@ -222,7 +222,7 @@ export const RegisterForm = () => {
         <View flexDirection={'row'} gap="sm" alignItems={'center'}>
           <ValidIcon isValid={isStrong} />
           <Text color={isStrong ? 'black' : 'textGrey'}>
-            At least 6 characters
+            At least 8 characters
           </Text>
         </View>
         <View flexDirection={'row'} gap="sm" alignItems={'center'}>

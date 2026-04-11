@@ -1,7 +1,7 @@
 import { useToast } from '@/components/demos/toast';
 import { OtpInput } from '@/components/otp-input';
-import { PrivacyNoticeLink } from '@/components/privacy-notice/privacy-notice-link';
 import { Button } from '@/features/shared/components/button';
+import { CustomPressable } from '@/features/shared/components/custom-pressable';
 import { Spacer } from '@/features/shared/components/spacer';
 import { Text } from '@/features/shared/components/text';
 
@@ -21,7 +21,6 @@ type Props = {
 export const VerifyEmailForm = ({ email, isForgotPassword }: Props) => {
   const { theme } = useUnistyles();
   const [code, setCode] = useState('');
-  console.log({ isForgotPassword });
 
   const [loading, setLoading] = useState(false);
   const { startTimer, timeLeft } = useTimer();
@@ -80,38 +79,52 @@ export const VerifyEmailForm = ({ email, isForgotPassword }: Props) => {
             autodismiss: true,
           });
         },
+        onResponse: () => {
+          setLoading(false);
+        },
       },
     });
   };
 
   const handleVerifyEmail = async () => {
-    setLoading(true);
-    const { data, error } = await authClient.emailOtp.verifyEmail({
+    await authClient.emailOtp.verifyEmail({
       email: email, // required
       otp: code, // required
+      fetchOptions: {
+        onRequest: () => {
+          setLoading(true);
+        },
+        onError: ({ error }) => {
+          setLoading(false);
+          showToast({
+            title: 'Error',
+            subtitle: error.message,
+            autodismiss: true,
+          });
+        },
+        onSuccess: () => {
+          showToast({
+            title: 'Success',
+            subtitle: `Your email has been verified. Welcome to HospiceConnect`,
+            autodismiss: true,
+          });
+          router.replace('/');
+          setLoading(false);
+        },
+        onResponse: () => {
+          setLoading(false);
+        },
+      },
     });
-    if (error) {
-      showToast({
-        title: 'Error',
-        subtitle: error.message,
-        autodismiss: true,
-      });
-    } else {
-      showToast({
-        title: 'Success',
-        subtitle: `Your email has been verified. Welcome to HospiceConnect ${data?.user?.name}`,
-        autodismiss: true,
-      });
-      router.replace('/');
-    }
-    setLoading(false);
   };
 
   const handleResendForgotPasswordOtp = async () => {
-    setLoading(true);
     await authClient.emailOtp.requestPasswordReset({
       email: email,
       fetchOptions: {
+        onRequest: () => {
+          setLoading(true);
+        },
         onSuccess: () => {
           setLoading(false);
           showToast({
@@ -127,6 +140,9 @@ export const VerifyEmailForm = ({ email, isForgotPassword }: Props) => {
             subtitle: error.message,
             autodismiss: true,
           });
+        },
+        onResponse: () => {
+          setLoading(false);
         },
       },
     });
@@ -153,12 +169,13 @@ export const VerifyEmailForm = ({ email, isForgotPassword }: Props) => {
             autodismiss: true,
           });
         },
+        onResponse: () => {
+          setLoading(false);
+        },
       },
     });
   };
 
-  const disabledColor =
-    timeLeft > 0 || loading ? theme.colors.grey : theme.colors.greenLight;
   const disabled = loading || code.length !== 6;
   return (
     <View>
@@ -176,13 +193,20 @@ export const VerifyEmailForm = ({ email, isForgotPassword }: Props) => {
         editable={!loading}
       />
       <Text>Didn’t receive the code ?</Text>
-      <PrivacyNoticeLink
+      <CustomPressable
         onPress={handleResendCode}
         disabled={timeLeft > 0 || loading}
-        style={{ backgroundColor: disabledColor, width: 'auto' }}
+        style={{ backgroundColor: 'transparent' }}
       >
-        {timeLeft > 0 ? `Resend Code in ${timeLeft}s` : 'Resend Code'}
-      </PrivacyNoticeLink>
+        <Text
+          style={{
+            color: theme.colors.blue,
+            opacity: timeLeft > 0 || loading ? 0.5 : 1,
+          }}
+        >
+          {timeLeft > 0 ? `Resend Code in ${timeLeft}s` : 'Resend Code'}
+        </Text>
+      </CustomPressable>
 
       <Spacer />
       <Button title="Verify Email" onPress={onPress} disabled={disabled} />
@@ -212,7 +236,6 @@ const styles = StyleSheet.create((theme) => ({
     },
     shadowOpacity: 0.1,
     shadowRadius: 8,
-    elevation: 4,
   },
 
   otpTextStyle: {
