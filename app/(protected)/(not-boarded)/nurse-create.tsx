@@ -27,7 +27,7 @@ import { useMutation } from 'convex/react';
 import { format } from 'date-fns';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { View } from 'react-native';
+import { Alert, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 
 const STEPS = [
@@ -130,6 +130,16 @@ const NurseCreate = () => {
     }
   };
   const CurrentStepComponent = STEPS[currentStep - 1].component;
+  const onConfirmBeforeSubmit = async () => {
+    Alert.alert(
+      'Confirm Submission',
+      'Are you sure you want to create this healthcare professional account?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Submit', onPress: () => form.handleSubmit(onSubmit) },
+      ],
+    );
+  };
   return (
     <Wrapper>
       <FormErrorBanner errors={errors} />
@@ -157,7 +167,7 @@ const NurseCreate = () => {
             <View style={{ flex: 1 }}>
               <Button
                 title="Submit"
-                onPress={form.handleSubmit(onSubmit)}
+                onPress={onConfirmBeforeSubmit}
                 disabled={!stepIsValid || form.formState.isSubmitting}
               />
             </View>

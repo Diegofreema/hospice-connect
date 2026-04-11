@@ -258,7 +258,7 @@ export const Subscriptions = () => {
               >
                 {isPro
                   ? `${currentPlanMeta?.label ?? 'Pro'} Subscriber`
-                  : 'Free Plan'}
+                  : 'Not Subscribed'}
               </Text>
               <Text
                 style={[

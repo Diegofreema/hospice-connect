@@ -14,6 +14,7 @@ import { useToast } from '@/components/demos/toast';
 import { authClient } from '@/lib/auth-client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from 'convex/react';
+import { Alert } from 'react-native';
 import {
   createHospiceValidator,
   type CreateHospiceValidator,
@@ -63,6 +64,17 @@ export const BusinessInformation = () => {
         autodismiss: true,
       });
     }
+  };
+
+  const onConfirmBeforeSubmit = async () => {
+    Alert.alert(
+      'Confirm Submission',
+      'Are you sure you want to create this Hospice business account?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Submit', onPress: () => handleSubmit(onSubmit) },
+      ],
+    );
   };
   return (
     <Stack gap="xl">
@@ -117,7 +129,7 @@ export const BusinessInformation = () => {
       />
 
       <Button
-        onPress={handleSubmit(onSubmit)}
+        onPress={onConfirmBeforeSubmit}
         title="Create"
         disabled={isSubmitting}
       />
