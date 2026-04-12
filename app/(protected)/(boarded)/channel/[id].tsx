@@ -1,74 +1,47 @@
+import { useAppChatContext } from '@/components/context/chat-context';
 import { ChatHeader } from '@/features/shared/components/chat-header';
 import { CustomPressable } from '@/features/shared/components/custom-pressable';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { Text } from '@/features/shared/components/text';
 import { View } from '@/features/shared/components/view';
 import { Wrapper } from '@/features/shared/components/wrapper';
+import { useStreamChannelQuery } from '@/hooks/use-stream-channel';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { IconSend } from '@tabler/icons-react-native';
 import { useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { StatusBar } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
-import type { Channel as StreamChatChannel } from 'stream-chat';
 import {
   Channel,
   MessageInput,
   MessageList,
   type SendButtonProps,
-  useChatContext,
   useMessageInputContext,
 } from 'stream-chat-expo';
 const ChannelScreen = () => {
-  // const { channel } = useAppChatContext();
-  const { client } = useChatContext();
+  const { channel } = useAppChatContext();
+
   const headerHeight = useHeaderHeight() + (StatusBar.currentHeight ?? 0);
   const { bottom } = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const [loading, setLoading] = useState(false);
-  const [channel, setChannel] = useState<StreamChatChannel | null>(null);
 
-  useEffect(() => {
-    if (!id || !client) return;
-    let active = true;
+  const { data: channelFromQuery, isLoading } = useStreamChannelQuery({
+    id,
+    skip: !!channel,
+  });
 
-    const fetchChannel = async () => {
-      setLoading(true);
-      try {
-        const channels = await client.queryChannels(
-          { type: 'messaging', cid: id },
-          {},
-          { watch: true, state: true },
-        );
-        if (active && channels.length > 0) {
-          setChannel(channels[0]);
-        }
-      } catch (error) {
-        console.log({ error });
-      } finally {
-        if (active) setLoading(false);
-      }
-    };
-
-    fetchChannel();
-
-    return () => {
-      active = false;
-      // Stop watching to unsubscribe from real-time events and avoid memory leaks
-      channel?.stopWatching();
-    };
-  }, [id, client, channel]);
-
-  if (loading || !channel) {
+  const channelToRender = channel || channelFromQuery;
+  if (isLoading || !channelToRender) {
     return <SmallLoader size={50} />;
   }
 
   return (
     <View backgroundColor="white">
       <Channel
-        channel={channel}
+        channel={channelToRender}
         hasCameraPicker={false}
         hasCommands={false}
         hasFilePicker={false}
@@ -80,7 +53,7 @@ const ChannelScreen = () => {
         MessageError={() => <Text>Error loading messages for this chat</Text>}
       >
         <View flex={1} style={{ marginBottom: bottom }}>
-          <ChatHeader channel={channel} />
+          <ChatHeader channel={channelToRender} />
           <MessageList />
           <KeyboardAvoidingView
             behavior={'translate-with-padding'}

@@ -1,5 +1,5 @@
 import { ConvexError, v } from 'convex/values';
-import { internal } from './_generated/api';
+import { components, internal } from './_generated/api';
 import { internalMutation, mutation, query } from './_generated/server';
 import { getUserHelperFn } from './helper';
 
@@ -152,6 +152,9 @@ export const hardDeleteUser = internalMutation({
       .first();
     if (userRecord) {
       await ctx.db.delete(userRecord._id);
+      await ctx.runMutation(components.betterAuth.users.deleteUserById, {
+        userId: userRecord.userId,
+      });
     }
   },
 });

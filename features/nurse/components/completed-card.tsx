@@ -55,9 +55,10 @@ export const CompletedCard = ({ item: post }: Props) => {
         <FlexText
           leftText="Business name"
           rightText={post?.hospice?.businessName || 'N/A'}
+          isBold
         />
 
-        <FlexText leftText="Patient name" rightText={name} />
+        <FlexText leftText="Patient name" isBold rightText={name} />
         <FlexText
           leftText="Phone number"
           rightText={formatPhoneNumber(post.phoneNumber)}
@@ -78,11 +79,12 @@ export const CompletedCard = ({ item: post }: Props) => {
           leftText="Gender"
           rightText={changeFirstLetterToCapital(post.gender)}
         />
-        <FlexText leftText="Discipline" rightText={post.discipline} />
+        <FlexText leftText="Discipline" rightText={post.discipline} isBold />
         <FlexText
           leftText="State"
           rightText={changeFirstLetterToCapital(post.state)}
         />
+        <FlexText leftText="Rate" rightText={`$${post.rate}/hour`} />
 
         {post.zipcode && (
           <FlexText leftText="Zip Code" rightText={post.zipcode} />

@@ -244,7 +244,7 @@ export const Post = ({
         <FlexText leftText="Care level" rightText={post.careLevel} />
         <FlexText leftText="Discipline" rightText={post.discipline} />
         <FlexText leftText="Zip Code" rightText={post.zipcode || 'N/A'} />
-
+        <FlexText leftText="Rate" rightText={`$${post.rate}/hour`} />
         <LongInfo title="Location" description={post.patientAddress} />
         <View flexDirection="row" gap="lg" style={styles.footer}>
           <CustomPressable

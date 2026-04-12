@@ -1,11 +1,14 @@
 import notifee, { EventType } from '@notifee/react-native';
-import messaging from '@react-native-firebase/messaging';
+import { onMessage, onNotificationOpenedApp, getInitialNotification, getMessaging } from '@react-native-firebase/messaging';
+import { getApp } from '@react-native-firebase/app';
 import { router } from 'expo-router';
 import { useEffect } from 'react';
 
 export const useSubscribeNotification = () => {
   useEffect(() => {
-    const unsubscribeOnNotificationOpen = messaging().onNotificationOpenedApp(
+    const firebaseMessaging = getMessaging(getApp());
+    const unsubscribeOnNotificationOpen = onNotificationOpenedApp(
+      firebaseMessaging,
       (remoteMessage) => {
         // Notification caused app to open from background state on iOS
         const channelId = remoteMessage.data?.channel_id;
@@ -23,9 +26,7 @@ export const useSubscribeNotification = () => {
         router.push(`/channel/${channelId}`);
       }
     });
-    messaging()
-      .getInitialNotification()
-      .then((remoteMessage) => {
+    getInitialNotification(firebaseMessaging).then((remoteMessage) => {
         if (remoteMessage) {
           // Notification caused app to open from quit state on iOS
           const channelId = remoteMessage.data?.channel_id;
@@ -49,7 +50,8 @@ export const useSubscribeNotification = () => {
       },
     );
 
-    const unsubscribeOnMessage = messaging().onMessage(
+    const unsubscribeOnMessage = onMessage(
+      firebaseMessaging,
       async (remoteMessage) => {
         // create the android channel to send the notification to
         const channelId = await notifee.createChannel({

@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { StyleSheet } from 'react-native-unistyles';
 const PublicLayout = () => {
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'right', 'left']}>
+    <SafeAreaView style={styles.container}>
       <Stack screenOptions={{ headerShown: false }} />
       <StatusBar style="light" />
     </SafeAreaView>
@@ -15,7 +15,6 @@ const PublicLayout = () => {
 const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.blue,
   },
 }));
 

@@ -1000,6 +1000,13 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
       >;
     };
     users: {
+      deleteUserById: FunctionReference<
+        "mutation",
+        "internal",
+        { userId: string },
+        any,
+        Name
+      >;
       getUser: FunctionReference<
         "query",
         "internal",

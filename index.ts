@@ -1,7 +1,7 @@
 import notifee from '@notifee/react-native';
-import messaging, {
-  FirebaseMessagingTypes,
-} from '@react-native-firebase/messaging';
+import { getMessaging, setBackgroundMessageHandler } from '@react-native-firebase/messaging';
+import { getApp } from '@react-native-firebase/app';
+import type { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 
 import { setNotifeeListeners } from './lib/utils/setNotifeeListener';
 
@@ -19,7 +19,7 @@ export const extractNotificationConfig = (
   const title = (data.title ?? notification.title) as string;
   return { data, body, title };
 };
-messaging().setBackgroundMessageHandler(async (remoteMessage) => {
+setBackgroundMessageHandler(getMessaging(getApp()), async (remoteMessage) => {
   // create the android channel to send the notification to
   const channelId = await notifee.createChannel({
     id: 'chat-messages',

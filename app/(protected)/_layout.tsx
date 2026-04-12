@@ -2,6 +2,7 @@ import { useAuth } from '@/components/context/auth';
 import { NotificationProvider } from '@/components/providers/notification-context';
 import { ActionComponent } from '@/features/shared/components/action-component';
 import { UnderReview } from '@/features/shared/components/under-review';
+import { DeletedAccountGate } from '@/features/authentication/components/deleted-account-gate';
 import { addEventListener } from '@react-native-community/netinfo';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -41,21 +42,23 @@ const ProtectedLayout = () => {
   const isBoarded = !!user?.isBoarded;
   return (
     <NotificationProvider>
-      <SafeAreaView
-        style={{ flex: 1, backgroundColor: 'white' }}
-        edges={['top', 'right', 'left']}
-      >
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Protected guard={isBoarded}>
-            <Stack.Screen name="(boarded)" />
-          </Stack.Protected>
-          <Stack.Protected guard={!isBoarded}>
-            <Stack.Screen name="(not-boarded)" />
-          </Stack.Protected>
-        </Stack>
+      <DeletedAccountGate>
+        <SafeAreaView
+          style={{ flex: 1, backgroundColor: 'white' }}
+          edges={['top', 'right', 'left']}
+        >
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Protected guard={isBoarded}>
+              <Stack.Screen name="(boarded)" />
+            </Stack.Protected>
+            <Stack.Protected guard={!isBoarded}>
+              <Stack.Screen name="(not-boarded)" />
+            </Stack.Protected>
+          </Stack>
 
-        <StatusBar style="dark" />
-      </SafeAreaView>
+          <StatusBar style="dark" />
+        </SafeAreaView>
+      </DeletedAccountGate>
     </NotificationProvider>
   );
 };

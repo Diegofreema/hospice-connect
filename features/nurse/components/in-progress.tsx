@@ -1,11 +1,10 @@
+import { type api } from '@/convex/_generated/api';
 import { ActionComponent } from '@/features/shared/components/action-component';
 import { SmallLoader } from '@/features/shared/components/small-loader';
-import React from 'react';
-import { AssignmentWithBusiness } from '../types';
-import { InProgressCard } from './in-progress-card';
-import { FlatList } from 'react-native';
 import { type FunctionReturnType } from 'convex/server';
-import { type api } from '@/convex/_generated/api';
+import React from 'react';
+import { FlatList } from 'react-native';
+import { InProgressCard } from './in-progress-card';
 
 type Props = {
   data: FunctionReturnType<typeof api.shifts.getInProgressShifts>['page'];

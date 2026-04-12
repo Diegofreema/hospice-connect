@@ -501,7 +501,7 @@ export const abbreviateCareLevel = (
 };
 
 export const getPasswordStrength = (password: string) => {
-  if (!password) return { strength: 0, label: '', color: '' };
+  if (!password) return { strength: 0, label: '', color: 'transparent' };
 
   let strength = 0;
   if (password.length >= 8) strength++;

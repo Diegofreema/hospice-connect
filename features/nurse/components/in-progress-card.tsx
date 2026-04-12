@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader } from '@/components/card';
-import { Doc, Id } from '@/convex/_generated/dataModel';
 import { FlexText } from '@/features/shared/components/flex-text';
 import {
   calculateAge,
@@ -7,15 +6,15 @@ import {
   formatPhoneNumber,
 } from '@/features/shared/utils';
 
+import { type api } from '@/convex/_generated/api';
 import { useSelectAssignment } from '@/features/hospice/hooks/use-select-assignment';
 import { useUpdatePostStatus } from '@/features/hospice/hooks/use-update-post-status';
 import { FlexButtons } from '@/features/shared/components/flex-buttons';
 import { LongInfo } from '@/features/shared/components/long-info';
 import { useMessage } from '@/hooks/use-message';
+import { type FunctionReturnType } from 'convex/server';
 import { format, parse } from 'date-fns';
 import { StyleSheet } from 'react-native-unistyles';
-import { type FunctionReturnType } from 'convex/server';
-import { type api } from '@/convex/_generated/api';
 
 type Props = {
   item: FunctionReturnType<
@@ -46,9 +45,10 @@ export const InProgressCard = ({ item: post, onOpenSheet }: Props) => {
         <FlexText
           leftText="Business name"
           rightText={post?.businessName || 'N/A'}
+          isBold
         />
 
-        <FlexText leftText="Patient name" rightText={name} />
+        <FlexText leftText="Patient name" isBold rightText={name} />
         <FlexText
           leftText="Phone number"
           rightText={formatPhoneNumber(post.phoneNumber)}
@@ -69,11 +69,12 @@ export const InProgressCard = ({ item: post, onOpenSheet }: Props) => {
           leftText="Gender"
           rightText={changeFirstLetterToCapital(post.gender)}
         />
-        <FlexText leftText="Discipline" rightText={post.discipline} />
+        <FlexText leftText="Discipline" rightText={post.discipline} isBold />
         <FlexText
           leftText="State"
           rightText={changeFirstLetterToCapital(post.state)}
         />
+        <FlexText leftText="Rate" rightText={`$${post.rate}/hour`} />
 
         {post.zipcode && (
           <FlexText leftText="Zip Code" rightText={post.zipcode} />

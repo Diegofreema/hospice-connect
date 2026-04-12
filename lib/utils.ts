@@ -1,5 +1,6 @@
 import { Status } from '@/features/authentication/admin/nurses/types';
-import messaging from '@react-native-firebase/messaging';
+import { getMessaging, requestPermission as firebaseRequestPermission, AuthorizationStatus } from '@react-native-firebase/messaging';
+import { getApp } from '@react-native-firebase/app';
 import { clsx, type ClassValue } from 'clsx';
 import { PermissionsAndroid, Platform } from 'react-native';
 import { twMerge } from 'tailwind-merge';
@@ -63,10 +64,11 @@ export const requestPermission = async () => {
     );
     return;
   }
-  const authStatus = await messaging().requestPermission();
+  const fcmMessaging = getMessaging(getApp());
+  const authStatus = await firebaseRequestPermission(fcmMessaging);
   const enabled =
-    authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-    authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+    authStatus === AuthorizationStatus.AUTHORIZED ||
+    authStatus === AuthorizationStatus.PROVISIONAL;
   if (enabled) {
     console.log('Authorization status:', authStatus);
   }

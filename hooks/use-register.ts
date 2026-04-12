@@ -1,6 +1,13 @@
 import { requestPermission } from '@/lib/utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import messaging from '@react-native-firebase/messaging';
+import {
+  getMessaging,
+  getToken,
+  isDeviceRegisteredForRemoteMessages,
+  onTokenRefresh,
+  registerDeviceForRemoteMessages,
+} from '@react-native-firebase/messaging';
+import { getApp } from '@react-native-firebase/app';
 import { useEffect, useRef } from 'react';
 import { StreamChat } from 'stream-chat';
 
@@ -17,13 +24,14 @@ export const useRegisterDevice = (
       }
       // unsubscribe any previous listener
       unsubscribeTokenRefreshListenerRef.current?.();
-      
+
+      const fcmMessaging = getMessaging(getApp());
       let token;
       try {
-        if (!messaging().isDeviceRegisteredForRemoteMessages) {
-          await messaging().registerDeviceForRemoteMessages();
+        if (!isDeviceRegisteredForRemoteMessages(fcmMessaging)) {
+          await registerDeviceForRemoteMessages(fcmMessaging);
         }
-        token = await messaging().getToken();
+        token = await getToken(fcmMessaging);
       } catch (error) {
         console.warn('Push Notifications are not fully supported on this device/simulator:', error);
         return;
@@ -39,7 +47,8 @@ export const useRegisterDevice = (
           await AsyncStorage.removeItem('@current_push_token');
         }
       };
-      unsubscribeTokenRefreshListenerRef.current = messaging().onTokenRefresh(
+      unsubscribeTokenRefreshListenerRef.current = onTokenRefresh(
+        fcmMessaging,
         async (newToken) => {
           await Promise.all([
             removeOldToken(),
