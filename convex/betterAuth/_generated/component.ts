@@ -39,6 +39,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   name: string;
                   role: string;
                   streamToken?: null | string;
+                  twoFactorEnabled?: null | boolean;
                   updatedAt: number;
                   userId?: null | string;
                 };
@@ -84,8 +85,13 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                 model: "verification";
               }
             | {
+                data: { backupCodes: string; secret: string; userId: string };
+                model: "twoFactor";
+              }
+            | {
                 data: {
                   createdAt: number;
+                  expiresAt?: null | number;
                   privateKey: string;
                   publicKey: string;
                 };
@@ -113,6 +119,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "image"
                     | "createdAt"
                     | "updatedAt"
+                    | "twoFactorEnabled"
                     | "userId"
                     | "role"
                     | "isBoarded"
@@ -245,10 +252,41 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                 }>;
               }
             | {
+                model: "twoFactor";
+                where?: Array<{
+                  connector?: "AND" | "OR";
+                  field: "secret" | "backupCodes" | "userId" | "_id";
+                  operator?:
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "not_in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
+                  value:
+                    | string
+                    | number
+                    | boolean
+                    | Array<string>
+                    | Array<number>
+                    | null;
+                }>;
+              }
+            | {
                 model: "jwks";
                 where?: Array<{
                   connector?: "AND" | "OR";
-                  field: "publicKey" | "privateKey" | "createdAt" | "_id";
+                  field:
+                    | "publicKey"
+                    | "privateKey"
+                    | "createdAt"
+                    | "expiresAt"
+                    | "_id";
                   operator?:
                     | "lt"
                     | "lte"
@@ -299,6 +337,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "image"
                     | "createdAt"
                     | "updatedAt"
+                    | "twoFactorEnabled"
                     | "userId"
                     | "role"
                     | "isBoarded"
@@ -431,10 +470,41 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                 }>;
               }
             | {
+                model: "twoFactor";
+                where?: Array<{
+                  connector?: "AND" | "OR";
+                  field: "secret" | "backupCodes" | "userId" | "_id";
+                  operator?:
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "not_in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
+                  value:
+                    | string
+                    | number
+                    | boolean
+                    | Array<string>
+                    | Array<number>
+                    | null;
+                }>;
+              }
+            | {
                 model: "jwks";
                 where?: Array<{
                   connector?: "AND" | "OR";
-                  field: "publicKey" | "privateKey" | "createdAt" | "_id";
+                  field:
+                    | "publicKey"
+                    | "privateKey"
+                    | "createdAt"
+                    | "expiresAt"
+                    | "_id";
                   operator?:
                     | "lt"
                     | "lte"
@@ -467,7 +537,13 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
         {
           join?: any;
           limit?: number;
-          model: "user" | "session" | "account" | "verification" | "jwks";
+          model:
+            | "user"
+            | "session"
+            | "account"
+            | "verification"
+            | "twoFactor"
+            | "jwks";
           offset?: number;
           paginationOpts: {
             cursor: string | null;
@@ -511,7 +587,13 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
         "internal",
         {
           join?: any;
-          model: "user" | "session" | "account" | "verification" | "jwks";
+          model:
+            | "user"
+            | "session"
+            | "account"
+            | "verification"
+            | "twoFactor"
+            | "jwks";
           select?: Array<string>;
           where?: Array<{
             connector?: "AND" | "OR";
@@ -556,6 +638,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   name?: string;
                   role?: string;
                   streamToken?: null | string;
+                  twoFactorEnabled?: null | boolean;
                   updatedAt?: number;
                   userId?: null | string;
                 };
@@ -568,6 +651,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "image"
                     | "createdAt"
                     | "updatedAt"
+                    | "twoFactorEnabled"
                     | "userId"
                     | "role"
                     | "isBoarded"
@@ -730,15 +814,52 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                 }>;
               }
             | {
+                model: "twoFactor";
+                update: {
+                  backupCodes?: string;
+                  secret?: string;
+                  userId?: string;
+                };
+                where?: Array<{
+                  connector?: "AND" | "OR";
+                  field: "secret" | "backupCodes" | "userId" | "_id";
+                  operator?:
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "not_in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
+                  value:
+                    | string
+                    | number
+                    | boolean
+                    | Array<string>
+                    | Array<number>
+                    | null;
+                }>;
+              }
+            | {
                 model: "jwks";
                 update: {
                   createdAt?: number;
+                  expiresAt?: null | number;
                   privateKey?: string;
                   publicKey?: string;
                 };
                 where?: Array<{
                   connector?: "AND" | "OR";
-                  field: "publicKey" | "privateKey" | "createdAt" | "_id";
+                  field:
+                    | "publicKey"
+                    | "privateKey"
+                    | "createdAt"
+                    | "expiresAt"
+                    | "_id";
                   operator?:
                     | "lt"
                     | "lte"
@@ -789,6 +910,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   name?: string;
                   role?: string;
                   streamToken?: null | string;
+                  twoFactorEnabled?: null | boolean;
                   updatedAt?: number;
                   userId?: null | string;
                 };
@@ -801,6 +923,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "image"
                     | "createdAt"
                     | "updatedAt"
+                    | "twoFactorEnabled"
                     | "userId"
                     | "role"
                     | "isBoarded"
@@ -963,15 +1086,52 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                 }>;
               }
             | {
+                model: "twoFactor";
+                update: {
+                  backupCodes?: string;
+                  secret?: string;
+                  userId?: string;
+                };
+                where?: Array<{
+                  connector?: "AND" | "OR";
+                  field: "secret" | "backupCodes" | "userId" | "_id";
+                  operator?:
+                    | "lt"
+                    | "lte"
+                    | "gt"
+                    | "gte"
+                    | "eq"
+                    | "in"
+                    | "not_in"
+                    | "ne"
+                    | "contains"
+                    | "starts_with"
+                    | "ends_with";
+                  value:
+                    | string
+                    | number
+                    | boolean
+                    | Array<string>
+                    | Array<number>
+                    | null;
+                }>;
+              }
+            | {
                 model: "jwks";
                 update: {
                   createdAt?: number;
+                  expiresAt?: null | number;
                   privateKey?: string;
                   publicKey?: string;
                 };
                 where?: Array<{
                   connector?: "AND" | "OR";
-                  field: "publicKey" | "privateKey" | "createdAt" | "_id";
+                  field:
+                    | "publicKey"
+                    | "privateKey"
+                    | "createdAt"
+                    | "expiresAt"
+                    | "_id";
                   operator?:
                     | "lt"
                     | "lte"
@@ -1022,6 +1182,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
           name: string;
           role: string;
           streamToken?: null | string;
+          twoFactorEnabled?: null | boolean;
           updatedAt: number;
           userId?: null | string;
         },
@@ -1042,6 +1203,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
           name: string;
           role: string;
           streamToken?: null | string;
+          twoFactorEnabled?: null | boolean;
           updatedAt: number;
           userId?: null | string;
         }>,

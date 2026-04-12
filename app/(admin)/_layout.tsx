@@ -11,6 +11,7 @@ const AdminLayout = () => {
         <Stack.Screen name="index" />
         <Stack.Screen name="forgot-password" />
         <Stack.Screen name="reset-password" />
+        <Stack.Screen name="verify-2fa" />
       </Stack.Protected>
       <Stack.Protected guard={isAuthenticated}>
         <Stack.Screen name="admin" />

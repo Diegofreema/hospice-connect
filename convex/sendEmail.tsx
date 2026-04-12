@@ -135,6 +135,111 @@ export const sendEmailVerification = async (
     `,
   });
 };
+export const sendTwoFactorOTP = async (
+  ctx: ActionCtx,
+  {
+    to,
+    code,
+    expires,
+  }: {
+    to: string;
+    code: string;
+    expires: number;
+  },
+) => {
+  // const html = await pretty(
+  //   await render(<VerifyEmail code={code} expires={new Date(expires)} />),
+  // );
+  await sendEmail(ctx, {
+    to,
+    subject: `Hi, Enable Two Factor Authentication`,
+    html: `
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Your Email</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: #f4f7fa;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+    }
+    .header {
+      background-color: #4C55FF;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .header h1 {
+      color: #ffffff;
+      margin: 0;
+      font-size: 28px;
+    }
+    .content {
+      padding: 40px 30px;
+      text-align: center;
+    }
+    .otp-box {
+      display: inline-block;
+      background-color: #f4f7fa;
+      padding: 20px 40px;
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+    .otp-code {
+      font-size: 36px;
+      font-weight: 700;
+      color: #005A5A;
+      letter-spacing: 8px;
+    }
+    .info-text {
+      color: #666666;
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .footer {
+      background-color: #f4f7fa;
+      padding: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: #999999;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>HospiceConnect</h1>
+    </div>
+    <div class="content">
+      <p class="info-text">To enable two factor authentication, please enter the code below.</p>
+      
+      <div class="otp-box">
+        <span class="otp-code">${code}</span>
+      </div>
+      
+      <p class="info-text">This code will expire in 15 minutes.</p>
+      
+      <p class="info-text">If you didn't create this account, please ignore this email.</p>
+    </div>
+    <div class="footer">
+      <p>© ${new Date().getFullYear()} HospiceConnect. All rights reserved.</p>
+    </div>
+    </div>
+  </div>
+</body>
+</html>
+    `,
+  });
+};
 
 export const sendResetPasswordOTP = async (
   ctx: ActionCtx,

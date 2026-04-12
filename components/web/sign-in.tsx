@@ -21,9 +21,10 @@ import { z } from 'zod';
 
 import { toast } from 'sonner-native';
 
+import { VerificationModal } from '@/features/admin/settings/components/verification-modal';
 import { authClient } from '@/lib/auth-client';
-
-import { Link, useRouter } from 'expo-router';
+import { Link, router } from 'expo-router';
+import { useState } from 'react';
 
 const SignInSchema = z.object({
   email: z.email({ error: 'Invalid email' }).min(1, 'Email is required'),
@@ -33,7 +34,10 @@ const SignInSchema = z.object({
 type SignInValues = z.infer<typeof SignInSchema>;
 
 export default function SignIn() {
-  const router = useRouter();
+  const [isOTPModalOpen, setIsOTPModalOpen] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+  const [isVerifyingOTP, setIsVerifyingOTP] = useState(false);
+
   const form = useForm<SignInValues>({
     resolver: zodResolver(SignInSchema),
     defaultValues: {
@@ -48,10 +52,31 @@ export default function SignIn() {
       email: values.email,
       password: values.password,
       fetchOptions: {
-        onSuccess: () => {
-          toast.success('Signed in', {
-            description: 'Welcome back',
-          });
+        onSuccess: async (context) => {
+          if (context.data.twoFactorRedirect) {
+            // Stay on this page — navigating away loses the temporary 2FA cookie
+            // in cross-domain setups (convex.site ≠ localhost). Send OTP here
+            // while the cookie is still valid in this request context.
+            await authClient.twoFactor.sendOtp({
+              fetchOptions: {
+                onSuccess: () => {
+                  setIsOTPModalOpen(true);
+                  toast.success('Verification code sent', {
+                    description: 'Please check your email.',
+                  });
+                },
+                onError: ({ error }) => {
+                  toast.error('Failed to send code', {
+                    description: error.message || 'Please try again later.',
+                  });
+                },
+              },
+            });
+          } else {
+            toast.success('Signed in', {
+              description: 'Welcome back',
+            });
+          }
         },
         onError: ({ error }) => {
           toast.error('Error', {
@@ -61,6 +86,31 @@ export default function SignIn() {
       },
     });
   }
+
+  const onVerifyOTP = async () => {
+    setIsVerifyingOTP(true);
+    await authClient.twoFactor.verifyOtp({
+      code: otpCode,
+      trustDevice: true,
+      fetchOptions: {
+        onSuccess: () => {
+          toast.success('Signed in successfully');
+          setIsOTPModalOpen(false);
+          setOtpCode('');
+          form.reset();
+          router.replace('/admin');
+        },
+        onError: ({ error }) => {
+          toast.error('Verification failed', {
+            description: error.message || 'Invalid code. Please try again.',
+          });
+        },
+        onResponse: () => {
+          setIsVerifyingOTP(false);
+        },
+      },
+    });
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -116,7 +166,7 @@ export default function SignIn() {
                 className="w-full"
                 disabled={form.formState.isSubmitting}
               >
-                Sign In
+                {form.formState.isSubmitting ? 'Signing in…' : 'Sign In'}
               </Button>
             </form>
           </Form>
@@ -128,6 +178,17 @@ export default function SignIn() {
           </Link>
         </CardContent>
       </Card>
+
+      <VerificationModal
+        isOpen={isOTPModalOpen}
+        onClose={() => setIsOTPModalOpen(false)}
+        onVerify={onVerifyOTP}
+        isVerifying={isVerifyingOTP}
+        otpCode={otpCode}
+        setOtpCode={setOtpCode}
+        title="Two-Factor Authentication"
+        description="We sent a 6-digit code to your email. Enter it below to complete sign-in."
+      />
     </div>
   );
 }

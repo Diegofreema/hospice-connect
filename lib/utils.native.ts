@@ -1,6 +1,8 @@
 import { Status } from '@/features/authentication/admin/nurses/types';
+import { AuthorizationStatus, getMessaging, requestPermission as firebaseRequestPermission } from '@react-native-firebase/messaging';
+import { getApp } from '@react-native-firebase/app';
 import { clsx, type ClassValue } from 'clsx';
-import { Platform } from 'react-native';
+import { PermissionsAndroid, Platform } from 'react-native';
 import { twMerge } from 'tailwind-merge';
 export const formatString = (str: string) => {
   return str
@@ -54,8 +56,20 @@ export const generateStatusText = (status: Status) => {
   }
 };
 
-// Web stub — permission requests are native-only.
-// Native platforms (iOS/Android) use requestPermission.native.ts via lib/utils.native.ts.
 export const requestPermission = async () => {
-  // no-op on web
+  // Request permission for Android 13 and above
+  if (Platform.OS === 'android' && Platform.Version >= 33) {
+    await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+    );
+    return;
+  }
+  const fcmMessaging = getMessaging(getApp());
+  const authStatus = await firebaseRequestPermission(fcmMessaging);
+  const enabled =
+    authStatus === AuthorizationStatus.AUTHORIZED ||
+    authStatus === AuthorizationStatus.PROVISIONAL;
+  if (enabled) {
+    console.log('Authorization status:', authStatus);
+  }
 };

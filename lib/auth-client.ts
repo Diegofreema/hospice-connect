@@ -6,6 +6,7 @@ import {
 import {
   emailOTPClient,
   inferAdditionalFields,
+  twoFactorClient,
 } from 'better-auth/client/plugins';
 import { createAuthClient } from 'better-auth/react';
 import Constants from 'expo-constants';
@@ -23,6 +24,9 @@ export const authClient = createAuthClient({
   },
   plugins: [
     emailOTPClient(),
+    twoFactorClient({
+      // onTwoFactorRedirect: ({ twoFactorMethods }) => {},
+    }),
     inferAdditionalFields({
       user: {
         role: {

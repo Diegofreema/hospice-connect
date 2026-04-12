@@ -6,7 +6,7 @@ import {
 } from '@convex-dev/better-auth';
 import { convex, crossDomain } from '@convex-dev/better-auth/plugins';
 import { betterAuth, type BetterAuthOptions } from 'better-auth';
-import { emailOTP } from 'better-auth/plugins';
+import { emailOTP, twoFactor } from 'better-auth/plugins';
 import { components, internal } from './_generated/api';
 import type { DataModel } from './_generated/dataModel';
 
@@ -18,6 +18,7 @@ import {
   sendEmailVerification,
   sendResetPassword,
   sendResetPasswordOTP,
+  sendTwoFactorOTP,
 } from './sendEmail';
 
 const siteUrl = process.env.SITE_URL!;
@@ -51,10 +52,12 @@ export const authComponent = createClient<DataModel, typeof authSchema>(
 export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
   return {
     baseURL: siteUrl,
+    appName: 'HospiceConnect',
     trustedOrigins: [
       'https://appleid.apple.com',
       urlToUse,
       nativeAppUrl,
+
       ...(isDevelopment
         ? [
             'exp://*/*', // Trust all Expo development URLs
@@ -99,6 +102,17 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
     },
     plugins: [
       expo(),
+      twoFactor({
+        otpOptions: {
+          async sendOTP({ user, otp }) {
+            await sendTwoFactorOTP(requireActionCtx(ctx), {
+              to: user.email,
+              code: otp,
+              expires: Date.now() + 15 * 60 * 1000,
+            });
+          },
+        },
+      }),
       convex({ authConfig }),
       crossDomain({ siteUrl }),
       emailOTP({

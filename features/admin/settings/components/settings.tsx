@@ -1,7 +1,6 @@
 import { CommissionCard } from '@/components/web/admin/commision-card';
 import { PasswordCard } from '@/components/web/admin/password-card';
 import { ProfileCard } from '@/components/web/admin/profile-card';
-
 export function Settings() {
   return (
     <div className="space-y-8 p-8">
@@ -19,6 +18,7 @@ export function Settings() {
           <ProfileCard />
         </div>
         <PasswordCard />
+        {/* <TwoFactorCard /> */}
         <CommissionCard />
       </div>
 

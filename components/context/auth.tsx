@@ -14,6 +14,7 @@ type User = {
   isBoarded: boolean;
   role: string;
   streamToken?: string;
+  twoFactorEnabled: boolean;
 };
 const AuthContext = createContext({
   user: null as User | null,
