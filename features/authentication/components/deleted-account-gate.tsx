@@ -1,7 +1,6 @@
 import { Center } from '@/components/center/center';
 import { api } from '@/convex/_generated/api';
 import { Button } from '@/features/shared/components/button';
-import { SmallLoader } from '@/features/shared/components/small-loader';
 import { Text } from '@/features/shared/components/text';
 import { Stack } from '@/features/shared/components/v-stack';
 import { Wrapper } from '@/features/shared/components/wrapper';
@@ -24,9 +23,11 @@ export const DeletedAccountGate = ({ children }: Props) => {
   const [isRestoring, setIsRestoring] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
 
-  // Still loading — show spinner
+  // Still loading — but because PreloadData fires this query during the splash,
+  // request will almost always be resolved by the time we reach here.
+  // Render children immediately to avoid a blocking spinner.
   if (request === undefined) {
-    return <SmallLoader size={50} />;
+    return <>{children}</>;
   }
 
   // No pending deletion — render the app normally

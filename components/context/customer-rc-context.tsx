@@ -22,11 +22,12 @@ export const CustomerRCProvider = ({ children }: PropsWithChildren) => {
   } = useGetCustomerRC();
 
   const isPro = !!(
-    customerInfo && Object.entries(customerInfo.entitlements.active).length > 0
+    customerInfo &&
+    Object.entries(customerInfo.entitlements?.active ?? {}).length > 0
   );
 
   const activeEntitlement = Object.entries(
-    customerInfo?.entitlements.active ?? {},
+    customerInfo?.entitlements?.active ?? {},
   )[0]?.[1];
   return (
     <CustomerRCContext.Provider

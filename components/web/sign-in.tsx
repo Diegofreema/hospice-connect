@@ -57,21 +57,22 @@ export default function SignIn() {
             // Stay on this page — navigating away loses the temporary 2FA cookie
             // in cross-domain setups (convex.site ≠ localhost). Send OTP here
             // while the cookie is still valid in this request context.
-            await authClient.twoFactor.sendOtp({
-              fetchOptions: {
-                onSuccess: () => {
-                  setIsOTPModalOpen(true);
-                  toast.success('Verification code sent', {
-                    description: 'Please check your email.',
-                  });
-                },
-                onError: ({ error }) => {
-                  toast.error('Failed to send code', {
-                    description: error.message || 'Please try again later.',
-                  });
-                },
-              },
-            });
+            const { data, error } = await authClient.twoFactor.sendOtp();
+
+            if (error) {
+              console.log(error);
+
+              toast.error('Failed to send code', {
+                description: error.message || 'Please try again later.',
+              });
+            }
+
+            if (data) {
+              setIsOTPModalOpen(true);
+              toast.success('Verification code sent', {
+                description: 'Please check your email.',
+              });
+            }
           } else {
             toast.success('Signed in', {
               description: 'Welcome back',
@@ -79,6 +80,8 @@ export default function SignIn() {
           }
         },
         onError: ({ error }) => {
+          console.log(error);
+
           toast.error('Error', {
             description: error.message || error.statusText,
           });

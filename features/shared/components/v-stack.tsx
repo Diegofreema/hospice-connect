@@ -1,5 +1,5 @@
 import { type PropsWithChildren } from 'react';
-import { View } from 'react-native';
+import { StyleProp, View, ViewStyle } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 
 type Props = {
@@ -15,6 +15,7 @@ type Props = {
   flex?: number;
   backgroundColor?: string;
   isCentered?: boolean;
+  style?: StyleProp<ViewStyle>;
 };
 
 export const Stack = ({
@@ -31,6 +32,7 @@ export const Stack = ({
   backgroundColor,
   ph,
   isCentered,
+  style,
 }: PropsWithChildren<Props>) => {
   styles.useVariants({
     mode,
@@ -44,7 +46,7 @@ export const Stack = ({
     isCentered,
   });
   return (
-    <View style={[styles.container(flex, backgroundColor, ph)]}>
+    <View style={[styles.container(flex, backgroundColor, ph), style]}>
       {children}
     </View>
   );

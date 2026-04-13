@@ -4,6 +4,7 @@ import { Spacer } from '@/features/shared/components/spacer';
 import {
   IconCalendarWeek,
   IconCreditCardPay,
+  IconExchange,
   IconHeadset,
   IconShieldBolt,
   IconShieldCheck,
@@ -63,6 +64,11 @@ const links: LinkType[] = [
     label: 'Terms of Service',
     icon: IconShieldBolt,
     link: 'https://hospice-connect-web.vercel.app/terms',
+  },
+  {
+    label: 'Change Account Type',
+    icon: IconExchange,
+    link: '/(protected)/(boarded)/(nurse)/(other-screens)/change-account-type',
   },
   {
     label: 'Delete Account',

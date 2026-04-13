@@ -1,11 +1,9 @@
 import { z } from 'zod';
 
 export const createHospiceValidator = z.object({
-  businessName: z
-    .string()
-    .min(2, 'Business name must be at least 2 characters'),
-  address: z.string().min(2, 'Address must be at least 2 characters'),
-  state: z.string().min(2, 'State of registration is required'),
+  businessName: z.string().min(1, 'Business name is required'),
+  address: z.string().min(1, 'Address is required'),
+  state: z.string().min(1, 'State of registration is required'),
   phoneNumber: z
     .string()
     .min(10, 'Phone number must be at least 10 characters')

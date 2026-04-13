@@ -1,5 +1,4 @@
 import { chatApiKey } from '@/chat-config';
-import { SmallLoader } from '@/features/shared/components/small-loader';
 import { useUnread } from '@/features/shared/hooks/use-unread';
 import { useRegisterDevice } from '@/hooks/use-register';
 import axios from 'axios';
@@ -71,8 +70,12 @@ export const ChatWrapper = ({ children }: PropsWithChildren) => {
     },
   };
 
+  // When the Stream Chat client is still initialising, render children without
+  // the <Chat> wrapper so tabs/home screens appear immediately.  The Messages
+  // tab's <ChannelList> has its own built-in skeleton, so it handles the
+  // not-connected state gracefully.
   if (!client) {
-    return <SmallLoader size={50} />;
+    return <OverlayProvider value={{ style: chatTheme }}>{children}</OverlayProvider>;
   }
 
   return (

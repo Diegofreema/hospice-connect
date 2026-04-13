@@ -85,7 +85,12 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                 model: "verification";
               }
             | {
-                data: { backupCodes: string; secret: string; userId: string };
+                data: {
+                  backupCodes: string;
+                  secret: string;
+                  userId: string;
+                  verified?: null | boolean;
+                };
                 model: "twoFactor";
               }
             | {
@@ -255,7 +260,12 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                 model: "twoFactor";
                 where?: Array<{
                   connector?: "AND" | "OR";
-                  field: "secret" | "backupCodes" | "userId" | "_id";
+                  field:
+                    | "secret"
+                    | "backupCodes"
+                    | "userId"
+                    | "verified"
+                    | "_id";
                   operator?:
                     | "lt"
                     | "lte"
@@ -473,7 +483,12 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                 model: "twoFactor";
                 where?: Array<{
                   connector?: "AND" | "OR";
-                  field: "secret" | "backupCodes" | "userId" | "_id";
+                  field:
+                    | "secret"
+                    | "backupCodes"
+                    | "userId"
+                    | "verified"
+                    | "_id";
                   operator?:
                     | "lt"
                     | "lte"
@@ -819,10 +834,16 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   backupCodes?: string;
                   secret?: string;
                   userId?: string;
+                  verified?: null | boolean;
                 };
                 where?: Array<{
                   connector?: "AND" | "OR";
-                  field: "secret" | "backupCodes" | "userId" | "_id";
+                  field:
+                    | "secret"
+                    | "backupCodes"
+                    | "userId"
+                    | "verified"
+                    | "_id";
                   operator?:
                     | "lt"
                     | "lte"
@@ -1091,10 +1112,16 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   backupCodes?: string;
                   secret?: string;
                   userId?: string;
+                  verified?: null | boolean;
                 };
                 where?: Array<{
                   connector?: "AND" | "OR";
-                  field: "secret" | "backupCodes" | "userId" | "_id";
+                  field:
+                    | "secret"
+                    | "backupCodes"
+                    | "userId"
+                    | "verified"
+                    | "_id";
                   operator?:
                     | "lt"
                     | "lte"

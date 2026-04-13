@@ -6,6 +6,7 @@ import { useAuth } from '@/components/context/auth';
 import { StackedModalProvider } from '@/components/demos/modal/modal-manager';
 import { ToastProvider } from '@/components/demos/toast';
 import Provider from '@/components/provider';
+import { api } from '@/convex/_generated/api';
 import { ErrorComponent } from '@/features/shared/components/error';
 import { useAnimationStore } from '@/hooks/use-animation';
 import { useFonts } from 'expo-font';
@@ -19,6 +20,7 @@ import {
 import { useSubscribeNotification } from '@/hooks/rc/use-subscribe-notification';
 import { usePendingImageRedirect } from '@/hooks/use-pending-image-redirect';
 import { useUpdate } from '@/hooks/use-update';
+import { useQuery } from 'convex/react';
 import React from 'react';
 import { Platform, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -57,23 +59,71 @@ export default function RootLayout() {
     return null;
   }
 
-  if (!isFinished && Platform.OS !== 'web') {
-    return <AnimatedView />;
-  }
+  const showSplash = !isFinished && Platform.OS !== 'web';
 
+  // Provider is now outside the animation gate so auth + Convex resolve
+  // during the 6-second splash — the app shows fully loaded once the
+  // animation finishes.
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Provider>
-        <View style={styles.container}>
-          <KeyboardProvider>
-            <InitialRoute />
-            <Toaster />
-          </KeyboardProvider>
-        </View>
+        {showSplash ? (
+          <>
+            <AnimatedView />
+            {/* Invisibly pre-fetch data so it is cached before the splash ends */}
+            <PreloadData />
+          </>
+        ) : (
+          <View style={styles.container}>
+            <KeyboardProvider>
+              <InitialRoute />
+              <Toaster />
+            </KeyboardProvider>
+          </View>
+        )}
       </Provider>
     </GestureHandlerRootView>
   );
 }
+
+// ---------------------------------------------------------------------------
+// PreloadData — renders nothing but fires Convex queries for the authenticated
+// user during the splash animation so the data is already cached when routes
+// mount.  Sub-components are conditionally rendered (not hooks called
+// conditionally) to stay within React's rules of hooks.
+// ---------------------------------------------------------------------------
+
+const PreloadDeletionStatus = () => {
+  useQuery(api.deleteAccount.checkDeletionStatus);
+  return null;
+};
+
+const PreloadNurse = ({ userId }: { userId: string }) => {
+  useQuery(api.nurses.getNurseById, { userId });
+  return null;
+};
+
+const PreloadHospice = () => {
+  useQuery(api.hospices.getHospiceByUserId);
+  return null;
+};
+
+const PreloadData = () => {
+  const { user, isPending } = useAuth();
+
+  // Nothing to pre-fetch until auth resolves or for non-mobile sessions
+  if (isPending || !user || user.role === 'admin') return null;
+
+  return (
+    <>
+      <PreloadDeletionStatus />
+      {user.isBoarded && user.role === 'nurse' && (
+        <PreloadNurse userId={user.id} />
+      )}
+      {user.isBoarded && user.role !== 'nurse' && <PreloadHospice />}
+    </>
+  );
+};
 
 const InitialRoute = () => {
   const { theme } = useUnistyles();

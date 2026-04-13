@@ -26,10 +26,11 @@ export const AccountSelector = ({ selected, setSelected }: Props) => {
           <Checkbox
             value={accountType.type === selected}
             style={styles.checkBox}
+            onValueChange={() => setSelected(accountType.type)}
           />
 
-          <Text size={'large'} isBold>
-            Enroll as {accountType.text}
+          <Text size={'normal'} isBold>
+            Enroll as a {accountType.text}
           </Text>
         </TouchableOpacity>
       ))}

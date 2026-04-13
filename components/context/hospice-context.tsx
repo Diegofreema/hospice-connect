@@ -1,5 +1,4 @@
 import { api } from '@/convex/_generated/api';
-import { SmallLoader } from '@/features/shared/components/small-loader';
 import { useQuery } from 'convex/react';
 
 import { type FunctionReturnType } from 'convex/server';
@@ -8,10 +7,14 @@ import * as React from 'react';
 
 WebBrowser.maybeCompleteAuthSession();
 
-const AuthContext = React.createContext({
-  hospice: null as FunctionReturnType<
-    typeof api.hospices.getHospiceByUserId
-  > | null,
+type HospiceContextType = {
+  hospice: FunctionReturnType<typeof api.hospices.getHospiceByUserId> | null;
+  isLoading: boolean;
+};
+
+const HospiceContext = React.createContext<HospiceContextType>({
+  hospice: null,
+  isLoading: true,
 });
 
 export const HospiceProvider = ({
@@ -21,25 +24,25 @@ export const HospiceProvider = ({
 }) => {
   const hospice = useQuery(api.hospices.getHospiceByUserId);
 
-  if (!hospice) {
-    return <SmallLoader size={50} />;
-  }
+  // undefined = still loading; null/object = resolved
+  const isLoading = hospice === undefined;
 
   return (
-    <AuthContext.Provider
+    <HospiceContext.Provider
       value={{
-        hospice,
+        hospice: hospice ?? null,
+        isLoading,
       }}
     >
       {children}
-    </AuthContext.Provider>
+    </HospiceContext.Provider>
   );
 };
 
 export const useHospice = () => {
-  const context = React.useContext(AuthContext);
+  const context = React.useContext(HospiceContext);
   if (!context) {
-    throw new Error('useNurse must be used within an HospiceProvider');
+    throw new Error('useHospice must be used within an HospiceProvider');
   }
   return context;
 };

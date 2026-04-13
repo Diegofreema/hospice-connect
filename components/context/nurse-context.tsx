@@ -1,5 +1,4 @@
 import { api } from '@/convex/_generated/api';
-import { SmallLoader } from '@/features/shared/components/small-loader';
 import { useQuery } from 'convex/react';
 
 import { type FunctionReturnType } from 'convex/server';
@@ -9,11 +8,20 @@ import { useAuth } from './auth';
 
 WebBrowser.maybeCompleteAuthSession();
 
-const AuthContext = React.createContext({
-  nurse: null as FunctionReturnType<typeof api.nurses.getNurseById> | null,
+type NurseContextType = {
+  nurse: FunctionReturnType<typeof api.nurses.getNurseById> | null;
+  isSuspended: boolean;
+  isPending: boolean;
+  isRejected: boolean;
+  isLoading: boolean;
+};
+
+const NurseContext = React.createContext<NurseContextType>({
+  nurse: null,
   isSuspended: false,
   isPending: false,
   isRejected: false,
+  isLoading: true,
 });
 
 export const NurseProvider = ({ children }: { children: React.ReactNode }) => {
@@ -22,29 +30,26 @@ export const NurseProvider = ({ children }: { children: React.ReactNode }) => {
     userId: user?.id as string,
   });
 
-  if (nurse === undefined) {
-    return <SmallLoader size={50} />;
-  }
+  // undefined = still loading from Convex; null/object = resolved
+  const isLoading = nurse === undefined;
 
-  if (nurse === null) {
-    return <SmallLoader size={50} />;
-  }
   return (
-    <AuthContext.Provider
+    <NurseContext.Provider
       value={{
-        nurse,
+        nurse: nurse ?? null,
         isSuspended: nurse?.status === 'suspended',
         isPending: nurse?.status === 'pending',
         isRejected: nurse?.status === 'rejected',
+        isLoading,
       }}
     >
       {children}
-    </AuthContext.Provider>
+    </NurseContext.Provider>
   );
 };
 
 export const useNurse = () => {
-  const context = React.useContext(AuthContext);
+  const context = React.useContext(NurseContext);
   if (!context) {
     throw new Error('useNurse must be used within an NurseProvider');
   }

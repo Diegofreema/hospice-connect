@@ -164,7 +164,7 @@ export const checkDeletionStatus = query({
   handler: async (ctx) => {
     const user = await getUserHelperFn(ctx);
     if (!user) {
-      throw new ConvexError({ message: 'User not found' });
+      return null;
     }
 
     const request = await ctx.db

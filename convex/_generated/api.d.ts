@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as account from "../account.js";
 import type * as actionHelper from "../actionHelper.js";
 import type * as activityLogs from "../activityLogs.js";
 import type * as adminActivityNotifications from "../adminActivityNotifications.js";
@@ -61,6 +62,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  account: typeof account;
   actionHelper: typeof actionHelper;
   activityLogs: typeof activityLogs;
   adminActivityNotifications: typeof adminActivityNotifications;

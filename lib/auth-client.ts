@@ -24,9 +24,7 @@ export const authClient = createAuthClient({
   },
   plugins: [
     emailOTPClient(),
-    twoFactorClient({
-      // onTwoFactorRedirect: ({ twoFactorMethods }) => {},
-    }),
+    twoFactorClient(),
     inferAdditionalFields({
       user: {
         role: {

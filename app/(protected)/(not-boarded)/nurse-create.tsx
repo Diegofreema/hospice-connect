@@ -15,13 +15,14 @@ import { Stack } from '@/features/shared/components/v-stack';
 
 import { Wrapper } from '@/features/shared/components/wrapper';
 import {
+  calculateAge,
   generateErrorMessage,
   timezone,
   validateFields,
 } from '@/features/shared/utils';
-import { authClient } from '@/lib/auth-client';
 
 import { FormErrorBanner } from '@/features/shared/components/form-error-banner';
+import { authClient } from '@/lib/auth-client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from 'convex/react';
 import { format } from 'date-fns';
@@ -75,6 +76,7 @@ const NurseCreate = () => {
   const fieldsToValidate = getFieldsForStep(currentStep);
 
   const values = form.watch();
+  console.log(calculateAge(values.dateOfBirth));
 
   const stepIsValid = validateFields(fieldsToValidate, values);
 
@@ -136,7 +138,8 @@ const NurseCreate = () => {
       'Are you sure you want to create this healthcare professional account?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Submit', onPress: () => form.handleSubmit(onSubmit) },
+        // @ts-ignore
+        { text: 'Submit', onPress: form.handleSubmit(onSubmit) },
       ],
     );
   };
@@ -152,7 +155,10 @@ const NurseCreate = () => {
         <Text style={{ alignSelf: 'flex-end' }}>
           Step {currentStep} of {STEPS.length}
         </Text>
-        <CurrentStepComponent form={form} />
+        <CurrentStepComponent
+          form={form}
+          age={calculateAge(values.dateOfBirth)}
+        />
         <Stack mode={'flex'} gap={'md'}>
           {currentStep > 1 && (
             <View style={{ flex: 1 }}>

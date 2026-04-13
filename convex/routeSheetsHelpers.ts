@@ -184,14 +184,25 @@ export const declineRouteSheetMutation = internalMutation({
       isSubmitted: false,
     });
 
+    const body = `${args.hospiceBusinessName} declined your route sheet for ${args.patientFirstName} ${args.patientLastName}. ${text}`;
+
     await ctx.db.insert('nurseNotifications', {
       isRead: false,
       nurseId: args.nurseId,
       title: 'Route sheet declined',
-      description: `${args.hospiceBusinessName} declined your route sheet for ${args.patientFirstName} ${args.patientLastName}. ${text}`,
+      description: body,
       type: 'normal',
       hospiceId: args.hospiceId,
       viewCount: 0,
+    });
+    await sendPushNotificationHelper({
+      ctx,
+      userId: args.nurseId,
+      title: 'Route sheet declined',
+      body,
+      data: {
+        type: 'normal',
+      },
     });
 
     await handleUnApprovedSubmittedRouteSheets(ctx, 'dec');

@@ -114,7 +114,7 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
         },
       }),
       convex({ authConfig }),
-      crossDomain({ siteUrl }),
+      crossDomain({ siteUrl: 'http://localhost:8081' }),
       emailOTP({
         async sendVerificationOTP({ email, otp, type }) {
           if (type === 'sign-in') {

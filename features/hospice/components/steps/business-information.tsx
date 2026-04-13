@@ -72,10 +72,14 @@ export const BusinessInformation = () => {
       'Are you sure you want to create this Hospice business account?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Submit', onPress: () => handleSubmit(onSubmit) },
+        // @ts-ignore
+        { text: 'Submit', onPress: handleSubmit(onSubmit) },
       ],
     );
   };
+
+  console.log({ errors });
+
   return (
     <Stack gap="xl">
       <ControlInput

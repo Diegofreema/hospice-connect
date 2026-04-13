@@ -7,7 +7,7 @@ export const createNurseValidator = z.object({
     .min(10, 'Phone number must be at least 10 characters')
     .max(10, 'Phone number must be at most 10 characters'),
   gender: z.string().min(1, 'Gender is required'),
-  dateOfBirth: z.date().optional(),
+  dateOfBirth: z.date(),
   discipline: z.enum(['RN', 'LVN', 'HHA']),
   licenseNumber: z.string().min(1, 'License number is required'),
   licenseState: z.string().min(1, 'License state is required'),
@@ -24,6 +24,7 @@ export type CreateNurseValidator = z.infer<typeof createNurseValidator>;
 export type StepProps = {
   form: UseFormReturn<CreateNurseValidator>;
   isEdit?: boolean;
+  age: number;
 };
 
 export const routeSheetValidator = z.object({

@@ -6,20 +6,14 @@ import { MyTitle } from '@/features/shared/components/my-title';
 import { Spacer } from '@/features/shared/components/spacer';
 
 import { Stack } from '@/features/shared/components/v-stack';
-import { calculateAge } from '@/features/shared/utils';
 import React from 'react';
 import { type StepProps } from '../../validators';
 
-export const PersonalInfo = ({ form }: StepProps) => {
+export const PersonalInfo = ({ form, age }: StepProps) => {
   const {
     control,
     formState: { errors },
-    watch,
   } = form;
-  const dob = watch('dateOfBirth');
-
-  const age = calculateAge(dob as Date);
-  console.log({ age });
 
   return (
     <Stack mb="xl">
