@@ -18,8 +18,8 @@ export const extractNotificationConfig = (
     ...((stream as unknown as Record<string, string> | undefined) ?? {}), // extract and merge stream object if present
   };
   const notification = remoteMessage.notification ?? {};
-  const body = (data.body ?? notification.body ?? '') as string;
-  const title = (data.title ?? notification.title) as string;
+  const body = (notification.body ?? data.message ?? '') as string;
+  const title = (notification.title ?? data.title ?? '') as string;
   return { data, body, title };
 };
 setBackgroundMessageHandler(getMessaging(getApp()), async (remoteMessage) => {
