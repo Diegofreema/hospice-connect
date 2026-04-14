@@ -65,8 +65,8 @@ export const useSubscribeNotification = () => {
           ...((stream as unknown as Record<string, string> | undefined) ?? {}),
         };
         const notification = remoteMessage.notification ?? {};
-        const body = (data.body ?? notification.body ?? '') as string;
-        const title = (data.title ?? notification.title) as string;
+        const body = (notification.body ?? data.message ?? '') as string;
+        const title = (notification.title ?? data.title ?? '') as string;
 
         await notifee.displayNotification({
           title,

@@ -314,7 +314,7 @@ const NursePaymentMethod = {
 export default defineSchema({
   users: defineTable(User)
     .index('email', ['email'])
-    .index('userId', ['userId']),
+    .index('userId', ['userId', 'email']),
   nurses: defineTable(Nurse)
     .index('userId', ['userId'])
     .index('by_discipline', ['discipline', 'stateOfRegistration', 'status'])

@@ -4,7 +4,7 @@ import { type Id } from '@/convex/_generated/dataModel';
 import { FlexButtons } from '@/features/shared/components/flex-buttons';
 import { generateErrorMessage } from '@/features/shared/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useAction } from 'convex/react';
+import { useAction, useMutation } from 'convex/react';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Modal, Text, TextInput, View } from 'react-native';
@@ -38,6 +38,10 @@ export const DeclineRouteSheetModal: React.FC<DeclineRouteSheetModalProps> = ({
   const declineRouteSheet = useAction(
     api.routeSheetsActions.approveOrDeclineRouteSheet,
   );
+
+  const sendDeclineOrApproveRouteSheetNotification = useMutation(
+    api.routeSheets.sendDeclineOrApproveRouteSheetNotification,
+  );
   const { showToast } = useToast();
   const {
     control,
@@ -58,13 +62,26 @@ export const DeclineRouteSheetModal: React.FC<DeclineRouteSheetModalProps> = ({
 
   const onSubmit = async (data: FormData) => {
     try {
-      await declineRouteSheet({
+      const {
+        hospiceBusinessName,
+        nurseId,
+        patientFirstName,
+        patientLastName,
+      } = await declineRouteSheet({
         routeSheetId,
         isApproved: false,
         hospiceId,
         reason: data.reason,
         notificationId,
         totalEarnings,
+      });
+      const text = `Reason: ${data.reason || 'N/A'}, Please resubmit shortly.`;
+      const body = `${hospiceBusinessName} declined your route sheet for ${patientFirstName} ${patientLastName}. ${text}`;
+      await sendDeclineOrApproveRouteSheetNotification({
+        title: 'Route sheet declined',
+        nurseId,
+
+        body,
       });
 
       showToast({

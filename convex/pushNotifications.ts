@@ -11,15 +11,46 @@ export const recordPushNotificationToken = mutation({
     const identity = await ctx.auth.getUserIdentity();
 
     if (!identity) return;
+
     const user = await ctx.db
       .query('users')
-      .withIndex('userId', (q) => q.eq('userId', identity.subject))
+      .withIndex('userId', (q) =>
+        q.eq('userId', identity.subject).eq('email', identity.email),
+      )
       .first();
+
     if (!user) return;
+
     await pushNotifications.recordToken(ctx, {
       userId: user._id,
       pushToken: args.token,
     });
+  },
+});
+
+// Internal mutation: removes a push token from all users except currentUserId.
+// This ensures a device token is only ever live for one account at a time.
+export const removeTokenFromOtherUsers = internalMutation({
+  args: {
+    token: v.string(),
+    currentUserId: v.id('users'),
+  },
+  handler: async (ctx, args) => {
+    // Find all users in our users table except the current one
+    const users = await ctx.db
+      .query('users')
+      .filter((q) => q.neq(q.field('_id'), args.currentUserId))
+      .collect();
+
+    for (const u of users) {
+      const status = await pushNotifications.getStatusForUser(ctx, {
+        userId: u._id,
+      });
+      // Only call removeToken if they actually have a token registered
+      if (status.hasToken) {
+        await pushNotifications.removeToken(ctx, { userId: u._id });
+      }
+    }
   },
 });
 

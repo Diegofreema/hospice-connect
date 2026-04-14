@@ -200,7 +200,7 @@ export const sendCaseRequestNotification = mutation({
         throw new ConvexError({ message: 'Assignment not found' });
       }
 
-      const hospice = await ctx.db.get(assignment.hospiceId);
+      const hospice = await ctx.db.get('hospices', assignment.hospiceId);
       if (!hospice) {
         throw new ConvexError({ message: 'Hospice not found' });
       }

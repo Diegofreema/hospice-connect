@@ -9,7 +9,7 @@ import {
   handlePendingNurseAccountsUpdate,
   updateCount,
 } from './counter';
-import { getUserHelperFn } from './helper';
+import { getUserHelperFn, sendPushNotificationHelper } from './helper';
 
 // Get pending nurse profile updates
 export const getPendingNurseUpdates = query({
@@ -151,14 +151,24 @@ export const approveNurseUpdate = mutation({
       stateOfRegistration: pending.stateOfRegistration,
       dateOfBirth: pending.dateOfBirth,
     });
+    const body = `Your profile update has been approved.`;
 
     await ctx.db.insert('nurseNotifications', {
       nurseId: pending.nurseId,
       type: 'admin',
       title: 'Profile Update Approved',
-      description: `Your profile update has been approved.`,
+      description: body,
       isRead: false,
       viewCount: 0,
+    });
+    await sendPushNotificationHelper({
+      ctx,
+      userId: currentProfile.userId,
+      title: 'Profile Update Approved',
+      body,
+      data: {
+        type: 'normal',
+      },
     });
     await handlePendingNurseAccountsUpdate(ctx, 'dec');
 
@@ -207,16 +217,28 @@ export const rejectNurseUpdate = mutation({
     );
     if (!pending)
       throw new ConvexError({ message: 'Pending profile not found' });
+    const nurse = await ctx.db.get('nurses', pending.nurseId);
+    if (!nurse) throw new ConvexError({ message: 'Nurse not found' });
 
+    const body = `Your profile update has been rejected. Reason: ${args.reason}`;
     await ctx.db.insert('nurseNotifications', {
       nurseId: pending.nurseId,
       type: 'admin',
       title: 'Profile Update Rejected',
-      description: `Your profile update has been rejected. Reason: ${args.reason}`,
+      description: body,
       isRead: false,
       viewCount: 0,
     });
     await handlePendingNurseAccountsUpdate(ctx, 'dec');
+    await sendPushNotificationHelper({
+      ctx,
+      userId: nurse.userId,
+      title: 'Profile Update Rejected',
+      body,
+      data: {
+        type: 'normal',
+      },
+    });
     // Update pending profile status
     await ctx.scheduler.runAfter(
       0,
@@ -259,13 +281,24 @@ export const approveHospiceUpdate = mutation({
       faxNumber: pending.faxNumber,
     });
 
+    const body = `Your profile update has been approved.`;
+
     await ctx.db.insert('hospiceNotifications', {
       hospiceId: pending.hospiceId,
       type: 'admin',
       title: 'Profile Update Approved',
-      description: `Your profile update has been approved.`,
+      description: body,
       isRead: false,
       viewCount: 0,
+    });
+    await sendPushNotificationHelper({
+      ctx,
+      userId: currentProfile.userId,
+      title: 'Profile Update Approved',
+      body,
+      data: {
+        type: 'normal',
+      },
     });
     await handlePendingHospiceAccountsUpdate(ctx, 'dec');
     await ctx.scheduler.runAfter(
@@ -292,14 +325,25 @@ export const rejectHospiceUpdate = mutation({
     const pending = await ctx.db.get(args.pendingProfileId);
     if (!pending)
       throw new ConvexError({ message: 'Pending profile not found' });
-
+    const hospice = await ctx.db.get('hospices', pending.hospiceId);
+    if (!hospice) throw new ConvexError({ message: 'Hospice not found' });
+    const body = `Your profile update has been rejected. Reason: ${args.reason}`;
     await ctx.db.insert('hospiceNotifications', {
       hospiceId: pending.hospiceId,
       type: 'admin',
       title: 'Profile Update Rejected',
-      description: `Your profile update has been rejected. Reason: ${args.reason}`,
+      description: body,
       isRead: false,
       viewCount: 0,
+    });
+    await sendPushNotificationHelper({
+      ctx,
+      userId: hospice.userId,
+      title: 'Profile Update Rejected',
+      body,
+      data: {
+        type: 'normal',
+      },
     });
     await handlePendingHospiceAccountsUpdate(ctx, 'dec');
     await ctx.scheduler.runAfter(

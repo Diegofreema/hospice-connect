@@ -68,16 +68,16 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       Notifications.addNotificationResponseReceivedListener((response) => {
         const data = response.notification.request.content.data;
 
-        if (data.type === 'normal') {
+        if (data?.type === 'normal') {
           router.push('/');
         }
-        if (data.type === 'nurse_notification') {
+        if (data?.type === 'nurse_notification') {
           router.push('/nurse-notification');
         }
-        if (data.type === 'hospice_notification') {
+        if (data?.type === 'hospice_notification') {
           router.push('/hospice-notification');
         }
-        if (data.type === 'hospice_route_sheet_notification') {
+        if (data?.type === 'hospice_route_sheet_notification') {
           router.push(
             `/view-route-sheet?id=${data?.routeSheetId}&notificationId=${data?.notificationId}&isRead=${data?.isRead}`,
           );
@@ -89,6 +89,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       responseListener.remove();
     };
   }, [router]);
+  console.log({ expoPushToken });
 
   return (
     <NotificationContext.Provider

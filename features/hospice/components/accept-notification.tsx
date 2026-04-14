@@ -3,7 +3,7 @@ import { api } from '@/convex/_generated/api';
 import { type Id } from '@/convex/_generated/dataModel';
 import { FlexButtons } from '@/features/shared/components/flex-buttons';
 import { generateErrorMessage } from '@/features/shared/utils';
-import { useAction } from 'convex/react';
+import { useAction, useMutation } from 'convex/react';
 import React, { useState } from 'react';
 import { Modal, Text, View } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
@@ -28,6 +28,9 @@ export const ApproveRouteSheetModal: React.FC<ApproveRouteSheetModalProps> = ({
 }) => {
   const [processing, setProcessing] = useState(false);
   const approve = useAction(api.routeSheetsActions.approveOrDeclineRouteSheet);
+  const sendDeclineOrApproveRouteSheetNotification = useMutation(
+    api.routeSheets.sendDeclineOrApproveRouteSheetNotification,
+  );
   const { showToast } = useToast();
 
   const handleClose = () => {
@@ -37,12 +40,24 @@ export const ApproveRouteSheetModal: React.FC<ApproveRouteSheetModalProps> = ({
   const onApprove = async () => {
     setProcessing(true);
     try {
-      await approve({
+      const {
+        hospiceBusinessName,
+        nurseId,
+        patientFirstName,
+        patientLastName,
+      } = await approve({
         routeSheetId,
         isApproved: true,
         hospiceId,
         notificationId,
         totalEarnings,
+      });
+
+      const body = `${hospiceBusinessName} accepted your route sheet for ${patientFirstName} ${patientLastName}.`;
+      await sendDeclineOrApproveRouteSheetNotification({
+        title: 'Route sheet approved',
+        nurseId,
+        body,
       });
 
       showToast({

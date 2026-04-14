@@ -111,16 +111,6 @@ export const approveRouteSheetMutation = internalMutation({
           type: 'admin',
           viewCount: 0,
         });
-
-        await sendPushNotificationHelper({
-          ctx,
-          userId: nurse.userId,
-          title: 'Route sheet approved',
-          body,
-          data: {
-            type: 'normal',
-          },
-        });
       }
     } else {
       await ctx.db.patch('hospiceNotifications', args.notificationId, {
@@ -136,17 +126,8 @@ export const approveRouteSheetMutation = internalMutation({
         hospiceId: args.hospiceId,
         viewCount: 0,
       });
-
-      await sendPushNotificationHelper({
-        ctx,
-        userId: nurse.userId,
-        title: 'Route sheet approved',
-        body,
-        data: {
-          type: 'normal',
-        },
-      });
     }
+
     await handleUnApprovedSubmittedRouteSheets(ctx, 'dec');
   },
 });
@@ -194,15 +175,6 @@ export const declineRouteSheetMutation = internalMutation({
       type: 'normal',
       hospiceId: args.hospiceId,
       viewCount: 0,
-    });
-    await sendPushNotificationHelper({
-      ctx,
-      userId: args.nurseId,
-      title: 'Route sheet declined',
-      body,
-      data: {
-        type: 'normal',
-      },
     });
 
     await handleUnApprovedSubmittedRouteSheets(ctx, 'dec');

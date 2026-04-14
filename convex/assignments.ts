@@ -757,12 +757,13 @@ export const cancelAssignment = mutation({
       }
     }
 
-    // === Step 2: Cancel ALL schedules (including 'on_going') ===
-    const cancellableStatuses = new Set(['available', 'on_going', 'booked']);
-
     for (const schedule of schedules) {
-      if (cancellableStatuses.has(schedule.status)) {
-        await ctx.db.patch(schedule._id, {
+      if (
+        schedule.status === 'available' ||
+        schedule.status === 'booked' ||
+        schedule.status === 'on_going'
+      ) {
+        await ctx.db.patch('schedules', schedule._id, {
           status: 'ended',
           canceledAt: args.cancelledAt,
         });

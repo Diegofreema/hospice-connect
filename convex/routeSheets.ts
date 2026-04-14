@@ -92,6 +92,8 @@ export const getDetailsForRouteSheet = query({
       )
       .collect();
 
+    console.log(schedules);
+
     return {
       nurse,
       assignment: {
@@ -327,6 +329,27 @@ export const updateHospiceNotificationStatus = internalMutation({
 
     await ctx.db.patch(args.notificationId, {
       status: args.status,
+    });
+  },
+});
+
+export const sendDeclineOrApproveRouteSheetNotification = mutation({
+  args: {
+    title: v.string(),
+    body: v.string(),
+    nurseId: v.id('nurses'),
+  },
+  handler: async (ctx, args) => {
+    const nurse = await ctx.db.get('nurses', args.nurseId);
+    if (!nurse) return;
+    await sendPushNotificationHelper({
+      ctx,
+      userId: nurse.userId,
+      title: args.title,
+      body: args.body,
+      data: {
+        type: 'normal',
+      },
     });
   },
 });

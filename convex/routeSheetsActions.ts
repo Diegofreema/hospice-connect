@@ -8,6 +8,7 @@
 
 import { ConvexError, v } from 'convex/values';
 import { internal } from './_generated/api';
+import { Id } from './_generated/dataModel';
 import { action } from './_generated/server';
 import {
   chargeOffSession,
@@ -25,7 +26,15 @@ export const approveOrDeclineRouteSheet = action({
     notificationId: v.id('hospiceNotifications'),
     totalEarnings: v.number(),
   },
-  handler: async (ctx, args): Promise<void> => {
+  handler: async (
+    ctx,
+    args,
+  ): Promise<{
+    nurseId: Id<'nurses'>;
+    hospiceBusinessName: string;
+    patientFirstName: string;
+    patientLastName: string;
+  }> => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new ConvexError({ message: 'Unauthorized' });
@@ -94,7 +103,13 @@ export const approveOrDeclineRouteSheet = action({
         },
       );
 
-      return;
+      return {
+        nurseId: nurse._id,
+        hospiceBusinessName: hospice.businessName,
+
+        patientFirstName: assignment.patientFirstName,
+        patientLastName: assignment.patientLastName,
+      };
     }
 
     // ── Approve path: charge Stripe first ─────────────────────────────────
@@ -195,5 +210,11 @@ export const approveOrDeclineRouteSheet = action({
         nurseStatus: nurse.status,
       },
     );
+    return {
+      nurseId: nurse._id,
+      hospiceBusinessName: hospice.businessName,
+      patientFirstName: assignment.patientFirstName,
+      patientLastName: assignment.patientLastName,
+    };
   },
 });

@@ -13,6 +13,7 @@ import { generateErrorMessage, trimText } from '@/features/shared/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery } from 'convex/react';
 
+import { useNurse } from '@/components/context/nurse-context';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -37,6 +38,7 @@ export const CompleteRouteSheet = ({ assignmentId, nurseId }: Props) => {
     nurseId,
     assignmentId,
   });
+  const { nurse } = useNurse();
   const commission = useQuery(api.adminSettings.getCommission);
   const submitRouteSheet = useMutation(api.routeSheets.submitRouteSheet);
   const { showToast } = useToast();
@@ -108,6 +110,7 @@ export const CompleteRouteSheet = ({ assignmentId, nurseId }: Props) => {
           disabled={isSubmitting}
           rate={data.assignment.rate}
           hospiceName={data.assignment.businessName}
+          assignmentTimezone={data.assignment.hospiceTimezone}
           handleSubmit={handleSubmit(onSubmit)}
           onGoBack={onHideRouteSheet}
           careLevel={data.assignment.careLevel}
@@ -124,7 +127,13 @@ export const CompleteRouteSheet = ({ assignmentId, nurseId }: Props) => {
               <Header assignment={data.assignment} nurse={data.nurse} />
             )}
             data={data.schedules}
-            renderItem={({ item }) => <ScheduleCard schedule={item} />}
+            renderItem={({ item }) => (
+              <ScheduleCard
+                schedule={item}
+                timeZone={data.assignment.hospiceTimezone}
+                nurseTimeZone={nurse?.nurseTimezone}
+              />
+            )}
             contentContainerStyle={{ paddingBottom: 50, gap: 25 }}
             showsVerticalScrollIndicator={false}
             keyExtractor={(item) => item._id}
