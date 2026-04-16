@@ -95,9 +95,9 @@ export function AdminDashboard() {
       </div>
 
       {/* Charts */}
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-2 min-w-0">
         {/* New Accounts Chart */}
-        <Card>
+        <Card className="min-w-0">
           <CardHeader>
             <CardTitle>New Accounts</CardTitle>
             <CardDescription>
@@ -117,12 +117,13 @@ export function AdminDashboard() {
                   color: 'hsl(var(--chart-2))',
                 },
               }}
-              className="h-75"
+              className="min-h-[300px] w-full"
             >
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData}>
+                <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid
                     strokeDasharray="3 3"
+                    vertical={false}
                     stroke="hsl(var(--border))"
                   />
                   <XAxis
@@ -135,9 +136,21 @@ export function AdminDashboard() {
                     }
                     stroke="hsl(var(--muted-foreground))"
                     fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    minTickGap={32}
                   />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                  <YAxis
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    allowDecimals={false}
+                  />
                   <ChartTooltip
+                    cursor={{ stroke: 'hsl(var(--muted-foreground))', strokeWidth: 1, strokeDasharray: '4 4' }}
                     content={
                       <ChartTooltipContent
                         labelFormatter={(value) =>
@@ -168,7 +181,7 @@ export function AdminDashboard() {
         </Card>
 
         {/* Assignment Status Chart */}
-        <Card>
+        <Card className="min-w-0">
           <CardHeader>
             <CardTitle>Assignment Status</CardTitle>
             <CardDescription>
@@ -183,26 +196,41 @@ export function AdminDashboard() {
                   color: 'hsl(var(--chart-1))',
                 },
               }}
-              className="h-75"
+              className="min-h-[300px] w-full"
             >
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={assignmentData}>
+                <BarChart data={assignmentData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid
                     strokeDasharray="3 3"
+                    vertical={false}
                     stroke="hsl(var(--border))"
                   />
                   <XAxis
                     dataKey="status"
                     stroke="hsl(var(--muted-foreground))"
                     fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
                   />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <YAxis
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    allowDecimals={false}
+                  />
+                  <ChartTooltip 
+                    cursor={{ fill: 'hsl(var(--muted-foreground)/0.1)' }}
+                    content={<ChartTooltipContent />} 
+                  />
                   <Bar
                     dataKey="count"
                     fill="hsl(var(--chart-1))"
                     radius={[4, 4, 0, 0]}
                     name="Assignments"
+                    maxBarSize={50}
                   />
                 </BarChart>
               </ResponsiveContainer>

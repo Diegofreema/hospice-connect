@@ -831,7 +831,6 @@ type SendNotificationToAllNursesWithSameDisciplineType = {
   state: string;
   hospiceId: Id<'hospices'>;
   hospiceName: string;
-
   cursor: string | null;
   numItems: number;
 };
@@ -841,7 +840,6 @@ export const sendNotificationToAllNursesWithSameDiscipline = async ({
   discipline,
   state,
   hospiceId,
-
   hospiceName,
   cursor,
   numItems,
@@ -849,7 +847,10 @@ export const sendNotificationToAllNursesWithSameDiscipline = async ({
   const nurses = await ctx.db
     .query('nurses')
     .withIndex('by_discipline', (q) =>
-      q.eq('discipline', discipline).eq('stateOfRegistration', state),
+      q
+        .eq('discipline', discipline)
+        .eq('stateOfRegistration', state)
+        .eq('status', 'approved'),
     )
     .paginate({ cursor, numItems });
   const { isDone, page, continueCursor } = nurses;
@@ -882,7 +883,6 @@ export const sendNotificationToAllNursesWithSameDiscipline = async ({
       discipline,
       state,
       hospiceId,
-
       hospiceName,
       cursor: continueCursor,
       numItems,

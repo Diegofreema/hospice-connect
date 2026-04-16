@@ -175,6 +175,7 @@ export const getSuspendedNurses = query({
 export const getUnSubmittedRouteSheets = query({
   args: {
     paginationOpts: paginationOptsValidator,
+    sortOrder: v.optional(v.union(v.literal('desc'), v.literal('asc'))),
   },
   handler: async (ctx, args) => {
     const user = await getUserHelperFn(ctx);
@@ -189,13 +190,10 @@ export const getUnSubmittedRouteSheets = query({
       .withIndex('by_completed_submitted', (q) =>
         q.eq('isCompleted', true).eq('isSubmitted', false),
       )
+      .order(args.sortOrder ?? 'desc')
       .paginate(args.paginationOpts);
 
-    const sortByCompletedAt = completedAndNotSubmittedAssignments.page.sort(
-      (a, b) => (b.completedAt || 0) - (a.completedAt || 0),
-    );
-
-    const completedAndNotSubmittedAssignmentsWithNurses = sortByCompletedAt.map(
+    const completedAndNotSubmittedAssignmentsWithNurses = completedAndNotSubmittedAssignments.page.map(
       async (c) => {
         const nurse = await ctx.db.get('nurses', c.nurseId);
         const hospice = await getHospiceByAssignmentId(ctx, c.assignmentId);
@@ -221,6 +219,7 @@ export const getUnSubmittedRouteSheets = query({
 export const getUnApprovedSubmittedRouteSheets = query({
   args: {
     paginationOpts: paginationOptsValidator,
+    sortOrder: v.optional(v.union(v.literal('desc'), v.literal('asc'))),
   },
   handler: async (ctx, args) => {
     const user = await getUserHelperFn(ctx);
@@ -233,6 +232,7 @@ export const getUnApprovedSubmittedRouteSheets = query({
     const unApprovedRouteSheets = await ctx.db
       .query('routeSheets')
       .withIndex('approved', (q) => q.eq('status', 'pending'))
+      .order(args.sortOrder ?? 'desc')
       .paginate(args.paginationOpts);
 
     const unApprovedRouteSheetsWithNursesAndHospices =

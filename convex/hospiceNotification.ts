@@ -242,6 +242,8 @@ export const sendCaseRequestNotification = mutation({
         title: `${nurse.name} (${nurse.discipline}) `,
         viewCount: 0,
       });
+      console.log('hospice userid', hospice.userId);
+
       await sendPushNotificationHelper({
         ctx,
         userId: hospice.userId,

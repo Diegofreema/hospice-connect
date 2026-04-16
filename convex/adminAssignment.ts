@@ -25,6 +25,7 @@ export const getAssignments = query({
     ),
     paginationOpts: paginationOptsValidator,
     searchQuery: v.optional(v.string()),
+    sortOrder: v.optional(v.union(v.literal('desc'), v.literal('asc'))),
   },
   handler: async (ctx, args) => {
     const user = await getUserHelperFn(ctx);
@@ -34,9 +35,10 @@ export const getAssignments = query({
       });
     }
     const normalizedSearch = args.searchQuery?.trim().toLowerCase() ?? '';
+    const sort = args.sortOrder ?? 'desc';
 
     const assignments = await filter(
-      ctx.db.query('assignments'),
+      ctx.db.query('assignments').order(sort),
       (assignment) => {
         const matchesSearch =
           !normalizedSearch ||

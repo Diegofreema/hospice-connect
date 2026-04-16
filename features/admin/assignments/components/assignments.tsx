@@ -42,10 +42,11 @@ type AssignmentStatus =
 export function Assignments() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<AssignmentStatus>('all');
+  const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
 
   const { status, loadMore, results } = usePaginatedQuery(
     api.adminAssignment.getAssignments,
-    { status: statusFilter, searchQuery },
+    { status: statusFilter, searchQuery, sortOrder },
     { initialNumItems: 25 },
   );
   const stats = useQuery(api.adminAssignment.getAssignmentStats);
@@ -151,6 +152,18 @@ export function Assignments() {
                 <SelectItem value="booked">Fully staffed</SelectItem>
                 <SelectItem value="completed">Completed</SelectItem>
                 <SelectItem value="ended">Ended</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select
+              value={sortOrder}
+              onValueChange={(value: 'desc' | 'asc') => setSortOrder(value)}
+            >
+              <SelectTrigger className="w-full md:w-45">
+                <SelectValue placeholder="Sort Order" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="desc">Most Recent</SelectItem>
+                <SelectItem value="asc">Least Recent</SelectItem>
               </SelectContent>
             </Select>
           </div>

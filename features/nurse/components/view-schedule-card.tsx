@@ -149,7 +149,7 @@ export const ViewShiftCard = ({
               onPress={handleAcceptSchedule}
               disabled={sending}
             >
-              Accept
+              Request
             </PrivacyNoticeLink>
           )}
           {shift.status !== 'completed' && shift.nurseId && isMine && (
