@@ -9,29 +9,35 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/dialog/Dialog';
+import { api } from '@/convex/_generated/api';
 import { authClient } from '@/lib/auth-client';
 import { IconLogout2 } from '@tabler/icons-react-native';
+import { useMutation } from 'convex/react';
 import { useState } from 'react';
 import { useUnistyles } from 'react-native-unistyles';
 import { toast } from 'sonner-native';
+import { generateErrorMessage } from '../utils';
 import { Button } from './button';
 
 export const LogOut = () => {
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
   const { theme } = useUnistyles();
+  const removeToken = useMutation(api.pushNotifications.removeToken);
 
   const onConfirmLogout = async () => {
     setLoading(true);
     try {
+      await removeToken();
       await authClient.signOut();
       toast('Success', {
         description: 'You have successfully logged out',
       });
-    } catch {
+    } catch (error) {
+      const errorMessage = generateErrorMessage(error, 'Failed to log out');
       showToast({
         title: 'Error',
-        subtitle: 'Failed to log out',
+        subtitle: errorMessage,
         autodismiss: true,
       });
     } finally {

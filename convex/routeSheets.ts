@@ -92,8 +92,6 @@ export const getDetailsForRouteSheet = query({
       )
       .collect();
 
-    console.log(schedules);
-
     return {
       nurse,
       assignment: {

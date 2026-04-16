@@ -23,13 +23,25 @@ export const extractNotificationConfig = (
   return { data, body, title };
 };
 setBackgroundMessageHandler(getMessaging(getApp()), async (remoteMessage) => {
+  // If the remoteMessage contains a notification object, the OS handles it automatically.
+  // We only manually display for data-only messages (like Stream Chat) to prevent duplicates.
+  if (remoteMessage.notification) {
+    return;
+  }
+
+  const { data, body, title } = extractNotificationConfig(remoteMessage);
+
+  // Prevent painting empty notifications from phantom dismiss intents or silent data payloads
+  if (!title && !body) {
+    return;
+  }
+
   // create the android channel to send the notification to
   const channelId = await notifee.createChannel({
     id: 'chat-messages',
     name: 'Chat Messages',
   });
   // display the notification
-  const { data, body, title } = extractNotificationConfig(remoteMessage);
   await notifee.displayNotification({
     title,
     body,

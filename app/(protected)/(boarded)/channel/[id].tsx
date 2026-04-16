@@ -5,6 +5,7 @@ import { SmallLoader } from '@/features/shared/components/small-loader';
 import { Text } from '@/features/shared/components/text';
 import { View } from '@/features/shared/components/view';
 import { Wrapper } from '@/features/shared/components/wrapper';
+import { DownloadableFileAttachment } from '@/features/messaging/components/chat-attachment-download';
 import { useStreamChannelQuery } from '@/hooks/use-stream-channel';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { IconSend } from '@tabler/icons-react-native';
@@ -46,6 +47,7 @@ const ChannelScreen = () => {
         hasCommands={false}
         hasFilePicker={false}
         SendButton={SendButton}
+        FileAttachment={DownloadableFileAttachment}
         EmptyStateIndicator={EmptyStateIndicator}
         LoadingErrorIndicator={() => (
           <Text>Error loading messages for this chat</Text>

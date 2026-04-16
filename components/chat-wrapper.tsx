@@ -1,4 +1,5 @@
 import { chatApiKey } from '@/chat-config';
+import { ChatImageGalleryDownloadButton } from '@/features/messaging/components/chat-attachment-download';
 import { useUnread } from '@/features/shared/hooks/use-unread';
 import { useRegisterDevice } from '@/hooks/use-register';
 import axios from 'axios';
@@ -75,11 +76,29 @@ export const ChatWrapper = ({ children }: PropsWithChildren) => {
   // tab's <ChannelList> has its own built-in skeleton, so it handles the
   // not-connected state gracefully.
   if (!client) {
-    return <OverlayProvider value={{ style: chatTheme }}>{children}</OverlayProvider>;
+    return (
+      <OverlayProvider
+        imageGalleryCustomComponents={{
+          header: {
+            rightElement: ChatImageGalleryDownloadButton,
+          },
+        }}
+        value={{ style: chatTheme }}
+      >
+        {children}
+      </OverlayProvider>
+    );
   }
 
   return (
-    <OverlayProvider value={{ style: chatTheme }}>
+    <OverlayProvider
+      imageGalleryCustomComponents={{
+        header: {
+          rightElement: ChatImageGalleryDownloadButton,
+        },
+      }}
+      value={{ style: chatTheme }}
+    >
       <Chat client={client} enableOfflineSupport>
         {children}
       </Chat>

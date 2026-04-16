@@ -142,7 +142,7 @@ export const RenderShifts = ({
       scrollEnabled={false}
       ListFooterComponent={
         <TouchableOpacity
-          style={styles.button}
+          style={[styles.button, { opacity: loading ? 0.5 : 1 }]}
           onPress={handleSubmit}
           disabled={loading}
         >

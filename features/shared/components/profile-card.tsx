@@ -2,17 +2,11 @@ import { Avatar } from '@/components/avatar/Avatar';
 import { SpinnerArc } from '@/components/loaders';
 import { api } from '@/convex/_generated/api';
 import { type Id } from '@/convex/_generated/dataModel';
-import {
-  clearPendingRoute,
-  savePendingRoute,
-} from '@/hooks/use-pending-image-redirect';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { IconCamera, IconUpload } from '@tabler/icons-react-native';
 import { useMutation } from 'convex/react';
 import * as ImagePicker from 'expo-image-picker';
-import { usePathname } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { Platform, TouchableOpacity, View } from 'react-native';
+import { useState } from 'react';
+import { TouchableOpacity, View } from 'react-native';
 import {
   changeFirstLetterToCapital,
   formatPhoneNumber,
@@ -62,7 +56,8 @@ export const ProfileCard = ({
   const formattedRate = rate ? `$${rate}/hr` : '';
 
   const [image, setImage] = useState<string | null>(null);
-  const pathname = usePathname();
+  const [file, setFile] = useState<ImagePicker.ImagePickerAsset>();
+
   const { theme } = useUnistyles();
   const [uploading, setUploading] = useState(false);
   const generateUploadUrl = useMutation(api.helper.generateUploadUrl);
@@ -70,50 +65,8 @@ export const ProfileCard = ({
   const updateHospiceImage = useMutation(api.hospices.updateHospiceImage);
   const { showToast } = useToast();
 
-  // Storage key for the selected image (unique per user)
-  const imageStorageKey = `profile_image_${nurseId || hospiceId}`;
-
-  // Load saved image on mount and check for pending picker results
-  useEffect(() => {
-    const loadImage = async () => {
-      try {
-        // First check for pending picker results on Android
-        if (Platform.OS === 'android') {
-          const result = await ImagePicker.getPendingResultAsync();
-          // Type guard: check if it's a successful result (not an error)
-          if (
-            result &&
-            'canceled' in result &&
-            !result.canceled &&
-            result.assets?.[0]?.uri
-          ) {
-            const uri = result.assets[0].uri;
-            setImage(uri);
-            await AsyncStorage.setItem(imageStorageKey, uri);
-            console.log('Recovered pending image:', uri);
-            return; // Exit early if we found a pending result
-          }
-        }
-
-        // If no pending result, try to load from storage
-        const savedImage = await AsyncStorage.getItem(imageStorageKey);
-        if (savedImage) {
-          setImage(savedImage);
-          console.log('Loaded saved image:', savedImage);
-        }
-      } catch (error) {
-        console.error('Error loading image:', error);
-      }
-    };
-
-    loadImage();
-  }, [imageStorageKey]);
-
   const pickImage = async () => {
     try {
-      // Save current route in case Android destroys the Activity
-      await savePendingRoute(pathname);
-
       // Modern photo picker doesn't require explicit permission requests
       // Users grant access on a per-image basis through the system picker
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -122,15 +75,10 @@ export const ProfileCard = ({
         allowsMultipleSelection: false,
       });
 
-      // Picker returned normally (Activity was NOT destroyed) — clear the saved route
-      await clearPendingRoute();
-
       if (!result.canceled) {
         const uri = result.assets[0].uri;
         setImage(uri);
-        // Save to AsyncStorage to persist across remounts
-        await AsyncStorage.setItem(imageStorageKey, uri);
-        console.log('Selected and saved image:', uri);
+        setFile(result.assets[0]);
       }
     } catch (error) {
       console.error('Error picking image:', error);
@@ -141,7 +89,8 @@ export const ProfileCard = ({
     if (!image) return;
     setUploading(true);
     try {
-      const response = await uploadProfilePicture(generateUploadUrl, image);
+      const response = await uploadProfilePicture(generateUploadUrl, file);
+
       if (response) {
         const { storageId } = response;
         if (nurseId) {
@@ -164,9 +113,9 @@ export const ProfileCard = ({
         });
         // Clear both state and storage after successful upload
         setImage(null);
-        await AsyncStorage.removeItem(imageStorageKey);
       }
     } catch (error) {
+      console.log({ error });
       showToast({
         title: 'Error',
         subtitle: generateErrorMessage(error, 'Failed to update image'),

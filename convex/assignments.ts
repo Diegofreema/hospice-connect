@@ -712,7 +712,6 @@ export const cancelAssignment = mutation({
       .collect();
 
     if (schedules.length === 0) {
-      // Maybe just mark assignment as cancelled
       await ctx.db.patch(assignment._id, {
         isCanceled: true,
         status: 'ended',
@@ -733,27 +732,31 @@ export const cancelAssignment = mutation({
     for (const schedule of schedules) {
       if (schedule.nurseId && !notifiedNurses.has(schedule.nurseId)) {
         notifiedNurses.add(schedule.nurseId);
+        const nurse = await ctx.db.get('nurses', schedule.nurseId);
+        if (!nurse) return;
 
-        await ctx.db.insert('nurseNotifications', {
-          nurseId: schedule.nurseId as Id<'nurses'>,
-          isRead: false,
-          hospiceId: args.hospiceId,
-          scheduleId: schedule._id,
-          description: text,
-          title: 'Assignment Ended',
-          type: 'normal',
-          viewCount: 0,
-        });
-
-        await sendPushNotificationHelper({
-          ctx,
-          userId: schedule.nurseId as Id<'nurses'>,
-          title: 'Assignment Ended',
-          body: text,
-          data: {
+        await Promise.all([
+          ctx.db.insert('nurseNotifications', {
+            nurseId: schedule.nurseId as Id<'nurses'>,
+            isRead: false,
+            hospiceId: args.hospiceId,
+            scheduleId: schedule._id,
+            description: text,
+            title: 'Assignment Ended',
             type: 'normal',
-          },
-        });
+            viewCount: 0,
+          }),
+
+          sendPushNotificationHelper({
+            ctx,
+            userId: nurse?.userId,
+            title: 'Assignment Ended',
+            body: text,
+            data: {
+              type: 'normal',
+            },
+          }),
+        ]);
       }
     }
 

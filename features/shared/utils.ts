@@ -18,6 +18,8 @@ import {
   subHours,
 } from 'date-fns';
 import { getTimezoneOffset, toZonedTime } from 'date-fns-tz';
+import type { ImagePickerAsset } from 'expo-image-picker';
+import { FileSystemUploadType, uploadAsync } from 'expo-file-system/legacy';
 import { Dimensions } from 'react-native';
 import Purchases from 'react-native-purchases';
 
@@ -68,21 +70,24 @@ export const uploadProfilePicture = async (
   generateUploadUrl: ReactMutation<
     FunctionReference<'mutation', 'public', {}, string, string | undefined>
   >,
-  selectedImage?: string,
+  selectedImage?: ImagePickerAsset,
 ): Promise<{ storageId: Id<'_storage'>; uploadUrl: string } | undefined> => {
   try {
-    if (!selectedImage) return;
+    if (!selectedImage?.uri) return;
     const uploadUrl = await generateUploadUrl();
-
-    const response = await fetch(selectedImage);
-    const blob = await response.blob();
-
-    const result = await fetch(uploadUrl, {
-      method: 'POST',
-      body: blob,
-      headers: { 'Content-Type': 'image/jpeg' },
+    const response = await uploadAsync(uploadUrl, selectedImage.uri, {
+      httpMethod: 'POST',
+      headers: { 'Content-Type': selectedImage.mimeType ?? 'image/jpeg' },
+      uploadType: FileSystemUploadType.BINARY_CONTENT,
     });
-    const { storageId } = await result.json();
+
+    if (response.status < 200 || response.status >= 300) {
+      throw new Error(`Image upload failed with status ${response.status}`);
+    }
+
+    const { storageId } = JSON.parse(response.body) as {
+      storageId: Id<'_storage'>;
+    };
 
     return { storageId, uploadUrl };
   } catch (error) {
