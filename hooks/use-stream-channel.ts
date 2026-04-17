@@ -9,7 +9,15 @@ interface UseStreamChannelOptions {
 }
 
 export const useStreamChannelQuery = ({ id, skip }: UseStreamChannelOptions) => {
-  const { client } = useChatContext();
+  // Safely access the Stream Chat client — the <Chat> provider may not be
+  // mounted yet during cold-start notification navigation.
+  let client;
+  try {
+    const context = useChatContext();
+    client = context?.client;
+  } catch {
+    client = null;
+  }
 
   const query = useQuery({
     queryKey: ['stream-channel', id],

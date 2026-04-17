@@ -274,7 +274,7 @@ export const sendScheduleNotification = mutation({
         title: 'Schedule assigned',
         body,
         data: {
-          type: 'normal',
+          type: 'nurse_notification',
         },
       });
     }

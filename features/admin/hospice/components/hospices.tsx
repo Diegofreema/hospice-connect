@@ -1,6 +1,5 @@
 'use client';
 
-import { Badge } from '@/components/web/ui/badge';
 import { Button } from '@/components/web/ui/button';
 import {
   Card,
@@ -19,8 +18,6 @@ import {
 } from '@/components/web/ui/select';
 import {
   Table,
-  TableBody,
-  TableCell,
   TableFooter,
   TableHead,
   TableHeader,
@@ -28,16 +25,9 @@ import {
 } from '@/components/web/ui/table';
 import { api } from '@/convex/_generated/api';
 import { useMutation, usePaginatedQuery, useQuery } from 'convex/react';
-import {
-  Building2,
-  Building2 as Building2Check,
-  Eye,
-  Filter,
-  Search,
-} from 'lucide-react-native';
+import { Filter, Search } from 'lucide-react-native';
 import { useState } from 'react';
 
-import { ActionDialog } from '@/components/web/admin/action-dialog';
 import { HospiceDetailsDialog } from '@/components/web/admin/hospice-details-dialog';
 import { PendingApprovalsCard } from '@/components/web/admin/pending-approvals-card';
 import type { Id } from '@/convex/_generated/dataModel';
@@ -46,13 +36,9 @@ import {
   generateErrorMessage,
 } from '@/features/shared/utils';
 import { usStates } from '@/lib/constants';
-import {
-  cn,
-  generateStatusColorAndBackgroundColor,
-  generateStatusText,
-} from '@/lib/utils';
+
 import { toast } from 'sonner-native';
-import { Loader } from '../../shared/loader';
+import HospiceTable from './hospice-table';
 
 type Status = 'pending' | 'approved' | 'rejected' | 'suspended';
 export function Hospices() {
@@ -61,6 +47,7 @@ export function Hospices() {
   const [status, setStatus] = useState<Status | 'all'>('all');
   const [selectedHospiceId, setSelectedHospiceId] =
     useState<Id<'hospices'> | null>(null);
+  const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
 
   const {
     results: hospices,
@@ -68,14 +55,14 @@ export function Hospices() {
     loadMore,
   } = usePaginatedQuery(
     api.adminHospices.getHospices,
-    { state: stateFilter, status, searchQuery },
+    { state: stateFilter, status, searchQuery, sort: sortOrder },
     { initialNumItems: 25 },
   );
   const hospiceStats = useQuery(api.adminHospices.getHospiceStats);
   const suspendHospice = useMutation(api.adminHospices.suspendHospice);
 
-  if (queryStatus === 'LoadingFirstPage' || hospiceStats === undefined) {
-    return <Loader message="Loading hospices" />;
+  if (hospiceStats === undefined) {
+    return;
   }
 
   const handleLoadMore = () => {
@@ -248,6 +235,19 @@ export function Hospices() {
                 <SelectItem value="rejected">Rejected</SelectItem>
               </SelectContent>
             </Select>
+
+            <Select
+              value={sortOrder}
+              onValueChange={(value: 'desc' | 'asc') => setSortOrder(value)}
+            >
+              <SelectTrigger className="w-full md:w-45">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="desc">Most Recent</SelectItem>
+                <SelectItem value="asc">Least Recent</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Table */}
@@ -266,95 +266,12 @@ export function Hospices() {
                   </TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody>
-                {hospices.map((hospice, index) => (
-                  <TableRow key={hospice._id}>
-                    <TableCell className="font-medium">{index + 1}</TableCell>
-                    <TableCell className="font-medium">
-                      {hospice.businessName}
-                    </TableCell>
-                    <TableCell>{hospice.email}</TableCell>
-                    <TableCell>
-                      {changeFirstLetterToCapital(hospice.state)}
-                    </TableCell>
-                    <TableCell>{hospice.licenseNumber}</TableCell>
-                    <TableCell>
-                      <Badge
-                        className={generateStatusColorAndBackgroundColor(
-                          hospice.status,
-                        )}
-                      >
-                        {generateStatusText(hospice.status)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => setSelectedHospiceId(hospice._id)}
-                          title="View Details"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        {hospice.status !== 'pending' ? (
-                          <ActionDialog
-                            title={
-                              hospice.status === 'suspended'
-                                ? 'Reactivate'
-                                : hospice.status === 'rejected'
-                                  ? 'Approve'
-                                  : 'Suspend'
-                            }
-                            description={
-                              hospice.status === 'suspended'
-                                ? 'Are you sure you want to reactivate this hospice?'
-                                : hospice.status === 'rejected'
-                                  ? 'Are you sure you want to approve this hospice?'
-                                  : 'Are you sure you want to suspend this hospice?'
-                            }
-                            onAction={() =>
-                              handleSuspendToggle(
-                                hospice._id,
-                                hospice.status === 'suspended' ||
-                                  hospice.status === 'rejected',
-                              )
-                            }
-                          >
-                            <Button
-                              className={cn(
-                                hospice.status === 'suspended' ||
-                                  hospice.status === 'rejected'
-                                  ? 'bg-green-500 hover:bg-green-600'
-                                  : 'bg-red-500 hover:bg-red-600',
-                              )}
-                              size="icon"
-                              title={
-                                hospice.status === 'suspended'
-                                  ? 'Reactivate'
-                                  : hospice.status === 'rejected'
-                                    ? 'Approve'
-                                    : 'Suspend'
-                              }
-                            >
-                              {hospice.status === 'suspended' ||
-                              hospice.status === 'rejected' ? (
-                                <Building2Check className="h-4 w-4 text-white" />
-                              ) : (
-                                <Building2 className="h-4 w-4 text-white" />
-                              )}
-                            </Button>
-                          </ActionDialog>
-                        ) : (
-                          <Button className=" cursor-not-allowed" disabled>
-                            <Building2 className="h-4 w-4 text-white" />
-                          </Button>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
+              <HospiceTable
+                handleSuspendToggle={handleSuspendToggle}
+                setSelectedHospiceId={setSelectedHospiceId}
+                hospices={hospices}
+                isLoading={queryStatus === 'LoadingFirstPage'}
+              />
               <TableFooter>
                 <Button
                   onClick={handleLoadMore}

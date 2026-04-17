@@ -34,6 +34,7 @@ export const getNurses = query({
       v.literal('HHA'),
       v.literal('all'),
     ),
+    sort: v.optional(v.union(v.literal('desc'), v.literal('asc'))),
   },
   handler: async (ctx, args) => {
     const user = await getUserHelperFn(ctx);
@@ -44,8 +45,9 @@ export const getNurses = query({
     }
 
     const normalizedSearch = args.searchQuery?.trim().toLowerCase() ?? '';
+    const order = args.sort === 'asc' ? 'asc' : 'desc';
 
-    const nurses = await filter(ctx.db.query('nurses'), (nurse) => {
+    const nurses = await filter(ctx.db.query('nurses').order(order), (nurse) => {
       const matchesSearch =
         !normalizedSearch ||
         nurse.name.toLowerCase().includes(normalizedSearch) ||

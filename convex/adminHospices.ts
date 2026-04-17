@@ -28,6 +28,7 @@ export const getHospices = query({
     ),
     state: v.optional(v.string()),
     searchQuery: v.optional(v.string()),
+    sort: v.optional(v.union(v.literal('desc'), v.literal('asc'))),
   },
   handler: async (ctx, args) => {
     const user = await getUserHelperFn(ctx);
@@ -38,8 +39,9 @@ export const getHospices = query({
     }
 
     const normalizedSearch = args.searchQuery?.trim().toLowerCase() ?? '';
+    const order = args.sort === 'asc' ? 'asc' : 'desc';
 
-    const hospices = await filter(ctx.db.query('hospices'), (hospice) => {
+    const hospices = await filter(ctx.db.query('hospices').order(order), (hospice) => {
       const matchesSearch =
         !normalizedSearch ||
         hospice.businessName.toLowerCase().includes(normalizedSearch) ||

@@ -43,6 +43,7 @@ export function Nurses() {
     null,
   );
   const [status, setStatus] = useState<Status | 'all'>('all');
+  const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
 
   const {
     results: nurses,
@@ -54,6 +55,8 @@ export function Nurses() {
       discipline: disciplineFilter,
       state: stateFilter,
       status,
+      searchQuery,
+      sort: sortOrder,
     },
     { initialNumItems: 30 },
   );
@@ -245,6 +248,19 @@ export function Nurses() {
                 <SelectItem value="suspended">Suspended</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="rejected">Rejected</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={sortOrder}
+              onValueChange={(value: 'desc' | 'asc') => setSortOrder(value)}
+            >
+              <SelectTrigger className="w-full md:w-45">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="desc">Most Recent</SelectItem>
+                <SelectItem value="asc">Least Recent</SelectItem>
               </SelectContent>
             </Select>
           </div>
