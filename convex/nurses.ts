@@ -683,11 +683,17 @@ export const sendNotificationsToNursesAndSuspendAccount = internalMutation({
           },
         });
       }
-      await ctx.db.patch('nurses', assignment.nurseId, {
-        status: 'suspended',
-      });
-      await handleSuspendedNurseCount(ctx, 'inc');
-      await handleApproveNurseCount(ctx, 'dec');
+      // Only update the status and counters if the nurse is not already
+      // suspended. Without this guard, a nurse manually suspended via
+      // suspendNurseFromShifts would be counted twice — once by that mutation
+      // and again here — causing suspendedNursesCount to drift high.
+      if (nurse && nurse.status !== 'suspended') {
+        await ctx.db.patch('nurses', assignment.nurseId, {
+          status: 'suspended',
+        });
+        await handleSuspendedNurseCount(ctx, 'inc');
+        await handleApproveNurseCount(ctx, 'dec');
+      }
     }
 
     if (!isDone) {

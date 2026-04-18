@@ -62,6 +62,8 @@ export const useSubscribeNotification = ({ setInitialChannelId }: Props) => {
         const channelId = data?.channel_id;
 
         if (channelId) {
+          console.log('Channel_id', channelId);
+
           setInitialChannelId(channelId);
         }
       }

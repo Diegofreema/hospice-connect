@@ -18,7 +18,6 @@ import {
 } from 'expo-router';
 
 import { useSubscribeNotification } from '@/hooks/rc/use-subscribe-notification';
-import { usePendingImageRedirect } from '@/hooks/use-pending-image-redirect';
 import { useUpdate } from '@/hooks/use-update';
 import notifee, { EventType } from '@notifee/react-native';
 import { useQuery } from 'convex/react';
@@ -157,26 +156,19 @@ const InitialRoute = () => {
   const isAuthenticated = !!user;
 
   useEffect(() => {
-    setIsMounted(true);
-  }, []);
+    if (!isMounted) {
+      setIsMounted(true);
+    }
+  }, [isMounted]);
   useSubscribeNotification({ setInitialChannelId });
   useEffect(() => {
     if (isMounted && initialChannelId && !isPending && user) {
       router.push(`/channel/${initialChannelId}`);
-      return () => {
-        setInitialChannelId(undefined);
-      };
+      setInitialChannelId(undefined);
     }
   }, [initialChannelId, isMounted, isPending, user]);
 
-  // Check for pending image picker results after Activity restart.
-  // Only redirect once auth is resolved (!isPending) so nav guards are stable.
-  usePendingImageRedirect(!isPending);
-
-  // Wait for auth to resolve before rendering navigation guards.
-  // This prevents flashing the login screen during Android cold-start
-  // (e.g. after the OS destroys the activity while the gallery is open).
-  console.log({ initialChannelId });
+  // usePendingImageRedirect(!isPending);
 
   return (
     <ToastProvider>

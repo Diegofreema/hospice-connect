@@ -8,6 +8,7 @@ import { Wrapper } from '@/features/shared/components/wrapper';
 import { authClient } from '@/lib/auth-client';
 import { useMutation } from 'convex/react';
 import React, { useState } from 'react';
+import { Alert } from 'react-native';
 import { useUnistyles } from 'react-native-unistyles';
 import { toast } from 'sonner-native';
 
@@ -21,7 +22,8 @@ export const ChangeAccountType = () => {
   if (!user) return null;
 
   const currentRole = user.role as 'nurse' | 'hospice';
-  const targetRole = currentRole === 'nurse' ? 'hospice' : 'nurse';
+  const targetRole =
+    currentRole === 'nurse' ? 'hospice' : 'Healthcare professional';
 
   const handleSwitchAccount = async () => {
     setIsLoading(true);
@@ -54,6 +56,17 @@ export const ChangeAccountType = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const onAlertPress = () => {
+    Alert.alert(
+      'Change Account Type',
+      'Are you sure you want to change your account type?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Change', onPress: handleSwitchAccount },
+      ],
+    );
   };
 
   return (
@@ -94,12 +107,10 @@ export const ChangeAccountType = () => {
             as a {targetRole}.
           </Text>
         </Stack>
-      </Stack>
 
-      <Stack mb="xl">
         <Button
           disabled={isLoading}
-          onPress={handleSwitchAccount}
+          onPress={onAlertPress}
           title={
             isLoading
               ? 'Switching...'

@@ -23,8 +23,14 @@ import { toast } from 'sonner-native';
 import { z } from 'zod';
 
 const supportSchema = z.object({
-  subject: z.string().min(3, 'Subject must be at least 3 characters'),
-  message: z.string().min(10, 'Message must be at least 10 characters'),
+  subject: z
+    .string()
+    .min(3, 'Subject must be at least 3 characters')
+    .max(100, 'Subject must be at most 100 characters'),
+  message: z
+    .string()
+    .min(10, 'Message must be at least 10 characters')
+    .max(500, 'Message must be at most 500 characters'),
 });
 
 type SupportFormValues = z.infer<typeof supportSchema>;
@@ -48,7 +54,6 @@ const SupportScreen = () => {
       subject: '',
       message: '',
     },
-    mode: 'onChange',
   });
 
   const onSubmit = async (data: SupportFormValues) => {
@@ -115,7 +120,7 @@ const SupportScreen = () => {
             <ControlInput
               control={control}
               name="subject"
-              label="Subject"
+              label="Subject (3-100 characters)"
               placeholder="What can we help you with?"
               errors={errors}
             />
@@ -124,7 +129,7 @@ const SupportScreen = () => {
               <ControlInput
                 control={control}
                 name="message"
-                label="Message"
+                label="Message (10-100 characters)"
                 placeholder="Describe your issue or feedback in detail..."
                 variant="textarea"
                 errors={errors}
