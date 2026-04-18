@@ -1,6 +1,8 @@
 import React, { forwardRef } from 'react';
 import { View } from 'react-native';
-import Signature, { type SignatureViewRef } from 'react-native-signature-canvas';
+import Signature, {
+  type SignatureViewRef,
+} from 'react-native-signature-canvas';
 import { StyleSheet } from 'react-native-unistyles';
 import { Button } from './button';
 type Props = {
@@ -22,7 +24,6 @@ const SignatureComponent = forwardRef<SignatureViewRef, Props>(
     };
 
     const handleConfirm = () => {
-      console.log('end');
       // @ts-ignore
       ref?.current.readSignature();
     };
@@ -37,7 +38,7 @@ const SignatureComponent = forwardRef<SignatureViewRef, Props>(
         </View>
       </View>
     );
-  }
+  },
 );
 
 SignatureComponent.displayName = 'SignatureComponent';

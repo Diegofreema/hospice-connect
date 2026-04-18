@@ -149,13 +149,12 @@ export const approveOrDeclineRouteSheet = action({
 
     if (commission && commission > 0) {
       const totalEarnings = args.totalEarnings;
-      console.log('totalEarnings', totalEarnings);
 
       if (totalEarnings > 0) {
         const commissionAmountCents = Math.round(
           totalEarnings * (commission / 100) * 100,
         );
-        console.log('commissionAmountCents', commissionAmountCents);
+
         const description = `Commission (${commission}%) — approved by ${hospice.businessName}`;
 
         try {

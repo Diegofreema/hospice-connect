@@ -24,7 +24,7 @@ const CreateScreen = () => {
   const { hospice } = useHospice();
   const createAssignment = useMutation(api.assignments.createAssignment);
   const timeZone = timezone();
-  console.log(timeZone);
+
   const onSubmit = async (data: CreateAssignmentValidator) => {
     if (!hospice) return;
 

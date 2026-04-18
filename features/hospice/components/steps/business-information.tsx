@@ -78,8 +78,6 @@ export const BusinessInformation = () => {
     );
   };
 
-  console.log({ errors });
-
   return (
     <Stack gap="xl">
       <ControlInput

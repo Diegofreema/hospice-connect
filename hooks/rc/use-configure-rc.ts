@@ -1,14 +1,14 @@
 import { useAuth } from '@/components/context/auth';
 import { useEffect, useRef } from 'react';
 import { Platform } from 'react-native';
-import Purchases, { LOG_LEVEL } from 'react-native-purchases';
+import Purchases from 'react-native-purchases';
 
 export const useConfigureRC = () => {
   const { user } = useAuth();
   const isConfigured = useRef(false);
 
   useEffect(() => {
-    Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
+    // Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
 
     if (!isConfigured.current) {
       // First-time SDK setup — no appUserID so RC generates an anonymous ID.

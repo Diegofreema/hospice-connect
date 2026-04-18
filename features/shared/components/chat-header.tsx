@@ -14,7 +14,7 @@ export const ChatHeader = ({ channel }: Props) => {
   const { user } = useAuth();
   const { theme } = useUnistyles();
   const otherMember = Object.values(channel.state.members).find(
-    (member) => member.user?.id !== user?.id
+    (member) => member.user?.id !== user?.id,
   );
   const image = otherMember?.user?.image;
   return (
@@ -23,6 +23,7 @@ export const ChatHeader = ({ channel }: Props) => {
       <Avatar
         image={{ uri: image || '', name: otherMember?.user?.name }}
         size={50}
+        onPress={() => router.back()}
       />
     </CustomPressable>
   );

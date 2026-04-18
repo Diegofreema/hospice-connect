@@ -82,7 +82,6 @@ export const RenderPosts = ({ posts, loadMore, loadingMore, isPro }: Props) => {
       router.push(
         `/route-sheet-preview?assignmentId=${assignmentId}&nurseId=${nurseId}`,
       );
-      console.log({ assignmentId, nurseId });
 
       bottomSheetRef.current?.close();
     },

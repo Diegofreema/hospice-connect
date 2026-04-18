@@ -6,9 +6,6 @@ import {
   setBackgroundMessageHandler,
 } from '@react-native-firebase/messaging';
 
-import { setNotifeeListeners } from './lib/utils/setNotifeeListener';
-
-setNotifeeListeners();
 export const extractNotificationConfig = (
   remoteMessage: FirebaseMessagingTypes.RemoteMessage,
 ) => {

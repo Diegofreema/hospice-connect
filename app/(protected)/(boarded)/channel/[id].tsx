@@ -1,11 +1,11 @@
 import { useAppChatContext } from '@/components/context/chat-context';
+import { DownloadableFileAttachment } from '@/features/messaging/components/chat-attachment-download';
 import { ChatHeader } from '@/features/shared/components/chat-header';
 import { CustomPressable } from '@/features/shared/components/custom-pressable';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { Text } from '@/features/shared/components/text';
 import { View } from '@/features/shared/components/view';
 import { Wrapper } from '@/features/shared/components/wrapper';
-import { DownloadableFileAttachment } from '@/features/messaging/components/chat-attachment-download';
 import { useStreamChannelQuery } from '@/hooks/use-stream-channel';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { IconSend } from '@tabler/icons-react-native';
@@ -23,20 +23,47 @@ import {
   useMessageInputContext,
 } from 'stream-chat-expo';
 const ChannelScreen = () => {
-  const { channel } = useAppChatContext();
+  const { channel: contextChannel } = useAppChatContext();
 
   const headerHeight = useHeaderHeight() + (StatusBar.currentHeight ?? 0);
   const { bottom } = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  const { data: channelFromQuery, isLoading } = useStreamChannelQuery({
+  const contextChannelMatchesId =
+    contextChannel &&
+    id &&
+    (contextChannel.cid === id || contextChannel.id === id);
+
+  const {
+    channel: channelFromQuery,
+    loading: isLoading,
+    retry,
+    isError,
+  } = useStreamChannelQuery({
     id,
-    skip: !!channel,
+    skip: !!contextChannelMatchesId,
   });
 
-  const channelToRender = channel || channelFromQuery;
-  if (isLoading || !channelToRender) {
+  const channelToRender = contextChannelMatchesId
+    ? contextChannel
+    : channelFromQuery;
+  console.log({ isLoading });
+
+  if (isLoading && id) {
     return <SmallLoader size={50} />;
+  }
+
+  if (isError || !channelToRender) {
+    return (
+      <Wrapper>
+        <View flex={1} justifyContent="center" alignItems="center" gap="md">
+          <Text>Could not load this conversation</Text>
+          <CustomPressable onPress={() => retry()}>
+            <Text style={{ color: '#2563EB' }}>Tap to retry</Text>
+          </CustomPressable>
+        </View>
+      </Wrapper>
+    );
   }
 
   return (

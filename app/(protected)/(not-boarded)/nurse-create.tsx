@@ -76,7 +76,6 @@ const NurseCreate = () => {
   const fieldsToValidate = getFieldsForStep(currentStep);
 
   const values = form.watch();
-  console.log(calculateAge(values.dateOfBirth));
 
   const stepIsValid = validateFields(fieldsToValidate, values);
 

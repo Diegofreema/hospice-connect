@@ -17,7 +17,6 @@ import { useMutation } from 'convex/react';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import { StyleSheet } from 'react-native-unistyles';
-import { useGetNurseId } from '../hooks/use-get-nurse-id';
 
 export const Reassign = () => {
   const { hospice } = useHospice();
@@ -36,14 +35,13 @@ export const Reassign = () => {
   });
   const { showToast } = useToast();
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const nurseId = useGetNurseId((state) => state.id);
 
   const onOpenSheet = () => {
     bottomSheetRef.current?.expand();
   };
   const onReassign = async () => {
     if (!hospice || !hospice?._id) return;
-    console.log('Pressed');
+
     setSending(true);
     try {
       await sendReassignmentNotification({

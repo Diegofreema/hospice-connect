@@ -20,7 +20,9 @@ import {
 import { useSubscribeNotification } from '@/hooks/rc/use-subscribe-notification';
 import { usePendingImageRedirect } from '@/hooks/use-pending-image-redirect';
 import { useUpdate } from '@/hooks/use-update';
+import notifee, { EventType } from '@notifee/react-native';
 import { useQuery } from 'convex/react';
+import { router } from 'expo-router';
 import React from 'react';
 import { Platform, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -31,10 +33,28 @@ import {
 } from 'react-native-reanimated';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { Toaster } from 'sonner-native';
-
 configureReanimatedLogger({
   level: ReanimatedLogLevel.warn,
   strict: false, // Reanimated runs in strict mode by default
+});
+
+notifee.onBackgroundEvent(async ({ detail, type }) => {
+  if (type === EventType.PRESS || type === EventType.ACTION_PRESS) {
+    // Prefer channel_cid (full cid e.g. "messaging:abc123") over channel_id
+    // (bare id e.g. "abc123") — both formats are handled by useStreamChannelQuery.
+    const data = detail.notification?.data as
+      | Record<string, string | undefined>
+      | undefined;
+    const channelId = data?.channel_cid ?? data?.channel_id;
+    if (channelId) {
+      // Store the channel ID instead of navigating directly. The app may
+      // be cold-starting, and ChatWrapper's conditional <Chat> will cause
+      // a tree remount that wipes any navigation performed before the
+      // client is ready. ChatWrapper will consume this and navigate.
+      router.push(`/channel/${channelId}`);
+    }
+    await Promise.resolve();
+  }
 });
 
 export function ErrorBoundary({ retry, error }: ErrorBoundaryProps) {
@@ -42,7 +62,7 @@ export function ErrorBoundary({ retry, error }: ErrorBoundaryProps) {
 }
 export default function RootLayout() {
   const isFinished = useAnimationStore((state) => state.isFinished);
-
+  const { isPending } = useAuth();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     PublicSansBold: require('@/assets/fonts/PublicSans-Bold.ttf'),
@@ -53,13 +73,13 @@ export default function RootLayout() {
   });
 
   useUpdate();
-
+  useSubscribeNotification();
   if (!loaded) {
     // Async font loading only occurs in development.
     return null;
   }
 
-  const showSplash = !isFinished && Platform.OS !== 'web';
+  const showSplash = !isFinished && Platform.OS !== 'web' && isPending;
 
   // Provider is now outside the animation gate so auth + Convex resolve
   // during the 6-second splash — the app shows fully loaded once the
@@ -134,7 +154,6 @@ const InitialRoute = () => {
   const isWeb = Platform.OS === 'web';
   console.log({ pathname, segment });
   const isAuthenticated = !!user;
-  useSubscribeNotification();
 
   // Check for pending image picker results after Activity restart.
   // Only redirect once auth is resolved (!isPending) so nav guards are stable.
