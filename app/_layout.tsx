@@ -23,7 +23,7 @@ import { useUpdate } from '@/hooks/use-update';
 import notifee, { EventType } from '@notifee/react-native';
 import { useQuery } from 'convex/react';
 import { router } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Platform, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
@@ -73,7 +73,7 @@ export default function RootLayout() {
   });
 
   useUpdate();
-  useSubscribeNotification();
+
   if (!loaded) {
     // Async font loading only occurs in development.
     return null;
@@ -147,13 +147,27 @@ const PreloadData = () => {
 
 const InitialRoute = () => {
   const { theme } = useUnistyles();
-
+  const [initialChannelId, setInitialChannelId] = useState<string>();
   const { user, isPending } = useAuth();
+  const [isMounted, setIsMounted] = useState(false);
   const segment = useSegments();
   const pathname = usePathname();
   const isWeb = Platform.OS === 'web';
   console.log({ pathname, segment });
   const isAuthenticated = !!user;
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+  useSubscribeNotification({ setInitialChannelId });
+  useEffect(() => {
+    if (isMounted && initialChannelId && !isPending && user) {
+      router.push(`/channel/${initialChannelId}`);
+      return () => {
+        setInitialChannelId(undefined);
+      };
+    }
+  }, [initialChannelId, isMounted, isPending, user]);
 
   // Check for pending image picker results after Activity restart.
   // Only redirect once auth is resolved (!isPending) so nav guards are stable.
@@ -162,6 +176,7 @@ const InitialRoute = () => {
   // Wait for auth to resolve before rendering navigation guards.
   // This prevents flashing the login screen during Android cold-start
   // (e.g. after the OS destroys the activity while the gallery is open).
+  console.log({ initialChannelId });
 
   return (
     <ToastProvider>

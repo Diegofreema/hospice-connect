@@ -1,10 +1,9 @@
-import notifee, { EventType } from '@notifee/react-native';
+import notifee from '@notifee/react-native';
 import { getApp } from '@react-native-firebase/app';
 import type { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 import {
   getInitialNotification,
   getMessaging,
-  onMessage,
   onNotificationOpenedApp,
 } from '@react-native-firebase/messaging';
 import { router } from 'expo-router';
@@ -25,8 +24,10 @@ const extractNotificationConfig = (
   const title = (notification.title ?? data.title ?? '') as string;
   return { data, body, title };
 };
-
-export const useSubscribeNotification = () => {
+type Props = {
+  setInitialChannelId: (channelId: string) => void;
+};
+export const useSubscribeNotification = ({ setInitialChannelId }: Props) => {
   useEffect(() => {
     const firebaseMessaging = getMessaging(getApp());
 
@@ -59,10 +60,9 @@ export const useSubscribeNotification = () => {
           string | undefined
         >;
         const channelId = data?.channel_id;
-        console.log('Cold start', { data });
 
         if (channelId) {
-          router.push(`/channel/${channelId}`);
+          setInitialChannelId(channelId);
         }
       }
     });
@@ -73,61 +73,43 @@ export const useSubscribeNotification = () => {
         const { data } = extractNotificationConfig(remoteMessage);
         const channelId = data?.channel_id as string | undefined;
         if (channelId) {
-          router.push(`/channel/${channelId}`);
+          setInitialChannelId(channelId);
         }
       }
     });
 
-    // ─── Foreground (app open, user taps notification banner) ─────────────────
-    const unsubscribeForegroundEvent = notifee.onForegroundEvent(
-      ({ detail, type }) => {
-        if (type === EventType.PRESS || type === EventType.ACTION_PRESS) {
-          const data = detail.notification?.data as
-            | Record<string, string | undefined>
-            | undefined;
-          const channelId = data?.channel_id;
-          console.log('Foreground event', { data, channelId });
-          if (channelId) {
-            router.push(`/channel/${channelId}`);
-          }
-        }
-      },
-    );
+    // // ─── Foreground FCM message received ─────────────────────────────────────
+    // const unsubscribeOnMessage = onMessage(
+    //   firebaseMessaging,
+    //   async (remoteMessage) => {
+    //     const { data, body, title } = extractNotificationConfig(remoteMessage);
 
-    // ─── Foreground FCM message received ─────────────────────────────────────
-    const unsubscribeOnMessage = onMessage(
-      firebaseMessaging,
-      async (remoteMessage) => {
-        const { data, body, title } = extractNotificationConfig(remoteMessage);
+    //     // Guard: Stream also sends silent data-only dismiss/clear events with no
+    //     // visible content. Showing those produces ghost notifications in the
+    //     // notification shade — skip them exactly as the background handler does.
+    //     if (!title && !body) {
+    //       return;
+    //     }
 
-        // Guard: Stream also sends silent data-only dismiss/clear events with no
-        // visible content. Showing those produces ghost notifications in the
-        // notification shade — skip them exactly as the background handler does.
-        if (!title && !body) {
-          return;
-        }
+    //     const notifeeChannelId = await notifee.createChannel({
+    //       id: 'chat-messages',
+    //       name: 'Chat Messages',
+    //     });
 
-        const notifeeChannelId = await notifee.createChannel({
-          id: 'chat-messages',
-          name: 'Chat Messages',
-        });
-
-        await notifee.displayNotification({
-          title,
-          body,
-          data,
-          android: {
-            channelId: notifeeChannelId,
-            pressAction: { id: 'default' },
-          },
-        });
-      },
-    );
+    //     await notifee.displayNotification({
+    //       title,
+    //       body,
+    //       data,
+    //       android: {
+    //         channelId: notifeeChannelId,
+    //         pressAction: { id: 'default' },
+    //       },
+    //     });
+    //   },
+    // );
 
     return () => {
       unsubscribeOnNotificationOpen();
-      unsubscribeForegroundEvent();
-      unsubscribeOnMessage();
     };
-  }, []);
+  }, [setInitialChannelId]);
 };
