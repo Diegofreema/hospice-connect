@@ -5,11 +5,7 @@ import { useMarkAsRead } from '@/features/hospice/hooks/use-mark-as-read';
 import { RoustSheetComponent } from '@/features/shared/components/route-sheet-component';
 import { SmallLoader } from '@/features/shared/components/small-loader';
 import { Text } from '@/features/shared/components/text';
-import {
-  calculateCanceledAtDueToTimezone,
-  calculateTotalEarnings,
-  getTimezoneDifference,
-} from '@/features/shared/utils';
+import { calculateTotalEarnings } from '@/features/shared/utils';
 import { useQuery } from 'convex/react';
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
@@ -47,22 +43,10 @@ export const RouteSheetById = () => {
   const isApproved = routeSheet.status === 'approved';
   const isSeen = !!routeSheet.isSeen;
 
-  const assignmentTimezone = assignment.hospiceTimezone;
-  const nurseTimezone = nurse.nurseTimezone;
-  const result = getTimezoneDifference(
-    assignmentTimezone as string,
-    nurseTimezone as string,
+  const totalEarnings = calculateTotalEarnings(
+    schedules,
+    assignment.hospiceTimezone,
   );
-
-  const shiftsWithTimezone = schedules.map((shift) => ({
-    ...shift,
-    canceledAt: calculateCanceledAtDueToTimezone(
-      result.hoursAhead > 0,
-      shift.canceledAt,
-      result.difference_hours,
-    ) as number,
-  }));
-  const totalEarnings = calculateTotalEarnings(shiftsWithTimezone);
 
   return (
     <ScrollView
@@ -90,6 +74,7 @@ export const RouteSheetById = () => {
         buttonText="Decline"
         hideButtons={isSeen}
         showDebit={false}
+        assignmentTimezone={assignment.hospiceTimezone}
       />
 
       {isSeen && (

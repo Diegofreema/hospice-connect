@@ -7,6 +7,7 @@ import { UnderReview } from '@/features/shared/components/under-review';
 import { useQuery } from 'convex/react';
 import { PropsWithChildren } from 'react';
 import { View } from 'react-native';
+import { Paywall } from './paywall';
 
 export const ProProvider = ({ children }: PropsWithChildren) => {
   const { isPro, isPending, isError, refetch } = useCustomerRCContext();
@@ -42,13 +43,13 @@ export const ProProvider = ({ children }: PropsWithChildren) => {
       </Wrapper>
     );
   }
-  // if (!isPro && !isPending) {
-  //   return (
-  //     <Wrapper>
-  //       <Paywall />
-  //     </Wrapper>
-  //   );
-  // }
+  if (!isPro && !isPending) {
+    return (
+      <Wrapper>
+        <Paywall />
+      </Wrapper>
+    );
+  }
 
   return <View style={{ flex: 1 }}>{children}</View>;
 };

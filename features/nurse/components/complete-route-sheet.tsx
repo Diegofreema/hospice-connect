@@ -13,7 +13,6 @@ import { generateErrorMessage, trimText } from '@/features/shared/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery } from 'convex/react';
 
-import { useNurse } from '@/components/context/nurse-context';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -38,7 +37,7 @@ export const CompleteRouteSheet = ({ assignmentId, nurseId }: Props) => {
     nurseId,
     assignmentId,
   });
-  const { nurse } = useNurse();
+
   const commission = useQuery(api.adminSettings.getCommission);
   const submitRouteSheet = useMutation(api.routeSheets.submitRouteSheet);
   const { showToast } = useToast();
@@ -131,7 +130,6 @@ export const CompleteRouteSheet = ({ assignmentId, nurseId }: Props) => {
               <ScheduleCard
                 schedule={item}
                 timeZone={data.assignment.hospiceTimezone}
-                nurseTimeZone={nurse?.nurseTimezone}
               />
             )}
             contentContainerStyle={{ paddingBottom: 50, gap: 25 }}

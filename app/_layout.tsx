@@ -17,6 +17,7 @@ import {
   useSegments,
 } from 'expo-router';
 
+import { generateErrorMessage } from '@/features/shared/utils';
 import { useSubscribeNotification } from '@/hooks/rc/use-subscribe-notification';
 import { useUpdate } from '@/hooks/use-update';
 import notifee, { EventType } from '@notifee/react-native';
@@ -57,7 +58,8 @@ notifee.onBackgroundEvent(async ({ detail, type }) => {
 });
 
 export function ErrorBoundary({ retry, error }: ErrorBoundaryProps) {
-  return <ErrorComponent refetch={retry} text={error.message} />;
+  const errorMessage = generateErrorMessage(error, error.message);
+  return <ErrorComponent refetch={retry} text={errorMessage} />;
 }
 export default function RootLayout() {
   const isFinished = useAnimationStore((state) => state.isFinished);

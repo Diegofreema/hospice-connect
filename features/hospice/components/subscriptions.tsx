@@ -46,13 +46,11 @@ const PLAN_META: Record<
   },
   $rc_three_month: {
     label: 'Quarterly',
-    badge: 'Save 10%',
     billingNote: 'Billed every 3 months',
     icon: IconUsers,
   },
   $rc_annual: {
     label: 'Annual',
-    badge: 'Best Value',
     billingNote: 'Billed once a year',
     icon: IconDiamond,
   },
@@ -129,6 +127,29 @@ export const Subscriptions = () => {
     (a, b) =>
       (SORT_ORDER[a.identifier] ?? 99) - (SORT_ORDER[b.identifier] ?? 99),
   );
+
+  // ── Compute savings badges from live prices ──────────────────────
+  // RevenueCat exposes `product.price` as a raw number (e.g. 9.99).
+  // We compare what the user would pay monthly vs the discounted period price.
+  const monthlyPkg = sorted.find((p) => p.identifier === '$rc_monthly');
+  const monthlyPrice = monthlyPkg?.product.price ?? 0;
+
+  const computedBadge = (pkg: PurchasesPackage): string | undefined => {
+    if (!monthlyPrice) return undefined;
+    if (pkg.identifier === '$rc_three_month') {
+      const savings = Math.round(
+        (1 - pkg.product.price / (monthlyPrice * 3)) * 100,
+      );
+      return savings > 0 ? `Save ${savings}%` : undefined;
+    }
+    if (pkg.identifier === '$rc_annual') {
+      const savings = Math.round(
+        (1 - pkg.product.price / (monthlyPrice * 12)) * 100,
+      );
+      return savings > 0 ? `Best Value · Save ${savings}%` : 'Best Value';
+    }
+    return undefined;
+  };
 
   // Pre-select the current plan if subscribed, otherwise default to first
   const defaultSelection = productId ?? sorted[0]?.identifier ?? null;
@@ -266,9 +287,7 @@ export const Subscriptions = () => {
                   { color: theme.colors.textGrey },
                 ]}
               >
-                {isPro
-                  ? (currentPlanMeta?.label ?? 'Active') + ' Plan'
-                  : 'Upgrade to unlock all features'}
+                {isPro && (currentPlanMeta?.label ?? 'Active') + ' Plan'}
               </Text>
             </View>
             {isPro && (
@@ -396,6 +415,7 @@ export const Subscriptions = () => {
                   };
                   const PlanIcon = meta.icon;
                   const price = pkg.product.priceString;
+                  const badge = computedBadge(pkg);
 
                   return (
                     <TouchableOpacity
@@ -414,14 +434,14 @@ export const Subscriptions = () => {
                         },
                       ]}
                     >
-                      {meta.badge && (
+                      {badge && (
                         <View
                           style={[
                             styles.badge,
                             { backgroundColor: theme.colors.blue },
                           ]}
                         >
-                          <Text style={styles.badgeText}>{meta.badge}</Text>
+                          <Text style={styles.badgeText}>{badge}</Text>
                         </View>
                       )}
                       {isCurrent && isPro && (
@@ -545,39 +565,47 @@ export const Subscriptions = () => {
 
         {/* ── Footer ── */}
         {/* Auto-renewal disclosure required by Apple guideline 3.1.2 */}
-        {!isPro && activePackage && (
+        {!isPro && activePackage && Platform.OS === 'ios' && (
           <Text
             style={[styles.disclosureText, { color: theme.colors.textGrey }]}
           >
             {`${activePackage.product.title} · ${activePackage.product.priceString} — subscription auto-renews unless cancelled at least 24 hours before the end of the current period. Manage or cancel anytime in your App Store account settings.`}
           </Text>
         )}
-        <View style={styles.footerLinks}>
-          {/* Apple's standard EULA — required when using Apple's standard Terms of Use */}
-          <TouchableOpacity
-            onPress={() =>
-              handleOpenLink(
-                'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/',
-              )
-            }
-          >
-            <Text style={[styles.footerLink, { color: theme.colors.textGrey }]}>
-              Terms of Use
+        {Platform.OS === 'ios' && (
+          <View style={styles.footerLinks}>
+            {/* Apple's standard EULA — required when using Apple's standard Terms of Use */}
+            <TouchableOpacity
+              onPress={() =>
+                handleOpenLink(
+                  'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/',
+                )
+              }
+            >
+              <Text
+                style={[styles.footerLink, { color: theme.colors.textGrey }]}
+              >
+                Terms of Use
+              </Text>
+            </TouchableOpacity>
+            <Text style={[styles.footerDot, { color: theme.colors.textGrey }]}>
+              ·
             </Text>
-          </TouchableOpacity>
-          <Text style={[styles.footerDot, { color: theme.colors.textGrey }]}>
-            ·
-          </Text>
-          <TouchableOpacity
-            onPress={() =>
-              handleOpenLink('https://hospice-connect-web.vercel.app/privacy')
-            }
-          >
-            <Text style={[styles.footerLink, { color: theme.colors.textGrey }]}>
-              Privacy Policy
-            </Text>
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity
+              onPress={() =>
+                handleOpenLink(
+                  'https://hospice-connect-web.vercel.app/privacy-policy',
+                )
+              }
+            >
+              <Text
+                style={[styles.footerLink, { color: theme.colors.textGrey }]}
+              >
+                Privacy Policy
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
         {/* {!isPro && (
           <TouchableOpacity onPress={handleRestore} style={styles.restoreBtn}>

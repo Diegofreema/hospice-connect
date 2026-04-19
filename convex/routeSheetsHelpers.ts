@@ -98,7 +98,7 @@ export const approveRouteSheetMutation = internalMutation({
       );
 
       if (!stillOverdue) {
-        const body = `${args.hospiceBusinessName} accepted your route sheet for ${args.patientFirstName} ${args.patientLastName}.Your account is now active.`;
+        const body = `${args.hospiceBusinessName} accepted your route sheet for ${args.patientFirstName} ${args.patientLastName}. Your account is now active.`;
         await ctx.db.patch(args.nurseId, { status: 'approved' });
         await handleApproveNurseCount(ctx, 'inc');
         await handleSuspendedNurseCount(ctx, 'dec');

@@ -2,37 +2,23 @@ import { type Doc } from '@/convex/_generated/dataModel';
 import { Text } from '@/features/shared/components/text';
 import { View } from '@/features/shared/components/view';
 import {
-  calculateCanceledAtDueToTimezone,
   calculateTotalHours,
-  getTimezoneDifference,
   timeIsBeforeOrSameTime,
 } from '@/features/shared/utils';
 import { format, parse } from 'date-fns';
 import { StyleSheet } from 'react-native-unistyles';
 type ScheduleProps = {
   schedule: Doc<'schedules'>;
-  timeZone?: string;
-  nurseTimeZone?: string;
+  timeZone: string;
 };
 
-export const ScheduleCard = ({
-  schedule,
-  timeZone,
-  nurseTimeZone,
-}: ScheduleProps) => {
+export const ScheduleCard = ({ schedule, timeZone }: ScheduleProps) => {
   const startDate = parse(schedule.startDate, 'dd-MM-yyyy', new Date());
   const endDate = parse(schedule.endDate, 'dd-MM-yyyy', new Date());
   const text = schedule.status === 'cancelled' ? 'Canceled At' : 'Ended At';
-  const result = getTimezoneDifference(
-    timeZone as string,
-    nurseTimeZone as string,
-  );
-  const canceledAt = calculateCanceledAtDueToTimezone(
-    result.hoursAhead > 0,
-    schedule.canceledAt,
-    result.difference_hours,
-  ) as number;
-  const totalHours = calculateTotalHours([{ ...schedule, canceledAt }]);
+  console.log(timeZone);
+
+  const totalHours = calculateTotalHours([schedule], timeZone);
 
   const hoursWorked =
     schedule.canceledAt &&
@@ -54,9 +40,9 @@ export const ScheduleCard = ({
           {schedule.endTime} ({hoursWorked}hrs)
         </Text>
       </View>
-      {canceledAt && (
+      {schedule.canceledAt && (
         <Text>
-          {text}: {format(canceledAt, 'MM/dd/yy h:mm a')}
+          {text}: {format(schedule.canceledAt, 'MM/dd/yy h:mm a')}
         </Text>
       )}
       <Text>Hourly Rate: ${schedule.rate.toString()}</Text>

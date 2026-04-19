@@ -4,11 +4,9 @@ import { Image } from 'expo-image';
 import React from 'react';
 import { StyleSheet } from 'react-native-unistyles';
 import {
-  calculateCanceledAtDueToTimezone,
   calculateTotalEarnings,
   calculateTotalHours,
   convertNumberToStringThenToNumber,
-  getTimezoneDifference,
   reverseDateStringToMDY,
 } from '../utils';
 import { FlexButtons } from './flex-buttons';
@@ -38,7 +36,7 @@ type Props = {
   showDebit?: boolean;
   date?: number;
   commission?: number;
-  assignmentTimezone?: string;
+  assignmentTimezone: string;
 };
 const headers = [
   'Date',
@@ -72,29 +70,7 @@ export const RoustSheetComponent = ({
   commission,
   assignmentTimezone,
 }: Props) => {
-  const result = getTimezoneDifference(
-    assignmentTimezone as string,
-    nurse.nurseTimezone as string,
-  );
-
-  const calculateTotalHoursByTimezone = (shift: Doc<'schedules'>) => {
-    const canceledAt = calculateCanceledAtDueToTimezone(
-      result.hoursAhead > 0,
-      shift.canceledAt,
-      result.difference_hours,
-    ) as number;
-    return calculateTotalHours([{ ...shift, canceledAt }]);
-  };
-  const totalHours = calculateTotalHours(
-    shifts.map((shift) => ({
-      ...shift,
-      canceledAt: calculateCanceledAtDueToTimezone(
-        result.hoursAhead > 0,
-        shift.canceledAt,
-        result.difference_hours,
-      ) as number,
-    })),
-  );
+  const totalHours = calculateTotalHours(shifts, assignmentTimezone);
 
   const data = [
     ...shifts.map((shift) => [
@@ -105,26 +81,17 @@ export const RoustSheetComponent = ({
       careLevel,
       shift.startTime,
       shift.endTime,
-      calculateTotalHoursByTimezone(shift).toFixed(2),
+      calculateTotalHours([shift], assignmentTimezone).toFixed(2),
       shift.rate.toFixed(2),
       `$${(
         convertNumberToStringThenToNumber(
-          calculateTotalHoursByTimezone(shift),
+          calculateTotalHours([shift], assignmentTimezone),
         ) * shift.rate
       ).toFixed(2)}`,
     ]),
   ];
 
-  const shiftsWithTimezone = shifts.map((shift) => ({
-    ...shift,
-    canceledAt: calculateCanceledAtDueToTimezone(
-      result.hoursAhead > 0,
-      shift.canceledAt,
-      result.difference_hours,
-    ) as number,
-  }));
-
-  const totalPay = calculateTotalEarnings(shiftsWithTimezone);
+  const totalPay = calculateTotalEarnings(shifts, assignmentTimezone);
 
   return (
     <View gap={'xxl'}>

@@ -24,12 +24,10 @@ const PLAN_META: Record<
   },
   $rc_three_month: {
     label: 'Quarterly',
-    badge: 'Save 10%',
     billingNote: 'Billed every 3 months',
   },
   $rc_annual: {
     label: 'Annually',
-    badge: 'Best Value',
     billingNote: 'Billed once per year',
   },
 };
@@ -68,6 +66,28 @@ export const Paywall = () => {
 
   const activeId = selectedId ?? sorted[0]?.identifier ?? null;
   const activePackage = sorted.find((p) => p.identifier === activeId) ?? null;
+
+  // ── Compute savings badges from live prices ──────────────────────
+  // RevenueCat exposes `product.price` as a raw number (e.g. 9.99).
+  const monthlyPkg = sorted.find((p) => p.identifier === '$rc_monthly');
+  const monthlyPrice = monthlyPkg?.product.price ?? 0;
+
+  const computedBadge = (pkg: PurchasesPackage): string | undefined => {
+    if (!monthlyPrice) return undefined;
+    if (pkg.identifier === '$rc_three_month') {
+      const savings = Math.round(
+        (1 - pkg.product.price / (monthlyPrice * 3)) * 100,
+      );
+      return savings > 0 ? `Save ${savings}%` : undefined;
+    }
+    if (pkg.identifier === '$rc_annual') {
+      const savings = Math.round(
+        (1 - pkg.product.price / (monthlyPrice * 12)) * 100,
+      );
+      return savings > 0 ? `Best Value · Save ${savings}%` : 'Best Value';
+    }
+    return undefined;
+  };
 
   const handlePurchase = async () => {
     if (!hospice?.businessName) {
@@ -145,7 +165,7 @@ export const Paywall = () => {
             onPress={() => setSelectedId(item.identifier)}
             price={price}
             hasFreeTrialOption={hasFreeTrialOption}
-            meta={meta}
+            meta={{ ...meta, badge: computedBadge(item) }}
           />
         );
       }}

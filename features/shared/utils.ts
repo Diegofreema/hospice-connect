@@ -18,8 +18,9 @@ import {
   subHours,
 } from 'date-fns';
 import { getTimezoneOffset, toZonedTime } from 'date-fns-tz';
-import type { ImagePickerAsset } from 'expo-image-picker';
 import { FileSystemUploadType, uploadAsync } from 'expo-file-system/legacy';
+import type { ImagePickerAsset } from 'expo-image-picker';
+import { DateTime } from 'luxon';
 import { Dimensions } from 'react-native';
 import Purchases from 'react-native-purchases';
 
@@ -226,14 +227,34 @@ export function convertTimeStringToDate2(timeString: string, value?: string) {
 
   return { hours: hours24, minutes: minutes };
 }
+function getTimestampInTimezone(
+  timestampMs: number,
+  targetTimezone: string,
+): number {
+  console.log(targetTimezone);
 
-// Function to calculate hours for a single shift
+  return DateTime.fromMillis(timestampMs, { zone: 'utc' })
+    .setZone(targetTimezone)
+    .toMillis(); // ← returns number
+}
 
 // Calculate total hours worked
-export function calculateTotalHours(shifts: Doc<'schedules'>[]) {
+export function calculateTotalHours(
+  shifts: Doc<'schedules'>[],
+  timeZone: string,
+) {
+  const shiftsWithTimezone = shifts.map((m) => ({
+    ...m,
+
+    canceledAt: m.canceledAt
+      ? getTimestampInTimezone(m.canceledAt, timeZone)
+      : undefined,
+  }));
+  console.log(shiftsWithTimezone, shifts);
+
   let totalHours = 0;
 
-  for (const shift of shifts) {
+  for (const shift of shiftsWithTimezone) {
     const startDateObj = parse(shift.startDate, 'dd-MM-yyyy', new Date());
     const startParts = convertTimeStringToDate2(shift.startTime);
     startDateObj.setHours(startParts.hours, startParts.minutes, 0, 0);
@@ -534,11 +555,16 @@ export const getPasswordStrength = (password: string) => {
   };
 };
 
-export const calculateTotalEarnings = (shifts: Doc<'schedules'>[]) => {
+export const calculateTotalEarnings = (
+  shifts: Doc<'schedules'>[],
+  timeZone: string,
+) => {
   return shifts.reduce(
     (acc, shift) =>
       acc +
-      convertNumberToStringThenToNumber(calculateTotalHours([shift])) *
+      convertNumberToStringThenToNumber(
+        calculateTotalHours([shift], timeZone),
+      ) *
         shift.rate,
     0,
   );
@@ -846,11 +872,12 @@ export const generateRouteSheetHtml = (
           <td>${abbreviateCareLevel(data?.assignment.careLevel)}</td>
           <td>${shift.startTime}</td>
           <td>${shift.endTime}</td>
-          <td>${calculateTotalHours([shift]).toFixed(2)}</td>
+          <td>${calculateTotalHours([shift], data.assignment.hospiceTimezone).toFixed(2)}</td>
           <td>${shift.rate.toFixed(2)}</td>
-          <td>$${(calculateTotalHours([shift]) * shift.rate || 0).toFixed(
-            2,
-          )}</td>
+          <td>$${(
+            calculateTotalHours([shift], data.assignment.hospiceTimezone) *
+              shift.rate || 0
+          ).toFixed(2)}</td>
         </tr>
       `,
              )
@@ -863,12 +890,15 @@ export const generateRouteSheetHtml = (
     <div class="totals-row">
       <p class="text-medium text-bold">Total hours: ${calculateTotalHours(
         data?.schedules || [],
+        data.assignment.hospiceTimezone,
       ).toFixed(2)}</p>
       <p class="text-medium text-bold">Total pay: $${data?.schedules
         .reduce(
           (acc, shift) =>
             acc +
-            convertNumberToStringThenToNumber(calculateTotalHours([shift])) *
+            convertNumberToStringThenToNumber(
+              calculateTotalHours([shift], data.assignment.hospiceTimezone),
+            ) *
               shift.rate,
           0,
         )
